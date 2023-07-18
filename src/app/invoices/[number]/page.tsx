@@ -27,7 +27,7 @@ export default function Invoice({ params: { number } }: { params: { number: stri
           </div>
 
           <div className="flex-1">
-            <div className="flex flex-col gap-4 rounded-lg bg-white p-4 shadow ring-1 ring-black/5">
+            <div className="sticky top-24 flex flex-col gap-4 rounded-lg bg-white p-4 shadow ring-1 ring-black/5">
               <h3 className="flex items-center justify-between text-xl">
                 <span>{invoice.client.name}</span>
                 <span>#{invoice.number}</span>
