@@ -1,0 +1,16 @@
+import { SquaresPlusIcon } from '@heroicons/react/24/outline'
+import { ReactNode } from 'react'
+
+export function Empty({ message, footer }: { message: string; footer?: ReactNode }) {
+  return (
+    <div className="overflow-hidden rounded-lg bg-white shadow">
+      <div className="my-12 px-4 py-5 sm:p-6">
+        <div className="flex flex-col items-center space-y-4 text-gray-500">
+          <SquaresPlusIcon className="h-8 w-8 text-gray-400" />
+          <span>{message}</span>
+        </div>
+      </div>
+      {Boolean(footer) && <div className="bg-gray-50 px-4 py-4 sm:px-6">{footer}</div>}
+    </div>
+  )
+}
