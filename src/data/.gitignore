@@ -1,0 +1,6 @@
+# Ignore all files in this directory to ensure you don't accidentally publish/commit production data
+*
+
+!.gitignore
+!example.ts
+!index.ts
