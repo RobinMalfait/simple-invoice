@@ -1,34 +1,33 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## Simple Invoice Generator
 
-## Getting Started
+This is a simple invoice generator tool. The data is in the code there is no database or anything.
 
-First, run the development server:
+### Getting started
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
+1. Install dependencies:
+
+```
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Run the project
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+### Changing data
 
-## Learn More
+All data is imported from `./src/data/index.ts`, there is also an example data set available in
+`./src/data/example.ts`. This file contains account info and invoices information.
 
-To learn more about Next.js, take a look at the following resources:
+You can add a custom `./src/data/production.ts` if you want, just make sure to update the reference
+in `./src/data/index.ts`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Changing invoice designs
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+All pages that require a design for the actual invoice, will import the design from
+`./src/ui/invoice/design.tsx`.
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+You can add your own designs in the `./src/ui/invoice/designs/`
+folder and change the design that should be used in `./src/ui/invoice/design.tsx`.
