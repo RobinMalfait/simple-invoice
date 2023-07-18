@@ -50,10 +50,12 @@ export function BigHeading() {
             {invoice.account.billing.country !== invoice.client.billing.country && (
               <span>{invoice.account.billing.country}</span>
             )}
-            <div className="mt-4">
-              <div className="text-sm font-medium text-gray-900">BTW Nummer:</div>
-              <div>{invoice.account.tax.value}</div>
-            </div>
+            {invoice.account.tax && (
+              <div className="mt-4">
+                <div className="text-sm font-medium text-gray-900">BTW Nummer:</div>
+                <div>{invoice.account.tax.value}</div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -68,10 +70,12 @@ export function BigHeading() {
             {invoice.account.billing.country !== invoice.client.billing.country && (
               <span>{invoice.client.billing.country}</span>
             )}
-            <div className="mt-4">
-              <div className="text-sm font-medium text-gray-900">BTW Nummer:</div>
-              <div>{invoice.client.tax.value}</div>
-            </div>
+            {invoice.client.tax && (
+              <div className="mt-4">
+                <div className="text-sm font-medium text-gray-900">BTW Nummer:</div>
+                <div>{invoice.client.tax.value}</div>
+              </div>
+            )}
           </div>
         </div>
       </div>

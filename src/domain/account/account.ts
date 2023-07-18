@@ -12,7 +12,7 @@ export type Account = {
   billing: Address
   currency: Currency
   language: Language
-  tax: Tax
+  tax: Tax | null
   timezone: string
   note: string | null
   legal: string | null
@@ -39,7 +39,7 @@ export class AccountBuilder {
       billing: this._billing ?? required('billing'),
       currency: this._currency ?? required('currency'),
       language: this._language ?? required('language'),
-      tax: this._tax ?? required('tax'),
+      tax: this._tax,
       timezone: this._timezone ?? required('timezone'),
       note: this._note,
       legal: this._legal,
