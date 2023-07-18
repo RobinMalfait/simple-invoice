@@ -1,0 +1,41 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`should calculate the next invoice number for the same date with a custom base "yy" 1`] = `"23001"`;
+
+exports[`should calculate the next invoice number for the same date with a custom base "yy" 2`] = `"23002"`;
+
+exports[`should calculate the next invoice number for the same date with a custom base "yy", and with a different amount of significantDigits 1`] = `"2301"`;
+
+exports[`should calculate the next invoice number for the same date with a custom base "yy", and with a different amount of significantDigits 2`] = `"2302"`;
+
+exports[`should calculate the next invoice number for the same date with a custom base "yyQ" 1`] = `"231001"`;
+
+exports[`should calculate the next invoice number for the same date with a custom base "yyQ" 2`] = `"231002"`;
+
+exports[`should calculate the next invoice number for the same date with a custom base "yyQ", and with a different amount of significantDigits 1`] = `"23101"`;
+
+exports[`should calculate the next invoice number for the same date with a custom base "yyQ", and with a different amount of significantDigits 2`] = `"23102"`;
+
+exports[`should calculate the next invoice number for the same date with a custom base "yyQQ" 1`] = `"2301001"`;
+
+exports[`should calculate the next invoice number for the same date with a custom base "yyQQ" 2`] = `"2301002"`;
+
+exports[`should calculate the next invoice number for the same date with a custom base "yyQQ", and with a different amount of significantDigits 1`] = `"230101"`;
+
+exports[`should calculate the next invoice number for the same date with a custom base "yyQQ", and with a different amount of significantDigits 2`] = `"230102"`;
+
+exports[`should calculate the next invoice number for the same date with a custom base "yyyyMMdd" 1`] = `"20230201001"`;
+
+exports[`should calculate the next invoice number for the same date with a custom base "yyyyMMdd" 2`] = `"20230201002"`;
+
+exports[`should calculate the next invoice number for the same date with a custom base "yyyyMMdd", and with a different amount of significantDigits 1`] = `"2023020101"`;
+
+exports[`should calculate the next invoice number for the same date with a custom base "yyyyMMdd", and with a different amount of significantDigits 2`] = `"2023020102"`;
+
+exports[`should calculate the next invoice number for the same date with a custom base "yyyyQ" 1`] = `"20231001"`;
+
+exports[`should calculate the next invoice number for the same date with a custom base "yyyyQ" 2`] = `"20231002"`;
+
+exports[`should calculate the next invoice number for the same date with a custom base "yyyyQ", and with a different amount of significantDigits 1`] = `"2023101"`;
+
+exports[`should calculate the next invoice number for the same date with a custom base "yyyyQ", and with a different amount of significantDigits 2`] = `"2023102"`;
