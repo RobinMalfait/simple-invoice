@@ -2,6 +2,7 @@ import { Account, AccountBuilder } from '~/domain/account/account'
 import { AddressBuilder } from '~/domain/address/address'
 import { ClientBuilder } from '~/domain/client/client'
 import { Invoice, InvoiceBuilder, InvoiceItemBuilder } from '~/domain/invoice/invoice'
+import { PaymentMethodBuilder } from '~/domain/payment-method/payment-method'
 import { TaxBuilder } from '~/domain/tax/tax'
 
 export const me: Account = new AccountBuilder()
@@ -16,6 +17,8 @@ export const me: Account = new AccountBuilder()
       .country('Belgium')
       .build(),
   )
+  .paymentMethod(new PaymentMethodBuilder().type('iban').value('BE32 1234 5678 9012').build())
+  .paymentMethod(new PaymentMethodBuilder().type('paypal').value('alice@acme.com').build())
   .tax(new TaxBuilder().value('BE 1234 567 890').build())
   .note('Gelieve te betalen binnen de 30 dagen.')
   .legal('Legal information for Acme Inc.')

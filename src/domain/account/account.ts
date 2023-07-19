@@ -1,6 +1,7 @@
 import { Address } from '~/domain/address/address'
 import { Currency } from '~/domain/currency/currency'
 import { Language } from '~/domain/language/language'
+import { PaymentMethod } from '~/domain/payment-method/payment-method'
 import { Tax } from '~/domain/tax/tax'
 import { required } from '~/utils/required'
 
@@ -14,6 +15,7 @@ export type Account = {
   language: Language
   tax: Tax | null
   timezone: string
+  paymentMethods: PaymentMethod[]
   note: string | null
   legal: string | null
 }
@@ -27,6 +29,7 @@ export class AccountBuilder {
   private _language: Language | null = Language.NL
   private _tax: Tax | null = null
   private _timezone: string | null = Intl.DateTimeFormat().resolvedOptions().timeZone
+  private _paymentMethods: PaymentMethod[] = []
   private _note: string | null = null
   private _legal: string | null = null
 
@@ -41,6 +44,7 @@ export class AccountBuilder {
       language: this._language ?? required('language'),
       tax: this._tax,
       timezone: this._timezone ?? required('timezone'),
+      paymentMethods: this._paymentMethods,
       note: this._note,
       legal: this._legal,
     }
@@ -86,6 +90,11 @@ export class AccountBuilder {
     return this
   }
 
+  public paymentMethods(paymentMethods: PaymentMethod[]): AccountBuilder {
+    this._paymentMethods = paymentMethods
+    return this
+  }
+
   public note(note: string): AccountBuilder {
     this._note = note
     return this
@@ -93,6 +102,11 @@ export class AccountBuilder {
 
   public legal(legal: string): AccountBuilder {
     this._legal = legal
+    return this
+  }
+
+  public paymentMethod(paymentMethod: PaymentMethod): AccountBuilder {
+    this._paymentMethods.push(paymentMethod)
     return this
   }
 }

@@ -1,7 +1,9 @@
-import { DevicePhoneMobileIcon, EnvelopeIcon } from '@heroicons/react/24/outline'
+import { BanknotesIcon, DevicePhoneMobileIcon, EnvelopeIcon } from '@heroicons/react/24/outline'
 import { useInvoice } from '~/ui/hooks/use-invoice'
+import { PaypalIcon } from '~/ui/icons/payment'
 import { TotalFeatures, total } from '~/ui/invoice/total'
 import { Money } from '~/ui/money'
+import { match } from '~/utils/match'
 
 export function BigFooter() {
   let invoice = useInvoice()
@@ -18,26 +20,66 @@ export function BigFooter() {
             </div>
           </div>
 
-          <table className="text-sm">
-            <tbody>
-              {invoice.account.email && (
+          <div className="flex gap-8">
+            <table className="text-sm">
+              <thead>
                 <tr>
-                  <td className="text-center">
-                    <EnvelopeIcon className="h-4 w-4 text-gray-500" />
+                  <td colSpan={2} className="text-sm font-medium text-gray-900">
+                    Contactgegevens
                   </td>
-                  <td className="px-3">{invoice.account.email}</td>
                 </tr>
-              )}
-              {invoice.account.phone && (
-                <tr>
-                  <td className="text-center">
-                    <DevicePhoneMobileIcon className="h-4 w-4 text-gray-500" />
-                  </td>
-                  <td className="px-3">{invoice.account.phone}</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {invoice.account.email && (
+                  <tr>
+                    <td className="text-center">
+                      <EnvelopeIcon className="h-4 w-4 text-gray-500" />
+                    </td>
+                    <td className="px-3">{invoice.account.email}</td>
+                  </tr>
+                )}
+                {invoice.account.phone && (
+                  <tr>
+                    <td className="text-center">
+                      <DevicePhoneMobileIcon className="h-4 w-4 text-gray-500" />
+                    </td>
+                    <td className="px-3">{invoice.account.phone}</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+
+            {invoice.account.paymentMethods.length > 0 && (
+              <table className="text-sm">
+                <thead>
+                  <tr>
+                    <td colSpan={2} className="text-sm font-medium text-gray-900">
+                      Betaalgegevens
+                    </td>
+                  </tr>
+                </thead>
+                <tbody>
+                  {invoice.account.paymentMethods.map((paymentMethod) => {
+                    return (
+                      <tr key={paymentMethod.id}>
+                        <td className="text-center">
+                          {match(paymentMethod.type, {
+                            iban() {
+                              return <BanknotesIcon className="h-4 w-4 text-gray-500" />
+                            },
+                            paypal() {
+                              return <PaypalIcon className="h-4 w-4 text-gray-500" />
+                            },
+                          })}
+                        </td>
+                        <td className="px-3">{paymentMethod.value}</td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            )}
+          </div>
         </div>
 
         {legal.length > 0 && (
