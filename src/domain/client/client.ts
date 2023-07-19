@@ -1,22 +1,24 @@
-import { Address } from '~/domain/address/address'
+import { z } from 'zod'
+import { Address, addressSchema } from '~/domain/address/address'
 import { Currency } from '~/domain/currency/currency'
 import { Language } from '~/domain/language/language'
-import { Tax } from '~/domain/tax/tax'
-import { required } from '~/utils/required'
+import { Tax, taxSchema } from '~/domain/tax/tax'
 
-export type Client = {
-  id: string
-  name: string
-  email: string | null
-  phone: string | null
-  billing: Address
-  currency: Currency
-  language: Language
-  tax: Tax | null
-  timezone: string
-  note: string | null
-  legal: string | null
-}
+export let clientSchema = z.object({
+  id: z.string().default(() => crypto.randomUUID()),
+  name: z.string(),
+  email: z.string().nullable(),
+  phone: z.string().nullable(),
+  billing: addressSchema,
+  currency: z.nativeEnum(Currency),
+  language: z.nativeEnum(Language),
+  tax: taxSchema.nullable(),
+  timezone: z.string(),
+  note: z.string().nullable(),
+  legal: z.string().nullable(),
+})
+
+export type Client = z.infer<typeof clientSchema>
 
 export class ClientBuilder {
   private _name: string | null = null
@@ -31,19 +33,18 @@ export class ClientBuilder {
   private _legal: string | null = null
 
   public build(): Client {
-    return {
-      id: crypto.randomUUID(),
-      name: this._name ?? required('name'),
+    return clientSchema.parse({
+      name: this._name,
       email: this._email,
       phone: this._phone,
-      billing: this._billing ?? required('billing'),
-      currency: this._currency ?? required('currency'),
-      language: this._language ?? required('language'),
+      billing: this._billing,
+      currency: this._currency,
+      language: this._language,
       tax: this._tax,
-      timezone: this._timezone ?? required('timezone'),
+      timezone: this._timezone,
       note: this._note,
       legal: this._legal,
-    }
+    })
   }
 
   public name(name: string): ClientBuilder {

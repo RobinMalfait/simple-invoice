@@ -1,9 +1,10 @@
 import { addDays, parseISO } from 'date-fns'
+import { z } from 'zod'
 
-import { Account } from '~/domain/account/account'
-import { Client } from '~/domain/client/client'
+import { Account, accountSchema } from '~/domain/account/account'
+import { Client, clientSchema } from '~/domain/client/client'
 import { IncrementStrategy } from '~/domain/invoice/number-strategies'
-import { required } from '~/utils/required'
+import { InvoiceItem, invoiceItemSchema } from './invoice-item'
 
 type Configuration = {
   defaultNetStrategy: (issueDate: Date) => Date
@@ -27,16 +28,18 @@ const configuration: Configuration = {
 
 // ---
 
-export type Invoice = {
-  id: string
-  number: string
-  account: Account
-  client: Client
-  items: InvoiceItem[]
-  note: string | null
-  issueDate: Date
-  dueDate: Date
-}
+export let invoiceSchema = z.object({
+  id: z.string().default(() => crypto.randomUUID()),
+  number: z.string(),
+  account: accountSchema,
+  client: clientSchema,
+  items: z.array(invoiceItemSchema),
+  note: z.string().nullable(),
+  issueDate: z.date(),
+  dueDate: z.date(),
+})
+
+export type Invoice = z.infer<typeof invoiceSchema>
 
 export class InvoiceBuilder {
   private _number: string | null = null
@@ -48,18 +51,15 @@ export class InvoiceBuilder {
   private _dueDate: Date | null = null
 
   public build(): Invoice {
-    let issueDate = this._issueDate ?? required('issueDate')
-
-    return {
-      id: crypto.randomUUID(),
-      number: this._number ?? configuration.numberStrategy(issueDate),
-      account: this._account ?? required('account'),
-      client: this._client ?? required('client'),
-      items: this._items ?? required('items'),
+    return invoiceSchema.parse({
+      number: this._number ?? configuration.numberStrategy(this._issueDate!),
+      account: this._account,
+      client: this._client,
+      items: this._items,
       note: this._note,
-      issueDate,
-      dueDate: this._dueDate ?? configuration.defaultNetStrategy(issueDate),
-    }
+      issueDate: this._issueDate,
+      dueDate: this._dueDate ?? configuration.defaultNetStrategy(this._issueDate!),
+    })
   }
 
   public number(number: string): InvoiceBuilder {
@@ -99,53 +99,6 @@ export class InvoiceBuilder {
 
   public item(item: InvoiceItem): InvoiceBuilder {
     this._items.push(item)
-    return this
-  }
-}
-
-// ---
-
-export type InvoiceItem = {
-  id: string
-  description: string
-  quantity: number
-  unitPrice: number
-  taxRate: number
-}
-
-export class InvoiceItemBuilder {
-  private _description: string | null = null
-  private _quantity: number | null = 1
-  private _unitPrice: number | null = null
-  private _taxRate: number | null = 0
-
-  public build(): InvoiceItem {
-    return {
-      id: crypto.randomUUID(),
-      description: this._description ?? required('description'),
-      quantity: this._quantity ?? required('quantity'),
-      unitPrice: this._unitPrice ?? required('unitPrice'),
-      taxRate: this._taxRate ?? required('taxRate'),
-    }
-  }
-
-  public description(description: string): InvoiceItemBuilder {
-    this._description = description
-    return this
-  }
-
-  public quantity(quantity: number): InvoiceItemBuilder {
-    this._quantity = quantity
-    return this
-  }
-
-  public unitPrice(unitPrice: number): InvoiceItemBuilder {
-    this._unitPrice = unitPrice
-    return this
-  }
-
-  public taxRate(unitPrice: number): InvoiceItemBuilder {
-    this._taxRate = unitPrice
     return this
   }
 }

@@ -1,4 +1,4 @@
-import { InvoiceItem } from '~/domain/invoice/invoice'
+import { InvoiceItem } from '~/domain/invoice/invoice-item'
 
 export function groupVat(items: InvoiceItem[]) {
   return Object.values<{ total: number; vat: number }>(

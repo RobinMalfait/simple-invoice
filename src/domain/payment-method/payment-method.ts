@@ -1,21 +1,22 @@
-import { required } from '~/utils/required'
+import { z } from 'zod'
 
-export type PaymentMethod = {
-  id: string
-  type: 'iban' | 'paypal'
-  value: string
-}
+export let paymentMethodSchema = z.object({
+  id: z.string().default(() => crypto.randomUUID()),
+  type: z.enum(['iban', 'paypal']),
+  value: z.string(),
+})
+
+export type PaymentMethod = z.infer<typeof paymentMethodSchema>
 
 export class PaymentMethodBuilder {
   private _type: PaymentMethod['type'] | null = null
   private _value: string | null = null
 
   public build(): PaymentMethod {
-    return {
-      id: crypto.randomUUID(),
-      type: this._type ?? required('type'),
-      value: this._value ?? required('value'),
-    }
+    return paymentMethodSchema.parse({
+      type: this._type,
+      value: this._value,
+    })
   }
 
   public type(type: PaymentMethod['type']): PaymentMethodBuilder {

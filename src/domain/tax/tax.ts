@@ -1,19 +1,27 @@
-import { required } from '~/utils/required'
+import { z } from 'zod'
 
-export type Tax = {
-  id: TaxID
-  value: string
+export enum TaxID {
+  VAT = 'vat',
 }
+
+// ---
+
+export let taxSchema = z.object({
+  id: z.nativeEnum(TaxID),
+  value: z.string(),
+})
+
+export type Tax = z.infer<typeof taxSchema>
 
 export class TaxBuilder {
   private _id: TaxID | null = TaxID.VAT
   private _value: string | null = null
 
   public build(): Tax {
-    return {
-      id: this._id ?? required('id'),
-      value: this._value ?? required('value'),
-    }
+    return taxSchema.parse({
+      id: this._id,
+      value: this._value,
+    })
   }
 
   public id(id: TaxID): TaxBuilder {
@@ -25,10 +33,4 @@ export class TaxBuilder {
     this._value = value
     return this
   }
-}
-
-// ---
-
-export enum TaxID {
-  VAT = 'vat',
 }

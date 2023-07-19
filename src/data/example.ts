@@ -1,7 +1,8 @@
 import { Account, AccountBuilder } from '~/domain/account/account'
 import { AddressBuilder } from '~/domain/address/address'
 import { ClientBuilder } from '~/domain/client/client'
-import { Invoice, InvoiceBuilder, InvoiceItemBuilder } from '~/domain/invoice/invoice'
+import { Invoice, InvoiceBuilder } from '~/domain/invoice/invoice'
+import { InvoiceItemBuilder } from '~/domain/invoice/invoice-item'
 import { PaymentMethodBuilder } from '~/domain/payment-method/payment-method'
 import { TaxBuilder } from '~/domain/tax/tax'
 
