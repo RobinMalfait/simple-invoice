@@ -1,11 +1,15 @@
-import { EyeIcon } from '@heroicons/react/24/outline'
+import { CheckCircleIcon, EyeIcon, XCircleIcon } from '@heroicons/react/24/outline'
+import { formatDistanceToNow } from 'date-fns'
 import { redirect } from 'next/navigation'
 import { invoices } from '~/data'
+import { Invoice } from '~/domain/invoice/invoice'
+import { classNames } from '~/ui/class-names'
 import { DownloadLink } from '~/ui/download-link'
 import { InvoiceProvider } from '~/ui/hooks/use-invoice'
 import { Invoice as InvoicePreview } from '~/ui/invoice/design'
-import { total, TotalFeatures } from '~/ui/invoice/total'
+import { TotalFeatures, total } from '~/ui/invoice/total'
 import { Money } from '~/ui/money'
+import { match } from '~/utils/match'
 
 export default function Invoice({ params: { number } }: { params: { number: string } }) {
   let invoice = invoices.find((invoice) => invoice.number === number)
@@ -25,9 +29,8 @@ export default function Invoice({ params: { number } }: { params: { number: stri
               </div>
             </div>
           </div>
-
-          <div className="flex-1">
-            <div className="sticky top-24 flex flex-col gap-4 rounded-lg bg-white p-4 shadow ring-1 ring-black/5">
+          <div className="sticky top-24 flex flex-1 flex-col gap-[--spacing]">
+            <div className="flex flex-col gap-4 rounded-lg bg-white p-4 shadow ring-1 ring-black/5">
               <h3 className="flex items-center justify-between text-xl">
                 <span>{invoice.client.name}</span>
                 <span>#{invoice.number}</span>
@@ -54,9 +57,106 @@ export default function Invoice({ params: { number } }: { params: { number: stri
                 </a>
               </div>
             </div>
+
+            <div className="flex flex-col gap-4 rounded-lg bg-white p-4 shadow ring-1 ring-black/5">
+              <span className="text-sm font-medium text-gray-900">Activity</span>
+              <ActivityFeed activity={invoice.events} />
+            </div>
           </div>
         </div>
       </div>
     </InvoiceProvider>
+  )
+}
+
+export function ActivityFeed({ activity }: { activity: Invoice['events'] }) {
+  return (
+    <>
+      <ul role="list" className="space-y-6">
+        {activity.map((activityItem, activityItemIdx) => (
+          <li key={activityItem.id} className="relative flex gap-x-4">
+            <div
+              className={classNames(
+                activityItemIdx === activity.length - 1 ? 'h-6' : '-bottom-6',
+                'absolute left-0 top-0 flex w-6 justify-center',
+              )}
+            >
+              <div className="w-px bg-gray-200" />
+            </div>
+
+            <div className="relative flex h-6 w-6 flex-none items-center justify-center bg-white">
+              {activityItemIdx === activity.length - 1 ? (
+                match(activityItem.type, {
+                  drafted: () => (
+                    <div className="h-1.5 w-1.5 rounded-full bg-gray-100 ring-1 ring-gray-300" />
+                  ),
+                  sent: () => (
+                    <div className="h-1.5 w-1.5 rounded-full bg-gray-100 ring-1 ring-gray-300" />
+                  ),
+                  'partially-paid': () => (
+                    <div className="h-1.5 w-1.5 rounded-full bg-gray-100 ring-1 ring-gray-300" />
+                  ),
+                  paid: () => (
+                    <CheckCircleIcon className="h-6 w-6 text-blue-600" aria-hidden="true" />
+                  ),
+                  overdue: () => (
+                    <XCircleIcon className="h-6 w-6 text-red-600" aria-hidden="true" />
+                  ),
+                })
+              ) : (
+                <div className="h-1.5 w-1.5 rounded-full bg-gray-100 ring-1 ring-gray-300" />
+              )}
+            </div>
+
+            <p className="flex-auto py-0.5 text-xs leading-5 text-gray-500">
+              {match(
+                activityItem.type,
+                {
+                  drafted: () => (
+                    <>
+                      <span className="font-medium text-gray-900">Drafted</span> the invoice.
+                    </>
+                  ),
+                  sent: () => (
+                    <>
+                      <span className="font-medium text-gray-900">Sent</span> the invoice.
+                    </>
+                  ),
+                  'partially-paid': (
+                    activityItem: Extract<Invoice['events'][number], { type: 'partially-paid' }>,
+                  ) => (
+                    <>
+                      <span className="font-medium text-gray-900">Partially paid</span> with{' '}
+                      <Money amount={activityItem.amount} />, outstanding amount of{' '}
+                      <Money amount={activityItem.outstanding} /> left.
+                    </>
+                  ),
+                  paid: () => (
+                    <>
+                      <span className="font-medium text-gray-900">Paid</span> the invoice.
+                    </>
+                  ),
+                  overdue: () => (
+                    <>
+                      The invoice is <span className="font-medium text-gray-900">overdue</span>.
+                    </>
+                  ),
+                },
+                activityItem,
+              )}
+            </p>
+
+            {activityItem.at && (
+              <time
+                dateTime={activityItem.at.toISOString()}
+                className="flex-none py-0.5 text-xs leading-5 text-gray-500"
+              >
+                {formatDistanceToNow(activityItem.at, { addSuffix: true })}
+              </time>
+            )}
+          </li>
+        ))}
+      </ul>
+    </>
   )
 }

@@ -5,6 +5,7 @@ import { Invoice as InvoiceType } from '~/domain/invoice/invoice'
 import { InvoiceProvider } from '~/ui/hooks/use-invoice'
 import { useInvoicePagination } from '~/ui/hooks/use-invoice-pagination'
 import { PageProvider } from '~/ui/hooks/use-pagination-info'
+import { StatusDisplay } from '~/ui/invoice/status'
 import { BigFooter } from './big-footer'
 import { BigHeading } from './big-heading'
 import { Items } from './items'
@@ -22,6 +23,11 @@ export function Invoice({ invoice }: { invoice: InvoiceType }) {
         {pages.map((items, pageIdx) => (
           <PageProvider key={pageIdx} info={{ total: pages.length, current: pageIdx }}>
             <div className="paper relative mx-auto flex flex-col bg-white print:m-0">
+              {pageIdx === 0 && (
+                <div className="absolute right-4 top-4 z-20 print:hidden">
+                  <StatusDisplay status={invoice.state} />
+                </div>
+              )}
               {pageIdx === 0 ? <BigHeading /> : <SmallHeading />}
 
               <div className="relative flex flex-1 flex-col overflow-hidden">

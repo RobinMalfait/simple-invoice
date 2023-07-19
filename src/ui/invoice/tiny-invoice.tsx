@@ -4,12 +4,14 @@ import { format } from 'date-fns'
 import { Invoice } from '~/domain/invoice/invoice'
 import { total, TotalFeatures } from '~/ui/invoice/total'
 import { Money } from '~/ui/money'
+import { StatusDisplay } from './status'
 
 export function TinyInvoice({ invoice }: { invoice: Invoice }) {
   return (
     <div className="flex aspect-a4 w-full shrink-0 flex-col overflow-hidden rounded-md bg-gradient-to-br from-rose-50/90 to-blue-50/90 shadow">
       <div className="flex items-center justify-between bg-white/75 p-3 backdrop-blur">
         {invoice.client.name}
+        <StatusDisplay variant="tiny-badge" status={invoice.state} />
       </div>
 
       <div className="flex flex-1 items-center justify-center border-y border-black/5">

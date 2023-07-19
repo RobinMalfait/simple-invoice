@@ -62,6 +62,10 @@ export const invoices: Invoice[] = [
     .client(Client1)
     .issueDate('2023-01-01')
     .item(new InvoiceItemBuilder().description('Item line #1').unitPrice(100_00).build())
+    .send('2023-01-01')
+    .pay('2023-01-06', 25_00) // Partial Payment
+    .pay('2023-01-07', 50_00) // Partial Payment
+    .pay('2023-01-08', 25_00) // Partial Payment
     .build(),
 
   // Single item invoice, with multiple quantities
@@ -72,6 +76,8 @@ export const invoices: Invoice[] = [
     .item(
       new InvoiceItemBuilder().description('Item line #1').quantity(4).unitPrice(100_00).build(),
     )
+    .send('2023-01-02')
+    .pay('2023-02-15')
     .build(),
 
   // Single item invoice, with tax
@@ -82,6 +88,7 @@ export const invoices: Invoice[] = [
     .item(
       new InvoiceItemBuilder().description('Item line #1').taxRate(0.21).unitPrice(100_00).build(),
     )
+    .send('2023-01-03')
     .build(),
 
   // Single item invoice, with multiple quantities and tax
