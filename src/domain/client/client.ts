@@ -7,7 +7,7 @@ import { Tax, taxSchema } from '~/domain/tax/tax'
 export let clientSchema = z.object({
   id: z.string().default(() => crypto.randomUUID()),
   name: z.string(),
-  email: z.string().nullable(),
+  email: z.string().email().nullable(),
   phone: z.string().nullable(),
   billing: addressSchema,
   currency: z.nativeEnum(Currency),
