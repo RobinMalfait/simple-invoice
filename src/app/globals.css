@@ -26,14 +26,14 @@
 }
 
 @layer components {
-  .page {
+  .paper {
     width: 210mm;
     height: 297mm;
 
     @apply overflow-hidden rounded-lg shadow-lg print:rounded-none print:shadow-none;
   }
 
-  .page + .page {
+  .paper + .paper {
     page-break-before: always;
     break-before: page;
   }
