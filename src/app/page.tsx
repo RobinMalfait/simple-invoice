@@ -3,6 +3,7 @@ import Link from 'next/link'
 import * as React from 'react'
 
 import { invoices, me } from '~/data'
+import { Currency } from '~/domain/currency/currency'
 import { Invoice } from '~/domain/invoice/invoice'
 import { Empty } from '~/ui/empty'
 import { I18NProvider } from '~/ui/hooks/use-i18n'
@@ -46,20 +47,54 @@ export default async function Home() {
               <React.Fragment key={title}>
                 <div className="col-span-full flex items-center justify-between rounded-lg bg-white p-3 ring-1 ring-black/5">
                   <span>{title}</span>
-                  <span>
-                    <Money
-                      amount={invoices.reduce(
-                        (acc, invoice) => acc + total(invoice.items, TotalFeatures.IncludingVAT),
-                        0,
-                      )}
-                    />
+                  <span className="flex items-center gap-2">
+                    {Array.from(
+                      invoices.reduce((acc, invoice) => {
+                        if (!acc.has(invoice.client.currency)) {
+                          acc.set(invoice.client.currency, [])
+                        }
+                        acc.get(invoice.client.currency)!.push(invoice)
+                        return acc
+                      }, new Map<Currency, Invoice[]>()),
+                    ).map(([currency, invoices], idx) => (
+                      <I18NProvider
+                        key={currency}
+                        value={{
+                          // Prefer my language when looking at the overview of invoices.
+                          language: me.language,
+
+                          // Prefer the currency of the client when looking at the overview of invoices.
+                          currency,
+                        }}
+                      >
+                        {idx !== 0 && <span className="text-gray-300">•</span>}
+                        <Money
+                          amount={invoices.reduce(
+                            (acc, invoice) =>
+                              acc + total(invoice.items, TotalFeatures.IncludingVAT),
+                            0,
+                          )}
+                        />
+                      </I18NProvider>
+                    ))}
                   </span>
                 </div>
 
                 {invoices.map((invoice) => (
-                  <Link key={invoice.id} href={`/invoices/${invoice.number}`}>
-                    <TinyInvoice invoice={invoice} />
-                  </Link>
+                  <I18NProvider
+                    key={invoice.id}
+                    value={{
+                      // Prefer the language of the account when looking at the overview of invoices.
+                      language: invoice.account.language,
+
+                      // Prefer the currency of the client when looking at the overview of invoices.
+                      currency: invoice.client.currency,
+                    }}
+                  >
+                    <Link href={`/invoices/${invoice.number}`}>
+                      <TinyInvoice invoice={invoice} />
+                    </Link>
+                  </I18NProvider>
                 ))}
               </React.Fragment>
             ))}
