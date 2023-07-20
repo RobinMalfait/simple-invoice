@@ -1,8 +1,10 @@
 import { Account, AccountBuilder } from '~/domain/account/account'
 import { AddressBuilder } from '~/domain/address/address'
 import { ClientBuilder } from '~/domain/client/client'
+import { Currency } from '~/domain/currency/currency'
 import { Invoice, InvoiceBuilder } from '~/domain/invoice/invoice'
 import { InvoiceItemBuilder } from '~/domain/invoice/invoice-item'
+import { Language } from '~/domain/language/language'
 import { PaymentMethodBuilder } from '~/domain/payment-method/payment-method'
 import { TaxBuilder } from '~/domain/tax/tax'
 
@@ -53,6 +55,8 @@ let Client2 = new ClientBuilder()
   .tax(new TaxBuilder().value('BE 9876 543 210').build())
   .note('This note will always be present on every invoice for this client')
   .legal('Legal information for Client Inc')
+  .language(Language.EN)
+  .currency(Currency.USD)
   .build()
 
 export const invoices: Invoice[] = [
