@@ -64,12 +64,8 @@ export function BigFooter() {
                       <tr key={paymentMethod.id}>
                         <td className="text-center">
                           {match(paymentMethod.type, {
-                            iban() {
-                              return <BanknotesIcon className="h-4 w-4 text-gray-500" />
-                            },
-                            paypal() {
-                              return <PaypalIcon className="h-4 w-4 text-gray-500" />
-                            },
+                            iban: () => <BanknotesIcon className="h-4 w-4 text-gray-500" />,
+                            paypal: () => <PaypalIcon className="h-4 w-4 text-gray-500" />,
                           })}
                         </td>
                         <td className="px-3">{paymentMethod.value}</td>
