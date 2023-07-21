@@ -66,31 +66,34 @@ export default async function Home() {
                 </div>
 
                 <div className="relative flex w-full flex-col gap-4">
-                  <div className="sticky top-[84px] z-20 flex justify-between rounded-md bg-white/95 p-3 text-gray-500 ring-1 ring-black/5">
-                    <span>{title}</span>
-                    <span className="flex items-center gap-2">
-                      {groupByCurrency(invoices).map(([currency, invoices], idx) => (
-                        <I18NProvider
-                          key={currency}
-                          value={{
-                            // Prefer my language when looking at the overview of invoices.
-                            language: me.language,
+                  <div className="sticky top-[84px] isolate z-20">
+                    <div className="absolute -inset-x-2 -top-6 bottom-11 z-10 bg-gray-100"></div>
+                    <div className="relative z-20 flex justify-between rounded-md bg-white/95 p-3 text-gray-500 ring-1 ring-black/5">
+                      <span>{title}</span>
+                      <span className="flex items-center gap-2">
+                        {groupByCurrency(invoices).map(([currency, invoices], idx) => (
+                          <I18NProvider
+                            key={currency}
+                            value={{
+                              // Prefer my language when looking at the overview of invoices.
+                              language: me.language,
 
-                            // Prefer the currency of the client when looking at the overview of invoices.
-                            currency,
-                          }}
-                        >
-                          {idx !== 0 && <span className="text-gray-300">•</span>}
-                          <Money
-                            amount={invoices.reduce(
-                              (acc, invoice) =>
-                                acc + total(invoice.items, TotalFeatures.IncludingVAT),
-                              0,
-                            )}
-                          />
-                        </I18NProvider>
-                      ))}
-                    </span>
+                              // Prefer the currency of the client when looking at the overview of invoices.
+                              currency,
+                            }}
+                          >
+                            {idx !== 0 && <span className="text-gray-300">•</span>}
+                            <Money
+                              amount={invoices.reduce(
+                                (acc, invoice) =>
+                                  acc + total(invoice.items, TotalFeatures.IncludingVAT),
+                                0,
+                              )}
+                            />
+                          </I18NProvider>
+                        ))}
+                      </span>
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-[repeat(auto-fill,minmax(275px,1fr))] gap-4">
