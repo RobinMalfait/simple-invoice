@@ -7,7 +7,7 @@ import { classNames } from '~/ui/class-names'
 import { DownloadLink } from '~/ui/download-link'
 import { InvoiceProvider } from '~/ui/hooks/use-invoice'
 import { Invoice as InvoicePreview } from '~/ui/invoice/design'
-import { TotalFeatures, total } from '~/ui/invoice/total'
+import { total } from '~/ui/invoice/total'
 import { Money } from '~/ui/money'
 import { match } from '~/utils/match'
 
@@ -38,7 +38,7 @@ export default function Invoice({ params: { number } }: { params: { number: stri
               </h3>
               <div className="rounded-md border border-gray-200 bg-gray-100 p-4">
                 <div className="p-4 text-center text-2xl font-bold text-gray-950">
-                  <Money amount={total(invoice.items, TotalFeatures.IncludingVAT)} />
+                  <Money amount={total(invoice)} />
                 </div>
               </div>
               <div className="flex items-center justify-between text-center">

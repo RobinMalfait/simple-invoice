@@ -2,7 +2,7 @@ import { BanknotesIcon, DevicePhoneMobileIcon, EnvelopeIcon } from '@heroicons/r
 import { useInvoice } from '~/ui/hooks/use-invoice'
 import { PaypalIcon } from '~/ui/icons/payment'
 import { Legal } from '~/ui/invoice/blocks/legal'
-import { TotalFeatures, total } from '~/ui/invoice/total'
+import { total } from '~/ui/invoice/total'
 import { Money } from '~/ui/money'
 import { match } from '~/utils/match'
 
@@ -16,7 +16,7 @@ export function BigFooter() {
           <div className="flex items-center justify-between text-xl font-medium">
             <span>Totaal</span>
             <div className="-mx-4 -my-2 rounded-full bg-black px-4 py-2 text-white">
-              <Money amount={total(invoice.items, TotalFeatures.IncludingVAT)} />
+              <Money amount={total(invoice)} />
             </div>
           </div>
 

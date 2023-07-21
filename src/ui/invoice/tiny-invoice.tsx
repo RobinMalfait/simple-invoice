@@ -2,7 +2,7 @@ import { CalendarIcon } from '@heroicons/react/24/outline'
 import { format } from 'date-fns'
 
 import { Invoice } from '~/domain/invoice/invoice'
-import { total, TotalFeatures } from '~/ui/invoice/total'
+import { total } from '~/ui/invoice/total'
 import { Money } from '~/ui/money'
 import { StatusDisplay } from './status'
 
@@ -19,7 +19,7 @@ export function TinyInvoice({ invoice }: { invoice: Invoice }) {
           <h3 className="text-xl font-medium text-gray-900">{invoice.number}</h3>
           <div className="mt-1 flex flex-grow flex-col justify-between">
             <div className="text-sm text-gray-500">
-              <Money amount={total(invoice.items, TotalFeatures.IncludingVAT)} />
+              <Money amount={total(invoice)} />
             </div>
           </div>
         </div>

@@ -23,6 +23,9 @@
   "jest": {
     "transform": {
       "^.+\\.(js|jsx|ts|tsx)$": "@swc/jest"
+    },
+    "moduleNameMapper": {
+      "^~/(.*)$": "<rootDir>/src/$1"
     }
   },
   "dependencies": {

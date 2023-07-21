@@ -2,6 +2,7 @@ import { Account, AccountBuilder } from '~/domain/account/account'
 import { AddressBuilder } from '~/domain/address/address'
 import { ClientBuilder } from '~/domain/client/client'
 import { Currency } from '~/domain/currency/currency'
+import { DiscountBuilder } from '~/domain/discount/discount'
 import { Invoice, InvoiceBuilder } from '~/domain/invoice/invoice'
 import { InvoiceItemBuilder } from '~/domain/invoice/invoice-item'
 import { Language } from '~/domain/language/language'
@@ -256,5 +257,50 @@ export const invoices: Invoice[] = [
     .client(Client1)
     .issueDate('2024-01-01')
     .item(new InvoiceItemBuilder().description('Item line #1').unitPrice(100_00).build())
+    .build(),
+
+  // Single item invoice, with a fixed discount
+  new InvoiceBuilder()
+    .account(me)
+    .client(Client1)
+    .issueDate('2024-01-01')
+    .item(new InvoiceItemBuilder().description('Item #1').unitPrice(100_00).taxRate(0.21).build())
+    .discount(new DiscountBuilder().type('fixed').value(2500).reason('25OFF').build())
+    .build(),
+
+  // Single item invoice, with a percentage discount
+  new InvoiceBuilder()
+    .account(me)
+    .client(Client1)
+    .issueDate('2024-01-01')
+    .item(new InvoiceItemBuilder().description('Item #1').unitPrice(100_00).taxRate(0.21).build())
+    .discount(new DiscountBuilder().type('percentage').value(0.1).reason('ABC').build())
+    .build(),
+
+  // Single item invoice, with a combination of discounts
+  new InvoiceBuilder()
+    .account(me)
+    .client(Client1)
+    .issueDate('2024-01-01')
+    .item(new InvoiceItemBuilder().description('Item #1').unitPrice(100_00).taxRate(0.21).build())
+    .discount(new DiscountBuilder().type('percentage').value(0.1).reason('ABC').build())
+    .discount(new DiscountBuilder().type('percentage').value(0.1).reason('DEF').build())
+    .discount(new DiscountBuilder().type('percentage').value(0.1).reason('HIJ').build())
+    .discount(new DiscountBuilder().type('fixed').value(2500).reason('25OFF').build())
+    .build(),
+
+  // Single item invoice, with a discount for an item
+  new InvoiceBuilder()
+    .account(me)
+    .client(Client1)
+    .issueDate('2024-01-01')
+    .item(
+      new InvoiceItemBuilder()
+        .description('Item #1')
+        .unitPrice(315_00)
+        .taxRate(0.21)
+        .discount(new DiscountBuilder().type('fixed').value(5_00).reason('5OFF').build())
+        .build(),
+    )
     .build(),
 ]

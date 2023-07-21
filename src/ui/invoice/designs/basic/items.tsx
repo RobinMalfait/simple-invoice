@@ -1,5 +1,6 @@
 import { Invoice } from '~/domain/invoice/invoice'
 import { Money } from '~/ui/money'
+import { match } from '~/utils/match'
 
 export function Items({ items, children }: { items: Invoice['items']; children: React.ReactNode }) {
   let containsVat = items.some((item) => item.taxRate > 0)
@@ -32,6 +33,32 @@ export function Items({ items, children }: { items: Invoice['items']; children: 
           <tr key={item.id}>
             <td className="whitespace-pre-wrap py-4 pl-12 pr-4 text-left align-top text-sm font-medium text-gray-900">
               {item.description}
+              <ul className="empty:hidden">
+                {item.discounts.map((discount, idx) => (
+                  <li
+                    key={idx}
+                    className="whitespace-nowrap text-left text-sm font-normal text-gray-500"
+                  >
+                    Korting
+                    {discount.reason && (
+                      <>
+                        <span className="px-1">
+                          (
+                          <span className="text-xs font-medium text-gray-400">
+                            {discount.reason}
+                          </span>
+                          )
+                        </span>
+                      </>
+                    )}
+                    <span className="px-3 text-gray-400">/</span>
+                    {match(discount.type, {
+                      fixed: () => <Money amount={-1 * discount.value} />,
+                      percentage: () => <>{(-1 * (discount.value * 100)).toFixed(0)}%</>,
+                    })}
+                  </li>
+                ))}
+              </ul>
             </td>
             <td className="whitespace-nowrap p-4 text-left align-top text-sm tabular-nums text-gray-500">
               {item.quantity}
@@ -45,7 +72,7 @@ export function Items({ items, children }: { items: Invoice['items']; children: 
               </td>
             )}
             <td className="whitespace-nowrap py-4 pl-4 pr-12 text-right align-top text-sm font-semibold text-gray-900">
-              <Money amount={item.unitPrice * item.quantity} />
+              <Money amount={itemPrice(item)} />
             </td>
           </tr>
         ))}
@@ -53,4 +80,16 @@ export function Items({ items, children }: { items: Invoice['items']; children: 
       </tbody>
     </table>
   )
+}
+
+function itemPrice(item: Invoice['items'][number]) {
+  let net = item.unitPrice * item.quantity
+  for (let discount of item.discounts) {
+    if (discount.type === 'percentage') {
+      net -= net * discount.value
+    } else if (discount.type === 'fixed') {
+      net -= discount.value
+    }
+  }
+  return net
 }

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { Discount } from '../discount/discount'
 
 export let InvoiceItem = z.object({
   id: z.string().default(() => crypto.randomUUID()),
@@ -6,6 +7,7 @@ export let InvoiceItem = z.object({
   quantity: z.number(),
   unitPrice: z.number(),
   taxRate: z.number(),
+  discounts: z.array(Discount),
 })
 
 export type InvoiceItem = z.infer<typeof InvoiceItem>
@@ -15,6 +17,7 @@ export class InvoiceItemBuilder {
   private _quantity: number | null = 1
   private _unitPrice: number | null = null
   private _taxRate: number | null = 0
+  private _discounts: Discount[] = []
 
   public build(): InvoiceItem {
     return InvoiceItem.parse({
@@ -22,6 +25,7 @@ export class InvoiceItemBuilder {
       quantity: this._quantity,
       unitPrice: this._unitPrice,
       taxRate: this._taxRate,
+      discounts: this._discounts,
     })
   }
 
@@ -42,6 +46,11 @@ export class InvoiceItemBuilder {
 
   public taxRate(unitPrice: number): InvoiceItemBuilder {
     this._taxRate = unitPrice
+    return this
+  }
+
+  public discount(discount: Discount): InvoiceItemBuilder {
+    this._discounts.push(discount)
     return this
   }
 }

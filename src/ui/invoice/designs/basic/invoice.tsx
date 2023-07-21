@@ -35,10 +35,10 @@ export function Invoice({ invoice }: { invoice: InvoiceType }) {
                   <Items items={items}>
                     {pageIdx === pages.length - 1 ? (
                       <>
-                        <Summary items={invoice.items} type="all" />
+                        <Summary items={invoice.items} discounts={invoice.discounts} type="all" />
                       </>
                     ) : (
-                      <Summary items={items} type="subtotal" />
+                      <Summary items={items} discounts={[]} type="subtotal" />
                     )}
                   </Items>
                 </FitContent>

@@ -3,6 +3,7 @@ import { z } from 'zod'
 
 import { Account } from '~/domain/account/account'
 import { Client } from '~/domain/client/client'
+import { Discount } from '~/domain/discount/discount'
 import { IncrementStrategy } from '~/domain/invoice/number-strategies'
 import { total } from '~/ui/invoice/total'
 import { match } from '~/utils/match'
@@ -41,6 +42,7 @@ export let Invoice = z.object({
   issueDate: z.date(),
   dueDate: z.date(),
   state: z.nativeEnum(InvoiceStatus).default(InvoiceStatus.Draft),
+  discounts: z.array(Discount),
 
   events: z.array(
     z
@@ -74,6 +76,7 @@ export class InvoiceBuilder {
   private _note: string | null = null
   private _issueDate: Date | null = null
   private _dueDate: Date | null = null
+  private _discounts: Discount[] = []
 
   private state = InvoiceStatus.Draft
   private paid: number = 0
@@ -94,6 +97,7 @@ export class InvoiceBuilder {
       note: this._note,
       issueDate: this._issueDate,
       dueDate: this._dueDate ?? configuration.defaultNetStrategy(this._issueDate!),
+      discounts: this._discounts,
       state: this.state,
       events: this.events,
     }
@@ -163,6 +167,19 @@ export class InvoiceBuilder {
     return this
   }
 
+  public discount(discount: Discount): InvoiceBuilder {
+    if (this.state !== InvoiceStatus.Draft) {
+      throw new Error('Cannot edit an invoice that is not in draft state')
+    }
+
+    if (new Set(this._items.map((item) => item.taxRate).filter((rate) => rate !== 0)).size > 1) {
+      throw new Error('Discount with mixed tax rates is not supported')
+    }
+
+    this._discounts.push(discount)
+    return this
+  }
+
   public item(item: InvoiceItem): InvoiceBuilder {
     if (this.state !== InvoiceStatus.Draft) {
       throw new Error('Cannot edit an invoice that is not in draft state')
@@ -197,7 +214,10 @@ export class InvoiceBuilder {
     return this
   }
 
-  public pay(at: string | Date, amount = total(this._items)): InvoiceBuilder {
+  public pay(
+    at: string | Date,
+    amount = total({ items: this._items, discounts: this._discounts }),
+  ): InvoiceBuilder {
     let parsedAt = typeof at === 'string' ? parseISO(at) : at
 
     match(this.state, {
@@ -205,7 +225,8 @@ export class InvoiceBuilder {
         throw new Error('Cannot pay an invoice that is in draft state')
       },
       [InvoiceStatus.Sent]: () => {
-        let remaining = total(this._items) - this.paid - amount
+        let remaining =
+          total({ items: this._items, discounts: this._discounts }) - this.paid - amount
 
         this.paid += amount
 
@@ -221,7 +242,8 @@ export class InvoiceBuilder {
         throw new Error('Cannot pay an invoice that is already paid')
       },
       [InvoiceStatus.PartialPaid]: () => {
-        let remaining = total(this._items) - this.paid - amount
+        let remaining =
+          total({ items: this._items, discounts: this._discounts }) - this.paid - amount
 
         this.paid += amount
 

@@ -8,7 +8,7 @@ import { classNames } from '~/ui/class-names'
 import { Empty } from '~/ui/empty'
 import { I18NProvider } from '~/ui/hooks/use-i18n'
 import { TinyInvoice } from '~/ui/invoice/tiny-invoice'
-import { TotalFeatures, total } from '~/ui/invoice/total'
+import { total } from '~/ui/invoice/total'
 import { Money } from '~/ui/money'
 
 function groupByQuarter(invoices: Invoice[]) {
@@ -84,11 +84,7 @@ export default async function Home() {
                           >
                             {idx !== 0 && <span className="text-gray-300">•</span>}
                             <Money
-                              amount={invoices.reduce(
-                                (acc, invoice) =>
-                                  acc + total(invoice.items, TotalFeatures.IncludingVAT),
-                                0,
-                              )}
+                              amount={invoices.reduce((acc, invoice) => acc + total(invoice), 0)}
                             />
                           </I18NProvider>
                         ))}
