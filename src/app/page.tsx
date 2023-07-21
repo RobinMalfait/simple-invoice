@@ -1,10 +1,10 @@
 import { compareDesc, format } from 'date-fns'
 import Link from 'next/link'
-import * as React from 'react'
 
 import { invoices, me } from '~/data'
 import { Currency } from '~/domain/currency/currency'
 import { Invoice } from '~/domain/invoice/invoice'
+import { classNames } from '~/ui/class-names'
 import { Empty } from '~/ui/empty'
 import { I18NProvider } from '~/ui/hooks/use-i18n'
 import { TinyInvoice } from '~/ui/invoice/tiny-invoice'
@@ -47,57 +47,86 @@ export default async function Home() {
         currency: me.currency,
       }}
     >
-      <main className="isolate mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <main className="isolate mx-auto w-full max-w-7xl space-y-8 px-4 py-8 sm:px-6 lg:px-8">
         {invoices.length > 0 ? (
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(275px,1fr))] gap-4">
-            {groupByQuarter(invoices).map(([title, invoices]) => (
-              <React.Fragment key={title}>
-                <div className="col-span-full flex items-center justify-between rounded-lg bg-white p-3 ring-1 ring-black/5">
-                  <span>{title}</span>
-                  <span className="flex items-center gap-2">
-                    {groupByCurrency(invoices).map(([currency, invoices], idx) => (
-                      <I18NProvider
-                        key={currency}
-                        value={{
-                          // Prefer my language when looking at the overview of invoices.
-                          language: me.language,
-
-                          // Prefer the currency of the client when looking at the overview of invoices.
-                          currency,
-                        }}
-                      >
-                        {idx !== 0 && <span className="text-gray-300">•</span>}
-                        <Money
-                          amount={invoices.reduce(
-                            (acc, invoice) =>
-                              acc + total(invoice.items, TotalFeatures.IncludingVAT),
-                            0,
-                          )}
-                        />
-                      </I18NProvider>
-                    ))}
-                  </span>
+          <>
+            {groupByQuarter(invoices).map(([title, invoices], idx, all) => (
+              <div key={title} className="relative flex gap-x-4">
+                <div
+                  className={classNames(
+                    idx === 0 ? '-top-8' : 'top-0',
+                    'absolute -bottom-8 left-0 flex w-6 justify-center',
+                  )}
+                >
+                  <div className="w-px bg-gray-300"></div>
                 </div>
 
-                {invoices.map((invoice) => (
-                  <I18NProvider
-                    key={invoice.id}
-                    value={{
-                      // Prefer the language of the account when looking at the overview of invoices.
-                      language: invoice.account.language,
+                <div className="relative mt-3 flex h-6 w-6 flex-none items-center justify-center bg-gray-100">
+                  <div className="h-1.5 w-1.5 rounded-full bg-gray-300 ring-1 ring-gray-300" />
+                </div>
 
-                      // Prefer the currency of the client when looking at the overview of invoices.
-                      currency: invoice.client.currency,
-                    }}
-                  >
-                    <Link href={`/invoices/${invoice.number}`}>
-                      <TinyInvoice invoice={invoice} />
-                    </Link>
-                  </I18NProvider>
-                ))}
-              </React.Fragment>
+                <div className="relative flex w-full flex-col gap-4">
+                  <div className="flex justify-between rounded-lg bg-white p-3 ring-1 ring-black/5">
+                    <span>{title}</span>
+                    <span className="flex items-center gap-2">
+                      {groupByCurrency(invoices).map(([currency, invoices], idx) => (
+                        <I18NProvider
+                          key={currency}
+                          value={{
+                            // Prefer my language when looking at the overview of invoices.
+                            language: me.language,
+
+                            // Prefer the currency of the client when looking at the overview of invoices.
+                            currency,
+                          }}
+                        >
+                          {idx !== 0 && <span className="text-gray-300">•</span>}
+                          <Money
+                            amount={invoices.reduce(
+                              (acc, invoice) =>
+                                acc + total(invoice.items, TotalFeatures.IncludingVAT),
+                              0,
+                            )}
+                          />
+                        </I18NProvider>
+                      ))}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-[repeat(auto-fill,minmax(275px,1fr))] gap-4">
+                    {invoices.map((invoice) => (
+                      <I18NProvider
+                        key={invoice.id}
+                        value={{
+                          // Prefer the language of the account when looking at the overview of invoices.
+                          language: invoice.account.language,
+
+                          // Prefer the currency of the client when looking at the overview of invoices.
+                          currency: invoice.client.currency,
+                        }}
+                      >
+                        <Link href={`/invoices/${invoice.number}`}>
+                          <TinyInvoice invoice={invoice} />
+                        </Link>
+                      </I18NProvider>
+                    ))}
+                  </div>
+                </div>
+              </div>
             ))}
-          </div>
+
+            <div className="relative flex gap-x-4">
+              <div className="absolute bottom-8 left-0 top-0 flex w-6 justify-center">
+                <div className="w-px bg-gray-300"></div>
+              </div>
+
+              <div className="relative mt-3 flex h-6 w-6 flex-none items-center justify-center bg-gray-100">
+                <div className="h-1.5 w-1.5 rounded-full bg-gray-300 ring-1 ring-gray-300" />
+              </div>
+
+              <div className="py-3 text-gray-500">The beginning of your adventure</div>
+            </div>
+          </>
         ) : (
           <Empty message="No invoices yet" />
         )}
