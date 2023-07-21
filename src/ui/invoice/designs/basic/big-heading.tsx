@@ -1,4 +1,5 @@
 import { format } from 'date-fns'
+import { Address } from '~/ui/address/address'
 import { useInvoice } from '~/ui/hooks/use-invoice'
 import { useLocale } from '~/ui/hooks/use-locale'
 import { Logo } from '~/ui/icons/logo'
@@ -43,13 +44,7 @@ export function BigHeading() {
           <h3 className="text-sm font-medium text-gray-900">Van:</h3>
           <div className="flex flex-col whitespace-pre-wrap text-sm font-normal">
             <span>{invoice.account.name}</span>
-            <span>{invoice.account.billing.street}</span>
-            <span>
-              {invoice.account.billing.zip} {invoice.account.billing.city}
-            </span>
-            {invoice.account.billing.country !== invoice.client.billing.country && (
-              <span>{invoice.account.billing.country}</span>
-            )}
+            <Address address={invoice.account.billing} />
             {invoice.account.tax && (
               <div className="mt-4">
                 <div className="text-sm font-medium text-gray-900">BTW Nummer:</div>
@@ -63,13 +58,7 @@ export function BigHeading() {
           <h3 className="text-sm font-medium text-gray-900">Naar:</h3>
           <div className="flex flex-col whitespace-pre-wrap text-sm font-normal">
             <span>{invoice.client.name}</span>
-            <span>{invoice.client.billing.street}</span>
-            <span>
-              {invoice.client.billing.zip} {invoice.client.billing.city}
-            </span>
-            {invoice.account.billing.country !== invoice.client.billing.country && (
-              <span>{invoice.client.billing.country}</span>
-            )}
+            <Address address={invoice.client.billing} />
             {invoice.client.tax && (
               <div className="mt-4">
                 <div className="text-sm font-medium text-gray-900">BTW Nummer:</div>
