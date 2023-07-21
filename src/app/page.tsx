@@ -49,7 +49,7 @@ export default async function Home() {
     >
       <main className="isolate mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {invoices.length > 0 ? (
-          <ul role="list" className="grid grid-cols-[repeat(auto-fill,minmax(275px,1fr))] gap-4">
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(275px,1fr))] gap-4">
             {groupByQuarter(invoices).map(([title, invoices]) => (
               <React.Fragment key={title}>
                 <div className="col-span-full flex items-center justify-between rounded-lg bg-white p-3 ring-1 ring-black/5">
@@ -97,7 +97,7 @@ export default async function Home() {
                 ))}
               </React.Fragment>
             ))}
-          </ul>
+          </div>
         ) : (
           <Empty message="No invoices yet" />
         )}
