@@ -61,12 +61,12 @@ export default async function Home() {
                   <div className="w-px bg-gray-300"></div>
                 </div>
 
-                <div className="relative mt-3 flex h-6 w-6 flex-none items-center justify-center bg-gray-100">
+                <div className="sticky top-24 mt-3 flex h-6 w-6 flex-none items-center justify-center bg-gray-100">
                   <div className="h-1.5 w-1.5 rounded-full bg-gray-300 ring-1 ring-gray-300" />
                 </div>
 
                 <div className="relative flex w-full flex-col gap-4">
-                  <div className="flex justify-between rounded-lg bg-white p-3 ring-1 ring-black/5">
+                  <div className="sticky top-[84px] z-20 flex justify-between rounded-md bg-white/95 p-3 text-gray-500 ring-1 ring-black/5">
                     <span>{title}</span>
                     <span className="flex items-center gap-2">
                       {groupByCurrency(invoices).map(([currency, invoices], idx) => (
