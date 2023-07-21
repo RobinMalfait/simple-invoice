@@ -69,7 +69,7 @@ export default function Invoice({ params: { number } }: { params: { number: stri
   )
 }
 
-export function ActivityFeed({ activity }: { activity: Invoice['events'] }) {
+function ActivityFeed({ activity }: { activity: Invoice['events'] }) {
   return (
     <>
       <ul role="list" className="space-y-6">
