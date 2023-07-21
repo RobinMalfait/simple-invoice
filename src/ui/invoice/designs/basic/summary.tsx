@@ -24,8 +24,7 @@ export function Summary({
           <div className="h-1 w-full rounded-full bg-gray-50"></div>
         </td>
       </tr>
-
-      {items.length > 0 && (
+      {(items.length > 1 || vats.length > 0) && (
         <tr>
           <td />
           <th
