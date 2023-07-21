@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import puppeteer from 'puppeteer'
 import { invoices } from '~/data'
 
-export async function GET(request: Request, { params, ...rest }: { params: { number: string } }) {
+export async function GET(request: Request, { params }: { params: { number: string } }) {
   let query = new URL(request.url).searchParams
   let invoice = invoices.find((invoice) => invoice.number === params.number)
   const type = query.has('preview') ? 'preview' : 'download'
