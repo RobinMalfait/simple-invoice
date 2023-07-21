@@ -30,13 +30,13 @@ export function Summary({
           <td />
           <th
             colSpan={2}
-            className="whitespace-nowrap px-4 py-3 text-left text-sm font-normal text-gray-500"
+            className="whitespace-nowrap px-4 py-2 text-left text-sm font-normal text-gray-500"
           >
             Subtotaal
           </th>
           <td
             colSpan={2}
-            className="whitespace-nowrap px-4 py-3 pl-4 pr-12 text-right align-top text-sm text-gray-500"
+            className="whitespace-nowrap px-4 py-2 pl-4 pr-12 text-right align-top text-sm text-gray-500"
           >
             <Money amount={total(items)} />
           </td>
@@ -48,13 +48,13 @@ export function Summary({
             <td />
             <th
               colSpan={2}
-              className="whitespace-nowrap px-4 py-3 text-left text-sm font-normal text-gray-500"
+              className="whitespace-nowrap px-4 py-2 text-left text-sm font-normal text-gray-500"
             >
               {`BTW (${(vat * 100).toFixed(0)}%)`}
             </th>
             <td
               colSpan={2}
-              className="whitespace-nowrap px-4 py-3 pl-4 pr-12 text-right align-top text-sm text-gray-500"
+              className="whitespace-nowrap px-4 py-2 pl-4 pr-12 text-right align-top text-sm text-gray-500"
             >
               <Money amount={total} />
             </td>
@@ -65,13 +65,13 @@ export function Summary({
           <td />
           <th
             colSpan={2}
-            className="whitespace-nowrap px-4 py-3 text-left text-sm font-bold text-gray-500"
+            className="whitespace-nowrap px-4 py-2 text-left text-sm font-bold text-gray-500"
           >
             Totaal
           </th>
           <td
             colSpan={2}
-            className="whitespace-nowrap px-4 py-3 pl-4 pr-12 text-right align-top text-sm font-bold text-gray-500"
+            className="whitespace-nowrap px-4 py-2 pl-4 pr-12 text-right align-top text-sm font-bold text-gray-500"
           >
             <Money amount={total(items, TotalFeatures.IncludingVAT)} />
           </td>
