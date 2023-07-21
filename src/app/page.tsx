@@ -11,6 +11,33 @@ import { TinyInvoice } from '~/ui/invoice/tiny-invoice'
 import { TotalFeatures, total } from '~/ui/invoice/total'
 import { Money } from '~/ui/money'
 
+function groupByQuarter(invoices: Invoice[]) {
+  return Array.from(
+    invoices
+      // Put most recent invoices first
+      .sort((a, z) => compareDesc(a.issueDate, z.issueDate))
+
+      // Group by quarter & year
+      .reduce((acc, invoice) => {
+        let key = [format(invoice.issueDate, 'QQQ'), format(invoice.issueDate, 'y')].join(' • ')
+        if (!acc.has(key)) acc.set(key, [])
+        acc.get(key)!.push(invoice)
+        return acc
+      }, new Map<string, Invoice[]>()),
+  )
+}
+
+function groupByCurrency(invoices: Invoice[]) {
+  return Array.from(
+    invoices.reduce((acc, invoice) => {
+      let key = invoice.client.currency
+      if (!acc.has(key)) acc.set(key, [])
+      acc.get(key)!.push(invoice)
+      return acc
+    }, new Map<Currency, Invoice[]>()),
+  )
+}
+
 export default async function Home() {
   return (
     <I18NProvider
@@ -23,40 +50,12 @@ export default async function Home() {
       <main className="isolate mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {invoices.length > 0 ? (
           <ul role="list" className="grid grid-cols-[repeat(auto-fill,minmax(275px,1fr))] gap-4">
-            {Object.entries(
-              invoices
-                // Put most recent invoices first
-                .sort((a, z) => compareDesc(a.issueDate, z.issueDate))
-
-                // Group by quarter & year
-                .reduce(
-                  (acc, invoice) => {
-                    let key = [
-                      format(invoice.issueDate, 'QQQ'),
-                      format(invoice.issueDate, 'y'),
-                    ].join(' • ')
-
-                    acc[key] = acc[key] || []
-                    acc[key].push(invoice)
-
-                    return acc
-                  },
-                  {} as Record<string, Invoice[]>,
-                ),
-            ).map(([title, invoices]) => (
+            {groupByQuarter(invoices).map(([title, invoices]) => (
               <React.Fragment key={title}>
                 <div className="col-span-full flex items-center justify-between rounded-lg bg-white p-3 ring-1 ring-black/5">
                   <span>{title}</span>
                   <span className="flex items-center gap-2">
-                    {Array.from(
-                      invoices.reduce((acc, invoice) => {
-                        if (!acc.has(invoice.client.currency)) {
-                          acc.set(invoice.client.currency, [])
-                        }
-                        acc.get(invoice.client.currency)!.push(invoice)
-                        return acc
-                      }, new Map<Currency, Invoice[]>()),
-                    ).map(([currency, invoices], idx) => (
+                    {groupByCurrency(invoices).map(([currency, invoices], idx) => (
                       <I18NProvider
                         key={currency}
                         value={{
