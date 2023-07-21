@@ -1,4 +1,4 @@
-import { compareDesc, format } from 'date-fns'
+import { format } from 'date-fns'
 import Link from 'next/link'
 
 import { invoices, me } from '~/data'
@@ -15,7 +15,7 @@ function groupByQuarter(invoices: Invoice[]) {
   return Array.from(
     invoices
       // Put most recent invoices first
-      .sort((a, z) => compareDesc(a.issueDate, z.issueDate))
+      .sort((a, z) => z.number.localeCompare(a.number))
 
       // Group by quarter & year
       .reduce((acc, invoice) => {
