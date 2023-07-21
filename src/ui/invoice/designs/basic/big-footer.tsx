@@ -20,7 +20,7 @@ export function BigFooter() {
             </div>
           </div>
 
-          <div className="flex gap-8">
+          <div className="flex items-start gap-8">
             <table className="text-sm">
               <thead>
                 <tr>
