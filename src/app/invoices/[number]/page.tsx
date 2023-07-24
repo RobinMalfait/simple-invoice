@@ -151,6 +151,7 @@ function ActivityFeed({ activity }: { activity: InvoiceType['events'] }) {
 
             {activityItem.at && (
               <time
+                title={activityItem.at.toLocaleString()}
                 dateTime={activityItem.at.toISOString()}
                 className="flex-none py-0.5 text-xs leading-5 text-gray-500"
               >
