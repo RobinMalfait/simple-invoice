@@ -1,8 +1,8 @@
+import { CubeIcon } from '@heroicons/react/24/outline'
 import { format } from 'date-fns'
 import { Address } from '~/ui/address/address'
 import { useInvoice } from '~/ui/hooks/use-invoice'
 import { useLocale } from '~/ui/hooks/use-locale'
-import { Logo } from '~/ui/icons/logo'
 
 export function BigHeading() {
   let locale = useLocale()
@@ -11,7 +11,7 @@ export function BigHeading() {
   return (
     <>
       <div className="bg-gray-50 px-12 py-8">
-        <Logo className="h-12 text-gray-400" />
+        <CubeIcon className="h-12 text-gray-400" />
 
         <div className="mt-4 flex items-end justify-between">
           <span className="space-x-3 text-2xl">

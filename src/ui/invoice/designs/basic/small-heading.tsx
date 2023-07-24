@@ -1,6 +1,6 @@
+import { CubeIcon } from '@heroicons/react/24/outline'
 import { useInvoice } from '~/ui/hooks/use-invoice'
 import { usePaginationInfo } from '~/ui/hooks/use-pagination-info'
-import { Logo } from '~/ui/icons/logo'
 
 export function SmallHeading() {
   let { total, current } = usePaginationInfo()
@@ -10,7 +10,7 @@ export function SmallHeading() {
     <div className="bg-gray-50 px-12 py-8">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Logo className="h-10 text-gray-400" />
+          <CubeIcon className="h-10 text-gray-400" />
 
           <span className="space-x-3 text-lg">
             <span>
