@@ -16,13 +16,19 @@ npm install
 npm run dev
 ```
 
+3. Copy the example `.env`
+
+```
+cp .env.example .env
+```
+
 ### Changing data
 
-All data is imported from `./src/data/index.ts`, there is also an example data set available in
-`./src/data/example.ts`. This file contains account info and invoices information.
+The `.env` file contains a `DATA_SOURCE_FILE` that points to a file in the `./src/data/` folder.
 
-You can add a custom `./src/data/production.ts` if you want, just make sure to update the reference
-in `./src/data/index.ts`.
+You can add as many files in the `./src/data/` folder as you want. E.g.: `./src/data/production.ts`
+or `./src/data/development.ts`. If you want to switch data sources, then you can update the
+`DATA_SOURCE_FILE` environment variable in your `.env`.
 
 ### Changing invoice designs
 
