@@ -1,12 +1,12 @@
 import { addDays, isPast, parseISO } from 'date-fns'
 import { z } from 'zod'
 
-import { Account, accountSchema } from '~/domain/account/account'
-import { Client, clientSchema } from '~/domain/client/client'
+import { Account } from '~/domain/account/account'
+import { Client } from '~/domain/client/client'
 import { IncrementStrategy } from '~/domain/invoice/number-strategies'
 import { total } from '~/ui/invoice/total'
 import { match } from '~/utils/match'
-import { InvoiceItem, invoiceItemSchema } from './invoice-item'
+import { InvoiceItem } from './invoice-item'
 import { InvoiceStatus } from './invoice-status'
 
 type Configuration = {
@@ -31,12 +31,12 @@ const configuration: Configuration = {
 
 // ---
 
-export let invoiceSchema = z.object({
+export let Invoice = z.object({
   id: z.string().default(() => crypto.randomUUID()),
   number: z.string(),
-  account: accountSchema,
-  client: clientSchema,
-  items: z.array(invoiceItemSchema),
+  account: Account,
+  client: Client,
+  items: z.array(InvoiceItem),
   note: z.string().nullable(),
   issueDate: z.date(),
   dueDate: z.date(),
@@ -64,7 +64,7 @@ export let invoiceSchema = z.object({
   ),
 })
 
-export type Invoice = z.infer<typeof invoiceSchema>
+export type Invoice = z.infer<typeof Invoice>
 
 export class InvoiceBuilder {
   private _number: string | null = null
@@ -103,7 +103,7 @@ export class InvoiceBuilder {
       input.events.push({ type: 'overdue' })
     }
 
-    return invoiceSchema.parse(input)
+    return Invoice.parse(input)
   }
 
   public number(number: string): InvoiceBuilder {

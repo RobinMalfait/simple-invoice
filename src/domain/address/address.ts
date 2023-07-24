@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export let addressSchema = z.object({
+export let Address = z.object({
   street1: z.string().nullable(),
   street2: z.string().nullable(),
   city: z.string().nullable(),
@@ -9,7 +9,7 @@ export let addressSchema = z.object({
   country: z.string().nullable(),
 })
 
-export type Address = z.infer<typeof addressSchema>
+export type Address = z.infer<typeof Address>
 
 export class AddressBuilder {
   private _street1: string | null = null
@@ -20,7 +20,7 @@ export class AddressBuilder {
   private _country: string | null = null
 
   public build(): Address {
-    return addressSchema.parse({
+    return Address.parse({
       street1: this._street1,
       street2: this._street2,
       city: this._city,

@@ -1,26 +1,26 @@
 import { z } from 'zod'
-import { Address, addressSchema } from '~/domain/address/address'
+import { Address } from '~/domain/address/address'
 import { Currency } from '~/domain/currency/currency'
 import { Language } from '~/domain/language/language'
-import { PaymentMethod, paymentMethodSchema } from '~/domain/payment-method/payment-method'
-import { Tax, taxSchema } from '~/domain/tax/tax'
+import { PaymentMethod } from '~/domain/payment-method/payment-method'
+import { Tax } from '~/domain/tax/tax'
 
-export let accountSchema = z.object({
+export let Account = z.object({
   id: z.string().default(() => crypto.randomUUID()),
   name: z.string(),
   email: z.string().email().nullable(),
   phone: z.string().nullable(),
-  billing: addressSchema,
+  billing: Address,
   currency: z.nativeEnum(Currency),
   language: z.nativeEnum(Language),
-  tax: taxSchema.nullable(),
+  tax: Tax.nullable(),
   timezone: z.string(),
-  paymentMethods: z.array(paymentMethodSchema),
+  paymentMethods: z.array(PaymentMethod),
   note: z.string().nullable(),
   legal: z.string().nullable(),
 })
 
-export type Account = z.infer<typeof accountSchema>
+export type Account = z.infer<typeof Account>
 
 export class AccountBuilder {
   private _name: string | null = null
@@ -36,7 +36,7 @@ export class AccountBuilder {
   private _legal: string | null = null
 
   public build(): Account {
-    return accountSchema.parse({
+    return Account.parse({
       name: this._name,
       email: this._email,
       phone: this._phone,

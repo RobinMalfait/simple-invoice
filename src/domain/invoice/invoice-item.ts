@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export let invoiceItemSchema = z.object({
+export let InvoiceItem = z.object({
   id: z.string().default(() => crypto.randomUUID()),
   description: z.string(),
   quantity: z.number(),
@@ -8,7 +8,7 @@ export let invoiceItemSchema = z.object({
   taxRate: z.number(),
 })
 
-export type InvoiceItem = z.infer<typeof invoiceItemSchema>
+export type InvoiceItem = z.infer<typeof InvoiceItem>
 
 export class InvoiceItemBuilder {
   private _description: string | null = null
@@ -17,7 +17,7 @@ export class InvoiceItemBuilder {
   private _taxRate: number | null = 0
 
   public build(): InvoiceItem {
-    return invoiceItemSchema.parse({
+    return InvoiceItem.parse({
       description: this._description,
       quantity: this._quantity,
       unitPrice: this._unitPrice,

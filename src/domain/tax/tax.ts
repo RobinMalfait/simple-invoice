@@ -6,19 +6,19 @@ export enum TaxID {
 
 // ---
 
-export let taxSchema = z.object({
+export let Tax = z.object({
   id: z.nativeEnum(TaxID),
   value: z.string(),
 })
 
-export type Tax = z.infer<typeof taxSchema>
+export type Tax = z.infer<typeof Tax>
 
 export class TaxBuilder {
   private _id: TaxID | null = TaxID.VAT
   private _value: string | null = null
 
   public build(): Tax {
-    return taxSchema.parse({
+    return Tax.parse({
       id: this._id,
       value: this._value,
     })
