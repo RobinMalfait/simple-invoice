@@ -2,7 +2,7 @@ import { CheckCircleIcon, EyeIcon, XCircleIcon } from '@heroicons/react/24/outli
 import { formatDistanceToNow } from 'date-fns'
 import { redirect } from 'next/navigation'
 import { invoices } from '~/data'
-import { Invoice } from '~/domain/invoice/invoice'
+import { Invoice as InvoiceType } from '~/domain/invoice/invoice'
 import { classNames } from '~/ui/class-names'
 import { DownloadLink } from '~/ui/download-link'
 import { InvoiceProvider } from '~/ui/hooks/use-invoice'
@@ -69,7 +69,7 @@ export default function Invoice({ params: { number } }: { params: { number: stri
   )
 }
 
-function ActivityFeed({ activity }: { activity: Invoice['events'] }) {
+function ActivityFeed({ activity }: { activity: InvoiceType['events'] }) {
   return (
     <>
       <ul role="list" className="space-y-6">
@@ -123,7 +123,10 @@ function ActivityFeed({ activity }: { activity: Invoice['events'] }) {
                     </>
                   ),
                   'partially-paid': (
-                    activityItem: Extract<Invoice['events'][number], { type: 'partially-paid' }>,
+                    activityItem: Extract<
+                      InvoiceType['events'][number],
+                      { type: 'partially-paid' }
+                    >,
                   ) => (
                     <>
                       <span className="font-medium text-gray-900">Partially paid</span> with{' '}
