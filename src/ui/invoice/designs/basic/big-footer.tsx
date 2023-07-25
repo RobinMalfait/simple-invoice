@@ -1,13 +1,13 @@
 import { BanknotesIcon, DevicePhoneMobileIcon, EnvelopeIcon } from '@heroicons/react/24/outline'
 import { useInvoice } from '~/ui/hooks/use-invoice'
 import { PaypalIcon } from '~/ui/icons/payment'
+import { Legal } from '~/ui/invoice/blocks/legal'
 import { TotalFeatures, total } from '~/ui/invoice/total'
 import { Money } from '~/ui/money'
 import { match } from '~/utils/match'
 
 export function BigFooter() {
   let invoice = useInvoice()
-  let legal = [invoice.client.legal, invoice.account.legal].filter(Boolean)
 
   return (
     <div>
@@ -78,15 +78,7 @@ export function BigFooter() {
           </div>
         </div>
 
-        {legal.length > 0 && (
-          <div className="w-full text-center">
-            <div className="whitespace-pre-wrap text-center text-xs empty:hidden">
-              {legal.map((line) => (
-                <div key={line}>{line}</div>
-              ))}
-            </div>
-          </div>
-        )}
+        <Legal className="w-full text-center text-xs" />
       </div>
     </div>
   )
