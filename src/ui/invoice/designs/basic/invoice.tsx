@@ -46,10 +46,7 @@ export function Invoice({ invoice }: { invoice: InvoiceType }) {
 
               {pageIdx === pages.length - 1 && notes.length > 0 && (
                 <div className="p-4">
-                  <div
-                    role="list"
-                    className="relative max-w-sm space-y-1 rounded-md bg-gray-50 p-4 text-xs"
-                  >
+                  <div className="relative max-w-sm space-y-1 rounded-md bg-gray-50 p-4 text-xs">
                     <div className="absolute -right-3 -top-3 rounded-full bg-gray-50 p-1">
                       <InformationCircleIcon className="h-6 w-6 text-gray-400" />
                     </div>
