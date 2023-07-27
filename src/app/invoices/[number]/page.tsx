@@ -21,7 +21,7 @@ export default function Invoice({ params: { number } }: { params: { number: stri
   return (
     <InvoiceProvider invoice={invoice}>
       <div className="[--spacing:theme(spacing.8)]">
-        <div className="mx-auto flex w-full max-w-7xl flex-1 gap-[--spacing] px-4 py-[--spacing] sm:px-6 lg:px-8">
+        <div className="mx-auto flex w-full max-w-7xl flex-1 flex-wrap gap-[--spacing] px-4 py-[--spacing] sm:px-6 lg:px-8">
           <div className="flex flex-[calc(210mm+calc(var(--spacing)*2))] grow-0 flex-col rounded-lg border border-black/10 bg-gray-950/10">
             <div className="h-[calc(297mm+calc(var(--spacing)*2))] overflow-hidden">
               <div className="relative z-10 h-full flex-1 overflow-auto py-[--spacing]">
@@ -29,7 +29,8 @@ export default function Invoice({ params: { number } }: { params: { number: stri
               </div>
             </div>
           </div>
-          <div className="sticky top-24 flex flex-1 flex-col gap-[--spacing]">
+
+          <div className="sticky top-24 flex max-w-md flex-1 flex-col gap-[--spacing]">
             <div className="flex flex-col gap-4 rounded-lg bg-white p-4 shadow ring-1 ring-black/5">
               <h3 className="flex items-center justify-between text-xl">
                 <span>{invoice.client.name}</span>
