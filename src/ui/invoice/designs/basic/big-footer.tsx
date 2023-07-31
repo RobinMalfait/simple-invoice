@@ -41,6 +41,7 @@ export function BigFooter() {
                         : field.icon.type === 'image'
                         ? function ImageIcon(props: React.ComponentProps<'img'>) {
                             // @ts-expect-error
+                            // eslint-disable-next-line @next/next/no-img-element
                             return <img src={field.icon.imageUrl} alt="" {...props} />
                           }
                         : 'div'
