@@ -1,4 +1,5 @@
-import { BanknotesIcon, DevicePhoneMobileIcon, EnvelopeIcon } from '@heroicons/react/24/outline'
+import * as HI from '@heroicons/react/24/outline'
+import { BanknotesIcon } from '@heroicons/react/24/outline'
 import { useInvoice } from '~/ui/hooks/use-invoice'
 import { PaypalIcon } from '~/ui/icons/payment'
 import { Legal } from '~/ui/invoice/blocks/legal'
@@ -21,33 +22,41 @@ export function BigFooter() {
           </div>
 
           <div className="flex items-start gap-8">
-            <table className="text-sm">
-              <thead>
-                <tr>
-                  <td colSpan={2} className="text-sm font-medium text-gray-900">
-                    Contactgegevens
-                  </td>
-                </tr>
-              </thead>
-              <tbody>
-                {invoice.account.email && (
+            {invoice.account.contactFields.length > 0 && (
+              <table className="text-sm">
+                <thead>
                   <tr>
-                    <td className="text-center">
-                      <EnvelopeIcon className="h-4 w-4 text-gray-500" />
+                    <td colSpan={2} className="text-sm font-medium text-gray-900">
+                      Contactgegevens
                     </td>
-                    <td className="px-3">{invoice.account.email}</td>
                   </tr>
-                )}
-                {invoice.account.phone && (
-                  <tr>
-                    <td className="text-center">
-                      <DevicePhoneMobileIcon className="h-4 w-4 text-gray-500" />
-                    </td>
-                    <td className="px-3">{invoice.account.phone}</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {invoice.account.contactFields.map((field) => {
+                    let Icon =
+                      field.icon === null
+                        ? 'div'
+                        : field.icon.type === 'heroicon'
+                        ? HI[field.icon.heroicon]
+                        : field.icon.type === 'image'
+                        ? function ImageIcon(props: React.ComponentProps<'img'>) {
+                            // @ts-expect-error
+                            return <img src={field.icon.imageUrl} alt="" {...props} />
+                          }
+                        : 'div'
+
+                    return (
+                      <tr key={field.id}>
+                        <td className="text-center">
+                          <Icon className="h-4 w-4 text-gray-500 grayscale" />
+                        </td>
+                        <td className="px-3">{field.value}</td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            )}
 
             {invoice.account.paymentMethods.length > 0 && (
               <table className="text-sm">

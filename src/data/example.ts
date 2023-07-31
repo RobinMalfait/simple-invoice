@@ -1,6 +1,7 @@
 import { Account, AccountBuilder } from '~/domain/account/account'
 import { AddressBuilder } from '~/domain/address/address'
 import { ClientBuilder } from '~/domain/client/client'
+import { ContactFieldBuilder } from '~/domain/contact-fields/contact-fields'
 import { Currency } from '~/domain/currency/currency'
 import { DiscountBuilder } from '~/domain/discount/discount'
 import { Invoice, InvoiceBuilder } from '~/domain/invoice/invoice'
@@ -23,6 +24,23 @@ export const me: Account = new AccountBuilder()
   )
   .paymentMethod(new PaymentMethodBuilder().type('iban').value('BE32 1234 5678 9012').build())
   .paymentMethod(new PaymentMethodBuilder().type('paypal').value('alice@acme.com').build())
+  .contactField(
+    new ContactFieldBuilder()
+      .icon({ type: 'heroicon', heroicon: 'GlobeAltIcon' })
+      .name('website')
+      .value('https://acme.com')
+      .build(),
+  )
+  .contactField(
+    new ContactFieldBuilder()
+      .icon({
+        type: 'image',
+        imageUrl: 'https://www.google.com/s2/favicons?domain=github.com&sz=16',
+      })
+      .name('github')
+      .value('https://github.com')
+      .build(),
+  )
   .tax(new TaxBuilder().value('BE 1234 567 890').build())
   .note('Gelieve te betalen binnen de 30 dagen.')
   .legal('Legal information for Acme Inc.')

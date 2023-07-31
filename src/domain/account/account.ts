@@ -4,6 +4,7 @@ import { Currency } from '~/domain/currency/currency'
 import { Language } from '~/domain/language/language'
 import { PaymentMethod } from '~/domain/payment-method/payment-method'
 import { Tax } from '~/domain/tax/tax'
+import { ContactField, ContactFieldBuilder } from '../contact-fields/contact-fields'
 
 export let Account = z.object({
   id: z.string().default(() => crypto.randomUUID()),
@@ -16,6 +17,7 @@ export let Account = z.object({
   tax: Tax.nullable(),
   timezone: z.string(),
   paymentMethods: z.array(PaymentMethod),
+  contactFields: z.array(ContactField),
   note: z.string().nullable(),
   legal: z.string().nullable(),
 })
@@ -32,6 +34,7 @@ export class AccountBuilder {
   private _tax: Tax | null = null
   private _timezone: string | null = Intl.DateTimeFormat().resolvedOptions().timeZone
   private _paymentMethods: PaymentMethod[] = []
+  private _contactFields: ContactField[] = []
   private _note: string | null = null
   private _legal: string | null = null
 
@@ -46,6 +49,7 @@ export class AccountBuilder {
       tax: this._tax,
       timezone: this._timezone,
       paymentMethods: this._paymentMethods,
+      contactFields: this._contactFields,
       note: this._note,
       legal: this._legal,
     })
@@ -56,13 +60,31 @@ export class AccountBuilder {
     return this
   }
 
-  public email(email: string): AccountBuilder {
+  public email(email: string, { includeInContactFields = true } = {}): AccountBuilder {
     this._email = email
+    if (includeInContactFields) {
+      this.contactField(
+        new ContactFieldBuilder()
+          .name('Email')
+          .value(email)
+          .icon({ type: 'heroicon', heroicon: 'EnvelopeIcon' })
+          .build(),
+      )
+    }
     return this
   }
 
-  public phone(phone: string): AccountBuilder {
+  public phone(phone: string, { includeInContactFields = true } = {}): AccountBuilder {
     this._phone = phone
+    if (includeInContactFields) {
+      this.contactField(
+        new ContactFieldBuilder()
+          .name('Phone')
+          .value(phone)
+          .icon({ type: 'heroicon', heroicon: 'PhoneIcon' })
+          .build(),
+      )
+    }
     return this
   }
 
@@ -96,6 +118,11 @@ export class AccountBuilder {
     return this
   }
 
+  public contactFields(contactFields: ContactField[]): AccountBuilder {
+    this._contactFields = contactFields
+    return this
+  }
+
   public note(note: string): AccountBuilder {
     this._note = note
     return this
@@ -108,6 +135,11 @@ export class AccountBuilder {
 
   public paymentMethod(paymentMethod: PaymentMethod): AccountBuilder {
     this._paymentMethods.push(paymentMethod)
+    return this
+  }
+
+  public contactField(contactField: ContactField): AccountBuilder {
+    this._contactFields.push(contactField)
     return this
   }
 }
