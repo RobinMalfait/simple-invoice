@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { icons } from './icon-names'
+import { icons, socialIcons } from './icon-names'
 
 export let ContactField = z.object({
   id: z.string().default(() => crypto.randomUUID()),
@@ -10,6 +10,10 @@ export let ContactField = z.object({
       z.object({
         type: z.literal('heroicon'),
         heroicon: z.enum(icons),
+      }),
+      z.object({
+        type: z.literal('socials'),
+        name: z.enum(socialIcons),
       }),
       z.object({
         type: z.literal('image'),

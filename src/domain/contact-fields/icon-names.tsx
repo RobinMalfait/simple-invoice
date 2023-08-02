@@ -1,3 +1,4 @@
+export const socialIcons = ['Facebook', 'Instagram', 'Twitter', 'GitHub', 'YouTube'] as const
 export const icons = [
   'AcademicCapIcon',
   'AdjustmentsHorizontalIcon',

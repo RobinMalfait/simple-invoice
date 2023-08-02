@@ -3,6 +3,7 @@ import { BanknotesIcon } from '@heroicons/react/24/outline'
 import { useInvoice } from '~/ui/hooks/use-invoice'
 import { useTranslation } from '~/ui/hooks/use-translation'
 import { PaypalIcon } from '~/ui/icons/payment'
+import * as SocialIcons from '~/ui/icons/social'
 import { Legal } from '~/ui/invoice/blocks/legal'
 import { total } from '~/ui/invoice/total'
 import { Money } from '~/ui/money'
@@ -40,6 +41,8 @@ export function BigFooter() {
                         ? 'div'
                         : field.icon.type === 'heroicon'
                         ? HI[field.icon.heroicon]
+                        : field.icon.type === 'socials'
+                        ? SocialIcons[field.icon.name]
                         : field.icon.type === 'image'
                         ? function ImageIcon(props: React.ComponentProps<'img'>) {
                             // @ts-expect-error
