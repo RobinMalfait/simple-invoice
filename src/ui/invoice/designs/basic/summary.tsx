@@ -1,3 +1,4 @@
+import { Discount } from '~/domain/discount/discount'
 import { Invoice } from '~/domain/invoice/invoice'
 import { summary, Summary } from '~/domain/invoice/summary'
 import { useTranslation } from '~/ui/hooks/use-translation'
@@ -57,12 +58,21 @@ let summaryItems: {
             </span>
           </>
         )}
+        {item.discount.type === 'fixed' && (item.discount.quantity ?? 1) !== 1 && (
+          <span>&times; {item.discount.quantity}</span>
+        )}
       </>,
       <>
-        {match(item.discount.type, {
-          fixed: () => <Money amount={-1 * item.discount.value} />,
-          percentage: () => <>{(-1 * (item.discount.value * 100)).toFixed(0)}%</>,
-        })}
+        {match(
+          item.discount.type,
+          {
+            fixed: (discount: Extract<Discount, { type: 'fixed' }>) => (
+              <Money amount={-1 * discount.value * (discount.quantity ?? 1)} />
+            ),
+            percentage: () => <>{(-1 * (item.discount.value * 100)).toFixed(0)}%</>,
+          },
+          item.discount,
+        )}
       </>,
     ]
   },

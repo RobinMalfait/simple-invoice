@@ -3,7 +3,11 @@ import { z } from 'zod'
 export let Discount = z
   .discriminatedUnion('type', [
     z.object({ type: z.literal('percentage'), value: z.number().min(0).max(1) }),
-    z.object({ type: z.literal('fixed'), value: z.number() }),
+    z.object({
+      type: z.literal('fixed'),
+      value: z.number(),
+      quantity: z.number().nullable().default(null),
+    }),
   ])
   .and(
     z.object({
@@ -17,12 +21,14 @@ export class DiscountBuilder {
   private _type: Discount['type'] | null = null
   private _value: Discount['value'] | null = null
   private _reason: Discount['reason'] = null
+  private _quantity: number | null = null
 
   public build(): Discount {
     return Discount.parse({
       type: this._type,
       value: this._value,
       reason: this._reason,
+      quantity: this._type === 'fixed' ? this._quantity : undefined,
     })
   }
 
@@ -38,6 +44,15 @@ export class DiscountBuilder {
 
   public reason(reason: Discount['reason']): DiscountBuilder {
     this._reason = reason
+    return this
+  }
+
+  public quantity(quantity: number | null): DiscountBuilder {
+    if (this._type !== 'fixed') {
+      throw new Error('Cannot set quantity on non-fixed discount')
+    }
+
+    this._quantity = quantity
     return this
   }
 }

@@ -43,7 +43,6 @@ export let Invoice = z.object({
   dueDate: z.date(),
   state: z.nativeEnum(InvoiceStatus).default(InvoiceStatus.Draft),
   discounts: z.array(Discount),
-
   events: z.array(
     z
       .discriminatedUnion('type', [

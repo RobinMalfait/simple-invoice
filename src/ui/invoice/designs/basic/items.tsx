@@ -1,3 +1,4 @@
+import { Discount } from '~/domain/discount/discount'
 import { Invoice } from '~/domain/invoice/invoice'
 import { useTranslation } from '~/ui/hooks/use-translation'
 import { Money } from '~/ui/money'
@@ -54,10 +55,26 @@ export function Items({ items, children }: { items: Invoice['items']; children: 
                       </>
                     )}
                     <span className="px-3 text-gray-400">/</span>
-                    {match(discount.type, {
-                      fixed: () => <Money amount={-1 * discount.value} />,
-                      percentage: () => <>{(-1 * (discount.value * 100)).toFixed(0)}%</>,
-                    })}
+                    {match(
+                      discount.type,
+                      {
+                        fixed: (discount: Extract<Discount, { type: 'fixed' }>) => {
+                          if (discount.quantity === 1) {
+                            return <Money amount={-1 * discount.value} />
+                          }
+
+                          return (
+                            <span>
+                              <Money amount={-1 * discount.value} />
+                              <span className="px-1">&times;</span>
+                              {discount.quantity}
+                            </span>
+                          )
+                        },
+                        percentage: () => <>{(-1 * (discount.value * 100)).toFixed(0)}%</>,
+                      },
+                      discount,
+                    )}
                   </li>
                 ))}
               </ul>
@@ -90,7 +107,7 @@ function itemPrice(item: Invoice['items'][number]) {
     if (discount.type === 'percentage') {
       net -= net * discount.value
     } else if (discount.type === 'fixed') {
-      net -= discount.value
+      net -= discount.value * (discount.quantity ?? 1)
     }
   }
   return net

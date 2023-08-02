@@ -25,7 +25,14 @@ export class InvoiceItemBuilder {
       quantity: this._quantity,
       unitPrice: this._unitPrice,
       taxRate: this._taxRate,
-      discounts: this._discounts,
+      discounts: this._discounts.map((discount) => {
+        // Default the quantity to the item quantity if it's a fixed discount
+        // with no quantity set explicitly.
+        if (discount.type === 'fixed' && discount.quantity === null) {
+          discount.quantity = this._quantity!
+        }
+        return discount
+      }),
     })
   }
 

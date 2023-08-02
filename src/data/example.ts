@@ -304,7 +304,7 @@ export const invoices: Invoice[] = [
     .discount(new DiscountBuilder().type('percentage').value(0.1).reason('ABC').build())
     .discount(new DiscountBuilder().type('percentage').value(0.1).reason('DEF').build())
     .discount(new DiscountBuilder().type('percentage').value(0.1).reason('HIJ').build())
-    .discount(new DiscountBuilder().type('fixed').value(2500).reason('25OFF').build())
+    .discount(new DiscountBuilder().type('fixed').value(2500).reason('25OFF').quantity(3).build())
     .build(),
 
   // Single item invoice, with a discount for an item
@@ -317,6 +317,7 @@ export const invoices: Invoice[] = [
         .description('Item #1')
         .unitPrice(315_00)
         .taxRate(0.21)
+        .quantity(3)
         .discount(new DiscountBuilder().type('fixed').value(5_00).reason('5OFF').build())
         .build(),
     )

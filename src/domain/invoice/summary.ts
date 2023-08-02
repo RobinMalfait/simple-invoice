@@ -20,7 +20,7 @@ export function summary(invoice: Pick<Invoice, 'items' | 'discounts'>): Summary[
       if (discount.type === 'percentage') {
         net -= net * discount.value
       } else if (discount.type === 'fixed') {
-        net -= discount.value
+        net -= discount.value * (discount.quantity ?? 1)
       }
     }
     return sum + net
@@ -42,7 +42,7 @@ export function summary(invoice: Pick<Invoice, 'items' | 'discounts'>): Summary[
 
     //
     else if (discount.type === 'fixed') {
-      let value = discount.value
+      let value = discount.value * (discount.quantity ?? 1)
       discountResult += value
       subtotalResult -= value
     }
