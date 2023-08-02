@@ -1,6 +1,7 @@
 import * as HI from '@heroicons/react/24/outline'
 import { BanknotesIcon } from '@heroicons/react/24/outline'
 import { useInvoice } from '~/ui/hooks/use-invoice'
+import { useTranslation } from '~/ui/hooks/use-translation'
 import { PaypalIcon } from '~/ui/icons/payment'
 import { Legal } from '~/ui/invoice/blocks/legal'
 import { total } from '~/ui/invoice/total'
@@ -9,13 +10,14 @@ import { match } from '~/utils/match'
 
 export function BigFooter() {
   let invoice = useInvoice()
+  let t = useTranslation()
 
   return (
     <div>
       <div className="relative space-y-12 bg-gray-50 px-12 py-8 text-gray-900">
         <div className="space-y-4">
           <div className="flex items-center justify-between text-xl font-medium">
-            <span>Totaal</span>
+            <span>{t((x) => x.summary.total)}</span>
             <div className="-mx-4 -my-2 rounded-full bg-black px-4 py-2 text-white">
               <Money amount={total(invoice)} />
             </div>
@@ -27,7 +29,7 @@ export function BigFooter() {
                 <thead>
                   <tr>
                     <td colSpan={2} className="text-sm font-medium text-gray-900">
-                      Contactgegevens
+                      {t((x) => x.summary.contactDetails)}
                     </td>
                   </tr>
                 </thead>
@@ -64,7 +66,7 @@ export function BigFooter() {
                 <thead>
                   <tr>
                     <td colSpan={2} className="text-sm font-medium text-gray-900">
-                      Betaalgegevens
+                      {t((x) => x.summary.paymentDetails)}
                     </td>
                   </tr>
                 </thead>

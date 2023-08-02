@@ -1,0 +1,40 @@
+{
+  "invoice": {
+    "title": "Invoice"
+  },
+  "dates": {
+    "issueDate": "Issue date:",
+    "dueDate": "Due date:"
+  },
+  "account": {
+    "title": "From:",
+    "vat": "VAT Number:"
+  },
+  "client": {
+    "title": "To:",
+    "vat": "VAT Number:"
+  },
+  "invoiceItem": {
+    "description": "Description",
+    "quantity": "Qty",
+    "unitPrice": "Unit price",
+    "vat": "VAT",
+    "subtotal": "Subtotal",
+    "total": "Total",
+    "discount": "Discount"
+  },
+  "summary": {
+    "subtotal": "Subtotal",
+    "total": "Total",
+    "contactDetails": "Contact details",
+    "paymentDetails": "Payment details",
+    "discount": {
+      "title": "Discount",
+      "total": "Total (discounts)"
+    },
+    "vat": "VAT (:rate)"
+  },
+  "pagination": {
+    "summary": ":current of :total"
+  }
+}

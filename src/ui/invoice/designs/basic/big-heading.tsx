@@ -3,10 +3,12 @@ import { format } from 'date-fns'
 import { Address } from '~/ui/address/address'
 import { useInvoice } from '~/ui/hooks/use-invoice'
 import { useLocale } from '~/ui/hooks/use-locale'
+import { useTranslation } from '~/ui/hooks/use-translation'
 
 export function BigHeading() {
   let locale = useLocale()
   let invoice = useInvoice()
+  let t = useTranslation()
 
   return (
     <>
@@ -16,7 +18,7 @@ export function BigHeading() {
         <div className="mt-4 flex items-end justify-between">
           <span className="space-x-3 text-2xl">
             <span>
-              <span className="font-medium text-gray-500">Factuur</span>
+              <span className="font-medium text-gray-500">{t((x) => x.invoice.title)}</span>
               <span className="text-gray-300">.</span>
             </span>
             <span className="text-lg text-gray-300">/</span>
@@ -24,13 +26,13 @@ export function BigHeading() {
           </span>
           <div className="text-right">
             <div className="space-x-3">
-              <span className="text-gray-500">Factuurdatum:</span>
+              <span className="text-gray-500">{t((x) => x.dates.issueDate)}</span>
               <span className="font-medium tabular-nums text-gray-700">
                 {format(invoice.issueDate, 'PPP', { locale })}
               </span>
             </div>
             <div className="space-x-3">
-              <span className="text-gray-500">Vervaldatum:</span>
+              <span className="text-gray-500">{t((x) => x.dates.dueDate)}</span>
               <span className="font-medium tabular-nums text-gray-700">
                 {format(invoice.dueDate, 'PPP', { locale })}
               </span>
@@ -41,13 +43,13 @@ export function BigHeading() {
 
       <div className="flex justify-between px-12 py-8 text-gray-500">
         <div>
-          <h3 className="text-sm font-medium text-gray-900">Van:</h3>
+          <h3 className="text-sm font-medium text-gray-900">{t((x) => x.account.title)}</h3>
           <div className="flex flex-col whitespace-pre-wrap text-sm font-normal">
             <span>{invoice.account.name}</span>
             <Address address={invoice.account.billing} />
             {invoice.account.tax && (
               <div className="mt-4">
-                <div className="text-sm font-medium text-gray-900">BTW Nummer:</div>
+                <div className="text-sm font-medium text-gray-900">{t((x) => x.account.vat)}</div>
                 <div>{invoice.account.tax.value}</div>
               </div>
             )}
@@ -55,13 +57,13 @@ export function BigHeading() {
         </div>
 
         <div>
-          <h3 className="text-sm font-medium text-gray-900">Naar:</h3>
+          <h3 className="text-sm font-medium text-gray-900">{t((x) => x.client.title)}</h3>
           <div className="flex flex-col whitespace-pre-wrap text-sm font-normal">
             <span>{invoice.client.name}</span>
             <Address address={invoice.client.billing} />
             {invoice.client.tax && (
               <div className="mt-4">
-                <div className="text-sm font-medium text-gray-900">BTW Nummer:</div>
+                <div className="text-sm font-medium text-gray-900">{t((x) => x.client.vat)}</div>
                 <div>{invoice.client.tax.value}</div>
               </div>
             )}

@@ -1,10 +1,12 @@
 import { CubeIcon } from '@heroicons/react/24/outline'
 import { useInvoice } from '~/ui/hooks/use-invoice'
 import { usePaginationInfo } from '~/ui/hooks/use-pagination-info'
+import { useTranslation } from '~/ui/hooks/use-translation'
 
 export function SmallHeading() {
   let { total, current } = usePaginationInfo()
   let invoice = useInvoice()
+  let t = useTranslation()
 
   return (
     <div className="bg-gray-50 px-12 py-8">
@@ -14,7 +16,7 @@ export function SmallHeading() {
 
           <span className="space-x-3 text-lg">
             <span>
-              <span className="font-medium text-gray-500">Factuur</span>
+              <span className="font-medium text-gray-500">{t((x) => x.invoice.title)}</span>
               <span className="text-gray-300">.</span>
             </span>
             <span className="text-sm text-gray-300">/</span>
@@ -23,7 +25,10 @@ export function SmallHeading() {
         </div>
 
         <span className="text-sm text-gray-600">
-          {current + 1} of {total}
+          {t((x) => x.pagination.summary, {
+            current: current + 1,
+            total,
+          })}
         </span>
       </div>
     </div>

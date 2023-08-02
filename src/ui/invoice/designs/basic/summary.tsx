@@ -1,25 +1,31 @@
 import { Invoice } from '~/domain/invoice/invoice'
 import { summary, Summary } from '~/domain/invoice/summary'
+import { useTranslation } from '~/ui/hooks/use-translation'
 import { Money } from '~/ui/money'
 import { match } from '~/utils/match'
 
 let summaryItems: {
   [P in Summary['type']]: (
     item: Extract<Summary, { type: P }>,
+    ctx: { t: ReturnType<typeof useTranslation> },
   ) => [React.ReactNode, React.ReactNode]
 } = {
-  subtotal: (item) => {
+  subtotal: (item, { t }) => {
     return [
-      <>{item.subtype === 'discounts' ? 'Totaal (kortingen)' : 'Subtotaal'}</>,
+      <>
+        {item.subtype === 'discounts'
+          ? t((x) => x.summary.discount.total)
+          : t((x) => x.summary.subtotal)}
+      </>,
       <>
         <Money amount={item.value} />
       </>,
     ]
   },
-  total: (item) => {
+  total: (item, { t }) => {
     return [
       <>
-        <span className="font-bold">Totaal</span>
+        <span className="font-bold">{t((x) => x.summary.total)}</span>
       </>,
       <>
         <span className="font-bold">
@@ -28,18 +34,22 @@ let summaryItems: {
       </>,
     ]
   },
-  vat: (item) => {
+  vat: (item, { t }) => {
     return [
-      <>{`BTW (${(item.rate * 100).toFixed(0)}%)`}</>,
+      <>
+        {t((x) => x.summary.vat, {
+          rate: `${(item.rate * 100).toFixed(0)}%`,
+        })}
+      </>,
       <>
         <Money amount={item.value} />
       </>,
     ]
   },
-  discount: (item) => {
+  discount: (item, { t }) => {
     return [
       <>
-        Korting
+        {t((x) => x.summary.discount.title)}
         {item.discount.reason && (
           <>
             <span className="px-1">
@@ -67,6 +77,7 @@ export function Summary({
   discounts: Invoice['discounts']
   type: 'all' | 'subtotal'
 }) {
+  let t = useTranslation()
   if (items.length === 0) return null
   let summaryInfo = summary({ items, discounts })
 
@@ -82,7 +93,7 @@ export function Summary({
         .filter(type === 'subtotal' ? (summaryItem) => summaryItem.type === 'subtotal' : () => true)
         .map((summaryItem, idx) => {
           // @ts-ignore
-          let [label, value] = summaryItems[summaryItem.type](summaryItem)
+          let [label, value] = summaryItems[summaryItem.type](summaryItem, { t })
           return (
             <tr key={idx}>
               <td />

@@ -1,0 +1,40 @@
+{
+  "invoice": {
+    "title": "Factuur"
+  },
+  "dates": {
+    "issueDate": "Factuurdatum:",
+    "dueDate": "Vervaldatum:"
+  },
+  "account": {
+    "title": "Van:",
+    "vat": "BTW Nummer:"
+  },
+  "client": {
+    "title": "Naar:",
+    "vat": "BTW Nummer:"
+  },
+  "invoiceItem": {
+    "description": "Beschrijving",
+    "quantity": "Aantal",
+    "unitPrice": "Eenheidsprijs",
+    "vat": "BTW",
+    "subtotal": "Subtotaal",
+    "total": "Totaal",
+    "discount": "Korting"
+  },
+  "summary": {
+    "subtotal": "Subtotaal",
+    "total": "Totaal",
+    "contactDetails": "Contactgegevens",
+    "paymentDetails": "Betaalgegevens",
+    "discount": {
+      "title": "Korting",
+      "total": "Totaal (kortingen)"
+    },
+    "vat": "BTW (:rate)"
+  },
+  "pagination": {
+    "summary": ":current van :total"
+  }
+}

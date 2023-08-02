@@ -1,30 +1,32 @@
 import { Invoice } from '~/domain/invoice/invoice'
+import { useTranslation } from '~/ui/hooks/use-translation'
 import { Money } from '~/ui/money'
 import { match } from '~/utils/match'
 
 export function Items({ items, children }: { items: Invoice['items']; children: React.ReactNode }) {
   let containsVat = items.some((item) => item.taxRate > 0)
+  let t = useTranslation()
 
   return (
     <table className="min-w-full">
       <thead className="bg-gray-50">
         <tr>
           <th className="w-full whitespace-nowrap py-3 pl-12 pr-4 text-left text-sm font-medium text-gray-900 ">
-            Beschrijving
+            {t((x) => x.invoiceItem.description)}
           </th>
           <th className="w-full whitespace-nowrap px-4 py-3 text-left text-sm font-medium text-gray-900">
-            Aantal
+            {t((x) => x.invoiceItem.quantity)}
           </th>
           <th className="w-full whitespace-nowrap px-4 py-3 text-right text-sm font-medium text-gray-900">
-            Eenheidsprijs
+            {t((x) => x.invoiceItem.unitPrice)}
           </th>
           {containsVat && (
             <th className="w-full whitespace-nowrap px-4 py-3 text-right text-sm font-medium text-gray-900">
-              BTW
+              {t((x) => x.invoiceItem.vat)}
             </th>
           )}
           <th className="w-full whitespace-nowrap py-3 pl-4 pr-12 text-right text-sm font-medium text-gray-900 ">
-            Subtotaal
+            {t((x) => x.invoiceItem.subtotal)}
           </th>
         </tr>
       </thead>
@@ -39,7 +41,7 @@ export function Items({ items, children }: { items: Invoice['items']; children: 
                     key={idx}
                     className="whitespace-nowrap text-left text-sm font-normal text-gray-500"
                   >
-                    Korting
+                    ${t((x) => x.summary.discount.title)}
                     {discount.reason && (
                       <>
                         <span className="px-1">
