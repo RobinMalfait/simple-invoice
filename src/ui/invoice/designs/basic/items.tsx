@@ -41,7 +41,7 @@ export function Items({ items, children }: { items: Invoice['items']; children: 
                     key={idx}
                     className="whitespace-nowrap text-left text-sm font-normal text-gray-500"
                   >
-                    ${t((x) => x.summary.discount.title)}
+                    {t((x) => x.summary.discount.title)}
                     {discount.reason && (
                       <>
                         <span className="px-1">
