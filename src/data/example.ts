@@ -33,7 +33,7 @@ export const me: Account = new AccountBuilder()
   )
   .contactField(
     new ContactFieldBuilder()
-      .icon({ type: 'socials', name: 'Instagram' })
+      .icon({ type: 'socials', name: 'GitHub' })
       .name('github')
       .value('https://github.com')
       .build(),
