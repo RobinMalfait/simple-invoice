@@ -107,7 +107,7 @@ function itemPrice(item: Invoice['items'][number]) {
     if (discount.type === 'percentage') {
       net -= net * discount.value
     } else if (discount.type === 'fixed') {
-      net -= discount.value * (discount.quantity ?? 1)
+      net -= discount.value * discount.quantity
     }
   }
   return net

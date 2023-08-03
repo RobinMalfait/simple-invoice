@@ -6,7 +6,8 @@ export let Discount = z
     z.object({
       type: z.literal('fixed'),
       value: z.number(),
-      quantity: z.number().nullable().default(null),
+      quantity: z.coerce.number().default(1),
+      quantityType: z.enum(['explicit', 'implicit']),
     }),
   ])
   .and(
@@ -22,6 +23,7 @@ export class DiscountBuilder {
   private _value: Discount['value'] | null = null
   private _reason: Discount['reason'] = null
   private _quantity: number | null = null
+  private _quantityType: 'explicit' | 'implicit' = 'implicit'
 
   public build(): Discount {
     return Discount.parse({
@@ -29,6 +31,7 @@ export class DiscountBuilder {
       value: this._value,
       reason: this._reason,
       quantity: this._type === 'fixed' ? this._quantity : undefined,
+      quantityType: this._type === 'fixed' ? this._quantityType : undefined,
     })
   }
 
@@ -53,6 +56,8 @@ export class DiscountBuilder {
     }
 
     this._quantity = quantity
+    this._quantityType = 'explicit'
+
     return this
   }
 }

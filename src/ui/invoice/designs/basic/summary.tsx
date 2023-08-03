@@ -67,7 +67,7 @@ let summaryItems: {
           item.discount.type,
           {
             fixed: (discount: Extract<Discount, { type: 'fixed' }>) => (
-              <Money amount={-1 * discount.value * (discount.quantity ?? 1)} />
+              <Money amount={-1 * discount.value * discount.quantity} />
             ),
             percentage: () => <>{(-1 * (item.discount.value * 100)).toFixed(0)}%</>,
           },

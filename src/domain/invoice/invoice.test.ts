@@ -155,7 +155,16 @@ describe('discounts', () => {
 
       expect(summary(invoice)).toEqual([
         { type: 'subtotal', value: 1000 },
-        { type: 'discount', discount: { type: 'fixed', reason: null, value: 100, quantity: 1 } },
+        {
+          type: 'discount',
+          discount: {
+            type: 'fixed',
+            reason: null,
+            value: 100,
+            quantity: 1,
+            quantityType: 'explicit',
+          },
+        },
         { type: 'total', value: 900 },
       ])
     })
@@ -171,7 +180,16 @@ describe('discounts', () => {
 
       expect(summary(invoice)).toEqual([
         { type: 'subtotal', value: 3000 },
-        { type: 'discount', discount: { type: 'fixed', reason: null, value: 100, quantity: 1 } },
+        {
+          type: 'discount',
+          discount: {
+            type: 'fixed',
+            reason: null,
+            value: 100,
+            quantity: 1,
+            quantityType: 'explicit',
+          },
+        },
         { type: 'total', value: 2900 },
       ])
     })
@@ -188,7 +206,16 @@ describe('discounts', () => {
 
       expect(summary(invoice)).toEqual([
         { type: 'subtotal', value: 2000 },
-        { type: 'discount', discount: { type: 'fixed', reason: null, value: 100, quantity: 1 } },
+        {
+          type: 'discount',
+          discount: {
+            type: 'fixed',
+            reason: null,
+            value: 100,
+            quantity: 1,
+            quantityType: 'explicit',
+          },
+        },
         { type: 'total', value: 1900 },
       ])
     })
@@ -205,7 +232,16 @@ describe('discounts', () => {
 
       expect(summary(invoice)).toEqual([
         { type: 'subtotal', value: 6000 },
-        { type: 'discount', discount: { type: 'fixed', value: 100, reason: null, quantity: 1 } },
+        {
+          type: 'discount',
+          discount: {
+            type: 'fixed',
+            value: 100,
+            reason: null,
+            quantity: 1,
+            quantityType: 'explicit',
+          },
+        },
         { type: 'total', value: 5900 },
       ])
     })
@@ -224,7 +260,16 @@ describe('discounts', () => {
 
         expect(summary(invoice)).toEqual([
           { type: 'subtotal', value: 1000 },
-          { type: 'discount', discount: { type: 'fixed', reason: null, value: 100, quantity: 1 } },
+          {
+            type: 'discount',
+            discount: {
+              type: 'fixed',
+              reason: null,
+              value: 100,
+              quantity: 1,
+              quantityType: 'explicit',
+            },
+          },
           { type: 'subtotal', value: 900 },
           { type: 'vat', rate: 0.21, value: 189 },
           { type: 'total', value: 1089 },
@@ -249,7 +294,16 @@ describe('discounts', () => {
 
         expect(summary(invoice)).toEqual([
           { type: 'subtotal', value: 3000 },
-          { type: 'discount', discount: { type: 'fixed', reason: null, value: 100, quantity: 1 } },
+          {
+            type: 'discount',
+            discount: {
+              type: 'fixed',
+              reason: null,
+              value: 100,
+              quantity: 1,
+              quantityType: 'explicit',
+            },
+          },
           { type: 'subtotal', value: 2900 },
           { type: 'vat', rate: 0.21, value: 609 },
           { type: 'total', value: 3509 },
@@ -272,7 +326,16 @@ describe('discounts', () => {
 
         expect(summary(invoice)).toEqual([
           { type: 'subtotal', value: 2000 },
-          { type: 'discount', discount: { type: 'fixed', reason: null, value: 100, quantity: 1 } },
+          {
+            type: 'discount',
+            discount: {
+              type: 'fixed',
+              reason: null,
+              value: 100,
+              quantity: 1,
+              quantityType: 'explicit',
+            },
+          },
           { type: 'subtotal', value: 1900 },
           { type: 'vat', rate: 0.21, value: 399 },
           { type: 'total', value: 2299 },
@@ -305,7 +368,16 @@ describe('discounts', () => {
 
         expect(summary(invoice)).toEqual([
           { type: 'subtotal', value: 6000 },
-          { type: 'discount', discount: { type: 'fixed', reason: null, value: 100, quantity: 1 } },
+          {
+            type: 'discount',
+            discount: {
+              type: 'fixed',
+              reason: null,
+              value: 100,
+              quantity: 1,
+              quantityType: 'explicit',
+            },
+          },
           { type: 'subtotal', value: 5900 },
           { type: 'vat', rate: 0.21, value: 1239 },
           { type: 'total', value: 7139 },
