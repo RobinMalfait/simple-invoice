@@ -58,7 +58,7 @@ let summaryItems: {
             </span>
           </>
         )}
-        {item.discount.type === 'fixed' && (item.discount.quantity ?? 1) !== 1 && (
+        {item.discount.type === 'fixed' && item.discount.quantity !== 1 && (
           <span>&times; {item.discount.quantity}</span>
         )}
       </>,

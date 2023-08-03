@@ -6,7 +6,7 @@ export let Discount = z
     z.object({
       type: z.literal('fixed'),
       value: z.number(),
-      quantity: z.coerce.number().default(1),
+      quantity: z.number().default(1),
       quantityType: z.enum(['explicit', 'implicit']),
     }),
   ])
@@ -22,7 +22,7 @@ export class DiscountBuilder {
   private _type: Discount['type'] | null = null
   private _value: Discount['value'] | null = null
   private _reason: Discount['reason'] = null
-  private _quantity: number | null = null
+  private _quantity: number | undefined = undefined
   private _quantityType: 'explicit' | 'implicit' = 'implicit'
 
   public build(): Discount {
