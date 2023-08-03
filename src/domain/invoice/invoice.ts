@@ -219,24 +219,24 @@ export class InvoiceBuilder {
   ): InvoiceBuilder {
     let parsedAt = typeof at === 'string' ? parseISO(at) : at
 
+    let handlePayment = () => {
+      let remaining = total({ items: this._items, discounts: this._discounts }) - this.paid - amount
+
+      this.paid += amount
+
+      if (remaining > 0) {
+        this.events.push({ type: 'partially-paid', at: parsedAt, amount, outstanding: remaining })
+        this.state = InvoiceStatus.PartialPaid
+      } else {
+        this.events.push({ type: 'paid', at: parsedAt, amount, outstanding: remaining })
+        this.state = InvoiceStatus.Paid
+      }
+    }
+
     match(this.state, {
-      [InvoiceStatus.Draft]: () => {
-        throw new Error('Cannot pay an invoice that is in draft state')
-      },
-      [InvoiceStatus.Sent]: () => {
-        let remaining =
-          total({ items: this._items, discounts: this._discounts }) - this.paid - amount
-
-        this.paid += amount
-
-        if (remaining > 0) {
-          this.events.push({ type: 'partially-paid', at: parsedAt, amount, outstanding: remaining })
-          this.state = InvoiceStatus.PartialPaid
-        } else {
-          this.events.push({ type: 'paid', at: parsedAt, amount, outstanding: remaining })
-          this.state = InvoiceStatus.Paid
-        }
-      },
+      // When money comes in _before_ an invoice is sent
+      [InvoiceStatus.Draft]: handlePayment,
+      [InvoiceStatus.Sent]: handlePayment,
       [InvoiceStatus.Paid]: () => {
         throw new Error('Cannot pay an invoice that is already paid')
       },
