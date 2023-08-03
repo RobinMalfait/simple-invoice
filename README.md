@@ -10,16 +10,16 @@ This is a simple invoice generator tool. The data is in the code there is no dat
 npm install
 ```
 
-2. Run the project
-
-```
-npm run dev
-```
-
-3. Copy the example `.env`
+2. Copy the example `.env`
 
 ```
 cp .env.example .env
+```
+
+3. Run the project
+
+```
+npm run dev
 ```
 
 ### Changing data
