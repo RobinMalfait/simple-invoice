@@ -1,7 +1,14 @@
 import { z } from 'zod'
 
 export enum TaxID {
+  /** Value Added Tax identification number */
   VAT = 'vat',
+
+  /** Business Number */
+  BN = 'bn',
+
+  // Employer Identification Number
+  EIN = 'ein',
 }
 
 // ---
