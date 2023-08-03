@@ -42,11 +42,13 @@ export function BigHeading() {
       </div>
 
       <div className="flex justify-between px-12 py-8 text-gray-500">
-        <div>
+        <div className="flex flex-col">
           <h3 className="text-sm font-medium text-gray-900">{t((x) => x.account.title)}</h3>
-          <div className="flex flex-col whitespace-pre-wrap text-sm font-normal">
-            <span>{invoice.account.name}</span>
-            <Address address={invoice.account.billing} />
+          <div className="flex flex-1 flex-col whitespace-pre-wrap text-sm font-normal">
+            <div className="flex-1">
+              <span>{invoice.account.name}</span>
+              <Address address={invoice.account.billing} />
+            </div>
             {invoice.account.tax && (
               <div className="mt-4">
                 <div className="text-sm font-medium text-gray-900">{t((x) => x.account.vat)}</div>
@@ -56,11 +58,13 @@ export function BigHeading() {
           </div>
         </div>
 
-        <div>
+        <div className="flex flex-col">
           <h3 className="text-sm font-medium text-gray-900">{t((x) => x.client.title)}</h3>
-          <div className="flex flex-col whitespace-pre-wrap text-sm font-normal">
-            <span>{invoice.client.name}</span>
-            <Address address={invoice.client.billing} />
+          <div className="flex flex-1 flex-col whitespace-pre-wrap text-sm font-normal">
+            <div className="flex-1">
+              <span>{invoice.client.name}</span>
+              <Address address={invoice.client.billing} />
+            </div>
             {invoice.client.tax && (
               <div className="mt-4">
                 <div className="text-sm font-medium text-gray-900">{t((x) => x.client.vat)}</div>
