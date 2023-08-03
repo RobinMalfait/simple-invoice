@@ -50,7 +50,7 @@ export default async function Home() {
       <main className="isolate mx-auto w-full max-w-7xl space-y-8 px-4 py-8 sm:px-6 lg:px-8">
         {invoices.length > 0 ? (
           <>
-            {groupByQuarter(invoices).map(([title, invoices], idx, all) => (
+            {groupByQuarter(invoices).map(([title, invoices], idx) => (
               <div key={title} className="relative flex gap-x-4">
                 <div
                   className={classNames(
