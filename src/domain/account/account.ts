@@ -25,18 +25,18 @@ export let Account = z.object({
 export type Account = z.infer<typeof Account>
 
 export class AccountBuilder {
-  private _name: string | null = null
-  private _email: string | null = null
-  private _phone: string | null = null
-  private _billing: Address | null = null
-  private _currency: Currency | null = Currency.EUR
-  private _language: Language | null = Language.NL
-  private _tax: Tax | null = null
-  private _timezone: string | null = Intl.DateTimeFormat().resolvedOptions().timeZone
-  private _paymentMethods: PaymentMethod[] = []
-  private _contactFields: ContactField[] = []
-  private _note: string | null = null
-  private _legal: string | null = null
+  private _name: Account['name'] | null = null
+  private _email: Account['email'] | null = null
+  private _phone: Account['phone'] | null = null
+  private _billing: Account['billing'] | null = null
+  private _currency: Account['currency'] | null = Currency.EUR
+  private _language: Account['language'] | null = Language.NL
+  private _tax: Account['tax'] | null = null
+  private _timezone: Account['timezone'] | null = Intl.DateTimeFormat().resolvedOptions().timeZone
+  private _paymentMethods: Account['paymentMethods'] = []
+  private _contactFields: Account['contactFields'] = []
+  private _note: Account['note'] | null = null
+  private _legal: Account['legal'] | null = null
 
   public build(): Account {
     return Account.parse({
@@ -55,7 +55,24 @@ export class AccountBuilder {
     })
   }
 
-  public name(name: string): AccountBuilder {
+  public static from(account: Account): AccountBuilder {
+    let builder = new AccountBuilder()
+    builder._name = account.name
+    builder._email = account.email
+    builder._phone = account.phone
+    builder._billing = account.billing
+    builder._currency = account.currency
+    builder._language = account.language
+    builder._tax = account.tax
+    builder._timezone = account.timezone
+    builder._paymentMethods = account.paymentMethods
+    builder._contactFields = account.contactFields
+    builder._note = account.note
+    builder._legal = account.legal
+    return builder
+  }
+
+  public name(name: Account['name']): AccountBuilder {
     this._name = name
     return this
   }
