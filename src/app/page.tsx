@@ -58,17 +58,17 @@ export default async function Home() {
                     'absolute -bottom-8 left-0 flex w-6 justify-center',
                   )}
                 >
-                  <div className="w-px bg-gray-300"></div>
+                  <div className="w-px bg-gray-300 dark:bg-zinc-500"></div>
                 </div>
 
-                <div className="sticky top-24 mt-3 flex h-6 w-6 flex-none items-center justify-center bg-gray-100">
-                  <div className="h-1.5 w-1.5 rounded-full bg-gray-300 ring-1 ring-gray-300" />
+                <div className="sticky top-24 mt-3 flex h-6 w-6 flex-none items-center justify-center bg-gray-100 dark:bg-zinc-900">
+                  <div className="h-1.5 w-1.5 rounded-full bg-gray-300 ring-1 ring-gray-300 dark:bg-zinc-500 dark:ring-zinc-500" />
                 </div>
 
                 <div className="relative flex w-full flex-col gap-4">
                   <div className="sticky top-[84px] isolate z-20">
-                    <div className="absolute -inset-x-2 -top-6 bottom-11 z-10 bg-gray-100"></div>
-                    <div className="relative z-20 flex justify-between rounded-md bg-white/95 p-3 text-gray-500 ring-1 ring-black/5">
+                    <div className="absolute -inset-x-1 -top-6 bottom-12 z-10 bg-gray-100 dark:bg-zinc-900"></div>
+                    <div className="relative z-20 -mx-1.5 flex justify-between rounded-md bg-white/95 px-[18px] py-3 text-gray-500 ring-1 ring-black/5 backdrop-blur dark:bg-zinc-800/95 dark:text-gray-400">
                       <span>{title}</span>
                       <span className="flex items-center gap-2">
                         {groupByCurrency(invoices).map(([currency, invoices], idx) => (
@@ -116,14 +116,16 @@ export default async function Home() {
 
             <div className="relative flex gap-x-4">
               <div className="absolute bottom-8 left-0 top-0 flex w-6 justify-center">
-                <div className="w-px bg-gray-300"></div>
+                <div className="w-px bg-gray-300 dark:bg-zinc-500"></div>
               </div>
 
-              <div className="relative mt-3 flex h-6 w-6 flex-none items-center justify-center bg-gray-100">
-                <div className="h-1.5 w-1.5 rounded-full bg-gray-300 ring-1 ring-gray-300" />
+              <div className="relative mt-3 flex h-6 w-6 flex-none items-center justify-center bg-gray-100 dark:bg-zinc-900">
+                <div className="h-1.5 w-1.5 rounded-full bg-gray-300 ring-1 ring-gray-300 dark:bg-zinc-500 dark:ring-zinc-500" />
               </div>
 
-              <div className="py-3 text-gray-500">The beginning of your adventure</div>
+              <div className="py-3 text-gray-500 dark:text-gray-300">
+                The beginning of your adventure
+              </div>
             </div>
           </>
         ) : (

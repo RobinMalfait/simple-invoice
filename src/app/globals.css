@@ -8,7 +8,7 @@
   }
 
   body {
-    @apply flex min-h-full flex-col bg-gray-100 font-sans text-gray-900 antialiased;
+    @apply flex min-h-full flex-col bg-gray-100 font-sans text-gray-900 antialiased dark:bg-zinc-900;
   }
 
   @page {

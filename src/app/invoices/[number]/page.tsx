@@ -22,7 +22,7 @@ export default function Invoice({ params: { number } }: { params: { number: stri
     <InvoiceProvider invoice={invoice}>
       <div className="[--spacing:theme(spacing.8)]">
         <div className="mx-auto flex w-full max-w-7xl flex-1 flex-wrap gap-[--spacing] px-4 py-[--spacing] sm:px-6 lg:px-8">
-          <div className="flex flex-[calc(210mm+calc(var(--spacing)*2))] grow-0 flex-col rounded-lg border border-black/10 bg-gray-950/10">
+          <div className="flex flex-[calc(210mm+calc(var(--spacing)*2))] grow-0 flex-col rounded-lg border border-black/10 bg-gray-950/10 dark:bg-zinc-600">
             <div className="h-[calc(297mm+calc(var(--spacing)*2))] overflow-hidden">
               <div className="relative z-10 h-full flex-1 overflow-auto py-[--spacing]">
                 <InvoicePreview invoice={invoice} />
@@ -31,13 +31,13 @@ export default function Invoice({ params: { number } }: { params: { number: stri
           </div>
 
           <div className="sticky top-24 flex max-w-md flex-1 flex-col gap-[--spacing]">
-            <div className="flex flex-col gap-4 rounded-lg bg-white p-4 shadow ring-1 ring-black/5">
+            <div className="flex flex-col gap-4 rounded-lg bg-white p-4 shadow ring-1 ring-black/5 dark:bg-zinc-800 dark:text-gray-300">
               <h3 className="flex items-center justify-between text-xl">
                 <span>{invoice.client.name}</span>
                 <span>#{invoice.number}</span>
               </h3>
-              <div className="rounded-md border border-gray-200 bg-gray-100 p-4">
-                <div className="p-4 text-center text-2xl font-bold text-gray-950">
+              <div className="rounded-md border border-gray-200 bg-gray-100 p-4 dark:border-zinc-950 dark:bg-zinc-900">
+                <div className="p-4 text-center text-2xl font-bold text-gray-950 dark:text-gray-300">
                   <Money amount={total(invoice)} />
                 </div>
               </div>
@@ -59,8 +59,8 @@ export default function Invoice({ params: { number } }: { params: { number: stri
               </div>
             </div>
 
-            <div className="flex flex-col gap-4 rounded-lg bg-white p-4 shadow ring-1 ring-black/5">
-              <span className="text-sm font-medium text-gray-900">Activity</span>
+            <div className="flex flex-col gap-4 rounded-lg bg-white p-4 shadow ring-1 ring-black/5 dark:bg-zinc-800 dark:text-gray-300">
+              <span className="text-sm font-medium text-gray-900 dark:text-gray-300">Activity</span>
               <ActivityFeed activity={invoice.events} />
             </div>
           </div>
@@ -82,45 +82,53 @@ function ActivityFeed({ activity }: { activity: InvoiceType['events'] }) {
                 'absolute left-0 top-0 flex w-6 justify-center',
               )}
             >
-              <div className="w-px bg-gray-200" />
+              <div className="w-px bg-gray-200 dark:bg-zinc-600" />
             </div>
 
-            <div className="relative flex h-6 w-6 flex-none items-center justify-center bg-white">
+            <div className="relative flex h-6 w-6 flex-none items-center justify-center bg-white dark:bg-zinc-800">
               {activityItemIdx === activity.length - 1 ? (
                 match(activityItem.type, {
                   drafted: () => (
-                    <div className="h-1.5 w-1.5 rounded-full bg-gray-100 ring-1 ring-gray-300" />
+                    <div className="h-1.5 w-1.5 rounded-full bg-gray-100 ring-1 ring-gray-300 dark:bg-zinc-800 dark:ring-gray-500" />
                   ),
                   sent: () => (
-                    <div className="h-1.5 w-1.5 rounded-full bg-gray-100 ring-1 ring-gray-300" />
+                    <div className="h-1.5 w-1.5 rounded-full bg-gray-100 ring-1 ring-gray-300 dark:bg-zinc-800 dark:ring-gray-500" />
                   ),
                   'partially-paid': () => (
-                    <div className="h-1.5 w-1.5 rounded-full bg-gray-100 ring-1 ring-gray-300" />
+                    <div className="h-1.5 w-1.5 rounded-full bg-gray-100 ring-1 ring-gray-300 dark:bg-zinc-800 dark:ring-gray-500" />
                   ),
                   paid: () => (
-                    <CheckCircleIcon className="h-6 w-6 text-blue-600" aria-hidden="true" />
+                    <CheckCircleIcon
+                      className="h-6 w-6 text-blue-600 dark:text-blue-300"
+                      aria-hidden="true"
+                    />
                   ),
                   overdue: () => (
-                    <XCircleIcon className="h-6 w-6 text-red-600" aria-hidden="true" />
+                    <XCircleIcon
+                      className="h-6 w-6 text-red-600 dark:text-red-300"
+                      aria-hidden="true"
+                    />
                   ),
                 })
               ) : (
-                <div className="h-1.5 w-1.5 rounded-full bg-gray-100 ring-1 ring-gray-300" />
+                <div className="h-1.5 w-1.5 rounded-full bg-gray-100 ring-1 ring-gray-300 dark:bg-zinc-800 dark:ring-gray-500" />
               )}
             </div>
 
-            <p className="flex-auto py-0.5 text-xs leading-5 text-gray-500">
+            <p className="flex-auto py-0.5 text-xs leading-5 text-gray-500 dark:text-gray-300">
               {match(
                 activityItem.type,
                 {
                   drafted: () => (
                     <>
-                      <span className="font-medium text-gray-900">Drafted</span> the invoice.
+                      <span className="font-medium text-gray-900 dark:text-gray-100">Drafted</span>{' '}
+                      the invoice.
                     </>
                   ),
                   sent: () => (
                     <>
-                      <span className="font-medium text-gray-900">Sent</span> the invoice.
+                      <span className="font-medium text-gray-900 dark:text-gray-100">Sent</span> the
+                      invoice.
                     </>
                   ),
                   'partially-paid': (
@@ -130,19 +138,23 @@ function ActivityFeed({ activity }: { activity: InvoiceType['events'] }) {
                     >,
                   ) => (
                     <>
-                      <span className="font-medium text-gray-900">Partially paid</span> with{' '}
-                      <Money amount={activityItem.amount} />, outstanding amount of{' '}
+                      <span className="font-medium text-gray-900 dark:text-gray-100">
+                        Partially paid
+                      </span>{' '}
+                      with <Money amount={activityItem.amount} />, outstanding amount of{' '}
                       <Money amount={activityItem.outstanding} /> left.
                     </>
                   ),
                   paid: () => (
                     <>
-                      <span className="font-medium text-gray-900">Paid</span> the invoice.
+                      <span className="font-medium text-gray-900 dark:text-gray-100">Paid</span> the
+                      invoice.
                     </>
                   ),
                   overdue: () => (
                     <>
-                      The invoice is <span className="font-medium text-gray-900">overdue</span>.
+                      The invoice is{' '}
+                      <span className="font-medium text-gray-900 dark:text-gray-100">overdue</span>.
                     </>
                   ),
                 },
@@ -154,7 +166,7 @@ function ActivityFeed({ activity }: { activity: InvoiceType['events'] }) {
               <time
                 title={activityItem.at.toLocaleString()}
                 dateTime={activityItem.at.toISOString()}
-                className="flex-none py-0.5 text-xs leading-5 text-gray-500"
+                className="flex-none py-0.5 text-xs leading-5 text-gray-500 dark:text-gray-300"
               >
                 {formatDistanceToNow(activityItem.at, { addSuffix: true })}
               </time>
