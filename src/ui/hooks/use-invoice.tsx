@@ -2,12 +2,14 @@
 
 import { ReactNode, createContext, useContext } from 'react'
 import { Invoice } from '~/domain/invoice/invoice'
+import { Quote } from '~/domain/quote/quote'
 import { I18NProvider } from '~/ui/hooks/use-i18n'
 import { pick } from '~/utils/pick'
 
-let Context = createContext<Invoice | null>(null)
+type Entity = Quote | Invoice
+let Context = createContext<Entity | null>(null)
 
-export function InvoiceProvider({ invoice, children }: { invoice: Invoice; children: ReactNode }) {
+export function InvoiceProvider({ invoice, children }: { invoice: Entity; children: ReactNode }) {
   return (
     <I18NProvider value={pick(invoice.client, ['currency', 'language'])}>
       <Context.Provider value={invoice}>{children}</Context.Provider>

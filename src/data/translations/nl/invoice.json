@@ -1,10 +1,15 @@
 {
+  "quote": {
+    "title": "Offerte"
+  },
   "invoice": {
     "title": "Factuur"
   },
   "dates": {
     "issueDate": "Factuurdatum:",
-    "dueDate": "Vervaldatum:"
+    "dueDate": "Vervaldatum:",
+    "quoteDate": "Offertedatum:",
+    "quoteExpirationDate": "Offerte vervaldatum:"
   },
   "account": {
     "title": "Van:",

@@ -1,3 +1,4 @@
+import { subDays } from 'date-fns'
 import { Account, AccountBuilder } from '~/domain/account/account'
 import { AddressBuilder } from '~/domain/address/address'
 import { ClientBuilder } from '~/domain/client/client'
@@ -8,6 +9,7 @@ import { Invoice, InvoiceBuilder } from '~/domain/invoice/invoice'
 import { InvoiceItemBuilder } from '~/domain/invoice/invoice-item'
 import { Language } from '~/domain/language/language'
 import { PaymentMethodBuilder } from '~/domain/payment-method/payment-method'
+import { Quote, QuoteBuilder } from '~/domain/quote/quote'
 import { TaxBuilder } from '~/domain/tax/tax'
 
 export const me: Account = new AccountBuilder()
@@ -75,7 +77,7 @@ let Client2 = new ClientBuilder()
   .currency(Currency.USD)
   .build()
 
-export const invoices: Invoice[] = [
+export const invoices: (Quote | Invoice)[] = [
   // Single item invoice
   new InvoiceBuilder()
     .account(me)
@@ -318,5 +320,69 @@ export const invoices: Invoice[] = [
         .discount(new DiscountBuilder().type('fixed').value(5_00).reason('5OFF').build())
         .build(),
     )
+    .build(),
+
+  // Quote
+  new QuoteBuilder()
+    .account(me)
+    .client(Client1)
+    .quoteDate(subDays(new Date(), 2))
+    .item(new InvoiceItemBuilder().description('Item #1').unitPrice(123).build())
+    .build(),
+
+  // Quote that is sent
+  new QuoteBuilder()
+    .account(me)
+    .client(Client1)
+    .quoteDate(subDays(new Date(), 2))
+    .item(new InvoiceItemBuilder().description('Item #1').unitPrice(123).build())
+    .send(subDays(new Date(), 1))
+    .build(),
+
+  // Quote that is accepted
+  new QuoteBuilder()
+    .account(me)
+    .client(Client1)
+    .quoteDate(subDays(new Date(), 2))
+    .item(new InvoiceItemBuilder().description('Item #1').unitPrice(123).build())
+    .send(subDays(new Date(), 1))
+    .accept(subDays(new Date(), 0))
+    .build(),
+
+  // Quote that is rejected
+  new QuoteBuilder()
+    .account(me)
+    .client(Client1)
+    .quoteDate(subDays(new Date(), 2))
+    .item(new InvoiceItemBuilder().description('Item #1').unitPrice(123).build())
+    .send(subDays(new Date(), 1))
+    .reject(subDays(new Date(), 0))
+    .build(),
+
+  // Quote that is expired
+  new QuoteBuilder()
+    .account(me)
+    .client(Client1)
+    .quoteDate(subDays(new Date(), 30))
+    .item(new InvoiceItemBuilder().description('Item #1').unitPrice(123).build())
+    .send(subDays(new Date(), 31))
+    .build(),
+
+  // Invoice from Quote
+  InvoiceBuilder.fromQuote(
+    new QuoteBuilder()
+      .account(me)
+      .client(Client1)
+      .quoteDate(subDays(new Date(), 20))
+      .item(new InvoiceItemBuilder().description('Item #1').unitPrice(60_00).build())
+      .send(subDays(new Date(), 19))
+      .accept(subDays(new Date(), 18))
+      .build(),
+  )
+    .issueDate(subDays(new Date(), 17))
+    .send(subDays(new Date(), 17))
+    .pay(subDays(new Date(), 3), 10_00)
+    .pay(subDays(new Date(), 2), 20_00)
+    .pay(subDays(new Date(), 1), 30_00)
     .build(),
 ]

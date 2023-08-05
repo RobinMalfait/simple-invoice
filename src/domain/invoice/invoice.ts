@@ -5,8 +5,11 @@ import { Account } from '~/domain/account/account'
 import { Client } from '~/domain/client/client'
 import { Discount } from '~/domain/discount/discount'
 import { IncrementStrategy } from '~/domain/invoice/number-strategies'
+import { Quote } from '~/domain/quote/quote'
 import { total } from '~/ui/invoice/total'
 import { match } from '~/utils/match'
+import { Event } from '../events/event'
+import { QuoteStatus } from '../quote/quote-status'
 import { InvoiceItem } from './invoice-item'
 import { InvoiceStatus } from './invoice-status'
 
@@ -33,6 +36,7 @@ const configuration: Configuration = {
 // ---
 
 export let Invoice = z.object({
+  type: z.literal('invoice').default('invoice'),
   id: z.string().default(() => crypto.randomUUID()),
   number: z.string(),
   account: Account,
@@ -43,26 +47,7 @@ export let Invoice = z.object({
   dueDate: z.date(),
   state: z.nativeEnum(InvoiceStatus).default(InvoiceStatus.Draft),
   discounts: z.array(Discount),
-  events: z.array(
-    z
-      .discriminatedUnion('type', [
-        z.object({ type: z.literal('drafted') }),
-        z.object({ type: z.literal('sent') }),
-        z.object({
-          type: z.literal('partially-paid'),
-          amount: z.number(),
-          outstanding: z.number(),
-        }),
-        z.object({ type: z.literal('paid'), amount: z.number(), outstanding: z.number() }),
-        z.object({ type: z.literal('overdue') }),
-      ])
-      .and(
-        z.object({
-          id: z.string().default(() => crypto.randomUUID()),
-          at: z.date().nullable().default(null),
-        }),
-      ),
-  ),
+  events: z.array(Event),
 })
 
 export type Invoice = z.infer<typeof Invoice>
@@ -79,13 +64,7 @@ export class InvoiceBuilder {
 
   private state = InvoiceStatus.Draft
   private paid: number = 0
-  private events: (
-    | { type: 'drafted' }
-    | { type: 'sent'; at: Date }
-    | { type: 'partially-paid'; at: Date; amount: number; outstanding: number }
-    | { type: 'paid'; at: Date; amount: number; outstanding: number }
-    | { type: 'overdue' }
-  )[] = [{ type: 'drafted' }]
+  private events: Event[] = [Event.parse({ type: 'invoice-drafted' })]
 
   public build(): Invoice {
     let input = {
@@ -103,10 +82,25 @@ export class InvoiceBuilder {
 
     if (input.state !== InvoiceStatus.Paid && isPast(input.dueDate)) {
       input.state = InvoiceStatus.Overdue
-      input.events.push({ type: 'overdue' })
+      input.events.push(Event.parse({ type: 'invoice-overdue', at: input.dueDate }))
     }
 
     return Invoice.parse(input)
+  }
+
+  public static fromQuote(quote: Quote): InvoiceBuilder {
+    if (quote.state !== QuoteStatus.Accepted) {
+      throw new Error('Cannot convert a quote to an invoice that is not accepted')
+    }
+
+    let builder = new InvoiceBuilder()
+    builder._account = quote.account
+    builder._client = quote.client
+    builder._items = quote.items
+    builder._note = quote.note
+    builder._discounts = quote.discounts
+    builder.events = [...quote.events, Event.parse({ type: 'invoice-drafted', from: 'quote' })]
+    return builder
   }
 
   public number(number: string): InvoiceBuilder {
@@ -193,7 +187,7 @@ export class InvoiceBuilder {
 
     match(this.state, {
       [InvoiceStatus.Draft]: () => {
-        this.events.push({ type: 'sent', at: parsedAt })
+        this.events.push(Event.parse({ type: 'invoice-sent', at: parsedAt }))
         this.state = InvoiceStatus.Sent
       },
       [InvoiceStatus.Sent]: () => {
@@ -225,10 +219,19 @@ export class InvoiceBuilder {
       this.paid += amount
 
       if (remaining > 0) {
-        this.events.push({ type: 'partially-paid', at: parsedAt, amount, outstanding: remaining })
+        this.events.push(
+          Event.parse({
+            type: 'invoice-partially-paid',
+            at: parsedAt,
+            amount,
+            outstanding: remaining,
+          }),
+        )
         this.state = InvoiceStatus.PartialPaid
       } else {
-        this.events.push({ type: 'paid', at: parsedAt, amount, outstanding: remaining })
+        this.events.push(
+          Event.parse({ type: 'invoice-paid', at: parsedAt, amount, outstanding: remaining }),
+        )
         this.state = InvoiceStatus.Paid
       }
     }
@@ -247,10 +250,19 @@ export class InvoiceBuilder {
         this.paid += amount
 
         if (remaining > 0) {
-          this.events.push({ type: 'partially-paid', at: parsedAt, amount, outstanding: remaining })
+          this.events.push(
+            Event.parse({
+              type: 'invoice-partially-paid',
+              at: parsedAt,
+              amount,
+              outstanding: remaining,
+            }),
+          )
           this.state = InvoiceStatus.PartialPaid
         } else {
-          this.events.push({ type: 'paid', at: parsedAt, amount, outstanding: remaining })
+          this.events.push(
+            Event.parse({ type: 'invoice-paid', at: parsedAt, amount, outstanding: remaining }),
+          )
           this.state = InvoiceStatus.Paid
         }
       },

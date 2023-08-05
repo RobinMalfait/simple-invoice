@@ -1,13 +1,16 @@
 import { CubeIcon } from '@heroicons/react/24/outline'
 import { format } from 'date-fns'
+import { Invoice } from '~/domain/invoice/invoice'
+import { Quote } from '~/domain/quote/quote'
 import { Address } from '~/ui/address/address'
 import { useInvoice } from '~/ui/hooks/use-invoice'
 import { useLocale } from '~/ui/hooks/use-locale'
 import { useTranslation } from '~/ui/hooks/use-translation'
+import { match } from '~/utils/match'
 
 export function BigHeading() {
   let locale = useLocale()
-  let invoice = useInvoice()
+  let entity = useInvoice()
   let t = useTranslation()
 
   return (
@@ -18,23 +21,66 @@ export function BigHeading() {
         <div className="mt-4 flex items-end justify-between">
           <span className="space-x-3 text-2xl">
             <span>
-              <span className="font-medium text-gray-500">{t((x) => x.invoice.title)}</span>
+              <span className="font-medium text-gray-500">
+                {t((x) =>
+                  match(entity.type, {
+                    quote: () => x.quote.title,
+                    invoice: () => x.invoice.title,
+                  }),
+                )}
+              </span>
               <span className="text-gray-300">.</span>
             </span>
             <span className="text-lg text-gray-300">/</span>
-            <span className="text-lg tabular-nums text-gray-500">{invoice.number}</span>
+            <span className="text-lg tabular-nums text-gray-500">{entity.number}</span>
           </span>
           <div className="text-right">
             <div className="space-x-3">
-              <span className="text-gray-500">{t((x) => x.dates.issueDate)}</span>
+              <span className="text-gray-500">
+                {t((x) =>
+                  match(entity.type, {
+                    quote: () => x.dates.quoteDate,
+                    invoice: () => x.dates.issueDate,
+                  }),
+                )}
+              </span>
               <span className="font-medium tabular-nums text-gray-700">
-                {format(invoice.issueDate, 'PPP', { locale })}
+                {format(
+                  match(
+                    entity.type,
+                    {
+                      quote: (quote: Quote) => quote.quoteDate,
+                      invoice: (invoice: Invoice) => invoice.issueDate,
+                    },
+                    entity,
+                  ),
+                  'PPP',
+                  { locale },
+                )}
               </span>
             </div>
             <div className="space-x-3">
-              <span className="text-gray-500">{t((x) => x.dates.dueDate)}</span>
+              <span className="text-gray-500">
+                {t((x) =>
+                  match(entity.type, {
+                    quote: () => x.dates.quoteExpirationDate,
+                    invoice: () => x.dates.dueDate,
+                  }),
+                )}
+              </span>
               <span className="font-medium tabular-nums text-gray-700">
-                {format(invoice.dueDate, 'PPP', { locale })}
+                {format(
+                  match(
+                    entity.type,
+                    {
+                      quote: (quote: Quote) => quote.quoteExpirationDate,
+                      invoice: (invoice: Invoice) => invoice.dueDate,
+                    },
+                    entity,
+                  ),
+                  'PPP',
+                  { locale },
+                )}
               </span>
             </div>
           </div>
@@ -46,13 +92,13 @@ export function BigHeading() {
           <h3 className="text-sm font-medium text-gray-900">{t((x) => x.account.title)}</h3>
           <div className="flex flex-1 flex-col whitespace-pre-wrap text-sm font-normal">
             <div className="flex-1">
-              <span>{invoice.account.name}</span>
-              <Address address={invoice.account.billing} />
+              <span>{entity.account.name}</span>
+              <Address address={entity.account.billing} />
             </div>
-            {invoice.account.tax && (
+            {entity.account.tax && (
               <div className="mt-4">
                 <div className="text-sm font-medium text-gray-900">{t((x) => x.account.vat)}</div>
-                <div>{invoice.account.tax.value}</div>
+                <div>{entity.account.tax.value}</div>
               </div>
             )}
           </div>
@@ -62,13 +108,13 @@ export function BigHeading() {
           <h3 className="text-sm font-medium text-gray-900">{t((x) => x.client.title)}</h3>
           <div className="flex flex-1 flex-col whitespace-pre-wrap text-sm font-normal">
             <div className="flex-1">
-              <span>{invoice.client.name}</span>
-              <Address address={invoice.client.billing} />
+              <span>{entity.client.name}</span>
+              <Address address={entity.client.billing} />
             </div>
-            {invoice.client.tax && (
+            {entity.client.tax && (
               <div className="mt-4">
                 <div className="text-sm font-medium text-gray-900">{t((x) => x.client.vat)}</div>
-                <div>{invoice.client.tax.value}</div>
+                <div>{entity.client.tax.value}</div>
               </div>
             )}
           </div>

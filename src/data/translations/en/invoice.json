@@ -1,10 +1,15 @@
 {
+  "quote": {
+    "title": "Quote"
+  },
   "invoice": {
     "title": "Invoice"
   },
   "dates": {
     "issueDate": "Issue date:",
-    "dueDate": "Due date:"
+    "dueDate": "Due date:",
+    "quoteDate": "Quote date:",
+    "quoteExpirationDate": "Quote expiration date:"
   },
   "account": {
     "title": "From:",

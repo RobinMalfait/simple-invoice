@@ -1,3 +1,5 @@
+'use client'
+
 import { useCallback } from 'react'
 
 import { Language } from '~/domain/language/language'
