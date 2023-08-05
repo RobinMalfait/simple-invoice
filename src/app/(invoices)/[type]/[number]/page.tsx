@@ -1,6 +1,7 @@
 import {
   CheckCircleIcon,
   ClockIcon,
+  EllipsisHorizontalCircleIcon,
   EyeIcon,
   PencilSquareIcon,
   XCircleIcon,
@@ -139,6 +140,14 @@ function ActivityIndicator({ item }: { item: Entity['events'][number] }) {
     case 'invoice-sent':
       return (
         <ClockIcon className="h-6 w-6 text-orange-600 dark:text-orange-300" aria-hidden="true" />
+      )
+
+    case 'invoice-partially-paid':
+      return (
+        <EllipsisHorizontalCircleIcon
+          className="h-6 w-6 text-orange-600 dark:text-orange-300"
+          aria-hidden="true"
+        />
       )
 
     case 'quote-accepted':
