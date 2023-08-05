@@ -5,11 +5,12 @@ import { format } from 'date-fns'
 
 import { Invoice } from '~/domain/invoice/invoice'
 import { Quote } from '~/domain/quote/quote'
+import { StatusDisplay as InvoiceStatusDisplay } from '~/ui/invoice/status'
 import { total } from '~/ui/invoice/total'
 import { Money } from '~/ui/money'
+import { StatusDisplay as QuoteStatusDisplay } from '~/ui/quote/status'
 import { match } from '~/utils/match'
 import { useTranslation } from '../hooks/use-translation'
-import { StatusDisplay } from './status'
 
 type Entity = Quote | Invoice
 
@@ -24,9 +25,11 @@ export function TinyInvoice({ invoice }: { invoice: Entity }) {
           {match(
             invoice.type,
             {
-              quote: (quote: Quote) => null,
+              quote: (quote: Quote) => (
+                <QuoteStatusDisplay variant="tiny-badge" status={quote.state} />
+              ),
               invoice: (invoice: Invoice) => (
-                <StatusDisplay variant="tiny-badge" status={invoice.state} />
+                <InvoiceStatusDisplay variant="tiny-badge" status={invoice.state} />
               ),
             },
             invoice,

@@ -6,7 +6,9 @@ import { Quote } from '~/domain/quote/quote'
 import { InvoiceProvider } from '~/ui/hooks/use-invoice'
 import { useInvoicePagination } from '~/ui/hooks/use-invoice-pagination'
 import { PageProvider } from '~/ui/hooks/use-pagination-info'
-import { StatusDisplay } from '~/ui/invoice/status'
+import { StatusDisplay as InvoiceStatusDisplay } from '~/ui/invoice/status'
+import { StatusDisplay as QuoteStatusDisplay } from '~/ui/quote/status'
+import { match } from '~/utils/match'
 import { BigFooter } from './big-footer'
 import { BigHeading } from './big-heading'
 import { Items } from './items'
@@ -26,9 +28,18 @@ export function Invoice({ invoice }: { invoice: Entity }) {
         {pages.map((items, pageIdx) => (
           <PageProvider key={pageIdx} info={{ total: pages.length, current: pageIdx }}>
             <div className="paper relative mx-auto flex flex-col bg-white print:m-0">
-              {pageIdx === 0 && invoice.type === 'invoice' && (
+              {pageIdx === 0 && (
                 <div className="absolute right-4 top-4 z-20 print:hidden">
-                  <StatusDisplay status={invoice.state} />
+                  {match(
+                    invoice.type,
+                    {
+                      quote: (quote: Quote) => <QuoteStatusDisplay status={quote.state} />,
+                      invoice: (invoice: InvoiceType) => (
+                        <InvoiceStatusDisplay status={invoice.state} />
+                      ),
+                    },
+                    invoice,
+                  )}
                 </div>
               )}
               {pageIdx === 0 ? <BigHeading /> : <SmallHeading />}
