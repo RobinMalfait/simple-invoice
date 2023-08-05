@@ -52,7 +52,7 @@ export default function Invoice({
                 <span>#{entity.number}</span>
               </h3>
               <div className="rounded-md border border-gray-200 bg-gray-100 p-4 dark:border-zinc-950 dark:bg-zinc-900">
-                <div className="p-4 text-center text-2xl font-bold text-gray-950 dark:text-gray-300">
+                <div className="p-4 py-8 text-center text-2xl font-bold text-gray-950 dark:text-gray-300">
                   <Money amount={total(entity)} />
                 </div>
               </div>
