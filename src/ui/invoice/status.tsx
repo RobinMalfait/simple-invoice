@@ -24,7 +24,7 @@ let statusClassMap: Record<InvoiceStatus, string> = {
   [InvoiceStatus.Draft]: 'bg-gray-50 text-gray-500 border-gray-300 ring-gray-400/50',
   [InvoiceStatus.Sent]: 'bg-orange-50 text-orange-500 border-orange-300 ring-orange-500/50',
   [InvoiceStatus.Paid]: 'bg-green-50 text-green-500 border-green-300 ring-emerald-500/50',
-  [InvoiceStatus.PartialPaid]: 'bg-green-50 text-green-500 border-green-300 ring-emerald-500/50',
+  [InvoiceStatus.PartialPaid]: 'bg-orange-50 text-orange-500 border-orange-300 ring-orange-500/50',
   [InvoiceStatus.Overdue]: 'bg-red-50 text-red-500 border-red-300 ring-red-500/50',
 }
 
