@@ -48,6 +48,7 @@ export let Invoice = z.object({
   state: z.nativeEnum(InvoiceStatus).default(InvoiceStatus.Draft),
   discounts: z.array(Discount),
   events: z.array(Event),
+  quote: Quote.nullable(),
 })
 
 export type Invoice = z.infer<typeof Invoice>
@@ -61,6 +62,7 @@ export class InvoiceBuilder {
   private _issueDate: Date | null = null
   private _dueDate: Date | null = null
   private _discounts: Discount[] = []
+  private _quote: Quote | null = null
 
   private state = InvoiceStatus.Draft
   private paid: number = 0
@@ -78,6 +80,7 @@ export class InvoiceBuilder {
       discounts: this._discounts,
       state: this.state,
       events: this.events,
+      quote: this._quote,
     }
 
     if (input.state !== InvoiceStatus.Paid && isPast(input.dueDate)) {
@@ -101,6 +104,7 @@ export class InvoiceBuilder {
     builder._discounts = quote.discounts
     builder.events = quote.events.slice()
     builder.events.push(Event.parse({ type: 'invoice-drafted', from: 'quote' }))
+    builder._quote = quote
     return builder
   }
 
