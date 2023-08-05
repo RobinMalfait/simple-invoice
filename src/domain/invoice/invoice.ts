@@ -99,7 +99,8 @@ export class InvoiceBuilder {
     builder._items = quote.items
     builder._note = quote.note
     builder._discounts = quote.discounts
-    builder.events = [...quote.events, Event.parse({ type: 'invoice-drafted', from: 'quote' })]
+    builder.events = quote.events.slice()
+    builder.events.push(Event.parse({ type: 'invoice-drafted', from: 'quote' }))
     return builder
   }
 

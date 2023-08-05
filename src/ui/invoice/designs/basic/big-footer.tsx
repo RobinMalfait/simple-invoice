@@ -20,7 +20,13 @@ export function BigFooter() {
           <div className="flex items-center justify-between text-xl font-medium">
             <span>{t((x) => x.summary.total)}</span>
             <div className="-mx-4 -my-2 rounded-full bg-black px-4 py-2 text-white">
-              <Money amount={total(invoice)} />
+              <Money
+                amount={match(invoice.type, {
+                  quote: () => total(invoice),
+                  invoice: () => total(invoice),
+                  receipt: () => 0,
+                })}
+              />
             </div>
           </div>
 

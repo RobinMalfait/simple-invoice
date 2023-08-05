@@ -5,6 +5,7 @@ import { format } from 'date-fns'
 
 import { Invoice } from '~/domain/invoice/invoice'
 import { Quote } from '~/domain/quote/quote'
+import { Receipt } from '~/domain/receipt/receipt'
 import { StatusDisplay as InvoiceStatusDisplay } from '~/ui/invoice/status'
 import { total } from '~/ui/invoice/total'
 import { Money } from '~/ui/money'
@@ -12,7 +13,7 @@ import { StatusDisplay as QuoteStatusDisplay } from '~/ui/quote/status'
 import { match } from '~/utils/match'
 import { useTranslation } from '../hooks/use-translation'
 
-type Entity = Quote | Invoice
+type Entity = Quote | Invoice | Receipt
 
 export function TinyInvoice({ invoice }: { invoice: Entity }) {
   let t = useTranslation()
@@ -27,6 +28,9 @@ export function TinyInvoice({ invoice }: { invoice: Entity }) {
             {
               quote: (quote: Quote) => <QuoteStatusDisplay status={quote.state} />,
               invoice: (invoice: Invoice) => <InvoiceStatusDisplay status={invoice.state} />,
+              receipt: (receipt: Receipt) => (
+                <InvoiceStatusDisplay status={receipt.invoice.state} />
+              ),
             },
             invoice,
           )}
@@ -37,6 +41,7 @@ export function TinyInvoice({ invoice }: { invoice: Entity }) {
             {match(invoice.type, {
               quote: () => <small className="lowercase">{t((x) => x.quote.title)}</small>,
               invoice: null,
+              receipt: () => <small className="lowercase">{t((x) => x.receipt.title)}</small>,
             })}
             <h3 className="text-xl font-medium text-gray-900">{invoice.number}</h3>
             <div className="mt-1 flex flex-grow flex-col justify-between">
@@ -56,6 +61,7 @@ export function TinyInvoice({ invoice }: { invoice: Entity }) {
                 {
                   quote: (quote: Quote) => format(quote.quoteDate, 'PP'),
                   invoice: (invoice: Invoice) => format(invoice.issueDate, 'PP'),
+                  receipt: (receipt: Receipt) => format(receipt.receiptDate, 'PP'),
                 },
                 invoice,
               )}
@@ -74,6 +80,7 @@ export function TinyInvoice({ invoice }: { invoice: Entity }) {
                 {
                   quote: (quote: Quote) => format(quote.quoteExpirationDate, 'PP'),
                   invoice: (invoice: Invoice) => format(invoice.dueDate, 'PP'),
+                  receipt: (receipt: Receipt) => format(receipt.receiptDate, 'PP'),
                 },
                 invoice,
               )}

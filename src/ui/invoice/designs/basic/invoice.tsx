@@ -3,9 +3,11 @@
 import { InformationCircleIcon } from '@heroicons/react/24/outline'
 import { Invoice as InvoiceType } from '~/domain/invoice/invoice'
 import { Quote } from '~/domain/quote/quote'
+import { Receipt } from '~/domain/receipt/receipt'
 import { InvoiceProvider } from '~/ui/hooks/use-invoice'
 import { useInvoicePagination } from '~/ui/hooks/use-invoice-pagination'
 import { PageProvider } from '~/ui/hooks/use-pagination-info'
+import { match } from '~/utils/match'
 import { BigFooter } from './big-footer'
 import { BigHeading } from './big-heading'
 import { Items } from './items'
@@ -13,7 +15,7 @@ import { SmallFooter } from './small-footer'
 import { SmallHeading } from './small-heading'
 import { Summary } from './summary'
 
-type Entity = Quote | InvoiceType
+type Entity = Quote | InvoiceType | Receipt
 
 export function Invoice({ invoice }: { invoice: Entity }) {
   let [pages, FitContent] = useInvoicePagination(invoice.items)
@@ -32,10 +34,23 @@ export function Invoice({ invoice }: { invoice: Entity }) {
                   <Items items={items}>
                     {pageIdx === pages.length - 1 ? (
                       <>
-                        <Summary items={invoice.items} discounts={invoice.discounts} type="all" />
+                        <Summary
+                          items={invoice.items}
+                          discounts={invoice.discounts}
+                          type="all"
+                          status={match(
+                            invoice.type,
+                            {
+                              quote: () => null,
+                              invoice: () => null,
+                              receipt: (e: Receipt) => e.invoice.state,
+                            },
+                            invoice,
+                          )}
+                        />
                       </>
                     ) : (
-                      <Summary items={items} discounts={[]} type="subtotal" />
+                      <Summary items={items} discounts={[]} type="subtotal" status={null} />
                     )}
                   </Items>
                 </FitContent>

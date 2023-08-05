@@ -1,20 +1,26 @@
 import { Discount } from '~/domain/discount/discount'
 import { Invoice } from '~/domain/invoice/invoice'
+import { InvoiceStatus } from './invoice-status'
 
 export type Summary =
   | { type: 'subtotal'; subtype?: 'discounts'; value: number }
   | { type: 'discount'; discount: Discount }
   | { type: 'vat'; rate: number; value: number }
   | { type: 'total'; value: number }
+  | { type: 'paid'; value: number }
 
-export function summary(invoice: Pick<Invoice, 'items' | 'discounts'>): Summary[] {
+export function summary({
+  items,
+  discounts,
+  status = null,
+}: Pick<Invoice, 'items' | 'discounts'> & { status?: InvoiceStatus | null }): Summary[] {
   let result: Summary[] = []
 
-  let hasDiscounts = invoice.discounts.length > 0
-  let hasVAT = invoice.items.some((item) => item.taxRate !== 0)
+  let hasDiscounts = discounts.length > 0
+  let hasVAT = items.some((item) => item.taxRate !== 0)
 
   // Calculate net subtotal
-  let subtotalResult = invoice.items.reduce((sum, item) => {
+  let subtotalResult = items.reduce((sum, item) => {
     let net = item.unitPrice * item.quantity
     for (let discount of item.discounts) {
       if (discount.type === 'percentage') {
@@ -31,7 +37,7 @@ export function summary(invoice: Pick<Invoice, 'items' | 'discounts'>): Summary[
 
   // Calculate discounts
   let discountResult = 0
-  for (let discount of invoice.discounts) {
+  for (let discount of discounts) {
     result.push({ type: 'discount', discount })
 
     if (discount.type === 'percentage') {
@@ -48,22 +54,21 @@ export function summary(invoice: Pick<Invoice, 'items' | 'discounts'>): Summary[
     }
   }
 
-  let isSingleFixedDiscount =
-    invoice.discounts.length === 1 && invoice.discounts[0].type === 'fixed'
+  let isSingleFixedDiscount = discounts.length === 1 && discounts[0].type === 'fixed'
 
-  if (invoice.discounts.length > 0 && !isSingleFixedDiscount) {
+  if (discounts.length > 0 && !isSingleFixedDiscount) {
     result.push({ type: 'subtotal', subtype: 'discounts', value: discountResult })
   }
 
   // Calculate VATs
-  let vatTypes = new Set(invoice.items.map((item) => item.taxRate)).size
+  let vatTypes = new Set(items.map((item) => item.taxRate)).size
 
   let vats = new Map<number, number>()
   let vatResult = 0
 
   // Only dealing with a single VAT rate
-  if (vatTypes === 1 && invoice.items[0].taxRate !== 0) {
-    let taxRate = invoice.items[0].taxRate
+  if (vatTypes === 1 && items[0].taxRate !== 0) {
+    let taxRate = items[0].taxRate
     let value = subtotalResult * taxRate
 
     vats.set(taxRate, value)
@@ -72,7 +77,7 @@ export function summary(invoice: Pick<Invoice, 'items' | 'discounts'>): Summary[
 
   // Dealing with multiple VAT rates (this is currently not supported in combination with discounts)
   else {
-    for (let item of invoice.items) {
+    for (let item of items) {
       if (item.taxRate === 0) continue
       if (!vats.has(item.taxRate)) vats.set(item.taxRate, 0)
 
@@ -92,6 +97,10 @@ export function summary(invoice: Pick<Invoice, 'items' | 'discounts'>): Summary[
 
   // Calculate total
   result.push({ type: 'total', value: subtotalResult + vatResult })
+
+  if (status === InvoiceStatus.Paid) {
+    result.push({ type: 'paid', value: subtotalResult + vatResult })
+  }
 
   return result
 }

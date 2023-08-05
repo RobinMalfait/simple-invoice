@@ -3,10 +3,11 @@
 import { ReactNode, createContext, useContext } from 'react'
 import { Invoice } from '~/domain/invoice/invoice'
 import { Quote } from '~/domain/quote/quote'
+import { Receipt } from '~/domain/receipt/receipt'
 import { I18NProvider } from '~/ui/hooks/use-i18n'
 import { pick } from '~/utils/pick'
 
-type Entity = Quote | Invoice
+type Entity = Quote | Invoice | Receipt
 let Context = createContext<Entity | null>(null)
 
 export function InvoiceProvider({ invoice, children }: { invoice: Entity; children: ReactNode }) {

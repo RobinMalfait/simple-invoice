@@ -5,11 +5,18 @@
   "invoice": {
     "title": "Factuur"
   },
+  "receipt": {
+    "title": "Kassabon",
+    "fields": {
+      "invoice": "Factuur:"
+    }
+  },
   "dates": {
     "issueDate": "Factuurdatum:",
     "dueDate": "Vervaldatum:",
     "quoteDate": "Offertedatum:",
-    "quoteExpirationDate": "Offerte vervaldatum:"
+    "quoteExpirationDate": "Offerte vervaldatum:",
+    "receiptDate": "Betaaldatum:"
   },
   "account": {
     "title": "Van:",
@@ -37,6 +44,7 @@
       "title": "Korting",
       "total": "Totaal (kortingen)"
     },
+    "paid": "Betaald",
     "vat": "BTW (:rate)"
   },
   "pagination": {

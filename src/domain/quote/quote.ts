@@ -4,10 +4,10 @@ import { z } from 'zod'
 import { Account } from '~/domain/account/account'
 import { Client } from '~/domain/client/client'
 import { Discount } from '~/domain/discount/discount'
+import { Event } from '~/domain/events/event'
 import { InvoiceItem } from '~/domain/invoice/invoice-item'
 import { IncrementStrategy } from '~/domain/invoice/number-strategies'
 import { match } from '~/utils/match'
-import { Event } from '../events/event'
 import { QuoteStatus } from './quote-status'
 
 type Configuration = {

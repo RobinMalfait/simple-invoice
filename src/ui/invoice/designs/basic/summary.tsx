@@ -35,6 +35,18 @@ let summaryItems: {
       </>,
     ]
   },
+  paid: (item, { t }) => {
+    return [
+      <>
+        <span className="font-bold">{t((x) => x.summary.paid)}</span>
+      </>,
+      <>
+        <span className="font-bold">
+          <Money amount={item.value} />
+        </span>
+      </>,
+    ]
+  },
   vat: (item, { t }) => {
     return [
       <>
@@ -81,15 +93,17 @@ let summaryItems: {
 export function Summary({
   items,
   discounts,
+  status,
   type = 'all',
 }: {
   items: Invoice['items']
   discounts: Invoice['discounts']
+  status: Invoice['state'] | null
   type: 'all' | 'subtotal'
 }) {
   let t = useTranslation()
   if (items.length === 0) return null
-  let summaryInfo = summary({ items, discounts })
+  let summaryInfo = summary({ items, discounts, status })
 
   return (
     <>

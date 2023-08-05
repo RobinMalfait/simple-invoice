@@ -10,6 +10,7 @@ import { InvoiceItemBuilder } from '~/domain/invoice/invoice-item'
 import { Language } from '~/domain/language/language'
 import { PaymentMethodBuilder } from '~/domain/payment-method/payment-method'
 import { Quote, QuoteBuilder } from '~/domain/quote/quote'
+import { Receipt, ReceiptBuilder } from '~/domain/receipt/receipt'
 import { TaxBuilder } from '~/domain/tax/tax'
 
 export const me: Account = new AccountBuilder()
@@ -77,7 +78,7 @@ let Client2 = new ClientBuilder()
   .currency(Currency.USD)
   .build()
 
-export const invoices: (Quote | Invoice)[] = [
+export const invoices: (Quote | Invoice | Receipt)[] = [
   // Single item invoice, drafted
   new InvoiceBuilder()
     .account(me)
@@ -459,4 +460,24 @@ export const invoices: (Quote | Invoice)[] = [
     .pay(subDays(new Date(), 2), 20_00)
     .pay(subDays(new Date(), 1), 30_00)
     .build(),
+
+  // Receipt from Invoice from Quote
+  ReceiptBuilder.fromInvoice(
+    InvoiceBuilder.fromQuote(
+      new QuoteBuilder()
+        .account(me)
+        .client(Client1)
+        .quoteDate(subDays(new Date(), 20))
+        .item(new InvoiceItemBuilder().description('Item #1').unitPrice(60_00).build())
+        .send(subDays(new Date(), 19))
+        .accept(subDays(new Date(), 18))
+        .build(),
+    )
+      .issueDate(subDays(new Date(), 17))
+      .send(subDays(new Date(), 17))
+      .pay(subDays(new Date(), 3), 10_00)
+      .pay(subDays(new Date(), 2), 20_00)
+      .pay(subDays(new Date(), 1), 30_00)
+      .build(),
+  ).build(),
 ]

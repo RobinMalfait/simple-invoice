@@ -2,6 +2,7 @@ import { CubeIcon } from '@heroicons/react/24/outline'
 import { format } from 'date-fns'
 import { Invoice } from '~/domain/invoice/invoice'
 import { Quote } from '~/domain/quote/quote'
+import { Receipt } from '~/domain/receipt/receipt'
 import { Address } from '~/ui/address/address'
 import { useInvoice } from '~/ui/hooks/use-invoice'
 import { useLocale } from '~/ui/hooks/use-locale'
@@ -26,6 +27,7 @@ export function BigHeading() {
                   match(entity.type, {
                     quote: () => x.quote.title,
                     invoice: () => x.invoice.title,
+                    receipt: () => x.receipt.title,
                   }),
                 )}
               </span>
@@ -41,21 +43,19 @@ export function BigHeading() {
                   match(entity.type, {
                     quote: () => x.dates.quoteDate,
                     invoice: () => x.dates.issueDate,
+                    receipt: () => x.receipt.fields.invoice,
                   }),
                 )}
               </span>
               <span className="font-medium tabular-nums text-gray-700">
-                {format(
-                  match(
-                    entity.type,
-                    {
-                      quote: (quote: Quote) => quote.quoteDate,
-                      invoice: (invoice: Invoice) => invoice.issueDate,
-                    },
-                    entity,
-                  ),
-                  'PPP',
-                  { locale },
+                {match(
+                  entity.type,
+                  {
+                    quote: (quote: Quote) => format(quote.quoteDate, 'PPP', { locale }),
+                    invoice: (invoice: Invoice) => format(invoice.issueDate, 'PPP', { locale }),
+                    receipt: (receipt: Receipt) => receipt.invoice.number,
+                  },
+                  entity,
                 )}
               </span>
             </div>
@@ -65,21 +65,19 @@ export function BigHeading() {
                   match(entity.type, {
                     quote: () => x.dates.quoteExpirationDate,
                     invoice: () => x.dates.dueDate,
+                    receipt: () => x.dates.receiptDate,
                   }),
                 )}
               </span>
               <span className="font-medium tabular-nums text-gray-700">
-                {format(
-                  match(
-                    entity.type,
-                    {
-                      quote: (quote: Quote) => quote.quoteExpirationDate,
-                      invoice: (invoice: Invoice) => invoice.dueDate,
-                    },
-                    entity,
-                  ),
-                  'PPP',
-                  { locale },
+                {match(
+                  entity.type,
+                  {
+                    quote: (quote: Quote) => format(quote.quoteExpirationDate, 'PPP', { locale }),
+                    invoice: (invoice: Invoice) => format(invoice.dueDate, 'PPP', { locale }),
+                    receipt: (receipt: Receipt) => format(receipt.receiptDate, 'PPP', { locale }),
+                  },
+                  entity,
                 )}
               </span>
             </div>

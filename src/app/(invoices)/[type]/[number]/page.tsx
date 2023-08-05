@@ -11,6 +11,7 @@ import { redirect } from 'next/navigation'
 import { invoices } from '~/data'
 import { Invoice as InvoiceType } from '~/domain/invoice/invoice'
 import { Quote as QuoteType } from '~/domain/quote/quote'
+import { Receipt as ReceiptType } from '~/domain/receipt/receipt'
 import { classNames } from '~/ui/class-names'
 import { DownloadLink } from '~/ui/download-link'
 import { InvoiceProvider } from '~/ui/hooks/use-invoice'
@@ -20,7 +21,7 @@ import { Money } from '~/ui/money'
 import { assertNever } from '~/utils/assert-never'
 import { match } from '~/utils/match'
 
-type Entity = QuoteType | InvoiceType
+type Entity = QuoteType | InvoiceType | ReceiptType
 
 export default function Invoice({
   params: { type, number },
@@ -49,7 +50,18 @@ export default function Invoice({
             <div className="flex flex-col gap-4 rounded-lg bg-white p-4 shadow ring-1 ring-black/5 dark:bg-zinc-800 dark:text-gray-300">
               <h3 className="flex items-center justify-between text-xl">
                 <span>{entity.client.name}</span>
-                <span>#{entity.number}</span>
+                <span>
+                  #
+                  {match(
+                    entity.type,
+                    {
+                      quote: (e: QuoteType) => e.number,
+                      invoice: (e: InvoiceType) => e.number,
+                      receipt: (e: ReceiptType) => e.invoice.number,
+                    },
+                    entity,
+                  )}
+                </span>
               </h3>
               <div className="rounded-md border border-gray-200 bg-gray-100 p-4 dark:border-zinc-950 dark:bg-zinc-900">
                 <div className="p-4 py-8 text-center text-2xl font-bold text-gray-950 dark:text-gray-300">
@@ -152,6 +164,7 @@ function ActivityIndicator({ item }: { item: Entity['events'][number] }) {
 
     case 'quote-accepted':
     case 'invoice-paid':
+    case 'receipt-created':
       return (
         <CheckCircleIcon className="h-6 w-6 text-blue-600 dark:text-blue-300" aria-hidden="true" />
       )
@@ -255,6 +268,14 @@ function ActivityText({ item }: { item: Entity['events'][number] }) {
         <>
           The invoice is{' '}
           <span className="font-medium text-gray-900 dark:text-gray-100">overdue</span>.
+        </>
+      )
+
+    case 'receipt-created':
+      return (
+        <>
+          The receipt has been{' '}
+          <span className="font-medium text-gray-900 dark:text-gray-100">created</span>.
         </>
       )
 

@@ -5,6 +5,7 @@ import { invoices, me } from '~/data'
 import { Currency } from '~/domain/currency/currency'
 import { Invoice } from '~/domain/invoice/invoice'
 import { Quote } from '~/domain/quote/quote'
+import { Receipt } from '~/domain/receipt/receipt'
 import { classNames } from '~/ui/class-names'
 import { Empty } from '~/ui/empty'
 import { I18NProvider } from '~/ui/hooks/use-i18n'
@@ -13,7 +14,7 @@ import { total } from '~/ui/invoice/total'
 import { Money } from '~/ui/money'
 import { match } from '~/utils/match'
 
-type Entity = Quote | Invoice
+type Entity = Quote | Invoice | Receipt
 
 let entityOrder = ['quote', 'invoice', 'receipt']
 
@@ -23,7 +24,7 @@ function groupByQuarter(invoices: Entity[]) {
       .sort((a, z) => {
         return (
           // Order by entity type
-          entityOrder.indexOf(a.type) - entityOrder.indexOf(z.type) ||
+          entityOrder.indexOf(z.type) - entityOrder.indexOf(a.type) ||
           // Put most recent invoices first
           z.number.localeCompare(a.number)
         )
@@ -38,6 +39,8 @@ function groupByQuarter(invoices: Entity[]) {
               [format(entity.quoteDate, 'QQQ'), format(entity.quoteDate, 'y')].join(' • '),
             invoice: (entity: Invoice) =>
               [format(entity.issueDate, 'QQQ'), format(entity.issueDate, 'y')].join(' • '),
+            receipt: (entity: Receipt) =>
+              [format(entity.receiptDate, 'QQQ'), format(entity.receiptDate, 'y')].join(' • '),
           },
           entity,
         )
