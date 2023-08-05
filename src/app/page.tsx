@@ -4,37 +4,58 @@ import Link from 'next/link'
 import { invoices, me } from '~/data'
 import { Currency } from '~/domain/currency/currency'
 import { Invoice } from '~/domain/invoice/invoice'
+import { Quote } from '~/domain/quote/quote'
 import { classNames } from '~/ui/class-names'
 import { Empty } from '~/ui/empty'
 import { I18NProvider } from '~/ui/hooks/use-i18n'
 import { TinyInvoice } from '~/ui/invoice/tiny-invoice'
 import { total } from '~/ui/invoice/total'
 import { Money } from '~/ui/money'
+import { match } from '~/utils/match'
 
-function groupByQuarter(invoices: Invoice[]) {
+type Entity = Quote | Invoice
+
+let entityOrder = ['quote', 'invoice', 'receipt']
+
+function groupByQuarter(invoices: Entity[]) {
   return Array.from(
     invoices
-      // Put most recent invoices first
-      .sort((a, z) => z.number.localeCompare(a.number))
+      .sort((a, z) => {
+        return (
+          // Order by entity type
+          entityOrder.indexOf(a.type) - entityOrder.indexOf(z.type) ||
+          // Put most recent invoices first
+          z.number.localeCompare(a.number)
+        )
+      })
 
       // Group by quarter & year
-      .reduce((acc, invoice) => {
-        let key = [format(invoice.issueDate, 'QQQ'), format(invoice.issueDate, 'y')].join(' • ')
+      .reduce((acc, entity) => {
+        let key = match(
+          entity.type,
+          {
+            quote: (entity: Quote) =>
+              [format(entity.quoteDate, 'QQQ'), format(entity.quoteDate, 'y')].join(' • '),
+            invoice: (entity: Invoice) =>
+              [format(entity.issueDate, 'QQQ'), format(entity.issueDate, 'y')].join(' • '),
+          },
+          entity,
+        )
         if (!acc.has(key)) acc.set(key, [])
-        acc.get(key)!.push(invoice)
+        acc.get(key)!.push(entity)
         return acc
-      }, new Map<string, Invoice[]>()),
+      }, new Map<string, Entity[]>()),
   )
 }
 
-function groupByCurrency(invoices: Invoice[]) {
+function groupByCurrency(invoices: Entity[]) {
   return Array.from(
     invoices.reduce((acc, invoice) => {
       let key = invoice.client.currency
       if (!acc.has(key)) acc.set(key, [])
       acc.get(key)!.push(invoice)
       return acc
-    }, new Map<Currency, Invoice[]>()),
+    }, new Map<Currency, Entity[]>()),
   )
 }
 
@@ -104,7 +125,7 @@ export default async function Home() {
                           currency: invoice.client.currency,
                         }}
                       >
-                        <Link href={`/invoices/${invoice.number}`}>
+                        <Link href={`/${invoice.type}/${invoice.number}`}>
                           <TinyInvoice invoice={invoice} />
                         </Link>
                       </I18NProvider>

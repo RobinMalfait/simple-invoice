@@ -50,7 +50,7 @@ export class DiscountBuilder {
     return this
   }
 
-  public quantity(quantity: number | null): DiscountBuilder {
+  public quantity(quantity: number): DiscountBuilder {
     if (this._type !== 'fixed') {
       throw new Error('Cannot set quantity on non-fixed discount')
     }

@@ -15,6 +15,9 @@
     "semi": false,
     "singleQuote": true,
     "printWidth": 100,
+    "tailwindFunctions": [
+      "tw"
+    ],
     "plugins": [
       "prettier-plugin-organize-imports",
       "prettier-plugin-tailwindcss"
