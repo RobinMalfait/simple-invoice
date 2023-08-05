@@ -37,7 +37,7 @@ export default function Invoice({
     <InvoiceProvider invoice={entity}>
       <div className="[--spacing:theme(spacing.8)]">
         <div className="mx-auto flex w-full max-w-7xl flex-1 flex-wrap gap-[--spacing] px-4 py-[--spacing] sm:px-6 lg:px-8">
-          <div className="flex flex-[calc(210mm+calc(var(--spacing)*2))] grow-0 flex-col rounded-lg border border-black/10 bg-gray-950/10 dark:bg-zinc-600">
+          <div className="flex w-[calc(210mm+calc(var(--spacing)*2))] grow-0 flex-col rounded-lg border border-black/10 bg-gray-950/10 dark:bg-zinc-600">
             <div className="h-[calc(297mm+calc(var(--spacing)*2))] overflow-hidden">
               <div className="relative z-10 h-full flex-1 overflow-auto py-[--spacing]">
                 <InvoicePreview invoice={entity} />
