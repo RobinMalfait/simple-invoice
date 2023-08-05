@@ -25,12 +25,8 @@ export function TinyInvoice({ invoice }: { invoice: Entity }) {
           {match(
             invoice.type,
             {
-              quote: (quote: Quote) => (
-                <QuoteStatusDisplay variant="tiny-badge" status={quote.state} />
-              ),
-              invoice: (invoice: Invoice) => (
-                <InvoiceStatusDisplay variant="tiny-badge" status={invoice.state} />
-              ),
+              quote: (quote: Quote) => <QuoteStatusDisplay status={quote.state} />,
+              invoice: (invoice: Invoice) => <InvoiceStatusDisplay status={invoice.state} />,
             },
             invoice,
           )}

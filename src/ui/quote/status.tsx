@@ -7,9 +7,8 @@ import {
 } from '@heroicons/react/24/outline'
 import { QuoteStatus } from '~/domain/quote/quote-status'
 import { classNames } from '~/ui/class-names'
-import { match } from '~/utils/match'
 
-export let statusIconMap: Record<
+let statusIconMap: Record<
   QuoteStatus,
   | typeof PencilIcon
   | typeof EnvelopeIcon
@@ -37,43 +36,18 @@ let statusClassMap: Record<QuoteStatus, string> = {
     'bg-red-50 text-red-700 ring-red-600/10 dark:bg-red-400/10 dark:text-red-400 dark:ring-red-400/20',
 }
 
-export type Variant = 'badge' | 'tiny-badge'
-
-export function StatusDisplay({
-  status,
-  variant = 'badge',
-}: {
-  status: QuoteStatus
-  variant?: Variant
-}) {
+export function StatusDisplay({ status }: { status: QuoteStatus }) {
   let Icon = statusIconMap[status]
 
-  return match(variant, {
-    badge() {
-      return (
-        <span
-          className={classNames(
-            'inline-flex items-center gap-2 rounded-md px-2 py-1 text-xs font-medium capitalize ring-1 ring-inset',
-            statusClassMap[status],
-          )}
-        >
-          <Icon className="h-5 w-5" />
-          <span className="pr-1">{status}</span>
-        </span>
-      )
-    },
-    'tiny-badge'() {
-      return (
-        <span
-          className={classNames(
-            'inline-flex items-center gap-2 rounded-md px-2 py-1 text-xs font-medium capitalize ring-1 ring-inset',
-            statusClassMap[status],
-          )}
-        >
-          <Icon className="h-4 w-4" />
-          <span className="pr-1">{status}</span>
-        </span>
-      )
-    },
-  })
+  return (
+    <span
+      className={classNames(
+        'inline-flex items-center gap-2 rounded-md px-2 py-1 text-xs font-medium capitalize ring-1 ring-inset',
+        statusClassMap[status],
+      )}
+    >
+      <Icon className="h-4 w-4" />
+      <span className="pr-1">{status}</span>
+    </span>
+  )
 }
