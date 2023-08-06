@@ -1,7 +1,5 @@
 'use client'
 
-import { autoUpdate, useFloating } from '@floating-ui/react'
-import { Portal } from '@headlessui/react'
 import { CalendarIcon, RectangleStackIcon } from '@heroicons/react/24/outline'
 import { format, isPast } from 'date-fns'
 import { Invoice } from '~/domain/invoice/invoice'
@@ -19,10 +17,6 @@ import { useTranslation } from '../hooks/use-translation'
 type Entity = Quote | Invoice | Receipt
 
 export function TinyInvoice({ invoice }: { invoice: Entity }) {
-  let { refs, floatingStyles } = useFloating({
-    placement: 'top-end',
-    whileElementsMounted: autoUpdate,
-  })
   let t = useTranslation()
   let isLayered = match(
     invoice.type,
@@ -55,10 +49,7 @@ export function TinyInvoice({ invoice }: { invoice: Entity }) {
   )
 
   return (
-    <div
-      ref={refs.setReference}
-      className="group relative rounded-md bg-white shadow transition-transform duration-300 will-change-transform hover:-translate-y-1 dark:bg-zinc-950"
-    >
+    <div className="group relative rounded-md bg-white shadow transition-transform duration-300 will-change-transform hover:-translate-y-1 dark:bg-zinc-950">
       {isLayered && (
         <>
           <div className="absolute inset-0 -z-10 h-full w-full rotate-2 rounded-md bg-gray-100 ring-1 ring-black/5 drop-shadow transition-[transform,opacity] duration-200 will-change-[transform,opacity] group-hover:rotate-0 group-hover:opacity-0 dark:bg-zinc-700"></div>
@@ -67,16 +58,14 @@ export function TinyInvoice({ invoice }: { invoice: Entity }) {
       )}
 
       {warning && (
-        <Portal>
-          <div ref={refs.setFloating} className="relative bg-red-500" style={floatingStyles}>
-            <div className="absolute -right-1.5 -top-1.5">
-              <span className="flex h-3 w-3">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
-                <span className="relative inline-flex h-3 w-3 rounded-full bg-red-500"></span>
-              </span>
-            </div>
+        <div className="absolute right-0 top-0 z-50 bg-red-500">
+          <div className="absolute -right-1.5 -top-1.5">
+            <span className="flex h-3 w-3">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
+              <span className="relative inline-flex h-3 w-3 rounded-full bg-red-500"></span>
+            </span>
           </div>
-        </Portal>
+        </div>
       )}
 
       <div className="relative z-10 flex aspect-a4 w-full shrink-0 flex-col rounded-md bg-gradient-to-br from-rose-50/90 to-blue-50/90 ring-1 ring-black/5 dark:from-rose-200/90 dark:to-blue-200/90">
