@@ -66,7 +66,11 @@ let summaryItems: {
         {item.discount.reason && (
           <>
             <span className="px-1">
-              (<span className="text-xs font-medium text-gray-400">{item.discount.reason}</span>)
+              (
+              <span className="text-xs font-medium text-gray-400 dark:text-zinc-200">
+                {item.discount.reason}
+              </span>
+              )
             </span>
           </>
         )}
@@ -110,7 +114,7 @@ export function Summary({
       <tr>
         <td></td>
         <td colSpan={4} className="pb-3 pl-4 pr-12">
-          <div className="h-1 w-full rounded-full bg-gray-50"></div>
+          <div className="h-1 w-full rounded-full bg-gray-50 dark:bg-zinc-900"></div>
         </td>
       </tr>
       {summaryInfo
@@ -123,13 +127,13 @@ export function Summary({
               <td />
               <th
                 colSpan={2}
-                className="whitespace-nowrap px-4 py-1 text-left text-sm font-normal text-gray-500"
+                className="whitespace-nowrap px-4 py-1 text-left text-sm font-normal text-gray-500 dark:text-zinc-100"
               >
                 {label}
               </th>
               <td
                 colSpan={2}
-                className="whitespace-nowrap px-4 py-1 pl-4 pr-12 text-right align-top text-sm text-gray-500"
+                className="whitespace-nowrap px-4 py-1 pl-4 pr-12 text-right align-top text-sm text-gray-500 dark:text-zinc-100"
               >
                 {value}
               </td>

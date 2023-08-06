@@ -10,23 +10,23 @@ export function Items({ items, children }: { items: Invoice['items']; children: 
 
   return (
     <table className="min-w-full">
-      <thead className="bg-gray-50">
+      <thead className="bg-gray-50 dark:bg-zinc-900">
         <tr>
-          <th className="w-full whitespace-nowrap py-3 pl-12 pr-4 text-left text-sm font-medium text-gray-900 ">
+          <th className="w-full whitespace-nowrap py-3 pl-12 pr-4 text-left text-sm font-medium text-gray-900 dark:text-zinc-50">
             {t((x) => x.invoiceItem.description)}
           </th>
-          <th className="w-full whitespace-nowrap px-4 py-3 text-left text-sm font-medium text-gray-900">
+          <th className="w-full whitespace-nowrap px-4 py-3 text-left text-sm font-medium text-gray-900 dark:text-zinc-50">
             {t((x) => x.invoiceItem.quantity)}
           </th>
-          <th className="w-full whitespace-nowrap px-4 py-3 text-right text-sm font-medium text-gray-900">
+          <th className="w-full whitespace-nowrap px-4 py-3 text-right text-sm font-medium text-gray-900 dark:text-zinc-50">
             {t((x) => x.invoiceItem.unitPrice)}
           </th>
           {containsVat && (
-            <th className="w-full whitespace-nowrap px-4 py-3 text-right text-sm font-medium text-gray-900">
+            <th className="w-full whitespace-nowrap px-4 py-3 text-right text-sm font-medium text-gray-900 dark:text-zinc-50">
               {t((x) => x.invoiceItem.vat)}
             </th>
           )}
-          <th className="w-full whitespace-nowrap py-3 pl-4 pr-12 text-right text-sm font-medium text-gray-900 ">
+          <th className="w-full whitespace-nowrap py-3 pl-4 pr-12 text-right text-sm font-medium text-gray-900 dark:text-zinc-50">
             {t((x) => x.invoiceItem.subtotal)}
           </th>
         </tr>
@@ -34,27 +34,27 @@ export function Items({ items, children }: { items: Invoice['items']; children: 
       <tbody>
         {items.map((item) => (
           <tr key={item.id}>
-            <td className="whitespace-pre-wrap py-4 pl-12 pr-4 text-left align-top text-sm font-medium text-gray-900">
+            <td className="whitespace-pre-wrap py-4 pl-12 pr-4 text-left align-top text-sm font-medium text-gray-900 dark:text-zinc-50">
               {item.description}
               <ul className="empty:hidden">
                 {item.discounts.map((discount, idx) => (
                   <li
                     key={idx}
-                    className="whitespace-nowrap text-left text-sm font-normal text-gray-500"
+                    className="whitespace-nowrap text-left text-sm font-normal text-gray-500 dark:text-zinc-100"
                   >
                     {t((x) => x.summary.discount.title)}
                     {discount.reason && (
                       <>
                         <span className="px-1">
                           (
-                          <span className="text-xs font-medium text-gray-400">
+                          <span className="text-xs font-medium text-gray-400 dark:text-zinc-200">
                             {discount.reason}
                           </span>
                           )
                         </span>
                       </>
                     )}
-                    <span className="px-3 text-gray-400">/</span>
+                    <span className="px-3 text-gray-400 dark:text-zinc-200">/</span>
                     {match(
                       discount.type,
                       {
@@ -79,18 +79,18 @@ export function Items({ items, children }: { items: Invoice['items']; children: 
                 ))}
               </ul>
             </td>
-            <td className="whitespace-nowrap p-4 text-left align-top text-sm tabular-nums text-gray-500">
+            <td className="whitespace-nowrap p-4 text-left align-top text-sm tabular-nums text-gray-500 dark:text-zinc-100">
               {item.quantity}
             </td>
-            <td className="whitespace-nowrap p-4 text-right align-top text-sm text-gray-500">
+            <td className="whitespace-nowrap p-4 text-right align-top text-sm text-gray-500 dark:text-zinc-100">
               <Money amount={item.unitPrice} />
             </td>
             {containsVat && (
-              <td className="whitespace-nowrap p-4 text-right align-top text-sm tabular-nums text-gray-500">
+              <td className="whitespace-nowrap p-4 text-right align-top text-sm tabular-nums text-gray-500 dark:text-zinc-100">
                 {`${(item.taxRate * 100).toFixed(0)}%`}
               </td>
             )}
-            <td className="whitespace-nowrap py-4 pl-4 pr-12 text-right align-top text-sm font-semibold text-gray-900">
+            <td className="whitespace-nowrap py-4 pl-4 pr-12 text-right align-top text-sm font-semibold text-gray-900 dark:text-zinc-50">
               <Money amount={itemPrice(item)} />
             </td>
           </tr>

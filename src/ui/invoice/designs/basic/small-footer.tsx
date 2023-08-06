@@ -8,7 +8,7 @@ export function SmallFooter() {
   let t = useTranslation()
 
   return (
-    <div className="flex items-center justify-between bg-gray-50 px-12 py-3 text-sm text-gray-600">
+    <div className="flex items-center justify-between bg-gray-50 px-12 py-3 text-sm text-gray-600 dark:bg-zinc-900 dark:text-zinc-300">
       <span>{invoice.account.name}</span>
       <span>
         {t((x) => x.pagination.summary, {
