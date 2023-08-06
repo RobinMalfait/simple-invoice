@@ -18,6 +18,10 @@ import { match } from '~/utils/match'
 
 type Entity = Quote | Invoice | Receipt
 
+function titleForQuarter(date: Date) {
+  return [format(date, 'QQQ'), format(date, 'y')].join(' • ')
+}
+
 function groupByQuarter(invoices: Entity[]) {
   return Array.from(
     invoices
@@ -28,12 +32,9 @@ function groupByQuarter(invoices: Entity[]) {
         let key = match(
           entity.type,
           {
-            quote: (entity: Quote) =>
-              [format(entity.quoteDate, 'QQQ'), format(entity.quoteDate, 'y')].join(' • '),
-            invoice: (entity: Invoice) =>
-              [format(entity.issueDate, 'QQQ'), format(entity.issueDate, 'y')].join(' • '),
-            receipt: (entity: Receipt) =>
-              [format(entity.receiptDate, 'QQQ'), format(entity.receiptDate, 'y')].join(' • '),
+            quote: (entity: Quote) => titleForQuarter(entity.quoteDate),
+            invoice: (entity: Invoice) => titleForQuarter(entity.issueDate),
+            receipt: (entity: Receipt) => titleForQuarter(entity.receiptDate),
           },
           entity,
         )
@@ -81,7 +82,14 @@ export default async function Home() {
                 </div>
 
                 <div className="sticky top-24 mt-3 flex h-6 w-6 flex-none items-center justify-center bg-gray-100 dark:bg-zinc-900">
-                  <div className="h-1.5 w-1.5 rounded-full bg-gray-300 ring-1 ring-gray-300 dark:bg-zinc-500 dark:ring-zinc-500" />
+                  <div
+                    className={classNames(
+                      'h-1.5 w-1.5 rounded-full ',
+                      title === titleForQuarter(new Date())
+                        ? 'bg-blue-400 ring-1 ring-blue-400 ring-offset-4 ring-offset-gray-100 dark:ring-offset-zinc-950'
+                        : 'bg-gray-300 ring-1 ring-gray-300 dark:bg-zinc-500 dark:ring-zinc-500',
+                    )}
+                  />
                 </div>
 
                 <div className="relative flex w-full flex-col gap-4">
