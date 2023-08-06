@@ -8,6 +8,7 @@ export let Event = z
     z.object({ type: z.literal('quote-accepted') }),
     z.object({ type: z.literal('quote-rejected') }),
     z.object({ type: z.literal('quote-expired') }),
+    z.object({ type: z.literal('quote-closed') }),
 
     // Invoices
     z.object({ type: z.literal('invoice-drafted'), from: z.enum(['quote']).optional() }),

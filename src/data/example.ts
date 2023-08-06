@@ -461,6 +461,16 @@ export const invoices: (Quote | Invoice | Receipt)[] = [
     .send(subDays(new Date(), 31))
     .build(),
 
+  // Quote that is closed
+  new QuoteBuilder()
+    .account(me)
+    .client(Client1)
+    .quoteDate(subDays(new Date(), 30))
+    .item(new InvoiceItemBuilder().description('Item #1').unitPrice(123).build())
+    .send(subDays(new Date(), 31))
+    .close(subDays(new Date(), 29))
+    .build(),
+
   // Invoice from Quote
   InvoiceBuilder.fromQuote(
     new QuoteBuilder()

@@ -136,6 +136,7 @@ function ActivityIndicator({ item }: { item: Event }) {
     case 'invoice-overdue':
       return <XCircleIcon className="h-6 w-6 text-red-600 dark:text-red-300" aria-hidden="true" />
 
+    case 'quote-closed':
     case 'invoice-closed':
       return (
         <LockClosedIcon className="h-4 w-4 text-gray-600 dark:text-gray-300" aria-hidden="true" />
@@ -184,6 +185,14 @@ function ActivityText({ item }: { item: Event }) {
       return (
         <>
           The quote <span className="font-medium text-gray-900 dark:text-gray-100">expired</span>.
+        </>
+      )
+
+    case 'quote-closed':
+      return (
+        <>
+          The quote has been{' '}
+          <span className="font-medium text-gray-900 dark:text-gray-100">closed</span>.
         </>
       )
 

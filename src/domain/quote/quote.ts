@@ -61,33 +61,50 @@ export class QuoteBuilder {
   private _discounts: Discount[] = []
   private events: Quote['events'] = [Event.parse({ type: 'quote-drafted' })]
 
-  private status = QuoteStatus.Draft
+  private _status = QuoteStatus.Draft
 
   public build(): Quote {
     let input = {
-      number: this._number ?? configuration.numberStrategy(this._quoteDate!),
+      number: this.computeNumber,
       account: this._account,
       client: this._client,
       items: this._items,
       note: this._note,
       quoteDate: this._quoteDate,
-      quoteExpirationDate:
-        this._quoteExpirationDate ?? configuration.defaultNetStrategy(this._quoteDate!),
+      quoteExpirationDate: this.computeQuoteExpirationDate,
       discounts: this._discounts,
-      status: this.status,
+      status: this._status,
       events: this.events,
     }
 
-    if (input.status !== QuoteStatus.Accepted && isPast(input.quoteExpirationDate)) {
-      input.status = QuoteStatus.Expired
+    if (input.status === QuoteStatus.Expired) {
       input.events.push(Event.parse({ type: 'quote-expired', at: input.quoteExpirationDate }))
     }
 
     return Quote.parse(input)
   }
 
+  get computeNumber() {
+    return this._number ?? configuration.numberStrategy(this._quoteDate!)
+  }
+
+  get computeQuoteExpirationDate() {
+    return this._quoteExpirationDate ?? configuration.defaultNetStrategy(this._quoteDate!)
+  }
+
+  get computeStatus() {
+    if (
+      ![QuoteStatus.Accepted, QuoteStatus.Closed].includes(this._status) &&
+      isPast(this.computeQuoteExpirationDate)
+    ) {
+      return QuoteStatus.Expired
+    }
+
+    return this._status
+  }
+
   public number(number: string): QuoteBuilder {
-    if (this.status !== QuoteStatus.Draft) {
+    if (this._status !== QuoteStatus.Draft) {
       throw new Error('Cannot edit a quote that is not in draft status')
     }
 
@@ -96,7 +113,7 @@ export class QuoteBuilder {
   }
 
   public account(account: Account): QuoteBuilder {
-    if (this.status !== QuoteStatus.Draft) {
+    if (this._status !== QuoteStatus.Draft) {
       throw new Error('Cannot edit an quote that is not in draft status')
     }
     this._account = account
@@ -104,7 +121,7 @@ export class QuoteBuilder {
   }
 
   public client(client: Client): QuoteBuilder {
-    if (this.status !== QuoteStatus.Draft) {
+    if (this._status !== QuoteStatus.Draft) {
       throw new Error('Cannot edit an quote that is not in draft status')
     }
     this._client = client
@@ -112,7 +129,7 @@ export class QuoteBuilder {
   }
 
   public items(items: InvoiceItem[]): QuoteBuilder {
-    if (this.status !== QuoteStatus.Draft) {
+    if (this._status !== QuoteStatus.Draft) {
       throw new Error('Cannot edit an quote that is not in draft status')
     }
     this._items = items
@@ -120,7 +137,7 @@ export class QuoteBuilder {
   }
 
   public note(note: string | null): QuoteBuilder {
-    if (this.status !== QuoteStatus.Draft) {
+    if (this._status !== QuoteStatus.Draft) {
       throw new Error('Cannot edit an quote that is not in draft status')
     }
     this._note = note
@@ -128,7 +145,7 @@ export class QuoteBuilder {
   }
 
   public quoteDate(quoteDate: string | Date): QuoteBuilder {
-    if (this.status !== QuoteStatus.Draft) {
+    if (this._status !== QuoteStatus.Draft) {
       throw new Error('Cannot edit an quote that is not in draft status')
     }
     this._quoteDate = typeof quoteDate === 'string' ? parseISO(quoteDate) : quoteDate
@@ -136,7 +153,7 @@ export class QuoteBuilder {
   }
 
   public quoteExpirationDate(quoteExpirationDate: string | Date): QuoteBuilder {
-    if (this.status !== QuoteStatus.Draft) {
+    if (this._status !== QuoteStatus.Draft) {
       throw new Error('Cannot edit an quote that is not in draft status')
     }
     this._quoteExpirationDate =
@@ -145,7 +162,7 @@ export class QuoteBuilder {
   }
 
   public discount(discount: Discount): QuoteBuilder {
-    if (this.status !== QuoteStatus.Draft) {
+    if (this._status !== QuoteStatus.Draft) {
       throw new Error('Cannot edit an quote that is not in draft status')
     }
 
@@ -158,7 +175,7 @@ export class QuoteBuilder {
   }
 
   public item(item: InvoiceItem): QuoteBuilder {
-    if (this.status !== QuoteStatus.Draft) {
+    if (this._status !== QuoteStatus.Draft) {
       throw new Error('Cannot edit an quote that is not in draft status')
     }
 
@@ -169,10 +186,10 @@ export class QuoteBuilder {
   public send(at: string | Date): QuoteBuilder {
     let parsedAt = typeof at === 'string' ? parseISO(at) : at
 
-    match(this.status, {
+    match(this._status, {
       [QuoteStatus.Draft]: () => {
         this.events.push(Event.parse({ type: 'quote-sent', at: parsedAt }))
-        this.status = QuoteStatus.Sent
+        this._status = QuoteStatus.Sent
       },
       [QuoteStatus.Sent]: () => {
         throw new Error('Cannot send a quote that is already sent')
@@ -186,6 +203,9 @@ export class QuoteBuilder {
       [QuoteStatus.Expired]: () => {
         throw new Error('Cannot send a quote that is already expired')
       },
+      [QuoteStatus.Closed]: () => {
+        throw new Error('Cannot send a quote that is already closed')
+      },
     })
 
     return this
@@ -194,13 +214,13 @@ export class QuoteBuilder {
   public accept(at: string | Date): QuoteBuilder {
     let parsedAt = typeof at === 'string' ? parseISO(at) : at
 
-    match(this.status, {
+    match(this._status, {
       [QuoteStatus.Draft]: () => {
         throw new Error('Cannot accept a quote that is not sent')
       },
       [QuoteStatus.Sent]: () => {
         this.events.push(Event.parse({ type: 'quote-accepted', at: parsedAt }))
-        this.status = QuoteStatus.Accepted
+        this._status = QuoteStatus.Accepted
       },
       [QuoteStatus.Accepted]: () => {
         throw new Error('Cannot accept a quote that is already accepted')
@@ -211,6 +231,9 @@ export class QuoteBuilder {
       [QuoteStatus.Expired]: () => {
         throw new Error('Cannot accept a quote that is already expired')
       },
+      [QuoteStatus.Closed]: () => {
+        throw new Error('Cannot accept a quote that is already closed')
+      },
     })
 
     return this
@@ -219,13 +242,13 @@ export class QuoteBuilder {
   public reject(at: string | Date): QuoteBuilder {
     let parsedAt = typeof at === 'string' ? parseISO(at) : at
 
-    match(this.status, {
+    match(this._status, {
       [QuoteStatus.Draft]: () => {
         throw new Error('Cannot reject a quote that is not sent')
       },
       [QuoteStatus.Sent]: () => {
         this.events.push(Event.parse({ type: 'quote-rejected', at: parsedAt }))
-        this.status = QuoteStatus.Rejected
+        this._status = QuoteStatus.Rejected
       },
       [QuoteStatus.Accepted]: () => {
         throw new Error('Cannot reject a quote that is already accepted')
@@ -235,6 +258,42 @@ export class QuoteBuilder {
       },
       [QuoteStatus.Expired]: () => {
         throw new Error('Cannot reject a quote that is already expired')
+      },
+      [QuoteStatus.Closed]: () => {
+        throw new Error('Cannot reject a quote that is already expired')
+      },
+    })
+
+    return this
+  }
+
+  public close(at: string | Date): QuoteBuilder {
+    let parsedAt = typeof at === 'string' ? parseISO(at) : at
+
+    if (isPast(this.computeQuoteExpirationDate)) {
+      this.events.push(Event.parse({ type: 'quote-expired', at: parsedAt }))
+      this._status = QuoteStatus.Expired
+    }
+
+    match(this._status, {
+      [QuoteStatus.Draft]: () => {
+        throw new Error('Cannot close a quote that is not sent')
+      },
+      [QuoteStatus.Sent]: () => {
+        throw new Error('Cannot close a quote that is sent')
+      },
+      [QuoteStatus.Accepted]: () => {
+        throw new Error('Cannot close a quote that is accepted')
+      },
+      [QuoteStatus.Rejected]: () => {
+        throw new Error('Cannot close a quote that is rejected')
+      },
+      [QuoteStatus.Expired]: () => {
+        this.events.push(Event.parse({ type: 'quote-closed', at: parsedAt }))
+        this._status = QuoteStatus.Closed
+      },
+      [QuoteStatus.Closed]: () => {
+        throw new Error('Cannot close a quote that is closed')
       },
     })
 

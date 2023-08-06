@@ -2,6 +2,7 @@ import {
   CheckCircleIcon,
   ClockIcon,
   EnvelopeIcon,
+  LockClosedIcon,
   PencilIcon,
   XCircleIcon,
 } from '@heroicons/react/24/outline'
@@ -15,12 +16,14 @@ let statusIconMap: Record<
   | typeof CheckCircleIcon
   | typeof XCircleIcon
   | typeof ClockIcon
+  | typeof LockClosedIcon
 > = {
   [QuoteStatus.Draft]: PencilIcon,
   [QuoteStatus.Sent]: EnvelopeIcon,
   [QuoteStatus.Accepted]: CheckCircleIcon,
   [QuoteStatus.Rejected]: XCircleIcon,
   [QuoteStatus.Expired]: ClockIcon,
+  [QuoteStatus.Closed]: LockClosedIcon,
 }
 
 let statusClassMap: Record<QuoteStatus, string> = {
@@ -34,6 +37,8 @@ let statusClassMap: Record<QuoteStatus, string> = {
     'bg-red-50 text-red-700 ring-red-600/10 dark:bg-red-400/10 dark:text-red-400 dark:ring-red-400/20',
   [QuoteStatus.Expired]:
     'bg-red-50 text-red-700 ring-red-600/10 dark:bg-red-400/10 dark:text-red-400 dark:ring-red-400/20',
+  [QuoteStatus.Closed]:
+    'bg-gray-50 text-gray-600 ring-gray-500/10 dark:bg-gray-400/10 dark:text-gray-400 dark:ring-gray-400/20',
 }
 
 export function StatusDisplay({ status }: { status: QuoteStatus }) {

@@ -4,4 +4,5 @@ export enum QuoteStatus {
   Accepted = 'accepted',
   Rejected = 'Rejected',
   Expired = 'Expired',
+  Closed = 'Closed',
 }
