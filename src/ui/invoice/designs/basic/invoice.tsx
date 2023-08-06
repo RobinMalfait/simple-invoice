@@ -1,10 +1,8 @@
 'use client'
 
 import { InformationCircleIcon } from '@heroicons/react/24/outline'
-import { Invoice as InvoiceType } from '~/domain/invoice/invoice'
-import { Quote } from '~/domain/quote/quote'
 import { Receipt } from '~/domain/receipt/receipt'
-import { InvoiceProvider } from '~/ui/hooks/use-invoice'
+import { InvoiceProvider, useInvoice } from '~/ui/hooks/use-invoice'
 import { useInvoicePagination } from '~/ui/hooks/use-invoice-pagination'
 import { PageProvider } from '~/ui/hooks/use-pagination-info'
 import { match } from '~/utils/match'
@@ -15,9 +13,8 @@ import { SmallFooter } from './small-footer'
 import { SmallHeading } from './small-heading'
 import { Summary } from './summary'
 
-type Entity = Quote | InvoiceType | Receipt
-
-export function Invoice({ invoice }: { invoice: Entity }) {
+export function Invoice() {
+  let invoice = useInvoice()
   let [pages, FitContent] = useInvoicePagination(invoice.items)
   let notes = [invoice.note, invoice.client.note, invoice.account.note].filter(Boolean)
 
