@@ -1,4 +1,4 @@
-import { format } from 'date-fns'
+import { compareDesc, format } from 'date-fns'
 import Link from 'next/link'
 
 import { invoices, me } from '~/data'
@@ -6,6 +6,7 @@ import { Currency } from '~/domain/currency/currency'
 import { Invoice } from '~/domain/invoice/invoice'
 import { Quote } from '~/domain/quote/quote'
 import { Receipt } from '~/domain/receipt/receipt'
+import { resolveRelevantEntityDate } from '~/domain/relevant-entity-date'
 import { classNames } from '~/ui/class-names'
 import { Empty } from '~/ui/empty'
 import { I18NProvider } from '~/ui/hooks/use-i18n'
@@ -16,19 +17,10 @@ import { match } from '~/utils/match'
 
 type Entity = Quote | Invoice | Receipt
 
-let entityOrder = ['quote', 'invoice', 'receipt']
-
 function groupByQuarter(invoices: Entity[]) {
   return Array.from(
     invoices
-      .sort((a, z) => {
-        return (
-          // Order by entity type
-          entityOrder.indexOf(z.type) - entityOrder.indexOf(a.type) ||
-          // Put most recent invoices first
-          z.number.localeCompare(a.number)
-        )
-      })
+      .sort((a, z) => compareDesc(resolveRelevantEntityDate(a), resolveRelevantEntityDate(z)))
 
       // Group by quarter & year
       .reduce((acc, entity) => {
