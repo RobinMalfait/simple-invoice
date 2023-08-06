@@ -67,19 +67,20 @@ function groupByCurrency(invoices: Entity[]) {
 // entity is present instead of 2 or 3 (quote, invoice, receipt).
 function squashEntities(entities: Entity[]) {
   let all = entities.slice()
-  let toRemove = new Set<Entity>()
+  let toRemove = new Set<string>()
 
   for (let entity of entities) {
     if (entity.type === 'invoice' && entity.quote) {
-      toRemove.add(entity.quote)
+      toRemove.add(entity.quote.id)
     } else if (entity.type === 'receipt') {
-      toRemove.add(entity.invoice)
-      if (entity.invoice.quote) toRemove.add(entity.invoice.quote)
+      toRemove.add(entity.invoice.id)
+      if (entity.invoice.quote) toRemove.add(entity.invoice.quote.id)
     }
   }
 
   for (let entity of toRemove) {
-    all.splice(all.indexOf(entity), 1)
+    let idx = all.findIndex((e) => e.id === entity)
+    if (idx !== -1) all.splice(idx, 1)
   }
 
   return all
