@@ -1,4 +1,4 @@
-import { compareDesc, format } from 'date-fns'
+import { compareDesc, format, isFuture } from 'date-fns'
 import Link from 'next/link'
 
 import { invoices, me } from '~/data'
@@ -10,6 +10,7 @@ import { resolveRelevantEntityDate } from '~/domain/relevant-entity-date'
 import { squashEntities } from '~/domain/squash-entities'
 import { classNames } from '~/ui/class-names'
 import { Empty } from '~/ui/empty'
+import { Disclosure, DisclosureButton, DisclosurePanel } from '~/ui/headlessui'
 import { I18NProvider } from '~/ui/hooks/use-i18n'
 import { TinyInvoice } from '~/ui/invoice/tiny-invoice'
 import { total } from '~/ui/invoice/total'
@@ -71,7 +72,12 @@ export default async function Home() {
         {squashedInvoices.length > 0 ? (
           <>
             {groupByQuarter(squashedInvoices).map(([title, invoices], idx) => (
-              <div key={title} className="relative flex gap-x-4">
+              <Disclosure
+                defaultOpen={!invoices.every((e) => isFuture(resolveRelevantEntityDate(e)))}
+                as="div"
+                key={title}
+                className="relative flex gap-x-4"
+              >
                 <div
                   className={classNames(
                     idx === 0 ? '-top-8' : 'top-0',
@@ -93,7 +99,7 @@ export default async function Home() {
                 </div>
 
                 <div className="relative flex w-full flex-col gap-4">
-                  <div className="sticky top-[84px] isolate z-20">
+                  <DisclosureButton className="sticky top-[84px] isolate z-20">
                     <div className="absolute -inset-x-1 -top-6 bottom-12 z-10 bg-gray-100 dark:bg-zinc-900"></div>
                     <div className="relative z-20 -mx-1.5 flex justify-between rounded-md bg-white/95 px-[18px] py-3 text-gray-500 ring-1 ring-black/5 backdrop-blur dark:bg-zinc-800/95 dark:text-gray-400">
                       <span>{title}</span>
@@ -117,9 +123,9 @@ export default async function Home() {
                         ))}
                       </span>
                     </div>
-                  </div>
+                  </DisclosureButton>
 
-                  <div className="grid grid-cols-[repeat(auto-fill,minmax(275px,1fr))] gap-4">
+                  <DisclosurePanel className="grid grid-cols-[repeat(auto-fill,minmax(275px,1fr))] gap-4">
                     {invoices.map((invoice) => (
                       <I18NProvider
                         key={invoice.id}
@@ -136,9 +142,9 @@ export default async function Home() {
                         </Link>
                       </I18NProvider>
                     ))}
-                  </div>
+                  </DisclosurePanel>
                 </div>
-              </div>
+              </Disclosure>
             ))}
 
             <div className="relative flex gap-x-4">
