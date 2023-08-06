@@ -1,10 +1,13 @@
 'use client'
 
+import { autoUpdate, useFloating } from '@floating-ui/react'
+import { Portal } from '@headlessui/react'
 import { CalendarIcon, RectangleStackIcon } from '@heroicons/react/24/outline'
-import { format } from 'date-fns'
-
+import { format, isPast } from 'date-fns'
 import { Invoice } from '~/domain/invoice/invoice'
+import { InvoiceStatus } from '~/domain/invoice/invoice-status'
 import { Quote } from '~/domain/quote/quote'
+import { QuoteStatus } from '~/domain/quote/quote-status'
 import { Receipt } from '~/domain/receipt/receipt'
 import { StatusDisplay as InvoiceStatusDisplay } from '~/ui/invoice/status'
 import { total } from '~/ui/invoice/total'
@@ -16,6 +19,10 @@ import { useTranslation } from '../hooks/use-translation'
 type Entity = Quote | Invoice | Receipt
 
 export function TinyInvoice({ invoice }: { invoice: Entity }) {
+  let { refs, floatingStyles } = useFloating({
+    placement: 'top-end',
+    whileElementsMounted: autoUpdate,
+  })
   let t = useTranslation()
   let isLayered = match(
     invoice.type,
@@ -27,13 +34,49 @@ export function TinyInvoice({ invoice }: { invoice: Entity }) {
     invoice,
   )
 
+  let warning = match(
+    invoice.type,
+    {
+      quote: (e: Quote) => e.status === QuoteStatus.Expired,
+      invoice: (e: Invoice) => {
+        if (e.status === InvoiceStatus.Overdue) {
+          return true
+        }
+
+        if (e.status === InvoiceStatus.Draft && isPast(e.issueDate)) {
+          return true
+        }
+
+        return false
+      },
+      receipt: () => false,
+    },
+    invoice,
+  )
+
   return (
-    <div className="group relative rounded-md bg-white shadow transition-transform duration-300 will-change-transform hover:-translate-y-1 dark:bg-zinc-950">
+    <div
+      ref={refs.setReference}
+      className="group relative rounded-md bg-white shadow transition-transform duration-300 will-change-transform hover:-translate-y-1 dark:bg-zinc-950"
+    >
       {isLayered && (
         <>
           <div className="absolute inset-0 -z-10 h-full w-full rotate-2 rounded-md bg-gray-100 ring-1 ring-black/5 drop-shadow transition-[transform,opacity] duration-200 will-change-[transform,opacity] group-hover:rotate-0 group-hover:opacity-0 dark:bg-zinc-700"></div>
           <div className="absolute inset-0 -z-10 h-full w-full -rotate-1 rounded-md bg-gray-50 ring-1 ring-black/5 drop-shadow transition-transform duration-200 will-change-[transform,opacity] group-hover:rotate-0 group-hover:opacity-0 dark:bg-zinc-600"></div>
         </>
+      )}
+
+      {warning && (
+        <Portal>
+          <div ref={refs.setFloating} className="relative bg-red-500" style={floatingStyles}>
+            <div className="absolute -right-1.5 -top-1.5">
+              <span className="flex h-3 w-3">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
+                <span className="relative inline-flex h-3 w-3 rounded-full bg-red-500"></span>
+              </span>
+            </div>
+          </div>
+        </Portal>
       )}
 
       <div className="relative z-10 flex aspect-a4 w-full shrink-0 flex-col rounded-md bg-gradient-to-br from-rose-50/90 to-blue-50/90 ring-1 ring-black/5 dark:from-rose-200/90 dark:to-blue-200/90">
