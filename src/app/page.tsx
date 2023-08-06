@@ -62,7 +62,32 @@ function groupByCurrency(invoices: Entity[]) {
   )
 }
 
+// We have 1 big list of all the quote, invoices and receipts. However, when we show the overview,
+// we only want 1 entity to be present for each invoice. So we squash the list such that only 1
+// entity is present instead of 2 or 3 (quote, invoice, receipt).
+function squashEntities(entities: Entity[]) {
+  let all = entities.slice()
+  let toRemove = new Set<Entity>()
+
+  for (let entity of entities) {
+    if (entity.type === 'invoice' && entity.quote) {
+      toRemove.add(entity.quote)
+    } else if (entity.type === 'receipt') {
+      toRemove.add(entity.invoice)
+      if (entity.invoice.quote) toRemove.add(entity.invoice.quote)
+    }
+  }
+
+  for (let entity of toRemove) {
+    all.splice(all.indexOf(entity), 1)
+  }
+
+  return all
+}
+
 export default async function Home() {
+  let squashedInvoices = squashEntities(invoices)
+
   return (
     <I18NProvider
       value={{
@@ -72,9 +97,9 @@ export default async function Home() {
       }}
     >
       <main className="isolate mx-auto w-full max-w-7xl space-y-8 px-4 py-8 sm:px-6 lg:px-8">
-        {invoices.length > 0 ? (
+        {squashedInvoices.length > 0 ? (
           <>
-            {groupByQuarter(invoices).map(([title, invoices], idx) => (
+            {groupByQuarter(squashedInvoices).map(([title, invoices], idx) => (
               <div key={title} className="relative flex gap-x-4">
                 <div
                   className={classNames(
