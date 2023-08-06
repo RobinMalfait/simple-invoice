@@ -19,6 +19,7 @@ export let Event = z
     }),
     z.object({ type: z.literal('invoice-paid'), amount: z.number(), outstanding: z.number() }),
     z.object({ type: z.literal('invoice-overdue') }),
+    z.object({ type: z.literal('invoice-closed') }),
 
     // Receipts
     z.object({ type: z.literal('receipt-created') }),

@@ -4,6 +4,7 @@ import {
   CheckCircleIcon,
   ClockIcon,
   EllipsisHorizontalCircleIcon,
+  LockClosedIcon,
   PencilSquareIcon,
   XCircleIcon,
 } from '@heroicons/react/24/outline'
@@ -135,6 +136,11 @@ function ActivityIndicator({ item }: { item: Event }) {
     case 'invoice-overdue':
       return <XCircleIcon className="h-6 w-6 text-red-600 dark:text-red-300" aria-hidden="true" />
 
+    case 'invoice-closed':
+      return (
+        <LockClosedIcon className="h-4 w-4 text-gray-600 dark:text-gray-300" aria-hidden="true" />
+      )
+
     default:
       return (
         <div className="h-1.5 w-1.5 rounded-full bg-gray-100 ring-1 ring-gray-300 dark:bg-zinc-800 dark:ring-gray-500" />
@@ -229,6 +235,14 @@ function ActivityText({ item }: { item: Event }) {
         <>
           The invoice is{' '}
           <span className="font-medium text-gray-900 dark:text-gray-100">overdue</span>.
+        </>
+      )
+
+    case 'invoice-closed':
+      return (
+        <>
+          The invoice has been{' '}
+          <span className="font-medium text-gray-900 dark:text-gray-100">closed</span>.
         </>
       )
 

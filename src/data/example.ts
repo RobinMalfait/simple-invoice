@@ -146,6 +146,16 @@ export const invoices: (Quote | Invoice | Receipt)[] = [
     .send(subDays(new Date(), 60))
     .build(),
 
+  // Single item invoice, closed
+  new InvoiceBuilder()
+    .account(me)
+    .client(Client1)
+    .issueDate(subDays(new Date(), 60))
+    .item(new InvoiceItemBuilder().description('Item line #1').unitPrice(100_00).build())
+    .send(subDays(new Date(), 60))
+    .close(subDays(new Date(), 59))
+    .build(),
+
   // Single item invoice, with multiple quantities
   new InvoiceBuilder()
     .account(me)

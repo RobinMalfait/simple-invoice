@@ -4,4 +4,5 @@ export enum InvoiceStatus {
   Paid = 'paid',
   PartialPaid = 'partial-paid',
   Overdue = 'overdue',
+  Closed = 'closed',
 }

@@ -3,6 +3,7 @@ import {
   CheckCircleIcon,
   ClockIcon,
   EnvelopeIcon,
+  LockClosedIcon,
   PencilIcon,
 } from '@heroicons/react/24/outline'
 import { InvoiceStatus } from '~/domain/invoice/invoice-status'
@@ -10,13 +11,18 @@ import { classNames } from '~/ui/class-names'
 
 let statusIconMap: Record<
   InvoiceStatus,
-  typeof CheckCircleIcon | typeof ClockIcon | typeof EnvelopeIcon | typeof PencilIcon
+  | typeof CheckCircleIcon
+  | typeof ClockIcon
+  | typeof EnvelopeIcon
+  | typeof PencilIcon
+  | typeof LockClosedIcon
 > = {
   [InvoiceStatus.Draft]: PencilIcon,
   [InvoiceStatus.Sent]: EnvelopeIcon,
   [InvoiceStatus.Paid]: CheckCircleIcon,
   [InvoiceStatus.PartialPaid]: BellAlertIcon,
   [InvoiceStatus.Overdue]: ClockIcon,
+  [InvoiceStatus.Closed]: LockClosedIcon,
 }
 
 let statusClassMap: Record<InvoiceStatus, string> = {
@@ -30,6 +36,8 @@ let statusClassMap: Record<InvoiceStatus, string> = {
     'bg-yellow-50 text-yellow-800 ring-yellow-600/20 dark:bg-yellow-400/10 dark:text-yellow-500 dark:ring-yellow-400/20',
   [InvoiceStatus.Overdue]:
     'bg-red-50 text-red-700 ring-red-600/10 dark:bg-red-400/10 dark:text-red-400 dark:ring-red-400/20',
+  [InvoiceStatus.Closed]:
+    'bg-gray-50 text-gray-600 ring-gray-500/10 dark:bg-gray-400/10 dark:text-gray-400 dark:ring-gray-400/20',
 }
 
 export function StatusDisplay({ status }: { status: InvoiceStatus }) {
