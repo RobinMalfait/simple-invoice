@@ -1,4 +1,4 @@
-import { subDays } from 'date-fns'
+import { addDays, subDays } from 'date-fns'
 import { Account, AccountBuilder } from '~/domain/account/account'
 import { AddressBuilder } from '~/domain/address/address'
 import { ClientBuilder } from '~/domain/client/client'
@@ -79,11 +79,19 @@ let Client2 = new ClientBuilder()
   .build()
 
 export const invoices: (Quote | Invoice | Receipt)[] = [
-  // Single item invoice, drafted
+  // Single item invoice, drafted (issue date in the future)
   new InvoiceBuilder()
     .account(me)
     .client(Client1)
-    .issueDate(subDays(new Date(), 10))
+    .issueDate(addDays(new Date(), 10))
+    .item(new InvoiceItemBuilder().description('Item line #1').unitPrice(100_00).build())
+    .build(),
+
+  // Single item invoice, drafted (issue date today!)
+  new InvoiceBuilder()
+    .account(me)
+    .client(Client1)
+    .issueDate(new Date())
     .item(new InvoiceItemBuilder().description('Item line #1').unitPrice(100_00).build())
     .build(),
 
