@@ -3,7 +3,17 @@ import { Invoice } from '~/domain/invoice/invoice'
 import { Quote } from '~/domain/quote/quote'
 import { Receipt } from '~/domain/receipt/receipt'
 
-export let me: Account
-export let invoices: (Quote | Invoice | Receipt)[]
+type Entity = Quote | Invoice | Receipt
 
-module.exports = require(`./${process.env.DATA_SOURCE_FILE}.ts`)
+let data = require(`./${process.env.DATA_SOURCE_FILE}.ts`)
+
+export let me: Account = data.me
+export let invoices: Entity[] = data.invoices.flatMap((entity: Entity) => {
+  if (entity.type === 'quote') {
+    return [entity]
+  } else if (entity.type === 'invoice') {
+    return [entity, entity.quote].filter(Boolean)
+  } else if (entity.type === 'receipt') {
+    return [entity, entity.invoice, entity.invoice.quote].filter(Boolean)
+  }
+}) as Entity[]
