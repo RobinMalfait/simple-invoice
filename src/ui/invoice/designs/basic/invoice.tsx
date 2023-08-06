@@ -40,7 +40,7 @@ export function Invoice() {
                             {
                               quote: () => null,
                               invoice: () => null,
-                              receipt: (e: Receipt) => e.invoice.state,
+                              receipt: (e: Receipt) => e.invoice.status,
                             },
                             invoice,
                           )}

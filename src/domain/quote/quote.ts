@@ -43,7 +43,7 @@ export let Quote = z.object({
   note: z.string().nullable(),
   quoteDate: z.date(),
   quoteExpirationDate: z.date(),
-  state: z.nativeEnum(QuoteStatus).default(QuoteStatus.Draft),
+  status: z.nativeEnum(QuoteStatus).default(QuoteStatus.Draft),
   discounts: z.array(Discount),
   events: z.array(Event),
 })
@@ -61,7 +61,7 @@ export class QuoteBuilder {
   private _discounts: Discount[] = []
   private events: Quote['events'] = [Event.parse({ type: 'quote-drafted' })]
 
-  private state = QuoteStatus.Draft
+  private status = QuoteStatus.Draft
 
   public build(): Quote {
     let input = {
@@ -74,12 +74,12 @@ export class QuoteBuilder {
       quoteExpirationDate:
         this._quoteExpirationDate ?? configuration.defaultNetStrategy(this._quoteDate!),
       discounts: this._discounts,
-      state: this.state,
+      status: this.status,
       events: this.events,
     }
 
-    if (input.state !== QuoteStatus.Accepted && isPast(input.quoteExpirationDate)) {
-      input.state = QuoteStatus.Expired
+    if (input.status !== QuoteStatus.Accepted && isPast(input.quoteExpirationDate)) {
+      input.status = QuoteStatus.Expired
       input.events.push(Event.parse({ type: 'quote-expired', at: input.quoteExpirationDate }))
     }
 
@@ -87,8 +87,8 @@ export class QuoteBuilder {
   }
 
   public number(number: string): QuoteBuilder {
-    if (this.state !== QuoteStatus.Draft) {
-      throw new Error('Cannot edit a quote that is not in draft state')
+    if (this.status !== QuoteStatus.Draft) {
+      throw new Error('Cannot edit a quote that is not in draft status')
     }
 
     this._number = number
@@ -96,48 +96,48 @@ export class QuoteBuilder {
   }
 
   public account(account: Account): QuoteBuilder {
-    if (this.state !== QuoteStatus.Draft) {
-      throw new Error('Cannot edit an quote that is not in draft state')
+    if (this.status !== QuoteStatus.Draft) {
+      throw new Error('Cannot edit an quote that is not in draft status')
     }
     this._account = account
     return this
   }
 
   public client(client: Client): QuoteBuilder {
-    if (this.state !== QuoteStatus.Draft) {
-      throw new Error('Cannot edit an quote that is not in draft state')
+    if (this.status !== QuoteStatus.Draft) {
+      throw new Error('Cannot edit an quote that is not in draft status')
     }
     this._client = client
     return this
   }
 
   public items(items: InvoiceItem[]): QuoteBuilder {
-    if (this.state !== QuoteStatus.Draft) {
-      throw new Error('Cannot edit an quote that is not in draft state')
+    if (this.status !== QuoteStatus.Draft) {
+      throw new Error('Cannot edit an quote that is not in draft status')
     }
     this._items = items
     return this
   }
 
   public note(note: string | null): QuoteBuilder {
-    if (this.state !== QuoteStatus.Draft) {
-      throw new Error('Cannot edit an quote that is not in draft state')
+    if (this.status !== QuoteStatus.Draft) {
+      throw new Error('Cannot edit an quote that is not in draft status')
     }
     this._note = note
     return this
   }
 
   public quoteDate(quoteDate: string | Date): QuoteBuilder {
-    if (this.state !== QuoteStatus.Draft) {
-      throw new Error('Cannot edit an quote that is not in draft state')
+    if (this.status !== QuoteStatus.Draft) {
+      throw new Error('Cannot edit an quote that is not in draft status')
     }
     this._quoteDate = typeof quoteDate === 'string' ? parseISO(quoteDate) : quoteDate
     return this
   }
 
   public quoteExpirationDate(quoteExpirationDate: string | Date): QuoteBuilder {
-    if (this.state !== QuoteStatus.Draft) {
-      throw new Error('Cannot edit an quote that is not in draft state')
+    if (this.status !== QuoteStatus.Draft) {
+      throw new Error('Cannot edit an quote that is not in draft status')
     }
     this._quoteExpirationDate =
       typeof quoteExpirationDate === 'string' ? parseISO(quoteExpirationDate) : quoteExpirationDate
@@ -145,8 +145,8 @@ export class QuoteBuilder {
   }
 
   public discount(discount: Discount): QuoteBuilder {
-    if (this.state !== QuoteStatus.Draft) {
-      throw new Error('Cannot edit an quote that is not in draft state')
+    if (this.status !== QuoteStatus.Draft) {
+      throw new Error('Cannot edit an quote that is not in draft status')
     }
 
     if (new Set(this._items.map((item) => item.taxRate).filter((rate) => rate !== 0)).size > 1) {
@@ -158,8 +158,8 @@ export class QuoteBuilder {
   }
 
   public item(item: InvoiceItem): QuoteBuilder {
-    if (this.state !== QuoteStatus.Draft) {
-      throw new Error('Cannot edit an quote that is not in draft state')
+    if (this.status !== QuoteStatus.Draft) {
+      throw new Error('Cannot edit an quote that is not in draft status')
     }
 
     this._items.push(item)
@@ -169,10 +169,10 @@ export class QuoteBuilder {
   public send(at: string | Date): QuoteBuilder {
     let parsedAt = typeof at === 'string' ? parseISO(at) : at
 
-    match(this.state, {
+    match(this.status, {
       [QuoteStatus.Draft]: () => {
         this.events.push(Event.parse({ type: 'quote-sent', at: parsedAt }))
-        this.state = QuoteStatus.Sent
+        this.status = QuoteStatus.Sent
       },
       [QuoteStatus.Sent]: () => {
         throw new Error('Cannot send a quote that is already sent')
@@ -194,13 +194,13 @@ export class QuoteBuilder {
   public accept(at: string | Date): QuoteBuilder {
     let parsedAt = typeof at === 'string' ? parseISO(at) : at
 
-    match(this.state, {
+    match(this.status, {
       [QuoteStatus.Draft]: () => {
         throw new Error('Cannot accept a quote that is not sent')
       },
       [QuoteStatus.Sent]: () => {
         this.events.push(Event.parse({ type: 'quote-accepted', at: parsedAt }))
-        this.state = QuoteStatus.Accepted
+        this.status = QuoteStatus.Accepted
       },
       [QuoteStatus.Accepted]: () => {
         throw new Error('Cannot accept a quote that is already accepted')
@@ -219,13 +219,13 @@ export class QuoteBuilder {
   public reject(at: string | Date): QuoteBuilder {
     let parsedAt = typeof at === 'string' ? parseISO(at) : at
 
-    match(this.state, {
+    match(this.status, {
       [QuoteStatus.Draft]: () => {
         throw new Error('Cannot reject a quote that is not sent')
       },
       [QuoteStatus.Sent]: () => {
         this.events.push(Event.parse({ type: 'quote-rejected', at: parsedAt }))
-        this.state = QuoteStatus.Rejected
+        this.status = QuoteStatus.Rejected
       },
       [QuoteStatus.Accepted]: () => {
         throw new Error('Cannot reject a quote that is already accepted')

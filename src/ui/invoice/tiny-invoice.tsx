@@ -42,10 +42,10 @@ export function TinyInvoice({ invoice }: { invoice: Entity }) {
           {match(
             invoice.type,
             {
-              quote: (quote: Quote) => <QuoteStatusDisplay status={quote.state} />,
-              invoice: (invoice: Invoice) => <InvoiceStatusDisplay status={invoice.state} />,
+              quote: (quote: Quote) => <QuoteStatusDisplay status={quote.status} />,
+              invoice: (invoice: Invoice) => <InvoiceStatusDisplay status={invoice.status} />,
               receipt: (receipt: Receipt) => (
-                <InvoiceStatusDisplay status={receipt.invoice.state} />
+                <InvoiceStatusDisplay status={receipt.invoice.status} />
               ),
             },
             invoice,

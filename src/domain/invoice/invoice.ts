@@ -45,7 +45,7 @@ export let Invoice = z.object({
   note: z.string().nullable(),
   issueDate: z.date(),
   dueDate: z.date(),
-  state: z.nativeEnum(InvoiceStatus).default(InvoiceStatus.Draft),
+  status: z.nativeEnum(InvoiceStatus).default(InvoiceStatus.Draft),
   discounts: z.array(Discount),
   events: z.array(Event),
   quote: Quote.nullable(),
@@ -64,7 +64,7 @@ export class InvoiceBuilder {
   private _discounts: Discount[] = []
   private _quote: Quote | null = null
 
-  private state = InvoiceStatus.Draft
+  private status = InvoiceStatus.Draft
   private paid: number = 0
   private events: Event[] = [Event.parse({ type: 'invoice-drafted' })]
 
@@ -78,13 +78,13 @@ export class InvoiceBuilder {
       issueDate: this._issueDate,
       dueDate: this._dueDate ?? configuration.defaultNetStrategy(this._issueDate!),
       discounts: this._discounts,
-      state: this.state,
+      status: this.status,
       events: this.events,
       quote: this._quote,
     }
 
-    if (input.state !== InvoiceStatus.Paid && isPast(input.dueDate)) {
-      input.state = InvoiceStatus.Overdue
+    if (input.status !== InvoiceStatus.Paid && isPast(input.dueDate)) {
+      input.status = InvoiceStatus.Overdue
       input.events.push(Event.parse({ type: 'invoice-overdue', at: input.dueDate }))
     }
 
@@ -92,7 +92,7 @@ export class InvoiceBuilder {
   }
 
   public static fromQuote(quote: Quote): InvoiceBuilder {
-    if (quote.state !== QuoteStatus.Accepted) {
+    if (quote.status !== QuoteStatus.Accepted) {
       throw new Error('Cannot convert a quote to an invoice that is not accepted')
     }
 
@@ -109,8 +109,8 @@ export class InvoiceBuilder {
   }
 
   public number(number: string): InvoiceBuilder {
-    if (this.state !== InvoiceStatus.Draft) {
-      throw new Error('Cannot edit an invoice that is not in draft state')
+    if (this.status !== InvoiceStatus.Draft) {
+      throw new Error('Cannot edit an invoice that is not in draft status')
     }
 
     this._number = number
@@ -118,56 +118,56 @@ export class InvoiceBuilder {
   }
 
   public account(account: Account): InvoiceBuilder {
-    if (this.state !== InvoiceStatus.Draft) {
-      throw new Error('Cannot edit an invoice that is not in draft state')
+    if (this.status !== InvoiceStatus.Draft) {
+      throw new Error('Cannot edit an invoice that is not in draft status')
     }
     this._account = account
     return this
   }
 
   public client(client: Client): InvoiceBuilder {
-    if (this.state !== InvoiceStatus.Draft) {
-      throw new Error('Cannot edit an invoice that is not in draft state')
+    if (this.status !== InvoiceStatus.Draft) {
+      throw new Error('Cannot edit an invoice that is not in draft status')
     }
     this._client = client
     return this
   }
 
   public items(items: InvoiceItem[]): InvoiceBuilder {
-    if (this.state !== InvoiceStatus.Draft) {
-      throw new Error('Cannot edit an invoice that is not in draft state')
+    if (this.status !== InvoiceStatus.Draft) {
+      throw new Error('Cannot edit an invoice that is not in draft status')
     }
     this._items = items
     return this
   }
 
   public note(note: string | null): InvoiceBuilder {
-    if (this.state !== InvoiceStatus.Draft) {
-      throw new Error('Cannot edit an invoice that is not in draft state')
+    if (this.status !== InvoiceStatus.Draft) {
+      throw new Error('Cannot edit an invoice that is not in draft status')
     }
     this._note = note
     return this
   }
 
   public issueDate(issueDate: string | Date): InvoiceBuilder {
-    if (this.state !== InvoiceStatus.Draft) {
-      throw new Error('Cannot edit an invoice that is not in draft state')
+    if (this.status !== InvoiceStatus.Draft) {
+      throw new Error('Cannot edit an invoice that is not in draft status')
     }
     this._issueDate = typeof issueDate === 'string' ? parseISO(issueDate) : issueDate
     return this
   }
 
   public dueDate(dueDate: string | Date): InvoiceBuilder {
-    if (this.state !== InvoiceStatus.Draft) {
-      throw new Error('Cannot edit an invoice that is not in draft state')
+    if (this.status !== InvoiceStatus.Draft) {
+      throw new Error('Cannot edit an invoice that is not in draft status')
     }
     this._dueDate = typeof dueDate === 'string' ? parseISO(dueDate) : dueDate
     return this
   }
 
   public discount(discount: Discount): InvoiceBuilder {
-    if (this.state !== InvoiceStatus.Draft) {
-      throw new Error('Cannot edit an invoice that is not in draft state')
+    if (this.status !== InvoiceStatus.Draft) {
+      throw new Error('Cannot edit an invoice that is not in draft status')
     }
 
     if (new Set(this._items.map((item) => item.taxRate).filter((rate) => rate !== 0)).size > 1) {
@@ -179,8 +179,8 @@ export class InvoiceBuilder {
   }
 
   public item(item: InvoiceItem): InvoiceBuilder {
-    if (this.state !== InvoiceStatus.Draft) {
-      throw new Error('Cannot edit an invoice that is not in draft state')
+    if (this.status !== InvoiceStatus.Draft) {
+      throw new Error('Cannot edit an invoice that is not in draft status')
     }
 
     this._items.push(item)
@@ -190,10 +190,10 @@ export class InvoiceBuilder {
   public send(at: string | Date): InvoiceBuilder {
     let parsedAt = typeof at === 'string' ? parseISO(at) : at
 
-    match(this.state, {
+    match(this.status, {
       [InvoiceStatus.Draft]: () => {
         this.events.push(Event.parse({ type: 'invoice-sent', at: parsedAt }))
-        this.state = InvoiceStatus.Sent
+        this.status = InvoiceStatus.Sent
       },
       [InvoiceStatus.Sent]: () => {
         throw new Error('Cannot send an invoice that is already sent')
@@ -232,16 +232,16 @@ export class InvoiceBuilder {
             outstanding: remaining,
           }),
         )
-        this.state = InvoiceStatus.PartialPaid
+        this.status = InvoiceStatus.PartialPaid
       } else {
         this.events.push(
           Event.parse({ type: 'invoice-paid', at: parsedAt, amount, outstanding: remaining }),
         )
-        this.state = InvoiceStatus.Paid
+        this.status = InvoiceStatus.Paid
       }
     }
 
-    match(this.state, {
+    match(this.status, {
       // When money comes in _before_ an invoice is sent
       [InvoiceStatus.Draft]: handlePayment,
       [InvoiceStatus.Sent]: handlePayment,
@@ -263,12 +263,12 @@ export class InvoiceBuilder {
               outstanding: remaining,
             }),
           )
-          this.state = InvoiceStatus.PartialPaid
+          this.status = InvoiceStatus.PartialPaid
         } else {
           this.events.push(
             Event.parse({ type: 'invoice-paid', at: parsedAt, amount, outstanding: remaining }),
           )
-          this.state = InvoiceStatus.Paid
+          this.status = InvoiceStatus.Paid
         }
       },
       [InvoiceStatus.Overdue]: () => {

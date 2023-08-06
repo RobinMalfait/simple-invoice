@@ -102,7 +102,7 @@ export function Summary({
 }: {
   items: Invoice['items']
   discounts: Invoice['discounts']
-  status: Invoice['state'] | null
+  status: Invoice['status'] | null
   type: 'all' | 'subtotal'
 }) {
   let t = useTranslation()

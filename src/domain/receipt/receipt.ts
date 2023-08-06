@@ -51,7 +51,7 @@ export class ReceiptBuilder {
   }
 
   public static fromInvoice(invoice: Invoice): ReceiptBuilder {
-    if (invoice.state !== InvoiceStatus.Paid) {
+    if (invoice.status !== InvoiceStatus.Paid) {
       throw new Error('Cannot create a receipt from an unpaid invoice')
     }
 
