@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { invoices } from '~/data'
+import { InvoiceProvider } from '~/ui/hooks/use-invoice'
 import { Invoice as InvoicePreview } from '~/ui/invoice/design'
 
 export default function Raw({
@@ -10,8 +11,12 @@ export default function Raw({
   let invoice = invoices.find((invoice) => invoice.type === type && invoice.number === number)
 
   if (!invoice) {
-    redirect('/')
+    return redirect('/')
   }
 
-  return <InvoicePreview invoice={invoice} />
+  return (
+    <InvoiceProvider invoice={invoice}>
+      <InvoicePreview />
+    </InvoiceProvider>
+  )
 }
