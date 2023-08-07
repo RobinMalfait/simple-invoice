@@ -2,6 +2,7 @@ import { ArrowDownIcon, ArrowUpIcon } from '@heroicons/react/20/solid'
 import { endOfQuarter, isWithinInterval, startOfQuarter, subQuarters } from 'date-fns'
 import Link from 'next/link'
 import { me, invoices as rawInvoices } from '~/data'
+import { Client } from '~/domain/client/client'
 import { Invoice } from '~/domain/invoice/invoice'
 import { InvoiceStatus } from '~/domain/invoice/invoice-status'
 import { Quote } from '~/domain/quote/quote'
@@ -35,6 +36,8 @@ export default function Page() {
   let currentInvoices = invoices.filter((e) =>
     isWithinInterval(resolveRelevantEntityDate(e), currentRange),
   )
+
+  let totalInvoiceSales = invoices.reduce((acc, e) => acc + total(e), 0)
 
   return (
     <I18NProvider
@@ -112,15 +115,15 @@ export default function Page() {
 
         {(() => {
           let data = currentInvoices.filter((e) => {
-                return (
-                  (e.type === 'quote' &&
-                    ![QuoteStatus.Expired, QuoteStatus.Rejected].includes(e.status)) ||
-                  (e.type === 'invoice' &&
-                    [InvoiceStatus.Draft, InvoiceStatus.Sent, InvoiceStatus.PartialPaid].includes(
-                      e.status,
-                    ))
-                )
-              })
+            return (
+              (e.type === 'quote' &&
+                ![QuoteStatus.Expired, QuoteStatus.Rejected].includes(e.status)) ||
+              (e.type === 'invoice' &&
+                [InvoiceStatus.Draft, InvoiceStatus.Sent, InvoiceStatus.PartialPaid].includes(
+                  e.status,
+                ))
+            )
+          })
 
           return (
             <div
@@ -135,28 +138,91 @@ export default function Page() {
               {data.length > 0 ? (
                 <div className="grid auto-cols-[minmax(275px,1fr)] grid-flow-col grid-cols-[repeat(auto-fill,minmax(275px,1fr))] gap-4 overflow-x-auto p-4">
                   {data.map((invoice) => (
-                <I18NProvider
-                  key={invoice.id}
-                  value={{
-                    // Prefer the language of the account when looking at the overview of invoices.
-                    language: invoice.account.language,
+                    <I18NProvider
+                      key={invoice.id}
+                      value={{
+                        // Prefer the language of the account when looking at the overview of invoices.
+                        language: invoice.account.language,
 
-                    // Prefer the currency of the client when looking at the overview of invoices.
-                    currency: invoice.client.currency,
-                  }}
-                >
-                  <Link href={`/${invoice.type}/${invoice.number}`}>
-                    <TinyInvoice invoice={invoice} />
-                  </Link>
-                </I18NProvider>
-              ))}
-          </div>
+                        // Prefer the currency of the client when looking at the overview of invoices.
+                        currency: invoice.client.currency,
+                      }}
+                    >
+                      <Link href={`/${invoice.type}/${invoice.number}`}>
+                        <TinyInvoice invoice={invoice} />
+                      </Link>
+                    </I18NProvider>
+                  ))}
+                </div>
               ) : (
                 <Empty message="No active quotes / invoices available" />
               )}
             </div>
           )
         })()}
+
+        <div className="grid grid-cols-2 gap-8">
+          {(() => {
+            let data = Array.from(
+              invoices
+                .reduce((acc, e) => {
+                  if (!acc.has(e.client.id)) {
+                    acc.set(e.client.id, { client: e.client, total: 0 })
+                  }
+                  acc.get(e.client.id)!.total += total(e)
+                  return acc
+                }, new Map<Client['id'], { client: Client; total: number }>())
+                .entries(),
+            )
+              .sort(([, a], [, z]) => z.total - a.total) // Sort by best paying client first.
+              .slice(0, 5) // Only show the top 5.
+
+            return (
+              <div
+                className={classNames(
+                  'overflow-auto rounded-md bg-white shadow ring-1 ring-black/5 dark:bg-zinc-800',
+                  data.length === 0 &&
+                    'opacity-50 transition-opacity duration-300 hover:opacity-100',
+                )}
+              >
+                <div className="border-b p-4 dark:border-zinc-900/75 dark:text-zinc-400">
+                  Top paying clients
+                </div>
+                {data.length > 0 ? (
+                  <div className="flex-1 divide-y divide-gray-100 dark:divide-zinc-900">
+                    {data.map(([id, { client, total }], idx) => (
+                      <I18NProvider key={id} value={client}>
+                        <div className="group relative flex items-center p-3 first:border-t-[1px] first:border-t-transparent focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 dark:border-zinc-800">
+                          <div className="absolute inset-2 z-0 flex">
+                            <div
+                              className="rounded-md bg-blue-200/30 dark:bg-blue-400/25"
+                              style={{ width: `${(total / totalInvoiceSales) * 100}%` }}
+                            />
+                          </div>
+                          <div className="z-10 flex w-full items-center space-x-2">
+                            <span className="w-[2ch] text-right text-sm font-medium tabular-nums text-gray-400 dark:text-zinc-400">
+                              {idx + 1}.
+                            </span>
+                            <div className="flex flex-1 items-center justify-between space-x-2 truncate dark:text-zinc-300">
+                              <span className="truncate">{client.name}</span>
+                              <span className="text-xs">
+                                <Money amount={total} />
+                                <small className="mx-1 inline-block w-[4ch] flex-shrink-0 text-right">
+                                  {((total / totalInvoiceSales) * 100).toFixed(0)}%
+                                </small>
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </I18NProvider>
+                    ))}
+                  </div>
+                ) : (
+                  <Empty message="No clients available" />
+                )}
+              </div>
+            )
+          })()}
         </div>
       </main>
     </I18NProvider>
