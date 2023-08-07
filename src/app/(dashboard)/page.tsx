@@ -19,7 +19,7 @@ import { Money } from '~/ui/money'
 import { match } from '~/utils/match'
 
 export default function Page() {
-  let invoices = squashEntities(rawInvoices)
+  let invoices = squashEntities(rawInvoices).sort((a, z) => z.number.localeCompare(a.number))
 
   let now = new Date()
 
