@@ -56,37 +56,56 @@ export default function Page() {
           </div>
         </div>
 
-        <div className="grid grid-cols-4 gap-4">
-          <CompareBlock
-            title="Invoices"
-            previous={previousInvoices}
-            current={currentInvoices}
-            value={(list) => list.length}
-          />
+        <div className="grid grid-cols-6 gap-4">
+          <div className="col-span-1">
+            <CompareBlock
+              title="Quotes"
+              previous={previousInvoices}
+              current={currentInvoices}
+              value={(list) => list.filter((e) => e.type === 'quote').length}
+            />
+          </div>
 
-          <CompareBlock
-            title="Upcoming"
-            current={currentInvoices}
-            value={(list) => list.filter((e) => isActiveEntity(e)).length}
-          />
+          <div className="col-span-1">
+            <CompareBlock
+              title="Invoices / Receipts"
+              previous={previousInvoices}
+              current={currentInvoices}
+              value={(list) =>
+                list.filter((e) => e.type === 'invoice' || e.type === 'receipt').length
+              }
+            />
+          </div>
 
-          <CompareBlock
-            inverse
-            title="Rejected / Expired"
-            previous={previousInvoices}
-            current={currentInvoices}
-            value={(list) => list.filter((e) => isDeadEntity(e)).length}
-          />
+          <div className="col-span-1">
+            <CompareBlock
+              title="Upcoming"
+              current={currentInvoices}
+              value={(list) => list.filter((e) => isActiveEntity(e)).length}
+            />
+          </div>
 
-          <CompareBlock
-            title="Paid"
-            previous={previousInvoices}
-            current={currentInvoices}
-            value={(list) =>
-              list.filter((e) => isPaidEntity(e)).reduce((acc, e) => acc + total(e), 0)
-            }
-            display={(value) => <Money amount={value} />}
-          />
+          <div className="col-span-1">
+            <CompareBlock
+              inverse
+              title="Rejected / Expired"
+              previous={previousInvoices}
+              current={currentInvoices}
+              value={(list) => list.filter((e) => isDeadEntity(e)).length}
+            />
+          </div>
+
+          <div className="col-span-2">
+            <CompareBlock
+              title="Paid"
+              previous={previousInvoices}
+              current={currentInvoices}
+              value={(list) =>
+                list.filter((e) => isPaidEntity(e)).reduce((acc, e) => acc + total(e), 0)
+              }
+              display={(value) => <Money amount={value} />}
+            />
+          </div>
         </div>
 
         {(() => {
