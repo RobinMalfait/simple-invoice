@@ -52,7 +52,7 @@ export default function Page() {
           <div></div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-sm">
+              <span className="text-sm dark:text-zinc-400">
                 <FormatRange start={start} end={end} />
               </span>
             </div>
