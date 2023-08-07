@@ -47,7 +47,7 @@ export const me: Account = new AccountBuilder()
   .build()
 
 let Client1 = new ClientBuilder()
-  .name('Client Inc')
+  .name('Client Inc #1')
   .email('bob@client.com')
   .billing(
     new AddressBuilder()
@@ -61,7 +61,7 @@ let Client1 = new ClientBuilder()
   .build()
 
 let Client2 = new ClientBuilder()
-  .name('Client Inc')
+  .name('Client Inc #2')
   .email('bob@client.com')
   .billing(
     new AddressBuilder()
