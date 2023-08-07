@@ -46,11 +46,9 @@ export function TinyInvoice({ invoice }: { invoice: Entity }) {
           {match(
             invoice.type,
             {
-              quote: (quote: Quote) => <QuoteStatusDisplay status={quote.status} />,
-              invoice: (invoice: Invoice) => <InvoiceStatusDisplay status={invoice.status} />,
-              receipt: (receipt: Receipt) => (
-                <InvoiceStatusDisplay status={receipt.invoice.status} />
-              ),
+              quote: (e: Quote) => <QuoteStatusDisplay status={e.status} />,
+              invoice: (e: Invoice) => <InvoiceStatusDisplay status={e.status} />,
+              receipt: (e: Receipt) => <InvoiceStatusDisplay status={e.invoice.status} />,
             },
             invoice,
           )}
@@ -86,9 +84,9 @@ export function TinyInvoice({ invoice }: { invoice: Entity }) {
               {match(
                 invoice.type,
                 {
-                  quote: (quote: Quote) => format(quote.quoteDate, 'PP'),
-                  invoice: (invoice: Invoice) => format(invoice.issueDate, 'PP'),
-                  receipt: (receipt: Receipt) => format(receipt.receiptDate, 'PP'),
+                  quote: (e: Quote) => format(e.quoteDate, 'PP'),
+                  invoice: (e: Invoice) => format(e.issueDate, 'PP'),
+                  receipt: (e: Receipt) => format(e.receiptDate, 'PP'),
                 },
                 invoice,
               )}
@@ -105,9 +103,9 @@ export function TinyInvoice({ invoice }: { invoice: Entity }) {
               {match(
                 invoice.type,
                 {
-                  quote: (quote: Quote) => format(quote.quoteExpirationDate, 'PP'),
-                  invoice: (invoice: Invoice) => format(invoice.dueDate, 'PP'),
-                  receipt: (receipt: Receipt) => format(receipt.receiptDate, 'PP'),
+                  quote: (e: Quote) => format(e.quoteExpirationDate, 'PP'),
+                  invoice: (e: Invoice) => format(e.dueDate, 'PP'),
+                  receipt: (e: Receipt) => format(e.receiptDate, 'PP'),
                 },
                 invoice,
               )}

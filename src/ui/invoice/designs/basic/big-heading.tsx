@@ -53,9 +53,9 @@ export function BigHeading() {
                 {match(
                   entity.type,
                   {
-                    quote: (quote: Quote) => format(quote.quoteDate, 'PPP', { locale }),
-                    invoice: (invoice: Invoice) => format(invoice.issueDate, 'PPP', { locale }),
-                    receipt: (receipt: Receipt) => receipt.invoice.number,
+                    quote: (e: Quote) => format(e.quoteDate, 'PPP', { locale }),
+                    invoice: (e: Invoice) => format(e.issueDate, 'PPP', { locale }),
+                    receipt: (e: Receipt) => e.invoice.number,
                   },
                   entity,
                 )}
@@ -75,9 +75,9 @@ export function BigHeading() {
                 {match(
                   entity.type,
                   {
-                    quote: (quote: Quote) => format(quote.quoteExpirationDate, 'PPP', { locale }),
-                    invoice: (invoice: Invoice) => format(invoice.dueDate, 'PPP', { locale }),
-                    receipt: (receipt: Receipt) => format(receipt.receiptDate, 'PPP', { locale }),
+                    quote: (e: Quote) => format(e.quoteExpirationDate, 'PPP', { locale }),
+                    invoice: (e: Invoice) => format(e.dueDate, 'PPP', { locale }),
+                    receipt: (e: Receipt) => format(e.receiptDate, 'PPP', { locale }),
                   },
                   entity,
                 )}
