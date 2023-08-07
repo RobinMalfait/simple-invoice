@@ -85,25 +85,15 @@ export class QuoteBuilder {
   }
 
   get computeNumber() {
-    if (this._number) {
-      return this._number
-    }
-
-    if (!this._quoteDate) {
-      throw new Error('Missing quote date')
-    }
+    if (this._number) return this._number
+    if (!this._quoteDate) return null // Let the validation handle this
 
     return configuration.numberStrategy(this._quoteDate)
   }
 
   get computeQuoteExpirationDate() {
-    if (this._quoteExpirationDate) {
-      return this._quoteExpirationDate
-    }
-
-    if (!this._quoteDate) {
-      throw new Error('Missing quote date')
-    }
+    if (this._quoteExpirationDate) return this._quoteExpirationDate
+    if (!this._quoteDate) return null // Let the validation handle this
 
     return configuration.defaultNetStrategy(this._quoteDate)
   }
@@ -111,7 +101,7 @@ export class QuoteBuilder {
   get computeStatus() {
     if (
       ![QuoteStatus.Accepted, QuoteStatus.Closed].includes(this._status) &&
-      isPast(this.computeQuoteExpirationDate)
+      isPast(this.computeQuoteExpirationDate!)
     ) {
       return QuoteStatus.Expired
     }
@@ -286,7 +276,7 @@ export class QuoteBuilder {
   public close(at: string | Date): QuoteBuilder {
     let parsedAt = typeof at === 'string' ? parseISO(at) : at
 
-    if (isPast(this.computeQuoteExpirationDate)) {
+    if (isPast(this.computeQuoteExpirationDate!)) {
       this.events.push(Event.parse({ type: 'quote-expired', at: parsedAt }))
       this._status = QuoteStatus.Expired
     }

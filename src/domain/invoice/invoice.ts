@@ -108,33 +108,23 @@ export class InvoiceBuilder {
   }
 
   get computeNumber() {
-    if (this._number) {
-      return this._number
-    }
-
-    if (!this._issueDate) {
-      throw new Error('Missing issue date')
-    }
+    if (this._number) return this._number
+    if (!this._issueDate) return null // Let the validation handle this
 
     return configuration.numberStrategy(this._issueDate)
   }
 
   get computeDueDate() {
-    if (this._dueDate) {
-      return this._dueDate
-    }
+    if (this._dueDate) return this._dueDate
+    if (!this._issueDate) return null // Let the validation handle this
 
-    if (!this._issueDate) {
-      throw new Error('Missing issue date')
-    }
-
-    return configuration.defaultNetStrategy(this._issueDate!)
+    return configuration.defaultNetStrategy(this._issueDate)
   }
 
   get computeStatus() {
     if (
       ![InvoiceStatus.Paid, InvoiceStatus.Closed].includes(this._status) &&
-      isPast(this.computeDueDate)
+      isPast(this.computeDueDate!)
     ) {
       return InvoiceStatus.Overdue
     }
@@ -322,7 +312,7 @@ export class InvoiceBuilder {
   public close(at: string | Date): InvoiceBuilder {
     let parsedAt = typeof at === 'string' ? parseISO(at) : at
 
-    if (isPast(this.computeDueDate)) {
+    if (isPast(this.computeDueDate!)) {
       this.events.push(Event.parse({ type: 'invoice-overdue', at: parsedAt }))
       this._status = InvoiceStatus.Overdue
     }
