@@ -1,11 +1,10 @@
 'use client'
 
 import { CalendarIcon, RectangleStackIcon } from '@heroicons/react/24/outline'
-import { format, isPast } from 'date-fns'
+import { format } from 'date-fns'
+import { entityHasWarning, isLayeredEntity } from '~/domain/entity-filters'
 import { Invoice } from '~/domain/invoice/invoice'
-import { InvoiceStatus } from '~/domain/invoice/invoice-status'
 import { Quote } from '~/domain/quote/quote'
-import { QuoteStatus } from '~/domain/quote/quote-status'
 import { Receipt } from '~/domain/receipt/receipt'
 import { StatusDisplay as InvoiceStatusDisplay } from '~/ui/invoice/status'
 import { total } from '~/ui/invoice/total'
@@ -18,35 +17,8 @@ type Entity = Quote | Invoice | Receipt
 
 export function TinyInvoice({ invoice }: { invoice: Entity }) {
   let t = useTranslation()
-  let isLayered = match(
-    invoice.type,
-    {
-      quote: () => false,
-      invoice: (e: Invoice) => e.quote !== null,
-      receipt: () => true,
-    },
-    invoice,
-  )
-
-  let warning = match(
-    invoice.type,
-    {
-      quote: (e: Quote) => e.status === QuoteStatus.Expired,
-      invoice: (e: Invoice) => {
-        if (e.status === InvoiceStatus.Overdue) {
-          return true
-        }
-
-        if (e.status === InvoiceStatus.Draft && isPast(e.issueDate)) {
-          return true
-        }
-
-        return false
-      },
-      receipt: () => false,
-    },
-    invoice,
-  )
+  let isLayered = isLayeredEntity(invoice)
+  let warning = entityHasWarning(invoice)
 
   return (
     <div className="group relative rounded-md bg-white shadow transition-transform duration-300 will-change-transform hover:-translate-y-1 dark:bg-zinc-950">

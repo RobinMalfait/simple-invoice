@@ -3,10 +3,9 @@ import { endOfQuarter, isWithinInterval, startOfQuarter, subQuarters } from 'dat
 import Link from 'next/link'
 import { me, invoices as rawInvoices } from '~/data'
 import { Client } from '~/domain/client/client'
+import { isActiveEntity, isDeadEntity, isPaidEntity } from '~/domain/entity-filters'
 import { Invoice } from '~/domain/invoice/invoice'
-import { InvoiceStatus } from '~/domain/invoice/invoice-status'
 import { Quote } from '~/domain/quote/quote'
-import { QuoteStatus } from '~/domain/quote/quote-status'
 import { Receipt } from '~/domain/receipt/receipt'
 import { resolveRelevantEntityDate } from '~/domain/relevant-entity-date'
 import { squashEntities } from '~/domain/squash-entities'
@@ -68,15 +67,7 @@ export default function Page() {
           <CompareBlock
             title="upcoming"
             current={currentInvoices}
-            value={(list) =>
-              list.filter(
-                (e) =>
-                  (e.type === 'quote' &&
-                    ![QuoteStatus.Rejected, QuoteStatus.Expired].includes(e.status)) ||
-                  (e.type === 'invoice' &&
-                    [InvoiceStatus.Draft, InvoiceStatus.Sent].includes(e.status)),
-              ).length
-            }
+            value={(list) => list.filter((e) => isActiveEntity(e)).length}
           />
 
           <CompareBlock
@@ -84,14 +75,7 @@ export default function Page() {
             title="rejected / expired"
             previous={previousInvoices}
             current={currentInvoices}
-            value={(list) =>
-              list.filter(
-                (e) =>
-                  (e.type === 'quote' &&
-                    [QuoteStatus.Rejected, QuoteStatus.Expired].includes(e.status)) ||
-                  (e.type === 'invoice' && e.status === InvoiceStatus.Overdue),
-              ).length
-            }
+            value={(list) => list.filter((e) => isDeadEntity(e)).length}
           />
 
           <CompareBlock
@@ -99,31 +83,14 @@ export default function Page() {
             previous={previousInvoices}
             current={currentInvoices}
             value={(list) =>
-              list
-                .filter(
-                  (e) =>
-                    (e.type === 'invoice' && e.status === InvoiceStatus.Paid) ||
-                    e.type === 'receipt',
-                )
-                .reduce((acc, e) => acc + total(e), 0)
+              list.filter((e) => isPaidEntity(e)).reduce((acc, e) => acc + total(e), 0)
             }
             display={(value) => <Money amount={value} />}
           />
         </div>
 
         {(() => {
-          let data = currentInvoices.filter((e) => {
-            return (
-              (e.type === 'quote' &&
-                ![QuoteStatus.Expired, QuoteStatus.Rejected, QuoteStatus.Closed].includes(
-                  e.status,
-                )) ||
-              (e.type === 'invoice' &&
-                [InvoiceStatus.Draft, InvoiceStatus.Sent, InvoiceStatus.PartialPaid].includes(
-                  e.status,
-                ))
-            )
-          })
+          let data = currentInvoices.filter((e) => isActiveEntity(e))
 
           return (
             <div
@@ -163,29 +130,14 @@ export default function Page() {
 
         <div className="grid grid-cols-2 gap-8">
           {(() => {
-            function isPaid(entity: Entity) {
-              return match(
-                entity.type,
-                {
-                  quote: () => false,
-                  invoice: (e: Invoice) => e.status === InvoiceStatus.Paid,
-                  receipt: () => true,
-                },
-                entity,
-              )
-            }
-
             let totalInvoiceSales = currentInvoices
-              .filter((e) => isPaid(e))
+              .filter((e) => isPaidEntity(e))
               .reduce((acc, e) => acc + total(e), 0)
 
             let data = Array.from(
               currentInvoices
                 .reduce((acc, e) => {
-                  // Only count paid invoices and receipts.
-                  if (!isPaid(e)) {
-                    return acc
-                  }
+                  if (!isPaidEntity(e)) return acc
 
                   if (!acc.has(e.client.id)) {
                     acc.set(e.client.id, { client: e.client, total: 0 })
