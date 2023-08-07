@@ -58,28 +58,28 @@ export default function Page() {
 
         <div className="grid grid-cols-4 gap-4">
           <CompareBlock
-            title="invoices"
+            title="Invoices"
             previous={previousInvoices}
             current={currentInvoices}
             value={(list) => list.length}
           />
 
           <CompareBlock
-            title="upcoming"
+            title="Upcoming"
             current={currentInvoices}
             value={(list) => list.filter((e) => isActiveEntity(e)).length}
           />
 
           <CompareBlock
             inverse
-            title="rejected / expired"
+            title="Rejected / Expired"
             previous={previousInvoices}
             current={currentInvoices}
             value={(list) => list.filter((e) => isDeadEntity(e)).length}
           />
 
           <CompareBlock
-            title="paid"
+            title="Paid"
             previous={previousInvoices}
             current={currentInvoices}
             value={(list) =>
