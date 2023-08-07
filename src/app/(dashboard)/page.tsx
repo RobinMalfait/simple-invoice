@@ -117,7 +117,9 @@ export default function Page() {
           let data = currentInvoices.filter((e) => {
             return (
               (e.type === 'quote' &&
-                ![QuoteStatus.Expired, QuoteStatus.Rejected].includes(e.status)) ||
+                ![QuoteStatus.Expired, QuoteStatus.Rejected, QuoteStatus.Closed].includes(
+                  e.status,
+                )) ||
               (e.type === 'invoice' &&
                 [InvoiceStatus.Draft, InvoiceStatus.Sent, InvoiceStatus.PartialPaid].includes(
                   e.status,
