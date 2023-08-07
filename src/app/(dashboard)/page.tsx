@@ -135,7 +135,7 @@ export default function Page() {
               )}
             >
               <div className="border-b p-4 dark:border-zinc-900/75 dark:text-zinc-400">
-                Active quotes / invoices
+                Active quotes / invoices ({data.length})
               </div>
               {data.length > 0 ? (
                 <div className="grid auto-cols-[minmax(275px,1fr)] grid-flow-col grid-cols-[repeat(auto-fill,minmax(275px,1fr))] gap-4 overflow-x-auto p-4">
