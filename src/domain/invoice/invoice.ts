@@ -98,9 +98,9 @@ export class InvoiceBuilder {
     let builder = new InvoiceBuilder()
     builder._account = quote.account
     builder._client = quote.client
-    builder._items = quote.items
+    builder._items = quote.items.slice()
     builder._note = quote.note
-    builder._discounts = quote.discounts
+    builder._discounts = quote.discounts.slice()
     builder.events = quote.events.slice()
     builder.events.push(Event.parse({ type: 'invoice-drafted', from: 'quote' }))
     builder._quote = quote

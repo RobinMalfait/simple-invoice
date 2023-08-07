@@ -59,10 +59,10 @@ export class ReceiptBuilder {
     builder._invoice = invoice
     builder._account = invoice.account
     builder._client = invoice.client
-    builder._items = invoice.items
+    builder._items = invoice.items.slice()
     builder._note = invoice.note
     builder._receiptDate = invoice.events.find((e) => e.type === 'invoice-paid')?.at ?? null
-    builder._discounts = invoice.discounts
+    builder._discounts = invoice.discounts.slice()
     builder.events = invoice.events.slice()
     builder.events.push(Event.parse({ type: 'receipt-created' }))
     return builder
