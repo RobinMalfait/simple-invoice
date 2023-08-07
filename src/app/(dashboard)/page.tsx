@@ -37,8 +37,6 @@ export default function Page() {
     isWithinInterval(resolveRelevantEntityDate(e), currentRange),
   )
 
-  let totalInvoiceSales = invoices.reduce((acc, e) => acc + total(e), 0)
-
   return (
     <I18NProvider
       value={{
@@ -165,8 +163,9 @@ export default function Page() {
 
         <div className="grid grid-cols-2 gap-8">
           {(() => {
+            let totalInvoiceSales = currentInvoices.reduce((acc, e) => acc + total(e), 0)
             let data = Array.from(
-              invoices
+              currentInvoices
                 .reduce((acc, e) => {
                   if (!acc.has(e.client.id)) {
                     acc.set(e.client.id, { client: e.client, total: 0 })
