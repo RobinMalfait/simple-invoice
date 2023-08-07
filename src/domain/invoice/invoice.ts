@@ -108,11 +108,27 @@ export class InvoiceBuilder {
   }
 
   get computeNumber() {
-    return this._number ?? configuration.numberStrategy(this._issueDate!)
+    if (this._number) {
+      return this._number
+    }
+
+    if (!this._issueDate) {
+      throw new Error('Missing issue date')
+    }
+
+    return configuration.numberStrategy(this._issueDate)
   }
 
   get computeDueDate() {
-    return this._dueDate ?? configuration.defaultNetStrategy(this._issueDate!)
+    if (this._dueDate) {
+      return this._dueDate
+    }
+
+    if (!this._issueDate) {
+      throw new Error('Missing issue date')
+    }
+
+    return configuration.defaultNetStrategy(this._issueDate!)
   }
 
   get computeStatus() {

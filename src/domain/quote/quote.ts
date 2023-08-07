@@ -85,11 +85,27 @@ export class QuoteBuilder {
   }
 
   get computeNumber() {
-    return this._number ?? configuration.numberStrategy(this._quoteDate!)
+    if (this._number) {
+      return this._number
+    }
+
+    if (!this._quoteDate) {
+      throw new Error('Missing quote date')
+    }
+
+    return configuration.numberStrategy(this._quoteDate)
   }
 
   get computeQuoteExpirationDate() {
-    return this._quoteExpirationDate ?? configuration.defaultNetStrategy(this._quoteDate!)
+    if (this._quoteExpirationDate) {
+      return this._quoteExpirationDate
+    }
+
+    if (!this._quoteDate) {
+      throw new Error('Missing quote date')
+    }
+
+    return configuration.defaultNetStrategy(this._quoteDate)
   }
 
   get computeStatus() {
