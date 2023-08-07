@@ -11,6 +11,7 @@ import { resolveRelevantEntityDate } from '~/domain/relevant-entity-date'
 import { squashEntities } from '~/domain/squash-entities'
 import { classNames } from '~/ui/class-names'
 import { FormatRange } from '~/ui/date-range'
+import { Empty } from '~/ui/empty'
 import { I18NProvider } from '~/ui/hooks/use-i18n'
 import { TinyInvoice } from '~/ui/invoice/tiny-invoice'
 import { total } from '~/ui/invoice/total'
@@ -109,13 +110,8 @@ export default function Page() {
           />
         </div>
 
-        <div className="overflow-auto rounded-md bg-white shadow ring-1 ring-black/5 dark:bg-zinc-800">
-          <div className="border-b p-4 dark:border-zinc-900/75 dark:text-zinc-400">
-            Active quotes / invoices
-          </div>
-          <div className="grid auto-cols-[minmax(275px,1fr)] grid-flow-col grid-cols-[repeat(auto-fill,minmax(275px,1fr))] gap-4 overflow-x-auto p-4">
-            {currentInvoices
-              .filter((e) => {
+        {(() => {
+          let data = currentInvoices.filter((e) => {
                 return (
                   (e.type === 'quote' &&
                     ![QuoteStatus.Expired, QuoteStatus.Rejected].includes(e.status)) ||
@@ -125,7 +121,20 @@ export default function Page() {
                     ))
                 )
               })
-              .map((invoice) => (
+
+          return (
+            <div
+              className={classNames(
+                'overflow-auto rounded-md bg-white shadow ring-1 ring-black/5 dark:bg-zinc-800',
+                data.length === 0 && 'opacity-50 transition-opacity duration-300 hover:opacity-100',
+              )}
+            >
+              <div className="border-b p-4 dark:border-zinc-900/75 dark:text-zinc-400">
+                Active quotes / invoices
+              </div>
+              {data.length > 0 ? (
+                <div className="grid auto-cols-[minmax(275px,1fr)] grid-flow-col grid-cols-[repeat(auto-fill,minmax(275px,1fr))] gap-4 overflow-x-auto p-4">
+                  {data.map((invoice) => (
                 <I18NProvider
                   key={invoice.id}
                   value={{
@@ -142,6 +151,12 @@ export default function Page() {
                 </I18NProvider>
               ))}
           </div>
+              ) : (
+                <Empty message="No active quotes / invoices available" />
+              )}
+            </div>
+          )
+        })()}
         </div>
       </main>
     </I18NProvider>
