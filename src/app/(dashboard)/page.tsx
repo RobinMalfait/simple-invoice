@@ -163,10 +163,30 @@ export default function Page() {
 
         <div className="grid grid-cols-2 gap-8">
           {(() => {
-            let totalInvoiceSales = currentInvoices.reduce((acc, e) => acc + total(e), 0)
+            function isPaid(entity: Entity) {
+              return match(
+                entity.type,
+                {
+                  quote: () => false,
+                  invoice: (e: Invoice) => e.status === InvoiceStatus.Paid,
+                  receipt: () => true,
+                },
+                entity,
+              )
+            }
+
+            let totalInvoiceSales = currentInvoices
+              .filter((e) => isPaid(e))
+              .reduce((acc, e) => acc + total(e), 0)
+
             let data = Array.from(
               currentInvoices
                 .reduce((acc, e) => {
+                  // Only count paid invoices and receipts.
+                  if (!isPaid(e)) {
+                    return acc
+                  }
+
                   if (!acc.has(e.client.id)) {
                     acc.set(e.client.id, { client: e.client, total: 0 })
                   }
