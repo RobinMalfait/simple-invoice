@@ -7,16 +7,20 @@ import {
   addDays,
   addMonths,
   addQuarters,
+  addYears,
   endOfDay,
   endOfMonth,
   endOfQuarter,
+  endOfYear,
   min,
   startOfDay,
   startOfMonth,
   startOfQuarter,
+  startOfYear,
   subDays,
   subMonths,
   subQuarters,
+  subYears,
 } from 'date-fns'
 import { FormatRange } from './date-range'
 import { Menu, MenuButton, MenuItem, MenuItems } from './headlessui'
@@ -74,6 +78,24 @@ export let options: [
     (now) => [subQuarters(startOfQuarter(now), 1), subQuarters(endOfQuarter(now), 1)],
     (value) => subQuarters(value, 1),
     (value) => addQuarters(value, 1),
+  ],
+  [
+    'Year to date',
+    (now) => [startOfYear(now), now],
+    (value) => subYears(value, 1),
+    (value) => addYears(value, 1),
+  ],
+  [
+    'This year',
+    (now) => [startOfYear(now), endOfYear(now)],
+    (value) => subYears(value, 1),
+    (value) => addYears(value, 1),
+  ],
+  [
+    'Last year',
+    (now) => [subYears(startOfYear(now), 1), subYears(endOfYear(now), 1)],
+    (value) => subYears(value, 1),
+    (value) => addYears(value, 1),
   ],
   [
     'All',
