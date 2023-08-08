@@ -11,7 +11,7 @@ export function resolveRelevantEntityDate(entity: Entity) {
     {
       quote: (e: Quote) => e.quoteDate,
       invoice: (e: Invoice) => e.issueDate,
-      receipt: (e: Receipt) => e.receiptDate,
+      receipt: (e: Receipt) => e.invoice.issueDate,
     },
     entity,
   )
