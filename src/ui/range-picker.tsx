@@ -105,7 +105,7 @@ export let options: [
   ],
   [
     'All',
-    (now) => [null, endOfDay(now)],
+    (_now) => [null, null],
     (_value, range) => subDays(min(range), 1),
     (_value, range) => addDays(min(range), 1),
   ],
