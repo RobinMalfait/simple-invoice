@@ -1,4 +1,4 @@
-import { format, isFuture } from 'date-fns'
+import { compareDesc, format, isFuture } from 'date-fns'
 import Link from 'next/link'
 
 import { invoices, me } from '~/data'
@@ -26,7 +26,11 @@ function titleForQuarter(date: Date) {
 function groupByQuarter(invoices: Entity[]) {
   return Array.from(
     invoices
-      .sort((a, z) => z.number.localeCompare(a.number))
+      .sort(
+        (a, z) =>
+          compareDesc(resolveRelevantEntityDate(a), resolveRelevantEntityDate(z)) ||
+          z.number.localeCompare(a.number),
+      )
 
       // Group by quarter & year
       .reduce((acc, entity) => {
