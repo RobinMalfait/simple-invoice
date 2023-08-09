@@ -1,4 +1,4 @@
-import { addDays, subDays } from 'date-fns'
+import { addDays, startOfToday, subMonths } from 'date-fns'
 import { Account, AccountBuilder } from '~/domain/account/account'
 import { AddressBuilder } from '~/domain/address/address'
 import { ClientBuilder } from '~/domain/client/client'
@@ -12,6 +12,39 @@ import { PaymentMethodBuilder } from '~/domain/payment-method/payment-method'
 import { Quote, QuoteBuilder } from '~/domain/quote/quote'
 import { Receipt, ReceiptBuilder } from '~/domain/receipt/receipt'
 import { TaxBuilder } from '~/domain/tax/tax'
+
+// Some small little helpers to make the examples below a bit more readable while ensuring that the
+// data is spread out over time.
+let state = {
+  past: subMonths(startOfToday(), 15),
+  future: startOfToday(),
+
+  now: startOfToday(),
+}
+function inThePast(offset = 5) {
+  state.past = addDays(state.past, offset)
+  state.now = state.past
+  return state.past
+}
+function today() {
+  return startOfToday()
+}
+function sameDay() {
+  return state.now
+}
+function nextDay() {
+  state.now = addDays(state.now, 1)
+  return state.now
+}
+function afterDays(days = 1) {
+  state.now = addDays(state.now, days)
+  return state.now
+}
+function inTheFuture(offset = 5) {
+  state.future = addDays(state.future, offset)
+  state.now = state.future
+  return state.future
+}
 
 export const me: Account = new AccountBuilder()
   .name('Acme Inc.')
@@ -79,112 +112,66 @@ let Client2 = new ClientBuilder()
   .build()
 
 export const invoices: (Quote | Invoice | Receipt)[] = [
-  // Single item invoice, drafted (issue date in the future)
-  new InvoiceBuilder()
-    .account(me)
-    .client(Client1)
-    .issueDate(addDays(new Date(), 10))
-    .item(new InvoiceItemBuilder().description('Item line #1').unitPrice(100_00).build())
-    .build(),
-
-  // Single item invoice, drafted (issue date today!)
-  new InvoiceBuilder()
-    .account(me)
-    .client(Client1)
-    .issueDate(new Date())
-    .item(new InvoiceItemBuilder().description('Item line #1').unitPrice(100_00).build())
-    .build(),
-
-  // Single item invoice, sent
-  new InvoiceBuilder()
-    .account(me)
-    .client(Client1)
-    .issueDate(subDays(new Date(), 10))
-    .item(new InvoiceItemBuilder().description('Item line #1').unitPrice(100_00).build())
-    .send(subDays(new Date(), 10))
-    .build(),
-
-  // Single item invoice, paid
-  new InvoiceBuilder()
-    .account(me)
-    .client(Client1)
-    .issueDate(subDays(new Date(), 10))
-    .item(new InvoiceItemBuilder().description('Item line #1').unitPrice(100_00).build())
-    .send(subDays(new Date(), 10))
-    .pay(subDays(new Date(), 4))
-    .build(),
-
-  // Single item invoice, partially paid
-  new InvoiceBuilder()
-    .account(me)
-    .client(Client1)
-    .issueDate(subDays(new Date(), 10))
-    .item(new InvoiceItemBuilder().description('Item line #1').unitPrice(100_00).build())
-    .send(subDays(new Date(), 10))
-    .pay(subDays(new Date(), 4), 25_00) // Partial Payment
-    .pay(subDays(new Date(), 3), 50_00) // Partial Payment
-    .build(),
-
   // Single item invoice, fully paid, via partial payments
   new InvoiceBuilder()
     .account(me)
     .client(Client1)
-    .issueDate(subDays(new Date(), 10))
+    .issueDate(inThePast())
     .item(new InvoiceItemBuilder().description('Item line #1').unitPrice(100_00).build())
-    .send(subDays(new Date(), 10))
-    .pay(subDays(new Date(), 4), 25_00) // Partial Payment
-    .pay(subDays(new Date(), 3), 50_00) // Partial Payment
-    .pay(subDays(new Date(), 2), 25_00) // Partial Payment
+    .send(nextDay())
+    .pay(nextDay(), 25_00) // Partial Payment
+    .pay(nextDay(), 50_00) // Partial Payment
+    .pay(nextDay(), 25_00) // Partial Payment
     .build(),
 
   // Single item invoice, overdue
   new InvoiceBuilder()
     .account(me)
     .client(Client1)
-    .issueDate(subDays(new Date(), 60))
+    .issueDate(inThePast(60))
     .item(new InvoiceItemBuilder().description('Item line #1').unitPrice(100_00).build())
-    .send(subDays(new Date(), 60))
+    .send(nextDay())
     .build(),
 
   // Single item invoice, closed
   new InvoiceBuilder()
     .account(me)
     .client(Client1)
-    .issueDate(subDays(new Date(), 60))
+    .issueDate(inThePast(60))
     .item(new InvoiceItemBuilder().description('Item line #1').unitPrice(100_00).build())
-    .send(subDays(new Date(), 60))
-    .close(subDays(new Date(), 59))
+    .send(sameDay())
+    .close(afterDays(60))
     .build(),
 
   // Single item invoice, with multiple quantities
   new InvoiceBuilder()
     .account(me)
     .client(Client1)
-    .issueDate(subDays(new Date(), 10))
+    .issueDate(inThePast())
     .item(
       new InvoiceItemBuilder().description('Item line #1').quantity(4).unitPrice(100_00).build(),
     )
-    .send(subDays(new Date(), 10))
-    .pay(subDays(new Date(), 5))
+    .send(nextDay())
+    .pay(nextDay())
     .build(),
 
   // Single item invoice, with tax
   new InvoiceBuilder()
     .account(me)
     .client(Client1)
-    .issueDate(subDays(new Date(), 10))
+    .issueDate(inThePast())
     .item(
       new InvoiceItemBuilder().description('Item line #1').taxRate(0.21).unitPrice(100_00).build(),
     )
-    .send(subDays(new Date(), 10))
-    .pay(subDays(new Date(), 5))
+    .send(nextDay())
+    .pay(nextDay())
     .build(),
 
   // Single item invoice, with multiple quantities and tax
   new InvoiceBuilder()
     .account(me)
     .client(Client1)
-    .issueDate(subDays(new Date(), 10))
+    .issueDate(inThePast())
     .item(
       new InvoiceItemBuilder()
         .description('Item line #1')
@@ -193,26 +180,26 @@ export const invoices: (Quote | Invoice | Receipt)[] = [
         .unitPrice(100_00)
         .build(),
     )
-    .send(subDays(new Date(), 10))
-    .pay(subDays(new Date(), 5))
+    .send(nextDay())
+    .pay(nextDay())
     .build(),
 
   // Multiple items invoice
   new InvoiceBuilder()
     .account(me)
     .client(Client1)
-    .issueDate(subDays(new Date(), 10))
+    .issueDate(inThePast())
     .item(new InvoiceItemBuilder().description('Item line #1').unitPrice(100_00).build())
     .item(new InvoiceItemBuilder().description('Item line #2').unitPrice(100_00).build())
-    .send(subDays(new Date(), 10))
-    .pay(subDays(new Date(), 5))
+    .send(nextDay())
+    .pay(nextDay())
     .build(),
 
   // Multiple items invoice, with multiple quantities
   new InvoiceBuilder()
     .account(me)
     .client(Client1)
-    .issueDate(subDays(new Date(), 10))
+    .issueDate(inThePast())
     .item(
       new InvoiceItemBuilder().description('Item line #1').quantity(2).unitPrice(100_00).build(),
     )
@@ -222,15 +209,15 @@ export const invoices: (Quote | Invoice | Receipt)[] = [
     .item(
       new InvoiceItemBuilder().description('Item line #3').quantity(7).unitPrice(100_00).build(),
     )
-    .send(subDays(new Date(), 10))
-    .pay(subDays(new Date(), 5))
+    .send(nextDay())
+    .pay(nextDay())
     .build(),
 
   // Multiple items invoice, with tax
   new InvoiceBuilder()
     .account(me)
     .client(Client1)
-    .issueDate(subDays(new Date(), 10))
+    .issueDate(inThePast())
     .item(
       new InvoiceItemBuilder().description('Item line #1').taxRate(0.21).unitPrice(100_00).build(),
     )
@@ -240,15 +227,15 @@ export const invoices: (Quote | Invoice | Receipt)[] = [
     .item(
       new InvoiceItemBuilder().description('Item line #2').taxRate(0.21).unitPrice(100_00).build(),
     )
-    .send(subDays(new Date(), 10))
-    .pay(subDays(new Date(), 5))
+    .send(nextDay())
+    .pay(nextDay())
     .build(),
 
   // Multiple items invoice, with multiple quantities and tax
   new InvoiceBuilder()
     .account(me)
     .client(Client1)
-    .issueDate(subDays(new Date(), 10))
+    .issueDate(inThePast())
     .item(
       new InvoiceItemBuilder()
         .description('Item line #1')
@@ -265,15 +252,15 @@ export const invoices: (Quote | Invoice | Receipt)[] = [
         .unitPrice(100_00)
         .build(),
     )
-    .send(subDays(new Date(), 10))
-    .pay(subDays(new Date(), 5))
+    .send(nextDay())
+    .pay(nextDay())
     .build(),
 
   // Multiple items invoice, with multiple quantities and multiple tax rates
   new InvoiceBuilder()
     .account(me)
     .client(Client1)
-    .issueDate(subDays(new Date(), 10))
+    .issueDate(inThePast())
     .item(
       new InvoiceItemBuilder()
         .description('Item line #1')
@@ -290,15 +277,15 @@ export const invoices: (Quote | Invoice | Receipt)[] = [
         .unitPrice(100_00)
         .build(),
     )
-    .send(subDays(new Date(), 10))
-    .pay(subDays(new Date(), 5))
+    .send(nextDay())
+    .pay(nextDay())
     .build(),
 
   // Multiple items invoice, spreading over multiple pages
   new InvoiceBuilder()
     .account(me)
     .client(Client1)
-    .issueDate(subDays(new Date(), 10))
+    .issueDate(inThePast())
     .item(
       new InvoiceItemBuilder().description('Item line #1').quantity(3).unitPrice(100_00).build(),
     )
@@ -336,72 +323,72 @@ export const invoices: (Quote | Invoice | Receipt)[] = [
       new InvoiceItemBuilder().description('Item line #13').taxRate(0.06).unitPrice(100_00).build(),
     )
     .item(new InvoiceItemBuilder().description('Item line #14').unitPrice(100_00).build())
-    .send(subDays(new Date(), 10))
-    .pay(subDays(new Date(), 5))
+    .send(nextDay())
+    .pay(nextDay())
     .build(),
 
   // Single item invoice with notes
   new InvoiceBuilder()
     .account(me)
     .client(Client2)
-    .issueDate(subDays(new Date(), 10))
+    .issueDate(inThePast())
     .item(new InvoiceItemBuilder().description('Item line #1').unitPrice(100_00).build())
     .note('This is a note for this specific invoice')
-    .send(subDays(new Date(), 10))
-    .pay(subDays(new Date(), 5))
+    .send(nextDay())
+    .pay(nextDay())
     .build(),
 
   // Single item invoice, in the future
   new InvoiceBuilder()
     .account(me)
     .client(Client1)
-    .issueDate(subDays(new Date(), 10))
+    .issueDate(inThePast())
     .item(new InvoiceItemBuilder().description('Item line #1').unitPrice(100_00).build())
-    .send(subDays(new Date(), 10))
-    .pay(subDays(new Date(), 5))
+    .send(nextDay())
+    .pay(nextDay())
     .build(),
 
   // Single item invoice, with a fixed discount
   new InvoiceBuilder()
     .account(me)
     .client(Client1)
-    .issueDate(subDays(new Date(), 10))
+    .issueDate(inThePast())
     .item(new InvoiceItemBuilder().description('Item #1').unitPrice(100_00).taxRate(0.21).build())
     .discount(new DiscountBuilder().type('fixed').value(2500).reason('25OFF').build())
-    .send(subDays(new Date(), 10))
-    .pay(subDays(new Date(), 5))
+    .send(nextDay())
+    .pay(nextDay())
     .build(),
 
   // Single item invoice, with a percentage discount
   new InvoiceBuilder()
     .account(me)
     .client(Client1)
-    .issueDate(subDays(new Date(), 10))
+    .issueDate(inThePast())
     .item(new InvoiceItemBuilder().description('Item #1').unitPrice(100_00).taxRate(0.21).build())
     .discount(new DiscountBuilder().type('percentage').value(0.1).reason('ABC').build())
-    .send(subDays(new Date(), 10))
-    .pay(subDays(new Date(), 5))
+    .send(nextDay())
+    .pay(nextDay())
     .build(),
 
   // Single item invoice, with a combination of discounts
   new InvoiceBuilder()
     .account(me)
     .client(Client1)
-    .issueDate(subDays(new Date(), 10))
+    .issueDate(inThePast())
     .item(new InvoiceItemBuilder().description('Item #1').unitPrice(100_00).taxRate(0.21).build())
     .discount(new DiscountBuilder().type('percentage').value(0.1).reason('ABC').build())
     .discount(new DiscountBuilder().type('percentage').value(0.1).reason('DEF').build())
     .discount(new DiscountBuilder().type('percentage').value(0.1).reason('HIJ').build())
     .discount(new DiscountBuilder().type('fixed').value(2500).reason('25OFF').quantity(2).build())
-    .send(subDays(new Date(), 10))
-    .pay(subDays(new Date(), 5))
+    .send(nextDay())
+    .pay(nextDay())
     .build(),
 
   // Single item invoice, with a discount for an item
   new InvoiceBuilder()
     .account(me)
     .client(Client1)
-    .issueDate(subDays(new Date(), 10))
+    .issueDate(inThePast())
     .item(
       new InvoiceItemBuilder()
         .description('Item #1')
@@ -411,15 +398,15 @@ export const invoices: (Quote | Invoice | Receipt)[] = [
         .discount(new DiscountBuilder().type('fixed').value(5_00).reason('5OFF').build())
         .build(),
     )
-    .send(subDays(new Date(), 10))
-    .pay(subDays(new Date(), 5))
+    .send(nextDay())
+    .pay(nextDay())
     .build(),
 
   // Quote
   new QuoteBuilder()
     .account(me)
     .client(Client1)
-    .quoteDate(subDays(new Date(), 2))
+    .quoteDate(inThePast(2))
     .item(new InvoiceItemBuilder().description('Item #1').unitPrice(123).build())
     .build(),
 
@@ -427,48 +414,48 @@ export const invoices: (Quote | Invoice | Receipt)[] = [
   new QuoteBuilder()
     .account(me)
     .client(Client1)
-    .quoteDate(subDays(new Date(), 2))
+    .quoteDate(inThePast(2))
     .item(new InvoiceItemBuilder().description('Item #1').unitPrice(123).build())
-    .send(subDays(new Date(), 1))
+    .send(nextDay())
     .build(),
 
   // Quote that is accepted
   new QuoteBuilder()
     .account(me)
     .client(Client1)
-    .quoteDate(subDays(new Date(), 2))
+    .quoteDate(inThePast(2))
     .item(new InvoiceItemBuilder().description('Item #1').unitPrice(123).build())
-    .send(subDays(new Date(), 1))
-    .accept(subDays(new Date(), 0))
+    .send(nextDay())
+    .accept(nextDay())
     .build(),
 
   // Quote that is rejected
   new QuoteBuilder()
     .account(me)
     .client(Client1)
-    .quoteDate(subDays(new Date(), 2))
+    .quoteDate(inThePast(2))
     .item(new InvoiceItemBuilder().description('Item #1').unitPrice(123).build())
-    .send(subDays(new Date(), 1))
-    .reject(subDays(new Date(), 0))
+    .send(nextDay())
+    .reject(nextDay())
     .build(),
 
   // Quote that is expired
   new QuoteBuilder()
     .account(me)
     .client(Client1)
-    .quoteDate(subDays(new Date(), 30))
+    .quoteDate(inThePast(32))
     .item(new InvoiceItemBuilder().description('Item #1').unitPrice(123).build())
-    .send(subDays(new Date(), 31))
+    .send(nextDay())
     .build(),
 
   // Quote that is closed
   new QuoteBuilder()
     .account(me)
     .client(Client1)
-    .quoteDate(subDays(new Date(), 30))
+    .quoteDate(inThePast(30))
     .item(new InvoiceItemBuilder().description('Item #1').unitPrice(123).build())
-    .send(subDays(new Date(), 31))
-    .close(subDays(new Date(), 29))
+    .send(nextDay())
+    .close(nextDay())
     .build(),
 
   // Invoice from Quote
@@ -476,17 +463,17 @@ export const invoices: (Quote | Invoice | Receipt)[] = [
     new QuoteBuilder()
       .account(me)
       .client(Client1)
-      .quoteDate(subDays(new Date(), 20))
+      .quoteDate(inThePast(20))
       .item(new InvoiceItemBuilder().description('Item #1').unitPrice(60_00).build())
-      .send(subDays(new Date(), 19))
-      .accept(subDays(new Date(), 18))
+      .send(nextDay())
+      .accept(nextDay())
       .build(),
   )
-    .issueDate(subDays(new Date(), 17))
-    .send(subDays(new Date(), 17))
-    .pay(subDays(new Date(), 3), 10_00)
-    .pay(subDays(new Date(), 2), 20_00)
-    .pay(subDays(new Date(), 1), 30_00)
+    .issueDate(nextDay())
+    .send(nextDay())
+    .pay(nextDay(), 10_00)
+    .pay(nextDay(), 20_00)
+    .pay(nextDay(), 30_00)
     .build(),
 
   // Receipt from Invoice from Quote
@@ -495,17 +482,63 @@ export const invoices: (Quote | Invoice | Receipt)[] = [
       new QuoteBuilder()
         .account(me)
         .client(Client1)
-        .quoteDate(subDays(new Date(), 20))
+        .quoteDate(inThePast(20))
         .item(new InvoiceItemBuilder().description('Item #1').unitPrice(60_00).build())
-        .send(subDays(new Date(), 19))
-        .accept(subDays(new Date(), 18))
+        .send(nextDay())
+        .accept(nextDay())
         .build(),
     )
-      .issueDate(subDays(new Date(), 17))
-      .send(subDays(new Date(), 17))
-      .pay(subDays(new Date(), 3), 10_00)
-      .pay(subDays(new Date(), 2), 20_00)
-      .pay(subDays(new Date(), 1), 30_00)
+      .issueDate(inThePast(17))
+      .send(nextDay())
+      .pay(nextDay(), 10_00)
+      .pay(nextDay(), 20_00)
+      .pay(nextDay(), 30_00)
       .build(),
   ).build(),
+
+  // Single item invoice, paid
+  new InvoiceBuilder()
+    .account(me)
+    .client(Client1)
+    .issueDate(inThePast())
+    .item(new InvoiceItemBuilder().description('Item line #1').unitPrice(100_00).build())
+    .send(nextDay())
+    .pay(nextDay())
+    .build(),
+
+  // Single item invoice, sent
+  new InvoiceBuilder()
+    .account(me)
+    .client(Client1)
+    .issueDate(today())
+    .item(new InvoiceItemBuilder().description('Item line #1').unitPrice(100_00).build())
+    .send(sameDay())
+    .build(),
+
+  // Single item invoice, partially paid
+  new InvoiceBuilder()
+    .account(me)
+    .client(Client1)
+    .issueDate(today())
+    .item(new InvoiceItemBuilder().description('Item line #1').unitPrice(100_00).build())
+    .send(nextDay())
+    .pay(nextDay(), 25_00) // Partial Payment
+    .pay(nextDay(), 50_00) // Partial Payment
+    .build(),
+
+  // Single item invoice, drafted (issue date today!)
+  new InvoiceBuilder()
+    .account(me)
+    .client(Client1)
+    .issueDate(today())
+    .item(new InvoiceItemBuilder().description('Item line #1').unitPrice(100_00).build())
+    .build(),
+
+  // Single item invoice, drafted (issue date in the future)
+  new InvoiceBuilder()
+    .account(me)
+    .client(Client1)
+    .issueDate(inTheFuture())
+    .item(new InvoiceItemBuilder().description('Item line #1').unitPrice(100_00).build())
+    .build(),
 ]
