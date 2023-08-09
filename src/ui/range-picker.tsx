@@ -68,6 +68,12 @@ export let options: [
     (value) => addMonths(value, 1),
   ],
   [
+    'Quarter to date',
+    (now) => [startOfQuarter(now), now],
+    (value) => subQuarters(value, 1),
+    (value) => addQuarters(value, 1),
+  ],
+  [
     'This quarter',
     (now) => [startOfQuarter(now), endOfQuarter(now)],
     (value) => subQuarters(value, 1),
