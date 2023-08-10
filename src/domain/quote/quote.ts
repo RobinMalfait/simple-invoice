@@ -73,7 +73,7 @@ export class QuoteBuilder {
       quoteDate: this._quoteDate,
       quoteExpirationDate: this.computeQuoteExpirationDate,
       discounts: this._discounts,
-      status: this._status,
+      status: this.computeStatus,
       events: this.events,
     }
 
