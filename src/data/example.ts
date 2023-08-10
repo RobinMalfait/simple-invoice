@@ -2,16 +2,53 @@ import { addDays, startOfToday, subMonths } from 'date-fns'
 import { Account, AccountBuilder } from '~/domain/account/account'
 import { AddressBuilder } from '~/domain/address/address'
 import { ClientBuilder } from '~/domain/client/client'
+import { configure } from '~/domain/configuration/configuration'
 import { ContactFieldBuilder } from '~/domain/contact-fields/contact-fields'
 import { Currency } from '~/domain/currency/currency'
 import { DiscountBuilder } from '~/domain/discount/discount'
 import { Invoice, InvoiceBuilder } from '~/domain/invoice/invoice'
 import { InvoiceItemBuilder } from '~/domain/invoice/invoice-item'
+import { IncrementStrategy } from '~/domain/invoice/number-strategies'
 import { Language } from '~/domain/language/language'
 import { PaymentMethodBuilder } from '~/domain/payment-method/payment-method'
 import { Quote, QuoteBuilder } from '~/domain/quote/quote'
 import { Receipt, ReceiptBuilder } from '~/domain/receipt/receipt'
 import { TaxBuilder } from '~/domain/tax/tax'
+
+configure({
+  quote: {
+    /**
+     * The default net strategy, this will be used to calculate the quoteExpirationDate based on the
+     * quoteDate.
+     *
+     * Typically this is 15 days after the quoteDate.
+     */
+    defaultNetStrategy: (quoteDate: Date) => addDays(quoteDate, 15),
+
+    /**
+     * All quotes should have an quote number in ascending order. This is the strategy to
+     * calculate the next quote number.
+     */
+    numberStrategy: new IncrementStrategy().next,
+  },
+
+  invoice: {
+    /**
+     * The default net strategy, this will be used to calculate the dueDate based on the issueDate.
+     *
+     * Typically this is 30 days after the issueDate.
+     */
+    defaultNetStrategy: (issueDate: Date) => addDays(issueDate, 30),
+
+    /**
+     * All invoices should have an invoice number in ascending order. This is the strategy to
+     * calculate the next invoice number.
+     */
+    numberStrategy: new IncrementStrategy().next,
+  },
+})
+
+// ---
 
 // Some small little helpers to make the examples below a bit more readable while ensuring that the
 // data is spread out over time.

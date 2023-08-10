@@ -1,37 +1,14 @@
-import { addDays, isPast, parseISO } from 'date-fns'
+import { isPast, parseISO } from 'date-fns'
 import { z } from 'zod'
 
 import { Account } from '~/domain/account/account'
 import { Client } from '~/domain/client/client'
+import { config } from '~/domain/configuration/configuration'
 import { Discount } from '~/domain/discount/discount'
 import { Event } from '~/domain/events/event'
 import { InvoiceItem } from '~/domain/invoice/invoice-item'
-import { IncrementStrategy } from '~/domain/invoice/number-strategies'
+import { QuoteStatus } from '~/domain/quote/quote-status'
 import { match } from '~/utils/match'
-import { QuoteStatus } from './quote-status'
-
-type Configuration = {
-  defaultNetStrategy: (quoteDate: Date) => Date
-  numberStrategy: (quoteDate: Date) => string
-}
-
-const configuration: Configuration = {
-  /**
-   * The default net strategy, this will be used to calculate the quoteExpirationDate based on the
-   * quoteDate.
-   *
-   * Typically this is 15 days after the quoteDate.
-   */
-  defaultNetStrategy: (quoteDate: Date) => addDays(quoteDate, 15),
-
-  /**
-   * All quotes should have an quote number in ascending order. This is the strategy to
-   * calculate the next quote number.
-   */
-  numberStrategy: new IncrementStrategy().next,
-}
-
-// ---
 
 export let Quote = z.object({
   type: z.literal('quote').default('quote'),
@@ -88,14 +65,14 @@ export class QuoteBuilder {
     if (this._number) return this._number
     if (!this._quoteDate) return null // Let the validation handle this
 
-    return configuration.numberStrategy(this._quoteDate)
+    return config().quote.numberStrategy(this._quoteDate)
   }
 
   private get computeQuoteExpirationDate() {
     if (this._quoteExpirationDate) return this._quoteExpirationDate
     if (!this._quoteDate) return null // Let the validation handle this
 
-    return configuration.defaultNetStrategy(this._quoteDate)
+    return config().quote.defaultNetStrategy(this._quoteDate)
   }
 
   private get computeStatus() {

@@ -1,39 +1,17 @@
-import { addDays, isPast, parseISO } from 'date-fns'
+import { isPast, parseISO } from 'date-fns'
 import { z } from 'zod'
 
 import { Account } from '~/domain/account/account'
 import { Client } from '~/domain/client/client'
+import { config } from '~/domain/configuration/configuration'
 import { Discount } from '~/domain/discount/discount'
-import { IncrementStrategy } from '~/domain/invoice/number-strategies'
+import { Event } from '~/domain/events/event'
+import { InvoiceItem } from '~/domain/invoice/invoice-item'
+import { InvoiceStatus } from '~/domain/invoice/invoice-status'
 import { Quote } from '~/domain/quote/quote'
+import { QuoteStatus } from '~/domain/quote/quote-status'
 import { total } from '~/ui/invoice/total'
 import { match } from '~/utils/match'
-import { Event } from '../events/event'
-import { QuoteStatus } from '../quote/quote-status'
-import { InvoiceItem } from './invoice-item'
-import { InvoiceStatus } from './invoice-status'
-
-type Configuration = {
-  defaultNetStrategy: (issueDate: Date) => Date
-  numberStrategy: (issueDate: Date) => string
-}
-
-const configuration: Configuration = {
-  /**
-   * The default net strategy, this will be used to calculate the dueDate based on the issueDate.
-   *
-   * Typically this is 30 days after the issueDate.
-   */
-  defaultNetStrategy: (issueDate: Date) => addDays(issueDate, 30),
-
-  /**
-   * All invoices should have an invoice number in ascending order. This is the strategy to
-   * calculate the next invoice number.
-   */
-  numberStrategy: new IncrementStrategy().next,
-}
-
-// ---
 
 export let Invoice = z.object({
   type: z.literal('invoice').default('invoice'),
@@ -111,14 +89,14 @@ export class InvoiceBuilder {
     if (this._number) return this._number
     if (!this._issueDate) return null // Let the validation handle this
 
-    return configuration.numberStrategy(this._issueDate)
+    return config().invoice.numberStrategy(this._issueDate)
   }
 
   private get computeDueDate() {
     if (this._dueDate) return this._dueDate
     if (!this._issueDate) return null // Let the validation handle this
 
-    return configuration.defaultNetStrategy(this._issueDate)
+    return config().invoice.defaultNetStrategy(this._issueDate)
   }
 
   private get computeStatus() {
