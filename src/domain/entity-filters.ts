@@ -93,7 +93,7 @@ export function isActiveEntity(entity: Entity) {
           InvoiceStatus.Sent,
 
           // Partially paid, waiting for the remaining amount
-          InvoiceStatus.PartialPaid,
+          InvoiceStatus.PartiallyPaid,
         ].includes(e.status)
       },
 

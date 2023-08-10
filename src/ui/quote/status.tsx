@@ -6,6 +6,7 @@ import {
   PencilIcon,
   XCircleIcon,
 } from '@heroicons/react/24/outline'
+import { title } from 'case'
 import { QuoteStatus } from '~/domain/quote/quote-status'
 import { classNames } from '~/ui/class-names'
 
@@ -52,7 +53,7 @@ export function StatusDisplay({ status }: { status: QuoteStatus }) {
       )}
     >
       <Icon className="h-4 w-4" />
-      <span className="pr-1">{status}</span>
+      <span className="pr-1">{title(status)}</span>
     </span>
   )
 }

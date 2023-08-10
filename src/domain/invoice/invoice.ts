@@ -225,7 +225,7 @@ export class InvoiceBuilder {
       [InvoiceStatus.Paid]: () => {
         throw new Error('Cannot send an invoice that is already paid')
       },
-      [InvoiceStatus.PartialPaid]: () => {
+      [InvoiceStatus.PartiallyPaid]: () => {
         throw new Error('Cannot send an invoice that is already partially paid')
       },
       [InvoiceStatus.Overdue]: () => {
@@ -259,7 +259,7 @@ export class InvoiceBuilder {
             outstanding: remaining,
           }),
         )
-        this._status = InvoiceStatus.PartialPaid
+        this._status = InvoiceStatus.PartiallyPaid
       } else {
         this.events.push(
           Event.parse({ type: 'invoice-paid', at: parsedAt, amount, outstanding: remaining }),
@@ -275,7 +275,7 @@ export class InvoiceBuilder {
       [InvoiceStatus.Paid]: () => {
         throw new Error('Cannot pay an invoice that is already paid')
       },
-      [InvoiceStatus.PartialPaid]: () => {
+      [InvoiceStatus.PartiallyPaid]: () => {
         let remaining =
           total({ items: this._items, discounts: this._discounts }) - this.paid - amount
 
@@ -290,7 +290,7 @@ export class InvoiceBuilder {
               outstanding: remaining,
             }),
           )
-          this._status = InvoiceStatus.PartialPaid
+          this._status = InvoiceStatus.PartiallyPaid
         } else {
           this.events.push(
             Event.parse({ type: 'invoice-paid', at: parsedAt, amount, outstanding: remaining }),
@@ -327,7 +327,7 @@ export class InvoiceBuilder {
       [InvoiceStatus.Paid]: () => {
         throw new Error('Cannot close an invoice that is already paid')
       },
-      [InvoiceStatus.PartialPaid]: () => {
+      [InvoiceStatus.PartiallyPaid]: () => {
         throw new Error('Cannot close an invoice that is already partially paid')
       },
       [InvoiceStatus.Overdue]: () => {

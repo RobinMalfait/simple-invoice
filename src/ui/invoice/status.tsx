@@ -6,6 +6,7 @@ import {
   LockClosedIcon,
   PencilIcon,
 } from '@heroicons/react/24/outline'
+import { title } from 'case'
 import { InvoiceStatus } from '~/domain/invoice/invoice-status'
 import { classNames } from '~/ui/class-names'
 
@@ -20,7 +21,7 @@ let statusIconMap: Record<
   [InvoiceStatus.Draft]: PencilIcon,
   [InvoiceStatus.Sent]: EnvelopeIcon,
   [InvoiceStatus.Paid]: CheckCircleIcon,
-  [InvoiceStatus.PartialPaid]: BellAlertIcon,
+  [InvoiceStatus.PartiallyPaid]: BellAlertIcon,
   [InvoiceStatus.Overdue]: ClockIcon,
   [InvoiceStatus.Closed]: LockClosedIcon,
 }
@@ -32,7 +33,7 @@ let statusClassMap: Record<InvoiceStatus, string> = {
     'bg-yellow-50 text-yellow-800 ring-yellow-600/20 dark:bg-yellow-400/10 dark:text-yellow-500 dark:ring-yellow-400/20',
   [InvoiceStatus.Paid]:
     'bg-green-50 text-green-700 ring-green-600/20 dark:bg-green-500/10 dark:text-green-400 dark:ring-green-500/20',
-  [InvoiceStatus.PartialPaid]:
+  [InvoiceStatus.PartiallyPaid]:
     'bg-yellow-50 text-yellow-800 ring-yellow-600/20 dark:bg-yellow-400/10 dark:text-yellow-500 dark:ring-yellow-400/20',
   [InvoiceStatus.Overdue]:
     'bg-red-50 text-red-700 ring-red-600/10 dark:bg-red-400/10 dark:text-red-400 dark:ring-red-400/20',
@@ -51,7 +52,7 @@ export function StatusDisplay({ status }: { status: InvoiceStatus }) {
       )}
     >
       <Icon className="h-4 w-4" />
-      <span className="pr-1">{status}</span>
+      <span className="pr-1">{title(status)}</span>
     </span>
   )
 }

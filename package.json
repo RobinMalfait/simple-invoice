@@ -37,6 +37,7 @@
     "@headlessui/tailwindcss": "^0.2.0",
     "@heroicons/react": "^2.0.18",
     "autoprefixer": "10.4.14",
+    "case": "^1.6.3",
     "date-fns": "^2.30.0",
     "next": "^13.4.13",
     "puppeteer": "^20.8.2",
