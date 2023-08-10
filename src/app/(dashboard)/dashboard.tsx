@@ -368,8 +368,14 @@ export function Dashboard({ me, invoices }: { me: Account; invoices: Entity[] })
                 // If the range is less than a quarter, use weeks.
                 if (days <= 92) return 'week'
 
+                // If the range is less than a year, use months.
+                if (days <= 365) return 'month'
+
+                // If the range is less than 5 years, use quarters.
+                if (days <= 5 * 365.25) return 'quarter'
+
                 // If the range is bigger, use months.
-                return 'month'
+                return 'year'
               })()
 
               let data = match(interval, {
