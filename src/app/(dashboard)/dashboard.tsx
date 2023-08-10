@@ -299,7 +299,10 @@ export function Dashboard({ me, invoices }: { me: Account; invoices: Entity[] })
                   footer={(data) =>
                     data && (
                       <div className="text-xs text-gray-500 dark:text-zinc-400">
-                        {data[0].client.name}
+                        <Link href={`/${data[0].type}/${data[0].number}`}>
+                          {data[0].client.name}{' '}
+                          <small className="tabular-nums">— {data[0].number}</small>
+                        </Link>
                       </div>
                     )
                   }
@@ -330,7 +333,10 @@ export function Dashboard({ me, invoices }: { me: Account; invoices: Entity[] })
                   footer={(data) =>
                     data && (
                       <div className="text-xs text-gray-500 dark:text-zinc-400">
-                        {data[0].client.name}
+                        <Link href={`/${data[0].type}/${data[0].number}`}>
+                          {data[0].client.name}{' '}
+                          <small className="tabular-nums">— {data[0].number}</small>
+                        </Link>
                       </div>
                     )
                   }
