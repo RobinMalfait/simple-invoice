@@ -35,7 +35,7 @@ import { match } from '~/utils/match'
 import { range } from '~/utils/range'
 
 export function Dashboard({ me, invoices }: { me: Account; invoices: Entity[] }) {
-  let [, defaultValue, defaultPrevious, defaultNext] = options.find((e) => e[0] === 'This quarter')!
+  let [, defaultRange, defaultPrevious, defaultNext] = options.find((e) => e[0] === 'This quarter')!
 
   let now = useCurrentDate()
 
@@ -53,7 +53,7 @@ export function Dashboard({ me, invoices }: { me: Account; invoices: Entity[] })
   }, [invoices])
 
   let [[start, end], setRange] = useState(() => {
-    let [start, end] = defaultValue(now)
+    let [start, end] = defaultRange(now)
     return [start ?? earliestDate, end ?? latestDate]
   })
 
@@ -293,12 +293,16 @@ export function Dashboard({ me, invoices }: { me: Account; invoices: Entity[] })
                       .pop() ?? null
                   }
                   value={(data) => data?.[1] ?? null}
-                  display={(v) => <span>{formatDistanceStrict(now, addMinutes(now, v))}</span>}
-                  footer={(v) => (
-                    <div className="text-xs dark:text-zinc-400">
-                      {v == null ? 'N/A' : v[0].client.name}
-                    </div>
+                  display={(value) => (
+                    <span>{formatDistanceStrict(now, addMinutes(now, value))}</span>
                   )}
+                  footer={(data) =>
+                    data && (
+                      <div className="text-xs text-gray-500 dark:text-zinc-400">
+                        {data[0].client.name}
+                      </div>
+                    )
+                  }
                 />
 
                 <CompareBlock<readonly [Entity, number] | null>
@@ -320,12 +324,16 @@ export function Dashboard({ me, invoices }: { me: Account; invoices: Entity[] })
                       .pop() ?? null
                   }
                   value={(data) => data?.[1] ?? null}
-                  display={(v) => <span>{formatDistanceStrict(now, addMinutes(now, v))}</span>}
-                  footer={(v) => (
-                    <div className="text-xs dark:text-zinc-400">
-                      {v == null ? 'N/A' : v[0].client.name}
-                    </div>
+                  display={(value) => (
+                    <span>{formatDistanceStrict(now, addMinutes(now, value))}</span>
                   )}
+                  footer={(data) =>
+                    data && (
+                      <div className="text-xs text-gray-500 dark:text-zinc-400">
+                        {data[0].client.name}
+                      </div>
+                    )
+                  }
                 />
               </div>
             </div>
@@ -508,8 +516,8 @@ function CompareBlock<T = Entity[]>({
   title: string
   data?: (values: Entity[]) => T
   value: (data: T) => number | null
-  display?: (value: number) => React.ReactElement
-  footer?: ((data: T) => React.ReactElement) | null
+  display?: (value: number) => React.ReactNode
+  footer?: ((data: T) => React.ReactNode) | null
   inverse?: boolean
 }) {
   let { withDiff, previous, current } = useContext(CompareConfigContext)
