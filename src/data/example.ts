@@ -16,7 +16,7 @@ import { TaxBuilder } from '~/domain/tax/tax'
 // Some small little helpers to make the examples below a bit more readable while ensuring that the
 // data is spread out over time.
 let state = {
-  past: subMonths(startOfToday(), 15),
+  past: subMonths(startOfToday(), 12),
   future: startOfToday(),
 
   now: startOfToday(),
