@@ -436,29 +436,32 @@ export function Dashboard({ me, invoices }: { me: Account; invoices: Entity[] })
                 }
               }
 
-              let toRemove = []
+              // Remove leading and trailing null-data
+              {
+                let toRemove = []
 
-              // Collect leading null-data
-              for (let obj of data) {
-                if (obj.previous === null && obj.current === null) {
-                  toRemove.push(obj)
-                } else {
-                  break
+                // Collect leading null-data
+                for (let obj of data) {
+                  if (obj.previous === null && obj.current === null) {
+                    toRemove.push(obj)
+                  } else {
+                    break
+                  }
                 }
-              }
 
-              // Collect trailing null-data
-              for (let obj of data.slice().reverse()) {
-                if (obj.previous === null && obj.current === null) {
-                  toRemove.push(obj)
-                } else {
-                  break
+                // Collect trailing null-data
+                for (let obj of data.slice().reverse()) {
+                  if (obj.previous === null && obj.current === null) {
+                    toRemove.push(obj)
+                  } else {
+                    break
+                  }
                 }
-              }
 
-              // Actually drop the items
-              for (let obj of toRemove) {
-                data.splice(data.indexOf(obj), 1)
+                // Actually drop the items
+                for (let obj of toRemove) {
+                  data.splice(data.indexOf(obj), 1)
+                }
               }
 
               let hasData = data.length > 1
