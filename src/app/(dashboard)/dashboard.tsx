@@ -99,7 +99,7 @@ export function Dashboard({ me, invoices }: { me: Account; invoices: Entity[] })
         }}
       >
         <main className="isolate mx-auto w-full max-w-7xl space-y-[--gap] px-4 py-[--gap] [--gap:theme(spacing.4)] sm:px-6 lg:px-8">
-          <div className="-mb-[--gap] -mt-[--gap] flex items-center justify-between py-[--gap]">
+          <div className="sticky top-16 z-10 -mx-2 -mb-[--gap] -mt-[--gap] flex items-center justify-between bg-gray-100/20 px-2 py-[--gap] backdrop-blur dark:bg-zinc-900/20">
             <div>
               <div className="flex items-center gap-2">
                 <button
