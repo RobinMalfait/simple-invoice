@@ -3,6 +3,7 @@ import Link from 'next/link'
 
 import { invoices, me } from '~/data'
 import { Currency } from '~/domain/currency/currency'
+import { isPaidEntity } from '~/domain/entity-filters'
 import { Invoice } from '~/domain/invoice/invoice'
 import { Quote } from '~/domain/quote/quote'
 import { Receipt } from '~/domain/receipt/receipt'
@@ -121,7 +122,9 @@ export default async function Home() {
                           >
                             {idx !== 0 && <span className="text-gray-300">•</span>}
                             <Money
-                              amount={invoices.reduce((acc, invoice) => acc + total(invoice), 0)}
+                              amount={invoices
+                                .filter((e) => isPaidEntity(e))
+                                .reduce((acc, invoice) => acc + total(invoice), 0)}
                             />
                           </I18NProvider>
                         ))}
