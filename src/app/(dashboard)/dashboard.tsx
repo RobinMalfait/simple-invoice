@@ -25,7 +25,16 @@ import {
 } from 'date-fns'
 import Link from 'next/link'
 import { createContext, useContext, useMemo, useState } from 'react'
-import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip } from 'recharts'
+import {
+  CartesianGrid,
+  Legend,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts'
 import { Account } from '~/domain/account/account'
 import { Client } from '~/domain/client/client'
 import { isActiveEntity, isDeadEntity, isPaidEntity } from '~/domain/entity-filters'
@@ -36,6 +45,7 @@ import { resolveRelevantEntityDate } from '~/domain/relevant-entity-date'
 import { classNames } from '~/ui/class-names'
 import { FormatRange } from '~/ui/date-range'
 import { Empty } from '~/ui/empty'
+import { useCurrencyFormatter } from '~/ui/hooks/use-currency-formatter'
 import { useCurrentDate } from '~/ui/hooks/use-current-date'
 import { I18NProvider } from '~/ui/hooks/use-i18n'
 import { TinyInvoice } from '~/ui/invoice/tiny-invoice'
@@ -354,203 +364,224 @@ export function Dashboard({ me, invoices }: { me: Account; invoices: Entity[] })
               </div>
             </div>
 
-            {(() => {
-              let days = differenceInDays(currentRange.end, currentRange.start)
-
-              // Determine the interval to use for the chart.
-              let interval = (() => {
-                // If the range is less than a day, use hours.
-                if (days <= 1) return 'hour'
-
-                // If the range is less than a month, use days.
-                if (days <= 30) return 'day'
-
-                // If the range is less than a quarter, use weeks.
-                if (days <= 92) return 'week'
-
-                // If the range is less than a year, use months.
-                if (days <= 365) return 'month'
-
-                // If the range is less than 5 years, use quarters.
-                if (days <= 5 * 365.25) return 'quarter'
-
-                // If the range is bigger, use months.
-                return 'year'
-              })()
-
-              let data = match(interval, {
-                hour: () => {
-                  return eachHourOfInterval(currentRange).map((start) => ({
-                    start,
-                    end: endOfHour(start),
-                  }))
-                },
-                day: () => {
-                  return eachDayOfInterval(currentRange).map((start) => ({
-                    start,
-                    end: endOfDay(start),
-                  }))
-                },
-                week: () => {
-                  return eachWeekOfInterval(currentRange, { weekStartsOn: 1 }).map((start) => ({
-                    start,
-                    end: endOfWeek(start, { weekStartsOn: 1 }),
-                  }))
-                },
-                month: () => {
-                  return eachMonthOfInterval(currentRange).map((start) => ({
-                    start,
-                    end: endOfMonth(start),
-                  }))
-                },
-                quarter: () => {
-                  return eachQuarterOfInterval(currentRange).map((start) => ({
-                    start,
-                    end: endOfQuarter(start),
-                  }))
-                },
-                year: () => {
-                  return eachYearOfInterval(currentRange).map((start) => ({
-                    start,
-                    end: endOfYear(start),
-                  }))
-                },
-              }).map((range) => ({
-                range,
-                previous: null as number | null,
-                current: null as number | null,
-              }))
-
-              for (let [period, entities] of [
-                ['previous', previousInvoices],
-                ['current', currentInvoices],
-              ] as const) {
-                next: for (let entity of entities) {
-                  if (!isPaidEntity(entity)) continue
-
-                  let date = resolveRelevantEntityDate(entity)
-                  if (period === 'previous') {
-                    date = next(date, [currentRange.start, currentRange.end])
-                  }
-
-                  for (let datum of data) {
-                    if (isWithinInterval(date, datum.range)) {
-                      datum[period] = (datum[period] ?? 0) + total(entity)
-                      continue next
-                    }
-                  }
-                }
-              }
-
-              // Remove leading and trailing null-data
-              {
-                let toRemove = []
-
-                // Collect leading null-data
-                for (let obj of data) {
-                  if (obj.previous === null && obj.current === null) {
-                    toRemove.push(obj)
-                  } else {
-                    break
-                  }
-                }
-
-                // Collect trailing null-data
-                for (let obj of data.slice().reverse()) {
-                  if (obj.previous === null && obj.current === null) {
-                    toRemove.push(obj)
-                  } else {
-                    break
-                  }
-                }
-
-                // Actually drop the items
-                for (let obj of toRemove) {
-                  data.splice(data.indexOf(obj), 1)
-                }
-              }
-
-              let hasData = data.length > 1
-
-              return (
-                <div
-                  className={classNames(
-                    'flex flex-1 flex-col overflow-auto rounded-md bg-white shadow ring-1 ring-black/5 dark:bg-zinc-800',
-                    !hasData && 'opacity-50 transition-opacity duration-300 hover:opacity-100',
-                  )}
-                >
-                  <div className="border-b p-4 dark:border-zinc-900/75 dark:text-zinc-400">
-                    Paid invoices compared to previous period
-                  </div>
-                  {hasData ? (
-                    <div className="flex aspect-video gap-4 overflow-x-auto [--current:theme(colors.blue.500)] [--grid-color:theme(colors.zinc.200)] [--previous:theme(colors.zinc.400/.50)] dark:[--grid-color:theme(colors.zinc.900)]">
-                      <div className="h-full w-full flex-1 p-4">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <LineChart data={data}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="var(--grid-color)" />
-                            <Tooltip
-                              content={({ payload = [] }) => (
-                                <div className="flex flex-col gap-2 rounded-md bg-white p-4 shadow ring-1 ring-black/10 dark:bg-zinc-900/75">
-                                  {payload.map((entry, index) => (
-                                    <div key={`item-${index}`} className="flex items-center gap-2">
-                                      <div
-                                        className="h-3 w-3 rounded-full"
-                                        style={{ backgroundColor: entry.color }}
-                                      />
-                                      <span className="text-sm font-medium text-gray-400 dark:text-zinc-400">
-                                        <Money amount={Number(entry.value)} />
-                                      </span>
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
-                            />
-                            <Legend
-                              content={({ payload = [] }) => (
-                                <div className="mt-4 flex items-center gap-8">
-                                  {payload.map((entry, index) => (
-                                    <div key={`item-${index}`} className="flex items-center gap-2">
-                                      <div
-                                        className="h-3 w-3 rounded-full"
-                                        style={{ backgroundColor: entry.color }}
-                                      />
-                                      <span className="text-sm font-medium text-gray-400 dark:text-zinc-400">
-                                        {entry.value}
-                                      </span>
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
-                            />
-                            <Line
-                              type="natural"
-                              name="Previous"
-                              dataKey="previous"
-                              stroke="var(--previous)"
-                              connectNulls
-                            />
-                            <Line
-                              type="natural"
-                              name="Current"
-                              dataKey="current"
-                              stroke="var(--current)"
-                              strokeWidth={2}
-                              connectNulls
-                            />
-                          </LineChart>
-                        </ResponsiveContainer>
-                      </div>
-                    </div>
-                  ) : (
-                    <Empty message="No data available" />
-                  )}
-                </div>
-              )
-            })()}
+            <ComparisonChart
+              currentRange={currentRange}
+              previousInvoices={previousInvoices}
+              currentInvoices={currentInvoices}
+              next={next}
+            />
           </div>
         </main>
       </I18NProvider>
     </CompareConfigContext.Provider>
+  )
+}
+
+function ComparisonChart({
+  currentRange,
+  previousInvoices,
+  currentInvoices,
+  next,
+}: {
+  currentRange: { start: Date; end: Date }
+  previousInvoices: Entity[]
+  currentInvoices: Entity[]
+  next: (value: Date, range: [start: Date, end: Date]) => Date
+}) {
+  let currencyFormatter = useCurrencyFormatter()
+
+  let days = differenceInDays(currentRange.end, currentRange.start)
+
+  // Determine the interval to use for the chart.
+  let interval = (() => {
+    // If the range is less than a day, use hours.
+    if (days <= 1) return 'hour'
+
+    // If the range is less than a month, use days.
+    if (days <= 30) return 'day'
+
+    // If the range is less than a quarter, use weeks.
+    if (days <= 92) return 'week'
+
+    // If the range is less than a year, use months.
+    if (days <= 365) return 'month'
+
+    // If the range is less than 5 years, use quarters.
+    if (days <= 5 * 365.25) return 'quarter'
+
+    // If the range is bigger, use months.
+    return 'year'
+  })()
+
+  let data = match(interval, {
+    hour: () => {
+      return eachHourOfInterval(currentRange).map((start) => ({
+        start,
+        end: endOfHour(start),
+      }))
+    },
+    day: () => {
+      return eachDayOfInterval(currentRange).map((start) => ({
+        start,
+        end: endOfDay(start),
+      }))
+    },
+    week: () => {
+      return eachWeekOfInterval(currentRange, { weekStartsOn: 1 }).map((start) => ({
+        start,
+        end: endOfWeek(start, { weekStartsOn: 1 }),
+      }))
+    },
+    month: () => {
+      return eachMonthOfInterval(currentRange).map((start) => ({
+        start,
+        end: endOfMonth(start),
+      }))
+    },
+    quarter: () => {
+      return eachQuarterOfInterval(currentRange).map((start) => ({
+        start,
+        end: endOfQuarter(start),
+      }))
+    },
+    year: () => {
+      return eachYearOfInterval(currentRange).map((start) => ({
+        start,
+        end: endOfYear(start),
+      }))
+    },
+  }).map((range) => ({
+    range,
+    previous: null as number | null,
+    current: null as number | null,
+  }))
+
+  for (let [period, entities] of [
+    ['previous', previousInvoices],
+    ['current', currentInvoices],
+  ] as const) {
+    next: for (let entity of entities) {
+      if (!isPaidEntity(entity)) continue
+
+      let date = resolveRelevantEntityDate(entity)
+      if (period === 'previous') {
+        date = next(date, [currentRange.start, currentRange.end])
+      }
+
+      for (let datum of data) {
+        if (isWithinInterval(date, datum.range)) {
+          datum[period] = (datum[period] ?? 0) + total(entity)
+          continue next
+        }
+      }
+    }
+  }
+
+  // Remove leading and trailing null-data
+  {
+    let toRemove = []
+
+    // Collect leading null-data
+    for (let obj of data) {
+      if (obj.previous === null && obj.current === null) {
+        toRemove.push(obj)
+      } else {
+        break
+      }
+    }
+
+    // Collect trailing null-data
+    for (let obj of data.slice().reverse()) {
+      if (obj.previous === null && obj.current === null) {
+        toRemove.push(obj)
+      } else {
+        break
+      }
+    }
+
+    // Actually drop the items
+    for (let obj of toRemove) {
+      data.splice(data.indexOf(obj), 1)
+    }
+  }
+
+  let hasData = data.length > 1
+
+  return (
+    <div
+      className={classNames(
+        'flex flex-1 flex-col overflow-auto rounded-md bg-white shadow ring-1 ring-black/5 dark:bg-zinc-800',
+        !hasData && 'opacity-50 transition-opacity duration-300 hover:opacity-100',
+      )}
+    >
+      <div className="border-b p-4 dark:border-zinc-900/75 dark:text-zinc-400">
+        Paid invoices compared to previous period
+      </div>
+      {hasData ? (
+        <div className="flex aspect-video gap-4 overflow-x-auto [--current:theme(colors.blue.500)] [--grid-color:theme(colors.zinc.200)] [--previous:theme(colors.zinc.400/.50)] dark:[--grid-color:theme(colors.zinc.900)]">
+          <div className="h-full w-full flex-1 p-4">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={data} margin={{ left: 50 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--grid-color)" />
+                <Tooltip
+                  content={({ payload = [] }) => (
+                    <div className="flex flex-col gap-2 rounded-md bg-white p-4 shadow ring-1 ring-black/10 dark:bg-zinc-900/75">
+                      {payload.map((entry, index) => (
+                        <div key={`item-${index}`} className="flex items-center gap-2">
+                          <div
+                            className="h-3 w-3 rounded-full"
+                            style={{ backgroundColor: entry.color }}
+                          />
+                          <span className="text-sm font-medium text-gray-400 dark:text-zinc-400">
+                            <Money amount={Number(entry.value)} />
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                />
+                <Legend
+                  content={({ payload = [] }) => (
+                    <div className="mt-4 flex items-center gap-8">
+                      {payload.map((entry, index) => (
+                        <div key={`item-${index}`} className="flex items-center gap-2">
+                          <div
+                            className="h-3 w-3 rounded-full"
+                            style={{ backgroundColor: entry.color }}
+                          />
+                          <span className="text-sm font-medium text-gray-400 dark:text-zinc-400">
+                            {entry.value}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                />
+                <YAxis tickFormatter={(x) => currencyFormatter.format(x / 100)} />
+                <XAxis />
+                <Line
+                  type="natural"
+                  name="Previous"
+                  dataKey="previous"
+                  stroke="var(--previous)"
+                  connectNulls
+                />
+                <Line
+                  type="natural"
+                  name="Current"
+                  dataKey="current"
+                  stroke="var(--current)"
+                  strokeWidth={2}
+                  connectNulls
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      ) : (
+        <Empty message="No data available" />
+      )}
+    </div>
   )
 }
 
