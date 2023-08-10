@@ -7,7 +7,18 @@ import {
   compareAsc,
   differenceInDays,
   differenceInMinutes,
-  format,
+  eachDayOfInterval,
+  eachHourOfInterval,
+  eachMonthOfInterval,
+  eachQuarterOfInterval,
+  eachWeekOfInterval,
+  eachYearOfInterval,
+  endOfDay,
+  endOfHour,
+  endOfMonth,
+  endOfQuarter,
+  endOfWeek,
+  endOfYear,
   formatDistanceStrict,
   isAfter,
   isWithinInterval,
@@ -32,7 +43,6 @@ import { total } from '~/ui/invoice/total'
 import { Money } from '~/ui/money'
 import { RangePicker, options } from '~/ui/range-picker'
 import { match } from '~/utils/match'
-import { range } from '~/utils/range'
 
 export function Dashboard({ me, invoices }: { me: Account; invoices: Entity[] }) {
   let [, defaultRange, defaultPrevious, defaultNext] = options.find((e) => e[0] === 'This quarter')!
@@ -345,74 +355,104 @@ export function Dashboard({ me, invoices }: { me: Account; invoices: Entity[] })
             </div>
 
             {(() => {
-              // TODO: Revisit all this logic because this isn't right yet...
-
               let days = differenceInDays(currentRange.end, currentRange.start)
 
               // Determine the interval to use for the chart.
               let interval = (() => {
                 // If the range is less than a day, use hours.
-                if (days < 1) return 'hour'
+                if (days <= 1) return 'hour'
 
                 // If the range is less than a month, use days.
-                if (days < 30) return 'day'
+                if (days <= 30) return 'day'
 
                 // If the range is less than a quarter, use weeks.
-                if (days < 92) return 'week'
+                if (days <= 92) return 'week'
 
                 // If the range is bigger, use months.
                 return 'month'
               })()
 
-              function collect(entities: Entity[], period = 'total') {
-                return Array.from(
-                  entities
-                    .filter((e) => isPaidEntity(e))
-                    .reduce((acc, e) => {
-                      let date = resolveRelevantEntityDate(e)
-                      if (period === 'previous') {
-                        date = next(date, [currentRange.start, currentRange.end])
-                      }
-                      let key = Number(
-                        match(interval, {
-                          hour: () => format(date, 'H', { weekStartsOn: 1 }),
-                          day: () => format(date, 'i', { weekStartsOn: 1 }),
-                          week: () => format(date, 'w', { weekStartsOn: 1 }),
-                          month: () => format(date, 'M', { weekStartsOn: 1 }),
-                        }),
-                      )
-                      if (!acc.has(key)) acc.set(key, 0)
-                      acc.set(key, acc.get(key)! + total(e))
-                      return acc
-                    }, new Map<number, number>())
-                    .entries(),
-                ).map(([name, value]) => [name, { [period]: value }] as const)
-              }
-
-              let previousData = collect(previousInvoices, 'previous')
-              let currentData = collect(currentInvoices, 'current')
-
               let data = match(interval, {
-                hour: () => range(24),
-                day: () => range(7).map((x) => x + 1),
-                week: () => range(4),
-                month: () => range(12).map((x) => x + 1),
-              }).map((idx) => ({ name: idx }))
+                hour: () => {
+                  return eachHourOfInterval(currentRange).map((start) => ({
+                    start,
+                    end: endOfHour(start),
+                  }))
+                },
+                day: () => {
+                  return eachDayOfInterval(currentRange).map((start) => ({
+                    start,
+                    end: endOfDay(start),
+                  }))
+                },
+                week: () => {
+                  return eachWeekOfInterval(currentRange, { weekStartsOn: 1 }).map((start) => ({
+                    start,
+                    end: endOfWeek(start, { weekStartsOn: 1 }),
+                  }))
+                },
+                month: () => {
+                  return eachMonthOfInterval(currentRange).map((start) => ({
+                    start,
+                    end: endOfMonth(start),
+                  }))
+                },
+                quarter: () => {
+                  return eachQuarterOfInterval(currentRange).map((start) => ({
+                    start,
+                    end: endOfQuarter(start),
+                  }))
+                },
+                year: () => {
+                  return eachYearOfInterval(currentRange).map((start) => ({
+                    start,
+                    end: endOfYear(start),
+                  }))
+                },
+              }).map((range) => ({
+                range,
+                previous: null as number | null,
+                current: null as number | null,
+              }))
 
-              for (let [name, obj] of [...previousData, ...currentData]) {
-                let existing = data.find((e) => e.name === name)
-                if (existing) {
-                  Object.assign(existing, obj)
-                } else {
-                  data.push({ name, ...obj })
+              for (let [period, entities] of [
+                ['previous', previousInvoices],
+                ['current', currentInvoices],
+              ] as const) {
+                next: for (let entity of entities) {
+                  if (!isPaidEntity(entity)) continue
+
+                  let date = resolveRelevantEntityDate(entity)
+                  if (period === 'previous') {
+                    date = next(date, [currentRange.start, currentRange.end])
+                  }
+
+                  for (let datum of data) {
+                    if (isWithinInterval(date, datum.range)) {
+                      datum[period] = (datum[period] ?? 0) + total(entity)
+                      continue next
+                    }
+                  }
                 }
               }
 
               let toRemove = []
+
+              // Collect leading null-data
               for (let obj of data) {
-                if ('previous' in obj || 'current' in obj) {
-                } else {
+                if (obj.previous === null && obj.current === null) {
                   toRemove.push(obj)
+                } else {
+                  break
+                }
+              }
+
+              // Collect trailing null-data
+              for (let obj of data.slice().reverse()) {
+                if (obj.previous === null && obj.current === null) {
+                  toRemove.push(obj)
+                } else {
+                  break
                 }
               }
 
