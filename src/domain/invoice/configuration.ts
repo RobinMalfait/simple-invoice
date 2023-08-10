@@ -11,4 +11,18 @@ export type InvoiceConfiguration = {
    * calculate the next invoice number.
    */
   numberStrategy: (issueDate: Date) => string
+
+  /**
+   * The configuration for PDF generation.
+   */
+  pdf: {
+    /**
+     *  The filename template for the PDF. You can use every property of the invoice as a placeholder.
+     *  - For example `{{number}}` will be replaced by the invoice number.
+     *  - You can also use nested properties, for example `{{client.name}}` will be replaced by the
+     *    client name.
+     *  - For dates, you can use a format string, for example `{{issueDate:dd-MM-yyyy}}`
+     */
+    filename: string
+  }
 }

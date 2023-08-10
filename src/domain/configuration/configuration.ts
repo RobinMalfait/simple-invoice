@@ -1,9 +1,11 @@
 import { InvoiceConfiguration } from '~/domain/invoice/configuration'
 import { QuoteConfiguration } from '~/domain/quote/configuration'
+import { ReceiptConfiguration } from '../receipt/configuration'
 
 export type Configuration = {
   quote: QuoteConfiguration
   invoice: InvoiceConfiguration
+  receipt: ReceiptConfiguration
 }
 
 let state = {

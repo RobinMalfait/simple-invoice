@@ -1,6 +1,10 @@
+import { kebab, lower, upper } from 'case'
+import { format } from 'date-fns'
 import { redirect } from 'next/navigation'
 import puppeteer from 'puppeteer'
 import { invoices } from '~/data'
+import { config } from '~/domain/configuration/configuration'
+import { match } from '~/utils/match'
 
 export async function GET(
   request: Request,
@@ -16,11 +20,38 @@ export async function GET(
     return redirect(`/`)
   }
 
-  return presentPDF(
-    invoice.number + '.pdf',
-    await generatePDF(request.url.replace('/pdf', '/raw')),
-    type,
-  )
+  let filenameTemplate = config()[invoice.type].pdf.filename
+  let filename = filenameTemplate.replace(/{{([^}]+)}}/g, (_, value) => {
+    let transformations: string[] = value.split('|')
+    let [path, arg] = transformations.shift()?.split(':') ?? []
+
+    let segments = path.split('.')
+    let next: any = invoice
+    for (let segment of segments) {
+      next = next[segment]
+      if (next === undefined || next === null) {
+        throw new Error(`Could not find property ${segment} in ${path}`)
+      }
+    }
+
+    if (next instanceof Date) {
+      next = format(next, arg ?? 'yyyy-MM-dd')
+    }
+
+    if (transformations.length > 0) {
+      for (let transform of transformations) {
+        next = match(transform, {
+          lower: () => lower(next),
+          upper: () => upper(next),
+          kebab: () => kebab(next),
+        })
+      }
+    }
+
+    return next
+  })
+
+  return presentPDF(filename, await generatePDF(request.url.replace('/pdf', '/raw')), type)
 }
 
 function presentPDF(filename: string, data: Buffer, type: 'download' | 'preview') {

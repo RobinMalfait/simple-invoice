@@ -12,4 +12,18 @@ export type QuoteConfiguration = {
    * calculate the next quote number.
    */
   numberStrategy: (quoteDate: Date) => string
+
+  /**
+   * The configuration for PDF generation.
+   */
+  pdf: {
+    /**
+     *  The filename template for the PDF. You can use every property of the quote as a placeholder.
+     *  - For example `{{number}}` will be replaced by the quote number.
+     *  - You can also use nested properties, for example `{{client.name}}` will be replaced by the
+     *    client name.
+     *  - For dates, you can use a format string, for example `{{quoteDate:dd-MM-yyyy}}`
+     */
+    filename: string
+  }
 }
