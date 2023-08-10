@@ -339,6 +339,8 @@ export function Dashboard({ me, invoices }: { me: Account; invoices: Entity[] })
             </div>
 
             {(() => {
+              // TODO: Revisit all this logic because this isn't right yet...
+
               let days = differenceInDays(currentRange.end, currentRange.start)
 
               // Determine the interval to use for the chart.
