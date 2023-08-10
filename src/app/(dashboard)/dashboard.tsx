@@ -164,7 +164,7 @@ export function Dashboard({ me, invoices }: { me: Account; invoices: Entity[] })
           </div>
 
           {(() => {
-            let data = currentInvoices.filter((e) => isActiveEntity(e))
+            let data = currentInvoices.filter((e) => isActiveEntity(e)).reverse()
 
             return (
               <div
