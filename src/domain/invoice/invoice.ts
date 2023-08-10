@@ -107,21 +107,21 @@ export class InvoiceBuilder {
     return builder
   }
 
-  get computeNumber() {
+  private get computeNumber() {
     if (this._number) return this._number
     if (!this._issueDate) return null // Let the validation handle this
 
     return configuration.numberStrategy(this._issueDate)
   }
 
-  get computeDueDate() {
+  private get computeDueDate() {
     if (this._dueDate) return this._dueDate
     if (!this._issueDate) return null // Let the validation handle this
 
     return configuration.defaultNetStrategy(this._issueDate)
   }
 
-  get computeStatus() {
+  private get computeStatus() {
     if (
       ![InvoiceStatus.Paid, InvoiceStatus.Closed].includes(this._status) &&
       isPast(this.computeDueDate!)

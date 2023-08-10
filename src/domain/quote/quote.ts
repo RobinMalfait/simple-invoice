@@ -84,21 +84,21 @@ export class QuoteBuilder {
     return Quote.parse(input)
   }
 
-  get computeNumber() {
+  private get computeNumber() {
     if (this._number) return this._number
     if (!this._quoteDate) return null // Let the validation handle this
 
     return configuration.numberStrategy(this._quoteDate)
   }
 
-  get computeQuoteExpirationDate() {
+  private get computeQuoteExpirationDate() {
     if (this._quoteExpirationDate) return this._quoteExpirationDate
     if (!this._quoteDate) return null // Let the validation handle this
 
     return configuration.defaultNetStrategy(this._quoteDate)
   }
 
-  get computeStatus() {
+  private get computeStatus() {
     if (
       ![QuoteStatus.Accepted, QuoteStatus.Closed].includes(this._status) &&
       isPast(this.computeQuoteExpirationDate!)
