@@ -626,7 +626,7 @@ function CompareBlock<T = Entity[]>({
     >
       <div className="flex flex-col gap-2">
         <span className="text-sm text-gray-600 dark:text-zinc-400">{title}</span>
-        <div className="flex items-baseline">
+        <div className="flex flex-1 flex-wrap items-baseline gap-2">
           <span className="text-2xl font-semibold tabular-nums text-zinc-500 dark:text-zinc-400">
             {currentValue === null ? 'N/A' : display(currentValue)}
           </span>
@@ -636,7 +636,7 @@ function CompareBlock<T = Entity[]>({
                 [1]: () => (
                   <span
                     className={classNames(
-                      'ml-2 flex items-baseline text-sm font-semibold',
+                      'flex items-baseline text-sm font-semibold',
                       inverse
                         ? 'text-red-600 dark:text-red-400'
                         : 'text-green-600 dark:text-green-400',
@@ -657,7 +657,7 @@ function CompareBlock<T = Entity[]>({
                 [-1]: () => (
                   <span
                     className={classNames(
-                      'ml-2 flex items-baseline text-sm font-semibold',
+                      'flex items-baseline text-sm font-semibold',
                       inverse
                         ? 'text-green-600 dark:text-green-400'
                         : 'text-red-600 dark:text-red-400',
