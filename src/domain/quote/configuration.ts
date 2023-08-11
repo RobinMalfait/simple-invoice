@@ -1,5 +1,5 @@
 import { addDays } from 'date-fns'
-import { IncrementStrategy } from '~/domain/invoice/number-strategies'
+import { IncrementStrategy } from '~/domain/number-strategies'
 
 export type Configuration = {
   /**

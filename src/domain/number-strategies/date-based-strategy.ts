@@ -16,8 +16,8 @@ export class DateBasedStrategy {
     private significantDigits = 3,
   ) {}
 
-  public next = (issueDate: Date): string => {
-    let base = this.base(issueDate)
+  public next = (date: Date): string => {
+    let base = this.base(date)
 
     if (this.countsByDate.has(base)) {
       this.countsByDate.set(base, this.countsByDate.get(base)! + 1)
