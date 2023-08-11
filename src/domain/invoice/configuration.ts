@@ -1,4 +1,7 @@
-export type InvoiceConfiguration = {
+import { addDays } from 'date-fns'
+import { IncrementStrategy } from './number-strategies'
+
+export type Configuration = {
   /**
    * The default net strategy, this will be used to calculate the dueDate based on the issueDate.
    *
@@ -25,4 +28,12 @@ export type InvoiceConfiguration = {
      */
     filename: string
   }
+}
+
+export let defaultConfiguration: Configuration = {
+  defaultNetStrategy: (issueDate: Date) => addDays(issueDate, 30),
+  numberStrategy: new IncrementStrategy().next,
+  pdf: {
+    filename: 'invoice-{{number}}.pdf',
+  },
 }

@@ -1,6 +1,15 @@
-import { InvoiceConfiguration } from '~/domain/invoice/configuration'
-import { QuoteConfiguration } from '~/domain/quote/configuration'
-import { ReceiptConfiguration } from '../receipt/configuration'
+import {
+  Configuration as InvoiceConfiguration,
+  defaultConfiguration as defaultInvoiceConfiguration,
+} from '~/domain/invoice/configuration'
+import {
+  Configuration as QuoteConfiguration,
+  defaultConfiguration as defaultQuoteConfiguration,
+} from '~/domain/quote/configuration'
+import {
+  Configuration as ReceiptConfiguration,
+  defaultConfiguration as defaultReceiptConfiguration,
+} from '~/domain/receipt/configuration'
 
 export type Configuration = {
   quote: QuoteConfiguration
@@ -8,12 +17,25 @@ export type Configuration = {
   receipt: ReceiptConfiguration
 }
 
+let defaultConfiguration: Configuration = {
+  quote: defaultQuoteConfiguration,
+  invoice: defaultInvoiceConfiguration,
+  receipt: defaultReceiptConfiguration,
+}
+
 let state = {
-  configuration: null as Configuration | null,
+  configuration: defaultConfiguration,
 }
 
 export function configure(configuration: Configuration) {
-  state.configuration = configuration
+  state.configuration = Object.assign(
+    {},
+    {
+      quote: { ...defaultQuoteConfiguration, ...configuration.quote },
+      invoice: { ...defaultInvoiceConfiguration, ...configuration.invoice },
+      receipt: { ...defaultReceiptConfiguration, ...configuration.receipt },
+    },
+  )
 }
 
 export function config(): Configuration {

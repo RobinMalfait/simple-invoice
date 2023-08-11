@@ -1,4 +1,7 @@
-export type QuoteConfiguration = {
+import { addDays } from 'date-fns'
+import { IncrementStrategy } from '~/domain/invoice/number-strategies'
+
+export type Configuration = {
   /**
    * The default net strategy, this will be used to calculate the quoteExpirationDate based on the
    * quoteDate.
@@ -26,4 +29,12 @@ export type QuoteConfiguration = {
      */
     filename: string
   }
+}
+
+export let defaultConfiguration: Configuration = {
+  defaultNetStrategy: (quoteDate: Date) => addDays(quoteDate, 15),
+  numberStrategy: new IncrementStrategy().next,
+  pdf: {
+    filename: 'quote-{{number}}.pdf',
+  },
 }

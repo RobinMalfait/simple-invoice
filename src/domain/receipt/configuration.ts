@@ -1,4 +1,4 @@
-export type ReceiptConfiguration = {
+export type Configuration = {
   /**
    * The configuration for PDF generation.
    */
@@ -12,4 +12,10 @@ export type ReceiptConfiguration = {
      */
     filename: string
   }
+}
+
+export let defaultConfiguration: Configuration = {
+  pdf: {
+    filename: 'receipt-{{invoice.number}}.pdf',
+  },
 }
