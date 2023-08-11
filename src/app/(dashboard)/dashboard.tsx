@@ -518,7 +518,7 @@ function ComparisonChart({
         Paid invoices compared to previous period
       </div>
       {hasData ? (
-        <div className="flex aspect-video gap-4 overflow-x-auto [--current:theme(colors.blue.500)] [--grid-color:theme(colors.zinc.200)] [--previous:theme(colors.zinc.400/.50)] dark:[--grid-color:theme(colors.zinc.900)]">
+        <div className="flex h-96 gap-4 overflow-x-auto [--current:theme(colors.blue.500)] [--grid-color:theme(colors.zinc.200)] [--previous:theme(colors.zinc.400/.50)] dark:[--grid-color:theme(colors.zinc.900)]">
           <div className="h-full w-full flex-1 p-4">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={data} margin={{ left: 50 }}>
