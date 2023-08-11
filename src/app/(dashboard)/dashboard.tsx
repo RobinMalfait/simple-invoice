@@ -27,7 +27,7 @@ import {
   isWithinInterval,
 } from 'date-fns'
 import Link from 'next/link'
-import { createContext, useContext, useMemo, useState } from 'react'
+import { Fragment, createContext, useContext, useMemo, useState } from 'react'
 import {
   CartesianGrid,
   Legend,
@@ -607,17 +607,29 @@ function ComparisonChart({
                 <Tooltip
                   content={({ payload = [] }) => (
                     <div className="flex flex-col gap-2 rounded-md bg-white p-4 shadow ring-1 ring-black/10 dark:bg-zinc-900/75">
-                      {payload.map((entry, index) => (
-                        <div key={`item-${index}`} className="flex items-center gap-2">
-                          <div
-                            className="h-3 w-3 rounded-full"
-                            style={{ backgroundColor: entry.color }}
-                          />
-                          <span className="text-sm font-medium text-gray-400 dark:text-zinc-400">
-                            <Money amount={Number(entry.value)} />
-                          </span>
-                        </div>
-                      ))}
+                      {payload.map((entry, index) => {
+                        return (
+                          <Fragment key={`item-${index}`}>
+                            {index === 0 && (
+                              <div className="text-sm font-semibold text-gray-500 dark:text-zinc-400">
+                                <FormatRange
+                                  start={entry.payload.range.start}
+                                  end={entry.payload.range.end}
+                                />
+                              </div>
+                            )}
+                            <div className="flex items-center gap-2">
+                              <div
+                                className="h-3 w-3 rounded-full"
+                                style={{ backgroundColor: entry.color }}
+                              />
+                              <span className="text-sm font-medium text-gray-400 dark:text-zinc-400">
+                                <Money amount={Number(entry.value)} />
+                              </span>
+                            </div>
+                          </Fragment>
+                        )
+                      })}
                     </div>
                   )}
                 />
