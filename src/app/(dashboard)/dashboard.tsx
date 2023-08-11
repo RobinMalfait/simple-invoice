@@ -587,7 +587,7 @@ function ComparisonChart({
   return (
     <div
       className={classNames(
-        'flex flex-1 flex-col overflow-auto rounded-md bg-white shadow ring-1 ring-black/5 dark:bg-zinc-800',
+        'flex h-full flex-1 flex-col overflow-auto rounded-md bg-white shadow ring-1 ring-black/5 dark:bg-zinc-800',
         !hasData && 'opacity-50 transition-opacity duration-300 hover:opacity-100',
       )}
     >
@@ -595,10 +595,10 @@ function ComparisonChart({
         Paid invoices compared to previous period
       </div>
       {hasData ? (
-        <div className="flex h-96 gap-4 overflow-x-auto [--current:theme(colors.blue.500)] [--grid-color:theme(colors.zinc.200)] [--previous:theme(colors.zinc.400/.50)] dark:[--grid-color:theme(colors.zinc.900)]">
+        <div className="flex min-h-[theme(spacing.96)] flex-1 gap-4 overflow-x-auto [--current:theme(colors.blue.500)] [--grid-color:theme(colors.zinc.200)] [--previous:theme(colors.zinc.400/.50)] dark:[--grid-color:theme(colors.zinc.900)]">
           <div className="h-full w-full flex-1 p-4">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={data} margin={{ left: 50 }}>
+              <LineChart data={data} margin={{ left: 50, right: 20 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--grid-color)" />
                 <Tooltip
                   content={({ payload = [] }) => (
@@ -619,7 +619,7 @@ function ComparisonChart({
                 />
                 <Legend
                   content={({ payload = [] }) => (
-                    <div className="mt-4 flex items-center gap-8">
+                    <div className="mt-4 flex items-center justify-end gap-8">
                       {payload.map((entry, index) => (
                         <div key={`item-${index}`} className="flex items-center gap-2">
                           <div
