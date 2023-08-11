@@ -40,6 +40,7 @@ import { Client } from '~/domain/client/client'
 import { isActiveEntity, isDeadEntity, isPaidEntity } from '~/domain/entity-filters'
 import { Invoice } from '~/domain/invoice/invoice'
 import { Quote } from '~/domain/quote/quote'
+import { QuoteStatus } from '~/domain/quote/quote-status'
 import { Receipt } from '~/domain/receipt/receipt'
 import { resolveRelevantEntityDate } from '~/domain/relevant-entity-date'
 import { classNames } from '~/ui/class-names'
@@ -92,6 +93,8 @@ export function Dashboard({ me, invoices }: { me: Account; invoices: Entity[] })
   let currentInvoices = invoices.filter((e) =>
     isWithinInterval(resolveRelevantEntityDate(e), currentRange),
   )
+
+  let systemContainsQuotes = invoices.some((e) => e.type === 'quote')
 
   return (
     <CompareConfigContext.Provider
@@ -226,6 +229,78 @@ export function Dashboard({ me, invoices }: { me: Account; invoices: Entity[] })
           <div className="grid grid-cols-5 gap-[--gap]">
             <div className="col-span-2 flex flex-1 flex-col gap-[--gap]">
               <div className="grid grid-cols-2 gap-[--gap]">
+                {systemContainsQuotes && (
+                  <>
+                    <CompareBlock<readonly [Entity, number] | null>
+                      inverse
+                      title={'Fastest accepted quote'}
+                      data={(list) =>
+                        list
+                          .filter((e) => e.type === 'quote' && e.status === QuoteStatus.Accepted)
+                          .flatMap((e) => {
+                            let sentAt = e.events.find((e) => e.type === 'quote-sent')?.at
+                            if (!sentAt) return []
+
+                            let paidAt = e.events.find((e) => e.type === 'quote-accepted')?.at
+                            if (!paidAt) return []
+
+                            return [[e, differenceInMinutes(paidAt, sentAt)] as const]
+                          })
+                          .sort(([, a], [, z]) => z - a)
+                          .pop() ?? null
+                      }
+                      value={(data) => data?.[1] ?? null}
+                      display={(value) => (
+                        <span>{formatDistanceStrict(now, addMinutes(now, value))}</span>
+                      )}
+                      footer={(data) =>
+                        data && (
+                          <div className="text-xs text-gray-500 dark:text-zinc-400">
+                            <Link href={`/${data[0].type}/${data[0].number}`}>
+                              {data[0].client.name}{' '}
+                              <small className="tabular-nums">— {data[0].number}</small>
+                            </Link>
+                          </div>
+                        )
+                      }
+                    />
+
+                    <CompareBlock<readonly [Entity, number] | null>
+                      inverse
+                      title={'Slowest accepted quote'}
+                      data={(list) =>
+                        list
+                          .filter((e) => e.type === 'quote' && e.status === QuoteStatus.Accepted)
+                          .flatMap((e) => {
+                            let sentAt = e.events.find((e) => e.type === 'quote-sent')?.at
+                            if (!sentAt) return []
+
+                            let paidAt = e.events.find((e) => e.type === 'quote-accepted')?.at
+                            if (!paidAt) return []
+
+                            return [[e, differenceInMinutes(paidAt, sentAt)] as const]
+                          })
+                          .sort(([, a], [, z]) => a - z)
+                          .pop() ?? null
+                      }
+                      value={(data) => data?.[1] ?? null}
+                      display={(value) => (
+                        <span>{formatDistanceStrict(now, addMinutes(now, value))}</span>
+                      )}
+                      footer={(data) =>
+                        data && (
+                          <div className="text-xs text-gray-500 dark:text-zinc-400">
+                            <Link href={`/${data[0].type}/${data[0].number}`}>
+                              {data[0].client.name}{' '}
+                              <small className="tabular-nums">— {data[0].number}</small>
+                            </Link>
+                          </div>
+                        )
+                      }
+                    />
+                  </>
+                )}
+
                 <CompareBlock<readonly [Entity, number] | null>
                   inverse
                   title={'Fastest paying client'}
