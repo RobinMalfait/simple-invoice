@@ -19,8 +19,11 @@ import {
   endOfQuarter,
   endOfWeek,
   endOfYear,
+  format,
   formatDistanceStrict,
   isAfter,
+  isSameMonth,
+  isSameWeek,
   isWithinInterval,
 } from 'date-fns'
 import Link from 'next/link'
@@ -473,22 +476,22 @@ function ComparisonChart({
   // Determine the interval to use for the chart.
   let interval = (() => {
     // If the range is less than a day, use hours.
-    if (days <= 1) return 'hour'
+    if (days <= 1) return 'hour' as const
 
     // If the range is less than a month, use days.
-    if (days <= 30) return 'day'
+    if (days <= 30) return 'day' as const
 
     // If the range is less than a quarter, use weeks.
-    if (days <= 92) return 'week'
+    if (days <= 92) return 'week' as const
 
     // If the range is less than a year, use months.
-    if (days <= 365) return 'month'
+    if (days <= 365) return 'month' as const
 
     // If the range is less than 5 years, use quarters.
-    if (days <= 5 * 365.25) return 'quarter'
+    if (days <= 5 * 365.25) return 'quarter' as const
 
     // If the range is bigger, use months.
-    return 'year'
+    return 'year' as const
   })()
 
   let data = match(interval, {
@@ -599,7 +602,7 @@ function ComparisonChart({
         <div className="flex min-h-[theme(spacing.96)] flex-1 gap-4 overflow-x-auto [--current:theme(colors.blue.500)] [--grid-color:theme(colors.zinc.200)] [--previous:theme(colors.zinc.400/.50)] dark:[--grid-color:theme(colors.zinc.900)]">
           <div className="h-full w-full flex-1 p-4">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={data} margin={{ left: 10, right: 20 }}>
+              <LineChart data={data} margin={{ left: 10, right: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--grid-color)" />
                 <Tooltip
                   content={({ payload = [] }) => (
@@ -643,7 +646,25 @@ function ComparisonChart({
                     return currencyFormatter.format(x / 100)
                   }}
                 />
-                <XAxis />
+                <XAxis
+                  tickMargin={16}
+                  tickFormatter={(idx) => {
+                    let { start, end } = data[idx].range
+                    return match(interval, {
+                      hour: () => format(start, 'p'),
+                      day: () => format(start, 'dd MMM'),
+                      week: () => {
+                        if (isSameWeek(start, end)) return format(start, 'dd')
+                        if (isSameMonth(start, end))
+                          return `${format(start, 'dd')} — ${format(end, 'dd MMM')}`
+                        return `${format(start, 'dd MMM')} — ${format(end, 'dd MMM')}`
+                      },
+                      month: () => format(start, 'LLL'),
+                      quarter: () => format(start, 'qqq yyyy'),
+                      year: () => format(start, 'yyyy'),
+                    })
+                  }}
+                />
                 <Line
                   type="natural"
                   name="Previous"
