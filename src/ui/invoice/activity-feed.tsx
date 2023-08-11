@@ -8,7 +8,7 @@ import {
   PencilSquareIcon,
   XCircleIcon,
 } from '@heroicons/react/24/outline'
-import { formatDistanceToNow } from 'date-fns'
+import { formatDistanceStrict, formatDistanceToNow } from 'date-fns'
 import { Event } from '~/domain/events/event'
 import { Invoice } from '~/domain/invoice/invoice'
 import { Quote } from '~/domain/quote/quote'
@@ -31,9 +31,10 @@ export function ActivityFeed({ latestVersionEntity }: { latestVersionEntity: Ent
   return (
     <>
       <ul role="list" className="space-y-6">
-        {activity.map((activityItem, activityItemIdx) => (
+        {activity.map((activityItem, activityItemIdx, all) => (
           <ActivityItem
             key={activityItem.id}
+            previous={all[activityItemIdx - 1]}
             item={activityItem}
             isLast={activityItemIdx === activity.length - 1}
           />
@@ -52,9 +53,10 @@ export function ActivityFeed({ latestVersionEntity }: { latestVersionEntity: Ent
             </span>
             <span className="h-px w-full bg-gray-200 dark:bg-zinc-600"></span>
           </li>
-          {missing.map((activityItem, activityItemIdx) => (
+          {missing.map((activityItem, activityItemIdx, all) => (
             <ActivityItem
               key={activityItem.id}
+              previous={all[activityItemIdx - 1]}
               item={activityItem}
               isLast={activityItemIdx === missing.length - 1}
             />
@@ -65,40 +67,59 @@ export function ActivityFeed({ latestVersionEntity }: { latestVersionEntity: Ent
   )
 }
 
-function ActivityItem({ item, isLast }: { item: Event; isLast: boolean }) {
+function ActivityItem({
+  item,
+  previous,
+  isLast,
+}: {
+  item: Event
+  previous?: Event
+  isLast: boolean
+}) {
+  let diff: string | null = null
+  if (previous && previous.at !== null && item.at !== null) {
+    diff = formatDistanceStrict(previous.at, item.at)
+  }
   return (
-    <li className="relative flex gap-x-4">
-      <div
-        className={classNames(
-          isLast ? 'h-6' : '-bottom-6',
-          'absolute left-0 top-0 flex w-6 justify-center',
-        )}
-      >
-        <div className="w-px bg-gray-200 dark:bg-zinc-600" />
-      </div>
-
-      <div className="relative flex h-6 w-6 flex-none items-center justify-center bg-white dark:bg-zinc-800">
-        {isLast ? (
-          <ActivityIndicator item={item} />
-        ) : (
-          <div className="h-1.5 w-1.5 rounded-full bg-gray-100 ring-1 ring-gray-300 dark:bg-zinc-800 dark:ring-gray-500" />
-        )}
-      </div>
-
-      <p className="flex-auto py-0.5 text-xs leading-5 text-gray-500 dark:text-gray-300">
-        <ActivityText item={item} />
-      </p>
-
-      {item.at && (
-        <time
-          title={item.at.toLocaleString()}
-          dateTime={item.at.toISOString()}
-          className="flex-none py-0.5 text-xs leading-5 text-gray-500 dark:text-gray-300"
+    <>
+      <li className="relative flex gap-x-4">
+        <div
+          className={classNames(
+            isLast ? 'h-6' : '-bottom-6',
+            'absolute left-0 top-0 flex w-6 justify-center',
+          )}
         >
-          {formatDistanceToNow(item.at, { addSuffix: true })}
-        </time>
-      )}
-    </li>
+          <div className="w-px bg-gray-200 dark:bg-zinc-600" />
+        </div>
+
+        <div className="relative flex h-6 w-6 flex-none items-center justify-center bg-white dark:bg-zinc-800">
+          {isLast ? (
+            <ActivityIndicator item={item} />
+          ) : (
+            <div className="h-1.5 w-1.5 rounded-full bg-gray-100 ring-1 ring-gray-300 dark:bg-zinc-800 dark:ring-gray-500" />
+          )}
+        </div>
+
+        <p className="flex-auto py-0.5 text-xs leading-5 text-gray-500 dark:text-gray-300">
+          <ActivityText item={item} />
+          {diff !== null && (
+            <span className="absolute -top-5 right-0 flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500">
+              <ClockIcon className="h-3 w-3" /> {diff}
+            </span>
+          )}
+        </p>
+
+        {item.at && (
+          <time
+            title={item.at.toLocaleString()}
+            dateTime={item.at.toISOString()}
+            className="flex-none py-0.5 text-xs leading-5 text-gray-500 dark:text-gray-300"
+          >
+            {formatDistanceToNow(item.at, { addSuffix: true })}
+          </time>
+        )}
+      </li>
+    </>
   )
 }
 
