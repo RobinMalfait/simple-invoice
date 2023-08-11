@@ -42,7 +42,9 @@ export function TinyInvoice({ invoice }: { invoice: Entity }) {
 
       <div className="relative z-10 flex aspect-a4 w-full shrink-0 flex-col rounded-md bg-gradient-to-br from-rose-50/90 to-blue-50/90 ring-1 ring-black/5 dark:from-rose-200/90 dark:to-blue-200/90">
         <div className="flex items-center justify-between rounded-t-md bg-gray-50 p-3 text-gray-500 dark:bg-zinc-950/75 dark:text-gray-300">
-          {invoice.client.name}
+          <span className="relative z-50 truncate" title={invoice.client.name}>
+            {invoice.client.name}
+          </span>
           {match(
             invoice.type,
             {
