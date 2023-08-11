@@ -27,7 +27,13 @@ let state = {
   configuration: defaultConfiguration,
 }
 
-export function configure(configuration: Configuration) {
+type DeepPartial<T> = T extends (...args: any[]) => void
+  ? T
+  : T extends object
+  ? { [P in keyof T]?: DeepPartial<T[P]> }
+  : T
+
+export function configure(configuration: DeepPartial<Configuration>) {
   state.configuration = Object.assign(
     {},
     {
@@ -35,7 +41,7 @@ export function configure(configuration: Configuration) {
       invoice: { ...defaultInvoiceConfiguration, ...configuration.invoice },
       receipt: { ...defaultReceiptConfiguration, ...configuration.receipt },
     },
-  )
+  ) as Configuration
 }
 
 export function config(): Configuration {
