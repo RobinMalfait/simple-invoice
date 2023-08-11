@@ -466,6 +466,7 @@ function ComparisonChart({
   next: (value: Date, range: [start: Date, end: Date]) => Date
 }) {
   let currencyFormatter = useCurrencyFormatter()
+  let shortCurrencyFormatter = useCurrencyFormatter({ type: 'short' })
 
   let days = differenceInDays(currentRange.end, currentRange.start)
 
@@ -598,7 +599,7 @@ function ComparisonChart({
         <div className="flex min-h-[theme(spacing.96)] flex-1 gap-4 overflow-x-auto [--current:theme(colors.blue.500)] [--grid-color:theme(colors.zinc.200)] [--previous:theme(colors.zinc.400/.50)] dark:[--grid-color:theme(colors.zinc.900)]">
           <div className="h-full w-full flex-1 p-4">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={data} margin={{ left: 50, right: 20 }}>
+              <LineChart data={data} margin={{ left: 10, right: 20 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--grid-color)" />
                 <Tooltip
                   content={({ payload = [] }) => (
@@ -634,7 +635,14 @@ function ComparisonChart({
                     </div>
                   )}
                 />
-                <YAxis tickFormatter={(x) => currencyFormatter.format(x / 100)} />
+                <YAxis
+                  tickFormatter={(x) => {
+                    if (x >= 100_000) {
+                      return `${shortCurrencyFormatter.format(x / 100_000)}k`
+                    }
+                    return currencyFormatter.format(x / 100)
+                  }}
+                />
                 <XAxis />
                 <Line
                   type="natural"

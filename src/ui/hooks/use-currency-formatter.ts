@@ -10,6 +10,7 @@ import { match } from '~/utils/match'
 function createCurrencyFormatter(
   currency: Currency = Currency.EUR,
   language: Language = Language.EN,
+  type: 'short' | 'long' = 'long',
 ) {
   return new Intl.NumberFormat(
     match(language, {
@@ -22,18 +23,18 @@ function createCurrencyFormatter(
         [Currency.USD]: 'USD',
         [Currency.EUR]: 'EUR',
       }),
-      minimumFractionDigits: 2,
+      minimumFractionDigits: type === 'short' ? 0 : 2,
     },
   )
 }
 
-export function useCurrencyFormatter() {
+export function useCurrencyFormatter({ type = 'long' }: { type?: 'short' | 'long' } = {}) {
   let { currency, language } = useI18N()
-  let [formatter, setFormatter] = useState(() => createCurrencyFormatter(currency, language))
+  let [formatter, setFormatter] = useState(() => createCurrencyFormatter(currency, language, type))
 
   useEffect(() => {
-    setFormatter(createCurrencyFormatter(currency, language))
-  }, [currency, language])
+    setFormatter(createCurrencyFormatter(currency, language, type))
+  }, [currency, language, type])
 
   return formatter
 }
