@@ -8,6 +8,18 @@ import { match } from '~/utils/match'
 
 type Entity = Quote | Invoice | Receipt
 
+export function isQuote(entity: Entity): entity is Quote {
+  return entity.type === 'quote'
+}
+
+export function isInvoice(entity: Entity): entity is Invoice {
+  return entity.type === 'invoice'
+}
+
+export function isReceipt(entity: Entity): entity is Receipt {
+  return entity.type === 'receipt'
+}
+
 export function isLayeredEntity(entity: Entity) {
   return match(
     entity.type,

@@ -37,7 +37,7 @@ import {
 } from 'recharts'
 import { Account } from '~/domain/account/account'
 import { Client } from '~/domain/client/client'
-import { isActiveEntity, isDeadEntity, isPaidEntity } from '~/domain/entity-filters'
+import { isActiveEntity, isDeadEntity, isPaidEntity, isQuote } from '~/domain/entity-filters'
 import { Invoice } from '~/domain/invoice/invoice'
 import { Quote } from '~/domain/quote/quote'
 import { QuoteStatus } from '~/domain/quote/quote-status'
@@ -94,7 +94,7 @@ export function Dashboard({ me, invoices }: { me: Account; invoices: Entity[] })
     isWithinInterval(resolveRelevantEntityDate(e), currentRange),
   )
 
-  let systemContainsQuotes = invoices.some((e) => e.type === 'quote')
+  let systemContainsQuotes = invoices.some((e) => isQuote(e))
 
   return (
     <CompareConfigContext.Provider

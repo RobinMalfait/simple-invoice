@@ -1,4 +1,5 @@
 import { Account } from '~/domain/account/account'
+import { isInvoice, isQuote, isReceipt } from '~/domain/entity-filters'
 import { Invoice } from '~/domain/invoice/invoice'
 import { Quote } from '~/domain/quote/quote'
 import { Receipt } from '~/domain/receipt/receipt'
@@ -12,11 +13,11 @@ export let invoices: Entity[] = (
   Array.from(
     new Set( // Make unique using identity
       data.invoices.flatMap((entity: Entity) => {
-        if (entity.type === 'quote') {
+        if (isQuote(entity)) {
           return [entity]
-        } else if (entity.type === 'invoice') {
+        } else if (isInvoice(entity)) {
           return [entity, entity.quote].filter(Boolean)
-        } else if (entity.type === 'receipt') {
+        } else if (isReceipt(entity)) {
           return [entity, entity.invoice, entity.invoice.quote].filter(Boolean)
         }
       }),
