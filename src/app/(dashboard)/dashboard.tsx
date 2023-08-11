@@ -223,76 +223,8 @@ export function Dashboard({ me, invoices }: { me: Account; invoices: Entity[] })
             )
           })()}
 
-          <div className="grid grid-cols-2 gap-[--gap]">
-            <div className="flex flex-1 flex-col gap-[--gap]">
-              {(() => {
-                let totalInvoiceSales = currentInvoices
-                  .filter((e) => isPaidEntity(e))
-                  .reduce((acc, e) => acc + total(e), 0)
-
-                let data = Array.from(
-                  currentInvoices
-                    .reduce((acc, e) => {
-                      if (!isPaidEntity(e)) return acc
-
-                      if (!acc.has(e.client.id)) {
-                        acc.set(e.client.id, { client: e.client, total: 0 })
-                      }
-                      acc.get(e.client.id)!.total += total(e)
-                      return acc
-                    }, new Map<Client['id'], { client: Client; total: number }>())
-                    .entries(),
-                )
-                  .sort(([, a], [, z]) => z.total - a.total) // Sort by best paying client first.
-                  .slice(0, 5) // Only show the top 5.
-
-                return (
-                  <div
-                    className={classNames(
-                      'flex-1 overflow-auto rounded-md bg-white shadow ring-1 ring-black/5 dark:bg-zinc-800',
-                      data.length === 0 &&
-                        'opacity-50 transition-opacity duration-300 hover:opacity-100',
-                    )}
-                  >
-                    <div className="border-b p-4 dark:border-zinc-900/75 dark:text-zinc-400">
-                      Top paying clients
-                    </div>
-                    {data.length > 0 ? (
-                      <div className="flex-1 divide-y divide-gray-100 dark:divide-zinc-900">
-                        {data.map(([id, { client, total }], idx) => (
-                          <I18NProvider key={id} value={client}>
-                            <div className="group relative flex items-center p-3 first:border-t-[1px] first:border-t-transparent focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 dark:border-zinc-800">
-                              <div className="absolute inset-2 z-0 flex">
-                                <div
-                                  className="rounded-md bg-blue-200/30 dark:bg-blue-400/25"
-                                  style={{ width: `${(total / totalInvoiceSales) * 100}%` }}
-                                />
-                              </div>
-                              <div className="z-10 flex w-full items-center space-x-2">
-                                <span className="w-[2ch] text-right text-sm font-medium tabular-nums text-gray-400 dark:text-zinc-400">
-                                  {idx + 1}.
-                                </span>
-                                <div className="flex flex-1 items-center justify-between space-x-2 truncate dark:text-zinc-300">
-                                  <span className="truncate">{client.name}</span>
-                                  <span className="text-xs">
-                                    <Money amount={total} />
-                                    <small className="mx-1 inline-block w-[4ch] flex-shrink-0 text-right">
-                                      {((total / totalInvoiceSales) * 100).toFixed(0)}%
-                                    </small>
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                          </I18NProvider>
-                        ))}
-                      </div>
-                    ) : (
-                      <Empty message="No clients available" />
-                    )}
-                  </div>
-                )
-              })()}
-
+          <div className="grid grid-cols-5 gap-[--gap]">
+            <div className="col-span-2 flex flex-1 flex-col gap-[--gap]">
               <div className="grid grid-cols-2 gap-[--gap]">
                 <CompareBlock<readonly [Entity, number] | null>
                   inverse
@@ -362,14 +294,84 @@ export function Dashboard({ me, invoices }: { me: Account; invoices: Entity[] })
                   }
                 />
               </div>
+
+              {(() => {
+                let totalInvoiceSales = currentInvoices
+                  .filter((e) => isPaidEntity(e))
+                  .reduce((acc, e) => acc + total(e), 0)
+
+                let data = Array.from(
+                  currentInvoices
+                    .reduce((acc, e) => {
+                      if (!isPaidEntity(e)) return acc
+
+                      if (!acc.has(e.client.id)) {
+                        acc.set(e.client.id, { client: e.client, total: 0 })
+                      }
+                      acc.get(e.client.id)!.total += total(e)
+                      return acc
+                    }, new Map<Client['id'], { client: Client; total: number }>())
+                    .entries(),
+                )
+                  .sort(([, a], [, z]) => z.total - a.total) // Sort by best paying client first.
+                  .slice(0, 5) // Only show the top 5.
+
+                return (
+                  <div
+                    className={classNames(
+                      'flex-1 overflow-auto rounded-md bg-white shadow ring-1 ring-black/5 dark:bg-zinc-800',
+                      data.length === 0 &&
+                        'opacity-50 transition-opacity duration-300 hover:opacity-100',
+                    )}
+                  >
+                    <div className="border-b p-4 dark:border-zinc-900/75 dark:text-zinc-400">
+                      Top paying clients
+                    </div>
+                    {data.length > 0 ? (
+                      <div className="flex-1 divide-y divide-gray-100 dark:divide-zinc-900">
+                        {data.map(([id, { client, total }], idx) => (
+                          <I18NProvider key={id} value={client}>
+                            <div className="group relative flex items-center p-3 first:border-t-[1px] first:border-t-transparent focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 dark:border-zinc-800">
+                              <div className="absolute inset-2 z-0 flex">
+                                <div
+                                  className="rounded-md bg-blue-200/30 dark:bg-blue-400/25"
+                                  style={{ width: `${(total / totalInvoiceSales) * 100}%` }}
+                                />
+                              </div>
+                              <div className="z-10 flex w-full items-center space-x-2">
+                                <span className="w-[2ch] text-right text-sm font-medium tabular-nums text-gray-400 dark:text-zinc-400">
+                                  {idx + 1}.
+                                </span>
+                                <div className="flex flex-1 items-center justify-between space-x-2 truncate dark:text-zinc-300">
+                                  <span className="truncate">{client.name}</span>
+                                  <span className="text-xs">
+                                    <Money amount={total} />
+                                    <small className="mx-1 inline-block w-[4ch] flex-shrink-0 text-right">
+                                      {((total / totalInvoiceSales) * 100).toFixed(0)}%
+                                    </small>
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </I18NProvider>
+                        ))}
+                      </div>
+                    ) : (
+                      <Empty message="No clients available" />
+                    )}
+                  </div>
+                )
+              })()}
             </div>
 
-            <ComparisonChart
-              currentRange={currentRange}
-              previousInvoices={previousInvoices}
-              currentInvoices={currentInvoices}
-              next={next}
-            />
+            <div className="col-span-3">
+              <ComparisonChart
+                currentRange={currentRange}
+                previousInvoices={previousInvoices}
+                currentInvoices={currentInvoices}
+                next={next}
+              />
+            </div>
           </div>
         </main>
       </I18NProvider>
