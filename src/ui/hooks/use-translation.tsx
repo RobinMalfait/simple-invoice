@@ -5,8 +5,8 @@ import { useCallback } from 'react'
 import { Language } from '~/domain/language/language'
 import { useI18N } from '~/ui/hooks/use-i18n'
 
-import EN_INVOICE from '../../data/translations/en/invoice.json'
-import NL_INVOICE from '../../data/translations/nl/invoice.json'
+import EN_INVOICE from '~/data/translations/en/invoice.json'
+import NL_INVOICE from '~/data/translations/nl/invoice.json'
 
 type Translation = typeof NL_INVOICE & typeof EN_INVOICE
 

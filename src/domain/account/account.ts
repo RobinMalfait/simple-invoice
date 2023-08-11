@@ -1,10 +1,10 @@
 import { z } from 'zod'
 import { Address } from '~/domain/address/address'
+import { ContactField, ContactFieldBuilder } from '~/domain/contact-fields/contact-fields'
 import { Currency } from '~/domain/currency/currency'
 import { Language } from '~/domain/language/language'
 import { PaymentMethod } from '~/domain/payment-method/payment-method'
 import { Tax } from '~/domain/tax/tax'
-import { ContactField, ContactFieldBuilder } from '../contact-fields/contact-fields'
 
 export let Account = z.object({
   id: z.string().default(() => crypto.randomUUID()),

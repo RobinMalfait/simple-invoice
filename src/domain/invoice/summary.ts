@@ -1,6 +1,6 @@
 import { Discount } from '~/domain/discount/discount'
 import { Invoice } from '~/domain/invoice/invoice'
-import { InvoiceStatus } from './invoice-status'
+import { InvoiceStatus } from '~/domain/invoice/invoice-status'
 
 export type Summary =
   | { type: 'subtotal'; subtype?: 'discounts'; value: number }

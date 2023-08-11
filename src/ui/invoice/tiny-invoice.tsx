@@ -6,12 +6,12 @@ import { entityHasWarning, isLayeredEntity } from '~/domain/entity-filters'
 import { Invoice } from '~/domain/invoice/invoice'
 import { Quote } from '~/domain/quote/quote'
 import { Receipt } from '~/domain/receipt/receipt'
+import { useTranslation } from '~/ui/hooks/use-translation'
 import { StatusDisplay as InvoiceStatusDisplay } from '~/ui/invoice/status'
 import { total } from '~/ui/invoice/total'
 import { Money } from '~/ui/money'
 import { StatusDisplay as QuoteStatusDisplay } from '~/ui/quote/status'
 import { match } from '~/utils/match'
-import { useTranslation } from '../hooks/use-translation'
 
 type Entity = Quote | Invoice | Receipt
 

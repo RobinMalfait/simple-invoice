@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { Discount } from '../discount/discount'
+import { Discount } from '~/domain/discount/discount'
 
 export let InvoiceItem = z.object({
   id: z.string().default(() => crypto.randomUUID()),

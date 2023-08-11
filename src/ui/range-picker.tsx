@@ -22,8 +22,8 @@ import {
   subQuarters,
   subYears,
 } from 'date-fns'
-import { FormatRange } from './date-range'
-import { Menu, MenuButton, MenuItem, MenuItems } from './headlessui'
+import { FormatRange } from '~/ui/date-range'
+import { Menu, MenuButton, MenuItem, MenuItems } from '~/ui/headlessui'
 
 export let options: [
   string,

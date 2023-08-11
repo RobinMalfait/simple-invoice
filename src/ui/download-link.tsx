@@ -2,7 +2,7 @@
 
 import { ArrowDownTrayIcon, ArrowPathIcon } from '@heroicons/react/24/outline'
 import { useEffect, useState } from 'react'
-import { useDisposables } from './hooks/use-disposables'
+import { useDisposables } from '~/ui/hooks/use-disposables'
 
 export function DownloadLink({
   children,
