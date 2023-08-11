@@ -23,7 +23,7 @@ export function Invoice() {
       <div className="grid w-full grid-flow-row gap-8 print:gap-0">
         {pages.map((items, pageIdx) => (
           <PageProvider key={pageIdx} info={{ total: pages.length, current: pageIdx }}>
-            <div className="paper relative mx-auto flex flex-col bg-white dark:bg-zinc-800 print:m-0">
+            <div className="paper relative mx-auto flex flex-col bg-white dark:bg-zinc-950/70 print:m-0">
               {pageIdx === 0 ? <BigHeading /> : <SmallHeading />}
 
               <div className="relative flex flex-1 flex-col overflow-hidden">
