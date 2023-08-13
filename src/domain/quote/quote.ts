@@ -77,7 +77,7 @@ export class QuoteBuilder {
 
   private get computeStatus() {
     if (
-      ![QuoteStatus.Accepted, QuoteStatus.Closed].includes(this._status) &&
+      ![QuoteStatus.Accepted, QuoteStatus.Closed, QuoteStatus.Rejected].includes(this._status) &&
       isPast(this.computeQuoteExpirationDate!)
     ) {
       return QuoteStatus.Expired
