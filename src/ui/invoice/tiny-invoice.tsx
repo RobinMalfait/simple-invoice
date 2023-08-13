@@ -2,10 +2,12 @@
 
 import { CalendarIcon, RectangleStackIcon } from '@heroicons/react/24/outline'
 import { format } from 'date-fns'
-import { entityHasWarning, isLayeredEntity } from '~/domain/entity-filters'
+import { entityHasWarning, isLayeredEntity, isQuote } from '~/domain/entity-filters'
 import { Invoice } from '~/domain/invoice/invoice'
 import { Quote } from '~/domain/quote/quote'
+import { QuoteStatus } from '~/domain/quote/quote-status'
 import { Receipt } from '~/domain/receipt/receipt'
+import { classNames } from '~/ui/class-names'
 import { useTranslation } from '~/ui/hooks/use-translation'
 import { StatusDisplay as InvoiceStatusDisplay } from '~/ui/invoice/status'
 import { total } from '~/ui/invoice/total'
@@ -21,7 +23,14 @@ export function TinyInvoice({ invoice }: { invoice: Entity }) {
   let warning = entityHasWarning(invoice)
 
   return (
-    <div className="group relative rounded-md bg-white shadow transition-transform duration-300 will-change-transform hover:-translate-y-1 dark:bg-zinc-950">
+    <div
+      className={classNames(
+        'group relative rounded-md bg-white shadow transition-[transform,opacity] duration-300 will-change-transform hover:-translate-y-1 dark:bg-zinc-950',
+        isQuote(invoice) &&
+          invoice.status === QuoteStatus.Rejected &&
+          'opacity-70 hover:opacity-100',
+      )}
+    >
       {isLayered && (
         <>
           <div className="absolute inset-0 -z-10 h-full w-full rotate-2 rounded-md bg-gray-100 ring-1 ring-black/5 drop-shadow transition-[transform,opacity] duration-200 will-change-[transform,opacity] group-hover:rotate-0 group-hover:opacity-0 dark:bg-zinc-700"></div>
