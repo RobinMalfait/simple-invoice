@@ -72,7 +72,7 @@ export class InvoiceBuilder {
     return Invoice.parse(input)
   }
 
-  public static fromQuote(quote: Quote): InvoiceBuilder {
+  public static fromQuote(quote: Quote, { withAttachments = true } = {}): InvoiceBuilder {
     if (quote.status !== QuoteStatus.Accepted) {
       throw new Error('Cannot convert a quote to an invoice that is not accepted')
     }
@@ -83,6 +83,9 @@ export class InvoiceBuilder {
     builder._items = quote.items.slice()
     builder._note = quote.note
     builder._discounts = quote.discounts.slice()
+    if (withAttachments) {
+      builder._attachments = quote.attachments.slice()
+    }
     builder.events = quote.events.slice()
     builder.events.push(Event.parse({ type: 'invoice-drafted', from: 'quote' }))
     builder._quote = quote

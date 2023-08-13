@@ -49,11 +49,12 @@ export class ReceiptBuilder {
       note: this._note,
       receiptDate: this._receiptDate,
       discounts: this._discounts,
+      attachments: this._attachments,
       events: this.events,
     })
   }
 
-  public static fromInvoice(invoice: Invoice): ReceiptBuilder {
+  public static fromInvoice(invoice: Invoice, { withAttachments = true } = {}): ReceiptBuilder {
     if (invoice.status !== InvoiceStatus.Paid) {
       throw new Error('Cannot create a receipt from an unpaid invoice')
     }
@@ -66,6 +67,9 @@ export class ReceiptBuilder {
     builder._note = invoice.note
     builder._receiptDate = invoice.events.find((e) => e.type === 'invoice-paid')?.at ?? null
     builder._discounts = invoice.discounts.slice()
+    if (withAttachments) {
+      builder._attachments = invoice.attachments.slice()
+    }
     builder.events = invoice.events.slice()
     builder.events.push(Event.parse({ type: 'receipt-created' }))
     return builder
