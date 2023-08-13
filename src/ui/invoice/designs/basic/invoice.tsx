@@ -2,8 +2,8 @@
 
 import { InformationCircleIcon } from '@heroicons/react/24/outline'
 import { Receipt } from '~/domain/receipt/receipt'
+import { useFittedPagination } from '~/ui/hooks/use-fitted-pagination'
 import { InvoiceProvider, useInvoice } from '~/ui/hooks/use-invoice'
-import { useInvoicePagination } from '~/ui/hooks/use-invoice-pagination'
 import { PageProvider } from '~/ui/hooks/use-pagination-info'
 import { match } from '~/utils/match'
 import { BigFooter } from './big-footer'
@@ -15,7 +15,7 @@ import { Summary } from './summary'
 
 export function Invoice() {
   let invoice = useInvoice()
-  let [pages, FitContent] = useInvoicePagination(invoice.items)
+  let [pages, FitContent] = useFittedPagination(invoice.items)
   let notes = [invoice.note, invoice.client.note, invoice.account.note].filter(Boolean)
 
   return (

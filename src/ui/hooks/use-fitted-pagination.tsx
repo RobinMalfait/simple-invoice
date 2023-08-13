@@ -23,7 +23,7 @@ function FitContent({ children, onResize }: Props) {
   )
 }
 
-export function useInvoicePagination<T>(list: T[]) {
+export function useFittedPagination<T>(list: T[]) {
   let [perPage, setPerPage] = useState([list.length])
 
   useIsomorphicEffect(() => {
