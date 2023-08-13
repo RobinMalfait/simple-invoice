@@ -260,6 +260,7 @@ export function Dashboard({ me, invoices }: { me: Account; invoices: Entity[] })
                         data && (
                           <div className="text-xs text-gray-500 dark:text-zinc-400">
                             <Link href={`/${data[0].type}/${data[0].number}`}>
+                              <span className="absolute inset-0"></span>
                               {data[0].client.name}{' '}
                               <small className="tabular-nums">— {data[0].number}</small>
                             </Link>
@@ -294,6 +295,7 @@ export function Dashboard({ me, invoices }: { me: Account; invoices: Entity[] })
                         data && (
                           <div className="text-xs text-gray-500 dark:text-zinc-400">
                             <Link href={`/${data[0].type}/${data[0].number}`}>
+                              <span className="absolute inset-0"></span>
                               {data[0].client.name}{' '}
                               <small className="tabular-nums">— {data[0].number}</small>
                             </Link>
@@ -330,6 +332,7 @@ export function Dashboard({ me, invoices }: { me: Account; invoices: Entity[] })
                     data && (
                       <div className="text-xs text-gray-500 dark:text-zinc-400">
                         <Link href={`/${data[0].type}/${data[0].number}`}>
+                          <span className="absolute inset-0"></span>
                           {data[0].client.name}{' '}
                           <small className="tabular-nums">— {data[0].number}</small>
                         </Link>
@@ -364,6 +367,7 @@ export function Dashboard({ me, invoices }: { me: Account; invoices: Entity[] })
                     data && (
                       <div className="text-xs text-gray-500 dark:text-zinc-400">
                         <Link href={`/${data[0].type}/${data[0].number}`}>
+                          <span className="absolute inset-0"></span>
                           {data[0].client.name}{' '}
                           <small className="tabular-nums">— {data[0].number}</small>
                         </Link>
@@ -736,7 +740,7 @@ function CompareBlock<T = Entity[]>({
   return (
     <div
       className={classNames(
-        'flex gap-2 rounded-md bg-white p-4 shadow ring-1 ring-black/5 dark:bg-zinc-800',
+        'relative flex gap-2 rounded-md bg-white p-4 shadow ring-1 ring-black/5 dark:bg-zinc-800',
         currentValue === null && 'opacity-50 transition-opacity duration-300 hover:opacity-100',
       )}
     >
