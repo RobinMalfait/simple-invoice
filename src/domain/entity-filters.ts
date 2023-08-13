@@ -62,6 +62,41 @@ export function entityHasWarning(entity: Entity) {
   )
 }
 
+export function warningMessageForEntity(entity: Entity): string | null {
+  return match(
+    entity.type,
+    {
+      // When a quote is expired, it should be handled (probably closed)
+      quote: (e: Quote) => {
+        if (e.status === QuoteStatus.Expired) {
+          return 'This quote is expired. You probably want to close it.'
+        }
+
+        return null
+      },
+
+      invoice: (e: Invoice) => {
+        // Overdue invoices should be handled, probably closed (+ new invoice)
+        if (e.status === InvoiceStatus.Overdue) {
+          return 'This invoice is overdue. You probably want to close it and send a new invoice.'
+        }
+
+        // Draft invoices with an issue date in the past are void because they cannot be completed
+        // since they were never sent before.
+        if (e.status === InvoiceStatus.Draft && isPast(e.issueDate)) {
+          return 'This invoice is void because the issue date is in the past and this invoice has never been sent.'
+        }
+
+        return null
+      },
+
+      // Receipts are in the final state, nothing to warn about
+      receipt: () => null,
+    },
+    entity,
+  )
+}
+
 export function isPaidEntity(entity: Entity) {
   return match(
     entity.type,

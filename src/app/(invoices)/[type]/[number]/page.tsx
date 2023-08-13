@@ -1,5 +1,7 @@
+import { ExclamationTriangleIcon } from '@heroicons/react/20/solid'
 import { redirect } from 'next/navigation'
 import { invoices } from '~/data'
+import { entityHasWarning, warningMessageForEntity } from '~/domain/entity-filters'
 import { Invoice as InvoiceType } from '~/domain/invoice/invoice'
 import { Quote as QuoteType } from '~/domain/quote/quote'
 import { Receipt as ReceiptType } from '~/domain/receipt/receipt'
@@ -66,10 +68,27 @@ export default function Invoice({
               <ActivityFeed latestVersionEntity={entity} />
             </div>
 
-            <div className="flex items-center justify-between">
-              <span></span>
+            <div className="flex items-center justify-end empty:hidden">
               <HistoryDropdown />
             </div>
+
+            {entityHasWarning(entity) && (
+              <div className="rounded-lg border-l-4 border-yellow-400 bg-yellow-50 p-4 dark:border-yellow-400/30 dark:bg-yellow-400/10">
+                <div className="flex">
+                  <div className="flex-shrink-0">
+                    <ExclamationTriangleIcon
+                      className="h-5 w-5 text-yellow-400"
+                      aria-hidden="true"
+                    />
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm text-yellow-700 dark:text-yellow-500">
+                      {warningMessageForEntity(entity)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </History>
       </div>
