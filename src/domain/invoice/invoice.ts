@@ -5,6 +5,7 @@ import { Account } from '~/domain/account/account'
 import { Client } from '~/domain/client/client'
 import { config } from '~/domain/configuration/configuration'
 import { Discount } from '~/domain/discount/discount'
+import { Document } from '~/domain/document/document'
 import { Event } from '~/domain/events/event'
 import { InvoiceItem } from '~/domain/invoice/invoice-item'
 import { InvoiceStatus } from '~/domain/invoice/invoice-status'
@@ -23,8 +24,9 @@ export let Invoice = z.object({
   note: z.string().nullable(),
   issueDate: z.date(),
   dueDate: z.date(),
-  status: z.nativeEnum(InvoiceStatus).default(InvoiceStatus.Draft),
   discounts: z.array(Discount),
+  attachments: z.array(Document).default([]),
+  status: z.nativeEnum(InvoiceStatus).default(InvoiceStatus.Draft),
   events: z.array(Event),
   quote: Quote.nullable(),
 })
@@ -40,6 +42,7 @@ export class InvoiceBuilder {
   private _issueDate: Date | null = null
   private _dueDate: Date | null = null
   private _discounts: Discount[] = []
+  private _attachments: Document[] = []
   private _quote: Quote | null = null
 
   private _status = InvoiceStatus.Draft
@@ -56,6 +59,7 @@ export class InvoiceBuilder {
       issueDate: this._issueDate,
       dueDate: this.computeDueDate,
       discounts: this._discounts,
+      attachments: this._attachments,
       status: this.computeStatus,
       events: this.events,
       quote: this._quote,
@@ -177,6 +181,15 @@ export class InvoiceBuilder {
     }
 
     this._discounts.push(discount)
+    return this
+  }
+
+  public attachment(attachment: Document): InvoiceBuilder {
+    if (this._status !== InvoiceStatus.Draft) {
+      throw new Error('Cannot edit an invoice that is not in draft status')
+    }
+
+    this._attachments.push(attachment)
     return this
   }
 

@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { Account } from '~/domain/account/account'
 import { Client } from '~/domain/client/client'
 import { Discount } from '~/domain/discount/discount'
+import { Document } from '~/domain/document/document'
 import { Event } from '~/domain/events/event'
 import { Invoice } from '~/domain/invoice/invoice'
 import { InvoiceItem } from '~/domain/invoice/invoice-item'
@@ -20,6 +21,7 @@ export let Receipt = z.object({
   note: z.string().nullable(),
   receiptDate: z.date(),
   discounts: z.array(Discount),
+  attachments: z.array(Document),
   events: z.array(Event),
 })
 
@@ -34,6 +36,7 @@ export class ReceiptBuilder {
   private _note: string | null = null
   private _receiptDate: Date | null = null
   private _discounts: Discount[] = []
+  private _attachments: Document[] = []
   private events: Receipt['events'] = [Event.parse({ type: 'quote-drafted' })]
 
   public build(): Receipt {
@@ -75,6 +78,11 @@ export class ReceiptBuilder {
 
   public receiptDate(receiptDate: string | Date): ReceiptBuilder {
     this._receiptDate = typeof receiptDate === 'string' ? parseISO(receiptDate) : receiptDate
+    return this
+  }
+
+  public attachment(attachment: Document): ReceiptBuilder {
+    this._attachments.push(attachment)
     return this
   }
 }
