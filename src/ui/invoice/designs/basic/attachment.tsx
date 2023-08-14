@@ -1,14 +1,22 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { collapse, expand, paginate, parse, stringify } from '~/ui/document/document'
+import { Document } from '~/domain/document/document'
+import { collapse, expand, paginate, parseMarkdown, stringify } from '~/ui/document/document'
 import { useFittedPagination } from '~/ui/hooks/use-fitted-pagination'
 import { PageProvider, usePaginationInfo } from '~/ui/hooks/use-pagination-info'
 import { useTranslation } from '~/ui/hooks/use-translation'
+import { match } from '~/utils/match'
 import { SmallFooter } from './small-footer'
 
-export function Attachment({ name, value }: { name: string; value: string }) {
-  let items = useMemo(() => expand(parse(value)), [value])
+export function Attachment({ document }: { document: Document }) {
+  let items = useMemo(() => {
+    return match(document.type, {
+      markdown: () => expand(parseMarkdown(document.value)),
+      html: () => expand(document.value),
+    })
+  }, [document])
+
   // @ts-expect-error I'll fix this later
   let [pages, FitContent] = useFittedPagination(items, paginate)
   let [htmlCache] = useState(() => new Map<number, string>())
@@ -25,7 +33,7 @@ export function Attachment({ name, value }: { name: string; value: string }) {
         return (
           <PageProvider key={pageIdx} info={{ total: pages.length, current: pageIdx }}>
             <div className="paper relative mx-auto flex flex-col overflow-hidden bg-white dark:bg-zinc-950/70 print:m-0">
-              <SmallHeading name={name} />
+              <SmallHeading name={document.name} />
 
               <div className="relative flex flex-1 flex-col overflow-auto p-12">
                 <FitContent>

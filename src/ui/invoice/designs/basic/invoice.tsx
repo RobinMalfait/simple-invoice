@@ -73,7 +73,7 @@ export function Invoice() {
         ))}
 
         {invoice.attachments.map((document) => (
-          <Attachment key={document.id} name={document.name} value={document.value} />
+          <Attachment key={document.id} document={document} />
         ))}
       </div>
     </InvoiceProvider>

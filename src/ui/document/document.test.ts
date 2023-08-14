@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import { dedent } from '~/utils/dedent'
-import { collapse, expand, paginate, parse, stringify } from './document'
+import { collapse, expand, paginate, parseMarkdown, stringify } from './document'
 
 global.DOMParser = window.DOMParser
 {
@@ -206,7 +206,7 @@ it('should split tables by rows instead of individual DOM nodes', () => {
 it('should move titles to the next page if they are the last item on the page', () => {
   expect(
     split(
-      parse(md`
+      parseMarkdown(md`
         # Foo
 
         Lorem ipsum dolor sit amet
@@ -222,7 +222,7 @@ it('should move titles to the next page if they are the last item on the page', 
 it('should move "title" elements with children to the next page if the title is the last item on the page (and therefore the children are on the next page)', () => {
   expect(
     split(
-      parse(md`
+      parseMarkdown(md`
         1. Foo
 
            - Foo 1

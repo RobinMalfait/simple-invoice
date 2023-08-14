@@ -4,7 +4,7 @@ import * as htmlparser2 from 'htmlparser2'
 import * as marked from 'marked'
 import { dedent } from '~/utils/dedent'
 
-export function parse(value: string): string {
+export function parseMarkdown(value: string): string {
   return marked.parse(dedent(value)).trim()
 }
 

@@ -548,7 +548,7 @@ export const invoices: (Quote | Invoice | Receipt)[] = [
     .item(new InvoiceItemBuilder().description('Item #1').unitPrice(123).build())
     .attachment(
       new DocumentBuilder()
-        .type('raw')
+        .type('markdown')
         .name('Example document')
         .value(md`
           ## Markdown documents
@@ -597,6 +597,21 @@ export const invoices: (Quote | Invoice | Receipt)[] = [
 
           ![Image of GitHub](https://github.com/github.png)
         `)
+        .build(),
+    )
+    .attachment(
+      new DocumentBuilder()
+        .name('HTML Versie')
+        .type('html')
+        .value(
+          String.raw`
+            <h1>Title</h1>
+            <ul>
+              <li class="text-red-500">Foo</li>
+              <li class="text-blue-500">Bar</li>
+            </ul>
+          `,
+        )
         .build(),
     )
     .build(),

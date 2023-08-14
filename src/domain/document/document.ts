@@ -4,7 +4,12 @@ export let Document = z
   .discriminatedUnion('type', [
     // z.object({ type: z.literal('path'), value: z.string() }),
     z.object({
-      type: z.literal('raw'),
+      type: z.literal('markdown'),
+      name: z.string(),
+      value: z.string(),
+    }),
+    z.object({
+      type: z.literal('html'),
       name: z.string(),
       value: z.string(),
     }),
