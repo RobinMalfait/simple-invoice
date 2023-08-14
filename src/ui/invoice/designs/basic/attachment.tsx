@@ -31,7 +31,7 @@ export function Attachment({ name, value }: { name: string; value: string }) {
                 <FitContent>
                   <div
                     dangerouslySetInnerHTML={{ __html: html }}
-                    className="prose flex max-w-[calc(297mm-calc(48px*2))] flex-1 flex-col dark:prose-invert"
+                    className="prose prose-sm flex max-w-[calc(297mm-calc(48px*2))] flex-1 flex-col dark:prose-invert"
                   />
                 </FitContent>
               </div>
