@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useIsomorphicEffect } from '~/ui/hooks/use-isomorphic-effect'
 import { usePaginationInfo } from '~/ui/hooks/use-pagination-info'
 
@@ -18,8 +18,12 @@ function FitContent({ enabled, children, onResize, onDone, ...props }: Props) {
         if (!enabled) return
 
         let { clientHeight, scrollHeight } = element.parentElement!
-        if (scrollHeight > clientHeight) onResize()
-        else onDone()
+
+        if (scrollHeight > clientHeight) {
+          onResize()
+        } else {
+          onDone()
+        }
       }}
       {...props}
     >
@@ -57,26 +61,37 @@ export function useFittedPagination<T>(list: T[]) {
     useMemo(() => {
       return function ScopedFitContent({ children, ...rest }: React.ComponentProps<'div'>) {
         let { current } = usePaginationInfo()
+
+        let handleDone = useCallback(() => {
+          setWorkingPage((page) => page + 1)
+        }, [])
+
+        let handleResize = useCallback(() => {
+          function update(perPage: number[]) {
+            let clone = perPage.slice()
+
+            clone[current] -= 1 // Subtract 1 from current page
+            clone[current + 1] ??= 0 // Create page if it doesn't exist
+            clone[current + 1] += 1 // Add 1 to next page
+
+            return clone
+          }
+
+          // Don't worry about it...
+          // This is fine...
+          try {
+            setPages(update)
+          } catch (err) {
+            requestAnimationFrame(() => setPages(update))
+          }
+        }, [current])
+
         return (
           <FitContent
             {...rest}
             enabled={workingPage === current}
-            onDone={() => {
-              if (workingPage !== current) return
-              setWorkingPage((page) => page + 1)
-            }}
-            onResize={() => {
-              if (workingPage !== current) return
-              setPages((perPage) => {
-                let clone = perPage.slice()
-
-                clone[current] -= 1 // Subtract 1 from current page
-                clone[current + 1] ??= 0 // Create page if it doesn't exist
-                clone[current + 1] += 1 // Add 1 to next page
-
-                return clone
-              })
-            }}
+            onDone={handleDone}
+            onResize={handleResize}
           >
             {children}
           </FitContent>
