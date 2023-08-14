@@ -169,7 +169,7 @@ it('should split nested lists over 2 pages', () => {
   ])
 })
 
-it('should split tables', () => {
+it('should split tables by rows instead of individual DOM nodes', () => {
   expect(
     split(
       dedent(html`
@@ -200,10 +200,10 @@ it('should split tables', () => {
           </tbody>
         </table>
       `),
-      [8, 4],
+      [2, 2],
     ),
   ).toEqual([
-    '<table><thead><tr><th>Column 1</th><th>Column 2</th><th>Column 3</th></tr></thead><tbody><tr><td>A</td><td>B</td><td>C</td></tr><tr><td>D</td><td>E</td></tr></tbody></table>',
-    '<table><tbody><tr><td>F</td></tr><tr><td>G</td><td>H</td><td>I</td></tr></tbody></table>',
+    '<table><thead><tr><th>Column 1</th><th>Column 2</th><th>Column 3</th></tr></thead><tbody><tr><td>A</td><td>B</td><td>C</td></tr></tbody></table>',
+    '<table><tbody><tr><td>D</td><td>E</td><td>F</td></tr><tr><td>G</td><td>H</td><td>I</td></tr></tbody></table>',
   ])
 })

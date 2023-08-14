@@ -48,6 +48,12 @@ function expandRecursively(ast: JSX | JSX[]): JSX[] {
       continue
     }
 
+    // Table rows should not be expanded
+    if (child.tag === 'tr') {
+      children.push([idx, child])
+      continue
+    }
+
     for (let grandChild of expandRecursively(child)) {
       children.push([idx, grandChild])
     }
