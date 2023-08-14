@@ -544,7 +544,7 @@ export const invoices: (Quote | Invoice | Receipt)[] = [
   new QuoteBuilder()
     .account(me)
     .client(Client1)
-    .quoteDate(inThePast(2))
+    .quoteDate(today())
     .item(new InvoiceItemBuilder().description('Item #1').unitPrice(123).build())
     .attachment(
       new DocumentBuilder()
