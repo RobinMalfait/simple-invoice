@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 import { useIsomorphicEffect } from '~/ui/hooks/use-isomorphic-effect'
 import { usePaginationInfo } from '~/ui/hooks/use-pagination-info'
 
@@ -9,6 +9,8 @@ interface Props extends React.ComponentProps<'div'> {
   onDone: () => void
   onResize: () => void
 }
+
+let pendingFitContent = new Set()
 
 function FitContent({ enabled, children, onResize, onDone, ...props }: Props) {
   return (
@@ -33,6 +35,7 @@ function FitContent({ enabled, children, onResize, onDone, ...props }: Props) {
 }
 
 export function useFittedPagination<T>(list: T[]) {
+  let id = useId()
   let [pages, setPages] = useState([list.length])
   let [workingPage, setWorkingPage] = useState(0)
 
@@ -41,6 +44,36 @@ export function useFittedPagination<T>(list: T[]) {
     setPages([list.length])
     setWorkingPage(0)
   }, [list])
+
+  // Completed all pages
+  let done = workingPage === pages.length
+
+  // Register the current unit of work
+  useEffect(() => {
+    pendingFitContent.add(id)
+    return () => {
+      pendingFitContent.delete(id)
+      delete document.documentElement.dataset.pdfState
+    }
+  }, [id])
+
+  // Complete unit of work
+  let debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  useEffect(() => {
+    if (!done) return
+
+    pendingFitContent.delete(id)
+
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current)
+    }
+
+    debounceRef.current = setTimeout(() => {
+      if (pendingFitContent.size === 0) {
+        document.documentElement.dataset.pdfState = 'ready'
+      }
+    }, 100)
+  }, [id, done])
 
   return [
     // Pages
@@ -63,7 +96,13 @@ export function useFittedPagination<T>(list: T[]) {
         let { current } = usePaginationInfo()
 
         let handleDone = useCallback(() => {
-          setWorkingPage((page) => page + 1)
+          // Don't worry about it...
+          // This is fine...
+          try {
+            setWorkingPage((page) => page + 1)
+          } catch (err) {
+            requestAnimationFrame(() => setWorkingPage((page) => page + 1))
+          }
         }, [])
 
         let handleResize = useCallback(() => {
