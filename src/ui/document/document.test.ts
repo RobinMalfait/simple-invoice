@@ -13,13 +13,9 @@ global.structuredClone = (x: any) => JSON.parse(JSON.stringify(x))
 
 let html = String.raw
 
-function paginate<T>(ast: T[], pages: number[]): T[][] {
-  return pages.map((page) => ast.splice(0, page))
-}
-
 function split(html: string, pages: number[]): string[] {
   let expanded = expand(html)
-  let paginated = paginate(expanded, pages)
+  let paginated = pages.map((page) => expanded.splice(0, page))
   let collapsed = paginated.map((page) => collapse(page))
   let stringified = collapsed.map((page) => stringify(page))
   return stringified
