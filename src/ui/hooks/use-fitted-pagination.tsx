@@ -34,7 +34,12 @@ function FitContent({ enabled, children, onResize, onDone, ...props }: Props) {
   )
 }
 
-export function useFittedPagination<T>(list: T[]) {
+function defaultPaginater<T>(list: T[], pages: number[]): T[][] {
+  let clone = list.slice()
+  return pages.map((amount) => clone.splice(0, amount))
+}
+
+export function useFittedPagination<T>(list: T[], paginateList = defaultPaginater) {
   let id = useId()
   let [pages, setPages] = useState([list.length])
   let [workingPage, setWorkingPage] = useState(0)
@@ -78,16 +83,16 @@ export function useFittedPagination<T>(list: T[]) {
   return [
     // Pages
     (() => {
-      let clone = list.slice()
-      return pages.map((amount, idx) => {
-        return [
-          // Items on page
-          clone.splice(0, amount),
+      return paginateList(list, pages).map(
+        (items, idx) =>
+          [
+            // Items on page
+            items,
 
-          // Are we done with this page or not
-          idx < workingPage,
-        ] as const
-      })
+            // Are we done with this page or not
+            idx < workingPage,
+          ] as const,
+      )
     })(),
 
     // Scoped FitContent component

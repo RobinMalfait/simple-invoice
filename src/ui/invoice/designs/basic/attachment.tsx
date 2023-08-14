@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { collapse, expand, parse, stringify } from '~/ui/document/document'
+import { collapse, expand, paginate, parse, stringify } from '~/ui/document/document'
 import { useFittedPagination } from '~/ui/hooks/use-fitted-pagination'
 import { PageProvider, usePaginationInfo } from '~/ui/hooks/use-pagination-info'
 import { useTranslation } from '~/ui/hooks/use-translation'
@@ -9,7 +9,8 @@ import { SmallFooter } from './small-footer'
 
 export function Attachment({ name, value }: { name: string; value: string }) {
   let items = useMemo(() => expand(parse(value)), [value])
-  let [pages, FitContent] = useFittedPagination(items)
+  // @ts-expect-error I'll fix this later
+  let [pages, FitContent] = useFittedPagination(items, paginate)
   let [htmlCache] = useState(() => new Map<number, string>())
 
   return (

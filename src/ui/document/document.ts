@@ -54,6 +54,16 @@ function expandRecursively(ast: JSX | JSX[]): JSX[] {
       continue
     }
 
+    // Mark list items with nested lists as having children
+    // This way we can move the `li` to the next page, if none of the nested lists' items are on the
+    // current page
+    if (
+      child.tag === 'li' &&
+      child.children.some((child) => child?.tag === 'ol' || child?.tag === 'ul')
+    ) {
+      child.props['data-has-children'] = true
+    }
+
     for (let grandChild of expandRecursively(child)) {
       children.push([idx, grandChild])
     }
@@ -83,6 +93,48 @@ function expandRecursively(ast: JSX | JSX[]): JSX[] {
 export function expand(html: string): JSX[] {
   let dom = htmlparser2.parseDocument(html)
   return expandRecursively(Array.from(dom.childNodes).map(jsxify))
+}
+
+export function paginate(items: JSX[], pages: number[]): JSX[][] {
+  let clone = items.slice()
+  let split = pages.map((page) => clone.splice(0, page))
+
+  for (let i = split.length - 2; i >= 0; i--) {
+    let again = true
+    while (again) {
+      again = false
+
+      let last = split[i][split[i].length - 1]
+      if (!last) break
+
+      // Move page headings to the next page if they are the last element on the page
+      if (['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].includes(last?.tag)) {
+        if (!Array.isArray(split[i + 1])) break
+
+        split[i + 1].unshift(split[i].pop()!)
+        again = true
+        continue
+      }
+
+      // Move lists to the next page if they are the last element on the page and have children
+      if (last.tag === 'ol' || last.tag === 'ul') {
+        if (
+          last.children.length === 1 &&
+          last.children[0]?.tag === 'li' &&
+          last.children[0].props['data-has-children'] &&
+          !last.children[0].children.some((child) => child?.tag === 'ol' || child?.tag === 'ul')
+        ) {
+          if (!Array.isArray(split[i + 1])) break
+
+          split[i + 1].unshift(split[i].pop()!)
+          again = true
+          continue
+        }
+      }
+    }
+  }
+
+  return split.filter((page) => page.length > 0)
 }
 
 export function collapse(ast: JSX[]): JSX[] {
@@ -134,6 +186,7 @@ export function collapse(ast: JSX[]): JSX[] {
   return returnValue.map((node) => {
     if (node === null) return null
     delete node.props[GROUP_ID_KEY]
+    delete node.props['data-has-children']
     return node
   })
 }
