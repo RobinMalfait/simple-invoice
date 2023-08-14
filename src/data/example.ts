@@ -549,6 +549,7 @@ export const invoices: (Quote | Invoice | Receipt)[] = [
     .attachment(
       new DocumentBuilder()
         .type('raw')
+        .name('Example document')
         .value(md`
           ## Markdown documents
 
