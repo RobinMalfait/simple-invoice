@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import { dedent } from '~/utils/dedent'
-import { split } from './html-split'
+import { collapse, expand, stringify } from './document'
 
 global.DOMParser = window.DOMParser
 {
@@ -12,7 +12,18 @@ global.DOMParser = window.DOMParser
 global.structuredClone = (x: any) => JSON.parse(JSON.stringify(x))
 
 let html = String.raw
-let md = String.raw
+
+function paginate<T>(ast: T[], pages: number[]): T[][] {
+  return pages.map((page) => ast.splice(0, page))
+}
+
+function split(html: string, pages: number[]): string[] {
+  let expanded = expand(html)
+  let paginated = paginate(expanded, pages)
+  let collapsed = paginated.map((page) => collapse(page))
+  let stringified = collapsed.map((page) => stringify(page))
+  return stringified
+}
 
 it('should split simple html', () => {
   expect(

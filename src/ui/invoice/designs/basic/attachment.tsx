@@ -1,8 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { collapse, expand, stringify } from '~/ui/document/html-split'
-import { parse } from '~/ui/document/markdown-document'
+import { collapse, expand, parse, stringify } from '~/ui/document/document'
 import { useFittedPagination } from '~/ui/hooks/use-fitted-pagination'
 import { PageProvider, usePaginationInfo } from '~/ui/hooks/use-pagination-info'
 import { useTranslation } from '~/ui/hooks/use-translation'

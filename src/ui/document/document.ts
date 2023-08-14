@@ -1,6 +1,12 @@
 import { randomUUID } from 'crypto'
 import type { ChildNode } from 'domhandler'
 import * as htmlparser2 from 'htmlparser2'
+import * as marked from 'marked'
+import { dedent } from '~/utils/dedent'
+
+export function parse(value: string): string {
+  return marked.parse(dedent(value)).trim()
+}
 
 type JSXNode = { tag: string; props: Record<string | symbol, any>; children: JSX[] }
 type JSX = JSXNode | null
@@ -73,10 +79,6 @@ export function expand(html: string): JSX[] {
   return expandRecursively(Array.from(dom.childNodes).map(jsxify))
 }
 
-function paginate(ast: JSX[], pages: number[]): JSX[][] {
-  return pages.map((page) => ast.splice(0, page))
-}
-
 export function collapse(ast: JSX[]): JSX[] {
   let byGroupId = new Map<string, JSX>()
 
@@ -139,12 +141,4 @@ export function stringify(ast: JSX | JSX[]): string {
     .map(([key, value]) => `${key}="${value}"`)
     .join(' ')
   return `<${ast.tag}${attributes.length > 0 ? ` ${attributes}` : ''}>${children}</${ast.tag}>`
-}
-
-export function split(html: string, pages: number[]): string[] {
-  let expanded = expand(html)
-  let paginated = paginate(expanded, pages)
-  let collapsed = paginated.map((page) => collapse(page))
-  let stringified = collapsed.map((page) => stringify(page))
-  return stringified
 }
