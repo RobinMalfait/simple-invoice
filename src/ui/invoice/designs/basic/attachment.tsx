@@ -9,12 +9,16 @@ import { PageProvider } from '~/ui/hooks/use-pagination-info'
 export function Attachment({ value }: { value: string }) {
   let items = useMemo(() => expand(parse(value)), [value])
   let [pages, FitContent] = useFittedPagination(items)
+  let [htmlCache] = useState(() => new Map<number, string>())
 
   return (
     <>
-      {pages.map((items, pageIdx) => {
-        let collapsed = collapse(items)
-        let html = stringify(collapsed)
+      {pages.map(([items, done], pageIdx) => {
+        if (done && !htmlCache.has(pageIdx)) {
+          htmlCache.set(pageIdx, stringify(collapse(items)))
+        }
+
+        let html = done ? htmlCache.get(pageIdx)! : stringify(collapse(items))
 
         return (
           <PageProvider key={pageIdx} info={{ total: pages.length, current: pageIdx }}>

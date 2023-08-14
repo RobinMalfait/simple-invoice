@@ -42,7 +42,15 @@ export function useFittedPagination<T>(list: T[]) {
     // Pages
     (() => {
       let clone = list.slice()
-      return pages.map((amount) => clone.splice(0, amount))
+      return pages.map((amount, idx) => {
+        return [
+          // Items on page
+          clone.splice(0, amount),
+
+          // Are we done with this page or not
+          idx < workingPage,
+        ] as const
+      })
     })(),
 
     // Scoped FitContent component
