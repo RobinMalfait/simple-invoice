@@ -634,6 +634,67 @@ export const invoices: (Quote | Invoice | Receipt)[] = [
     .pay(nextDay(), 30_00)
     .build(),
 
+  // Invoice from quote with attachment(s)
+  InvoiceBuilder.fromQuote(
+    new QuoteBuilder()
+      .account(me)
+      .client(Client1)
+      .quoteDate(today())
+      .item(new InvoiceItemBuilder().description('Item #1').unitPrice(123).build())
+      .attachment(
+        new DocumentBuilder()
+          .name('Example document')
+          .type('markdown')
+          .value(md`
+            ## Attachment
+
+            1. Foo
+            1. Bar
+            1. Baz
+          `)
+
+          .build(),
+      )
+      .send(nextDay())
+      .accept(nextDay())
+      .build(),
+  )
+    .issueDate(nextDay())
+    .send(nextDay())
+    .pay(nextDay())
+    .build(),
+
+  // Invoice from quote without inheritting the attachment(s)
+  InvoiceBuilder.fromQuote(
+    new QuoteBuilder()
+      .account(me)
+      .client(Client1)
+      .quoteDate(today())
+      .item(new InvoiceItemBuilder().description('Item #1').unitPrice(123).build())
+      .attachment(
+        new DocumentBuilder()
+          .name('Example document')
+          .type('markdown')
+          .value(md`
+            ## Attachment
+
+            1. Foo
+            1. Bar
+            1. Baz
+          `)
+
+          .build(),
+      )
+      .send(nextDay())
+      .accept(nextDay())
+      .build(),
+    { withAttachments: false },
+  )
+    .issueDate(nextDay())
+    .send(nextDay())
+    .pay(nextDay())
+    .build(),
+
   // Receipt from Invoice from Quote
   ReceiptBuilder.fromInvoice(
     InvoiceBuilder.fromQuote(
