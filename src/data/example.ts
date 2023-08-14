@@ -6,6 +6,7 @@ import { configure } from '~/domain/configuration/configuration'
 import { ContactFieldBuilder } from '~/domain/contact-fields/contact-fields'
 import { Currency } from '~/domain/currency/currency'
 import { DiscountBuilder } from '~/domain/discount/discount'
+import { DocumentBuilder, md } from '~/domain/document/document'
 import { Invoice, InvoiceBuilder } from '~/domain/invoice/invoice'
 import { InvoiceItemBuilder } from '~/domain/invoice/invoice-item'
 import { Language } from '~/domain/language/language'
@@ -537,6 +538,66 @@ export const invoices: (Quote | Invoice | Receipt)[] = [
     .item(new InvoiceItemBuilder().description('Item #1').unitPrice(123).build())
     .send(nextDay())
     .close(nextDay())
+    .build(),
+
+  // Quote with an attachment
+  new QuoteBuilder()
+    .account(me)
+    .client(Client1)
+    .quoteDate(inThePast(2))
+    .item(new InvoiceItemBuilder().description('Item #1').unitPrice(123).build())
+    .attachment(
+      new DocumentBuilder()
+        .type('raw')
+        .value(md`
+          ## Markdown documents
+
+          ### Text
+
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin vel mi cursus, convallis lorem efficitur, commodo nibh. Morbi venenatis velit at bibendum pulvinar. Vivamus sollicitudin lacus in dui varius, id efficitur quam congue. Mauris non mauris molestie, ullamcorper dolor ut, fringilla nunc. Vivamus vulputate laoreet quam, blandit tincidunt mi condimentum vitae. Aenean interdum dolor vel tincidunt blandit. Maecenas facilisis imperdiet porta.
+
+          You can also use **bold** in your text, or _italic_ or even ~~strikethrough~~. Some people prefer some \`code\` highlights. Sometimes, you just require a good old [link](https://example.com).
+
+          ### Code
+
+          ~~~javascript
+          const foo = 'bar'
+          console.log(foo)
+          ~~~
+
+          ### Lists
+
+          #### Ordered lists
+
+          1. List items
+          1. Can be used
+          1. They can also be used
+             1. With nested numbers
+             1. And more nesting
+
+          #### Unordered lists
+
+          - Or you can use
+          - Bullet points
+          - Instead
+            - With nesting
+            - And more nesting
+
+          ### Tables
+
+          | Column 1 | Column 2 | Column 3 |
+          | -------- | -------- | -------- |
+          | Row 1    | Row 1    | Row 1    |
+          | Row 2    | Row 2    | Row 2    |
+          | Row 3    | Row 3    | Row 3    |
+          | Row 4    | Row 4    | Row 4    |
+
+          ### Images
+
+          ![Image of GitHub](https://github.com/github.png)
+        `)
+        .build(),
+    )
     .build(),
 
   // Invoice from Quote

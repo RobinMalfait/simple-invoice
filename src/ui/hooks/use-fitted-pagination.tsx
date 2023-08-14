@@ -1,22 +1,27 @@
 'use client'
 
-import { ReactNode, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useIsomorphicEffect } from '~/ui/hooks/use-isomorphic-effect'
 import { usePaginationInfo } from '~/ui/hooks/use-pagination-info'
 
-interface Props {
-  children: ReactNode
+interface Props extends React.ComponentProps<'div'> {
+  enabled: boolean
+  onDone: () => void
   onResize: () => void
 }
 
-function FitContent({ children, onResize }: Props) {
+function FitContent({ enabled, children, onResize, onDone, ...props }: Props) {
   return (
     <div
       ref={(element) => {
         if (!element) return
+        if (!enabled) return
+
         let { clientHeight, scrollHeight } = element.parentElement!
         if (scrollHeight > clientHeight) onResize()
+        else onDone()
       }}
+      {...props}
     >
       {children}
     </div>
@@ -24,28 +29,37 @@ function FitContent({ children, onResize }: Props) {
 }
 
 export function useFittedPagination<T>(list: T[]) {
-  let [perPage, setPerPage] = useState([list.length])
+  let [pages, setPages] = useState([list.length])
+  let [workingPage, setWorkingPage] = useState(0)
 
   useIsomorphicEffect(() => {
-    // Reset the per-page, and let it re-calculate
-    setPerPage([list.length])
+    // Reset the per-page, and let it re-calculate when the `list` changes.
+    setPages([list.length])
+    setWorkingPage(0)
   }, [list])
 
   return [
     // Pages
-    perPage.map((amount, i) => {
-      let offset = perPage.slice(0, i).reduce((total, amount) => total + amount, 0)
-      return list.slice(offset, offset + amount)
-    }),
+    (() => {
+      let clone = list.slice()
+      return pages.map((amount) => clone.splice(0, amount))
+    })(),
 
     // Scoped FitContent component
     useMemo(() => {
-      return function ScopedFitContent({ children }: { children: ReactNode }) {
+      return function ScopedFitContent({ children, ...rest }: React.ComponentProps<'div'>) {
         let { current } = usePaginationInfo()
         return (
           <FitContent
+            {...rest}
+            enabled={workingPage === current}
+            onDone={() => {
+              if (workingPage !== current) return
+              setWorkingPage((page) => page + 1)
+            }}
             onResize={() => {
-              setPerPage((perPage) => {
+              if (workingPage !== current) return
+              setPages((perPage) => {
                 let clone = perPage.slice()
 
                 clone[current] -= 1 // Subtract 1 from current page
@@ -60,6 +74,6 @@ export function useFittedPagination<T>(list: T[]) {
           </FitContent>
         )
       }
-    }, [setPerPage]),
+    }, [workingPage]),
   ] as const
 }

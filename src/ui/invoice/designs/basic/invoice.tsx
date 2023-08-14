@@ -6,6 +6,7 @@ import { useFittedPagination } from '~/ui/hooks/use-fitted-pagination'
 import { InvoiceProvider, useInvoice } from '~/ui/hooks/use-invoice'
 import { PageProvider } from '~/ui/hooks/use-pagination-info'
 import { match } from '~/utils/match'
+import { Attachment } from './attachment'
 import { BigFooter } from './big-footer'
 import { BigHeading } from './big-heading'
 import { Items } from './items'
@@ -69,6 +70,10 @@ export function Invoice() {
               {pageIdx === pages.length - 1 ? <BigFooter /> : <SmallFooter />}
             </div>
           </PageProvider>
+        ))}
+
+        {invoice.attachments.map((document) => (
+          <Attachment key={document.id} value={document.value} />
         ))}
       </div>
     </InvoiceProvider>
