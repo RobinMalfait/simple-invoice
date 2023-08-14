@@ -8,5 +8,5 @@ module.exports = {
       },
     },
   },
-  plugins: [require('@headlessui/tailwindcss')],
+  plugins: [require('@headlessui/tailwindcss'), require('@tailwindcss/typography')],
 }

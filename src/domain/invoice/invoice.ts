@@ -5,6 +5,7 @@ import { Account } from '~/domain/account/account'
 import { Client } from '~/domain/client/client'
 import { config } from '~/domain/configuration/configuration'
 import { Discount } from '~/domain/discount/discount'
+import { Document } from '~/domain/document/document'
 import { Event } from '~/domain/events/event'
 import { InvoiceItem } from '~/domain/invoice/invoice-item'
 import { InvoiceStatus } from '~/domain/invoice/invoice-status'
@@ -23,8 +24,9 @@ export let Invoice = z.object({
   note: z.string().nullable(),
   issueDate: z.date(),
   dueDate: z.date(),
-  status: z.nativeEnum(InvoiceStatus).default(InvoiceStatus.Draft),
   discounts: z.array(Discount),
+  attachments: z.array(Document).default([]),
+  status: z.nativeEnum(InvoiceStatus).default(InvoiceStatus.Draft),
   events: z.array(Event),
   quote: Quote.nullable(),
 })
@@ -40,6 +42,7 @@ export class InvoiceBuilder {
   private _issueDate: Date | null = null
   private _dueDate: Date | null = null
   private _discounts: Discount[] = []
+  private _attachments: Document[] = []
   private _quote: Quote | null = null
 
   private _status = InvoiceStatus.Draft
@@ -56,6 +59,7 @@ export class InvoiceBuilder {
       issueDate: this._issueDate,
       dueDate: this.computeDueDate,
       discounts: this._discounts,
+      attachments: this._attachments,
       status: this.computeStatus,
       events: this.events,
       quote: this._quote,
@@ -68,7 +72,7 @@ export class InvoiceBuilder {
     return Invoice.parse(input)
   }
 
-  public static fromQuote(quote: Quote): InvoiceBuilder {
+  public static fromQuote(quote: Quote, { withAttachments = true } = {}): InvoiceBuilder {
     if (quote.status !== QuoteStatus.Accepted) {
       throw new Error('Cannot convert a quote to an invoice that is not accepted')
     }
@@ -79,6 +83,9 @@ export class InvoiceBuilder {
     builder._items = quote.items.slice()
     builder._note = quote.note
     builder._discounts = quote.discounts.slice()
+    if (withAttachments) {
+      builder._attachments = quote.attachments.slice()
+    }
     builder.events = quote.events.slice()
     builder.events.push(Event.parse({ type: 'invoice-drafted', from: 'quote' }))
     builder._quote = quote
@@ -177,6 +184,15 @@ export class InvoiceBuilder {
     }
 
     this._discounts.push(discount)
+    return this
+  }
+
+  public attachment(attachment: Document): InvoiceBuilder {
+    if (this._status !== InvoiceStatus.Draft) {
+      throw new Error('Cannot edit an invoice that is not in draft status')
+    }
+
+    this._attachments.push(attachment)
     return this
   }
 

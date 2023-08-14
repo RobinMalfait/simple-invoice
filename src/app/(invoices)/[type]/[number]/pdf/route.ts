@@ -76,7 +76,7 @@ async function generatePDF(url: string) {
   await page.goto(url)
 
   // Give the page time to load
-  await new Promise((resolve) => setTimeout(resolve, 1000))
+  await page.waitForSelector('[data-pdf-state="ready"]')
   let pdfBuffer = await page.pdf({ printBackground: true, format: 'A4', preferCSSPageSize: true })
 
   await browser.close()

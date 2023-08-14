@@ -2,10 +2,11 @@
 
 import { InformationCircleIcon } from '@heroicons/react/24/outline'
 import { Receipt } from '~/domain/receipt/receipt'
+import { useFittedPagination } from '~/ui/hooks/use-fitted-pagination'
 import { InvoiceProvider, useInvoice } from '~/ui/hooks/use-invoice'
-import { useInvoicePagination } from '~/ui/hooks/use-invoice-pagination'
 import { PageProvider } from '~/ui/hooks/use-pagination-info'
 import { match } from '~/utils/match'
+import { Attachment } from './attachment'
 import { BigFooter } from './big-footer'
 import { BigHeading } from './big-heading'
 import { Items } from './items'
@@ -15,13 +16,13 @@ import { Summary } from './summary'
 
 export function Invoice() {
   let invoice = useInvoice()
-  let [pages, FitContent] = useInvoicePagination(invoice.items)
+  let [pages, FitContent] = useFittedPagination(invoice.items)
   let notes = [invoice.note, invoice.client.note, invoice.account.note].filter(Boolean)
 
   return (
     <InvoiceProvider invoice={invoice}>
       <div className="grid w-full grid-flow-row gap-8 print:gap-0">
-        {pages.map((items, pageIdx) => (
+        {pages.map(([items], pageIdx) => (
           <PageProvider key={pageIdx} info={{ total: pages.length, current: pageIdx }}>
             <div className="paper relative mx-auto flex flex-col bg-white dark:bg-zinc-950/70 print:m-0">
               {pageIdx === 0 ? <BigHeading /> : <SmallHeading />}
@@ -69,6 +70,10 @@ export function Invoice() {
               {pageIdx === pages.length - 1 ? <BigFooter /> : <SmallFooter />}
             </div>
           </PageProvider>
+        ))}
+
+        {invoice.attachments.map((document) => (
+          <Attachment key={document.id} document={document} />
         ))}
       </div>
     </InvoiceProvider>

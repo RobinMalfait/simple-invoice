@@ -5,6 +5,7 @@ import { Account } from '~/domain/account/account'
 import { Client } from '~/domain/client/client'
 import { config } from '~/domain/configuration/configuration'
 import { Discount } from '~/domain/discount/discount'
+import { Document } from '~/domain/document/document'
 import { Event } from '~/domain/events/event'
 import { InvoiceItem } from '~/domain/invoice/invoice-item'
 import { QuoteStatus } from '~/domain/quote/quote-status'
@@ -16,12 +17,13 @@ export let Quote = z.object({
   number: z.string(),
   account: Account,
   client: Client,
-  items: z.array(InvoiceItem),
+  items: z.array(InvoiceItem).default([]),
   note: z.string().nullable(),
   quoteDate: z.date(),
   quoteExpirationDate: z.date(),
+  discounts: z.array(Discount).default([]),
+  attachments: z.array(Document).default([]),
   status: z.nativeEnum(QuoteStatus).default(QuoteStatus.Draft),
-  discounts: z.array(Discount),
   events: z.array(Event),
 })
 
@@ -36,6 +38,7 @@ export class QuoteBuilder {
   private _quoteDate: Date | null = null
   private _quoteExpirationDate: Date | null = null
   private _discounts: Discount[] = []
+  private _attachments: Document[] = []
   private events: Quote['events'] = [Event.parse({ type: 'quote-drafted' })]
 
   private _status = QuoteStatus.Draft
@@ -50,6 +53,7 @@ export class QuoteBuilder {
       quoteDate: this._quoteDate,
       quoteExpirationDate: this.computeQuoteExpirationDate,
       discounts: this._discounts,
+      attachments: this._attachments,
       status: this.computeStatus,
       events: this.events,
     }
@@ -154,6 +158,15 @@ export class QuoteBuilder {
     }
 
     this._discounts.push(discount)
+    return this
+  }
+
+  public attachment(attachment: Document): QuoteBuilder {
+    if (this._status !== QuoteStatus.Draft) {
+      throw new Error('Cannot edit an quote that is not in draft status')
+    }
+
+    this._attachments.push(attachment)
     return this
   }
 
