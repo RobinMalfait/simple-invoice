@@ -18,7 +18,7 @@ export function Attachment({ document }: { document: Document }) {
   }, [document])
 
   // @ts-expect-error I'll fix this later
-  let [pages, FitContent] = useFittedPagination(items, paginate)
+  let [pages, FitContent, completed] = useFittedPagination(items, paginate)
   let [htmlCache] = useState(() => new Map<number, string>())
 
   return (
@@ -33,6 +33,14 @@ export function Attachment({ document }: { document: Document }) {
         return (
           <PageProvider key={pageIdx} info={{ total: pages.length, current: pageIdx }}>
             <div className="paper relative mx-auto flex flex-col overflow-hidden bg-white dark:bg-zinc-950/70 print:m-0">
+              {!completed && (
+                <div className="absolute inset-0 z-20 bg-black/10 backdrop-blur">
+                  <div className="p-4 text-xl dark:text-white">
+                    Computing <strong className="font-bold">{document.name}</strong>, please hold on
+                    tight&hellip;
+                  </div>
+                </div>
+              )}
               <SmallHeading name={document.name} />
 
               <div className="relative flex flex-1 flex-col overflow-auto p-12">

@@ -142,5 +142,8 @@ export function useFittedPagination<T>(list: T[], paginateList = defaultPaginate
         )
       }
     }, [workingPage]),
+
+    // Done
+    done,
   ] as const
 }
