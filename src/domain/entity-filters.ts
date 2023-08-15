@@ -62,6 +62,36 @@ export function entityHasWarning(entity: Entity) {
   )
 }
 
+export function entityHasAttachments(entity: Entity, type: 'any' | 'direct') {
+  return match(type, {
+    // Whether any of the entities in the chain has attachments
+    any: () =>
+      match(
+        entity.type,
+        {
+          quote: (e: Quote) => e.attachments.length > 0,
+          invoice: (e: Invoice) => {
+            return e.attachments.length > 0 || (e.quote ? e.quote.attachments.length > 0 : false)
+          },
+          receipt: (e: Receipt) => e.attachments.length > 0 || e.invoice.attachments.length > 0,
+        },
+        entity,
+      ),
+
+    // Whether the entity itself has attachments
+    direct: () =>
+      match(
+        entity.type,
+        {
+          quote: (e: Quote) => e.attachments.length > 0,
+          invoice: (e: Invoice) => e.attachments.length > 0,
+          receipt: (e: Receipt) => e.attachments.length > 0,
+        },
+        entity,
+      ),
+  })
+}
+
 export function warningMessageForEntity(entity: Entity): string | null {
   return match(
     entity.type,

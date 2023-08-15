@@ -1,8 +1,13 @@
 'use client'
 
-import { CalendarIcon, RectangleStackIcon } from '@heroicons/react/24/outline'
+import { CalendarIcon, PaperClipIcon, RectangleStackIcon } from '@heroicons/react/24/outline'
 import { format } from 'date-fns'
-import { entityHasWarning, isLayeredEntity, isQuote } from '~/domain/entity-filters'
+import {
+  entityHasAttachments,
+  entityHasWarning,
+  isLayeredEntity,
+  isQuote,
+} from '~/domain/entity-filters'
 import { Invoice } from '~/domain/invoice/invoice'
 import { Quote } from '~/domain/quote/quote'
 import { QuoteStatus } from '~/domain/quote/quote-status'
@@ -20,6 +25,7 @@ type Entity = Quote | Invoice | Receipt
 export function TinyInvoice({ invoice }: { invoice: Entity }) {
   let t = useTranslation()
   let isLayered = isLayeredEntity(invoice)
+  let hasAttachments = entityHasAttachments(invoice, 'any')
   let warning = entityHasWarning(invoice)
 
   return (
@@ -66,13 +72,18 @@ export function TinyInvoice({ invoice }: { invoice: Entity }) {
         </div>
 
         <div className="relative flex flex-1 items-center justify-center border-y border-black/5">
-          {isLayered && (
-            <div className="absolute bottom-2 right-2 flex">
+          <div className="absolute bottom-2 right-2 flex gap-2 empty:hidden">
+            {hasAttachments && (
+              <div className="rounded-md bg-black/5 p-2">
+                <PaperClipIcon className="h-5 w-5" />
+              </div>
+            )}
+            {isLayered && (
               <div className="rounded-md bg-black/5 p-2">
                 <RectangleStackIcon className="h-5 w-5" />
               </div>
-            </div>
-          )}
+            )}
+          </div>
           <div className="text-center">
             {match(invoice.type, {
               quote: () => <small className="lowercase">{t((x) => x.quote.title)}</small>,
