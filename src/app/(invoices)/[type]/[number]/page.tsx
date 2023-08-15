@@ -6,6 +6,7 @@ import { Invoice as InvoiceType } from '~/domain/invoice/invoice'
 import { Quote as QuoteType } from '~/domain/quote/quote'
 import { Receipt as ReceiptType } from '~/domain/receipt/receipt'
 import { ActivityFeed } from '~/ui/invoice/activity-feed'
+import { AttachmentList } from '~/ui/invoice/attachment-list'
 import { Invoice as InvoicePreview } from '~/ui/invoice/design'
 import { total } from '~/ui/invoice/total'
 import { Money } from '~/ui/money'
@@ -66,6 +67,13 @@ export default function Invoice({
             <div className="flex flex-col gap-4 rounded-lg bg-white p-4 shadow ring-1 ring-black/5 dark:bg-zinc-800 dark:text-gray-300">
               <span className="text-sm font-medium text-gray-900 dark:text-gray-300">Activity</span>
               <ActivityFeed latestVersionEntity={entity} />
+            </div>
+
+            <div className="flex flex-col gap-4 rounded-lg bg-white p-4 shadow ring-1 ring-black/5 dark:bg-zinc-800 dark:text-gray-300">
+              <span className="text-sm font-medium text-gray-900 dark:text-gray-300">
+                Attachments
+              </span>
+              <AttachmentList />
             </div>
 
             <div className="flex items-center justify-end empty:hidden">
