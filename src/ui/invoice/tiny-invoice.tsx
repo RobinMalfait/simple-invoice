@@ -74,12 +74,12 @@ export function TinyInvoice({ invoice }: { invoice: Entity }) {
         <div className="relative flex flex-1 items-center justify-center border-y border-black/5">
           <div className="absolute bottom-2 right-2 flex gap-2 empty:hidden">
             {hasAttachments && (
-              <div className="rounded-md bg-black/5 p-2">
+              <div title="Contains attachments" className="rounded-md bg-black/5 p-2">
                 <PaperClipIcon className="h-5 w-5" />
               </div>
             )}
             {isLayered && (
-              <div className="rounded-md bg-black/5 p-2">
+              <div title="Contains related documents" className="rounded-md bg-black/5 p-2">
                 <RectangleStackIcon className="h-5 w-5" />
               </div>
             )}
