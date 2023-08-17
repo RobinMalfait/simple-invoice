@@ -1,7 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
-import { useIsomorphicEffect } from '~/ui/hooks/use-isomorphic-effect'
+import { useEffect, useId, useMemo, useReducer, useRef } from 'react'
 import { usePaginationInfo } from '~/ui/hooks/use-pagination-info'
 
 interface Props extends React.ComponentProps<'div'> {
@@ -39,19 +38,117 @@ function defaultPaginater<T>(list: T[], pages: number[]): T[][] {
   return pages.map((amount) => clone.splice(0, amount))
 }
 
+type PaginationState = {
+  list: unknown[]
+  workingPage: number
+  pages: number[]
+  between: [number, number]
+}
+
+type Action = { type: 'good' } | { type: 'bad' } | { type: 'reset'; list: unknown[] }
+
+function paginationReducer(state: PaginationState, action: Action): PaginationState {
+  switch (action.type) {
+    case 'reset': {
+      return {
+        ...state,
+        list: action.list,
+        workingPage: 0,
+        pages: [action.list.length],
+        between: [0, action.list.length],
+      }
+    }
+
+    case 'good': {
+      let remaining = state.list.length - state.pages.reduce((a, b) => a + b, 0)
+
+      // If we've handled all the pages, then we're done
+      if (remaining === 0) {
+        return { ...state, workingPage: state.workingPage + 1 }
+      }
+
+      let [min, max] = state.between
+
+      // We are stuck on a number, let's try the larger one first because if that one fits, its
+      // better to fill the page with the larger number.
+      if (max - min === 1) {
+        // Try the larger number first
+        return {
+          ...state,
+          // @ts-expect-error TypeScript doesn't know about `with` yet...
+          pages: state.pages.with(state.workingPage, max),
+          between: [max, max],
+        }
+      }
+
+      if (min === max) {
+        // Prepare the next page
+        return {
+          ...state,
+          pages: [...state.pages, remaining],
+          workingPage: state.workingPage + 1,
+          between: [0, remaining],
+        }
+      }
+
+      // We didn't settle on a number yet, let's keep going
+      return {
+        ...state,
+        // @ts-expect-error TypeScript doesn't know about `with` yet...
+        pages: state.pages.with(state.workingPage, Math.ceil((min + max) / 2)),
+        between: [state.pages[state.workingPage], max],
+      }
+    }
+
+    case 'bad': {
+      let [min, max] = state.between
+
+      // We tried the larger number first, and it didn't fit, so we know that the smaller number
+      // is the one that fits.
+      if (min === max) {
+        return {
+          ...state,
+          // @ts-expect-error TypeScript doesn't know about `with` yet...
+          pages: state.pages.with(state.workingPage, min - 1),
+          between: [min - 1, min - 1],
+        }
+      }
+
+      // When it's "bad", we know it doesn't fit, which means that we should always move to the
+      // left.
+      return {
+        ...state,
+        // @ts-expect-error TypeScript doesn't know about `with` yet...
+        pages: state.pages.with(state.workingPage, Math.floor((min + max) / 2)),
+        between: [min, state.pages[state.workingPage]],
+      }
+    }
+
+    default: {
+      return state
+    }
+  }
+}
+
 export function useFittedPagination<T>(list: T[], paginateList = defaultPaginater) {
   let id = useId()
-  let [pages, setPages] = useState([list.length])
-  let [workingPage, setWorkingPage] = useState(0)
+  let [state, dispatch] = useReducer(paginationReducer, {
+    list,
+    workingPage: 0,
+    pages: [list.length],
+    between: [0, list.length],
+  })
 
-  useIsomorphicEffect(() => {
+  useEffect(() => {
+    // Bail if the list hasn't changed
+    if (list === state.list) return
+
     // Reset the per-page, and let it re-calculate when the `list` changes.
-    setPages([list.length])
-    setWorkingPage(0)
-  }, [list])
+    dispatch({ type: 'reset', list })
+  }, [list, state.list])
 
   // Completed all pages
-  let done = workingPage === pages.length
+  let done = state.workingPage === state.pages.length
 
   // Register the current unit of work
   useEffect(() => {
@@ -83,14 +180,14 @@ export function useFittedPagination<T>(list: T[], paginateList = defaultPaginate
   return [
     // Pages
     (() => {
-      return paginateList(list, pages).map(
+      return paginateList(list, state.pages).map(
         (items, idx) =>
           [
             // Items on page
             items,
 
             // Are we done with this page or not
-            idx < workingPage,
+            idx < state.workingPage,
           ] as const,
       )
     })(),
@@ -100,48 +197,22 @@ export function useFittedPagination<T>(list: T[], paginateList = defaultPaginate
       return function ScopedFitContent({ children, ...rest }: React.ComponentProps<'div'>) {
         let { current } = usePaginationInfo()
 
-        let handleDone = useCallback(() => {
-          // Don't worry about it...
-          // This is fine...
-          try {
-            setWorkingPage((page) => page + 1)
-          } catch (err) {
-            requestAnimationFrame(() => setWorkingPage((page) => page + 1))
-          }
-        }, [])
-
-        let handleResize = useCallback(() => {
-          function update(perPage: number[]) {
-            let clone = perPage.slice()
-
-            clone[current] -= 1 // Subtract 1 from current page
-            clone[current + 1] ??= 0 // Create page if it doesn't exist
-            clone[current + 1] += 1 // Add 1 to next page
-
-            return clone
-          }
-
-          // Don't worry about it...
-          // This is fine...
-          try {
-            setPages(update)
-          } catch (err) {
-            requestAnimationFrame(() => setPages(update))
-          }
-        }, [current])
-
         return (
           <FitContent
             {...rest}
-            enabled={workingPage === current}
-            onDone={handleDone}
-            onResize={handleResize}
+            enabled={state.workingPage === current}
+            onDone={() => {
+              queueMicrotask(() => dispatch({ type: 'good' }))
+            }}
+            onResize={() => {
+              queueMicrotask(() => dispatch({ type: 'bad' }))
+            }}
           >
             {children}
           </FitContent>
         )
       }
-    }, [workingPage]),
+    }, [state.workingPage]),
 
     // Done
     done,
