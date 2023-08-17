@@ -166,11 +166,22 @@ export class InvoiceBuilder {
     return this
   }
 
-  public dueDate(dueDate: string | Date): InvoiceBuilder {
+  public dueDate(dueDate: string | Date | ((issueDate: Date) => Date)): InvoiceBuilder {
     if (this._status !== InvoiceStatus.Draft) {
       throw new Error('Cannot edit an invoice that is not in draft status')
     }
-    this._dueDate = typeof dueDate === 'string' ? parseISO(dueDate) : dueDate
+
+    if (typeof dueDate === 'function') {
+      if (this._issueDate === null) {
+        throw new Error('Issue date is not configured yet.')
+      }
+      this._dueDate = dueDate(this._issueDate)
+    } else if (typeof dueDate === 'string') {
+      this._issueDate = parseISO(dueDate)
+    } else {
+      this._issueDate = this._issueDate
+    }
+
     return this
   }
 
