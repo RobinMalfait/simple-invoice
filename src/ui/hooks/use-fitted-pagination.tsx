@@ -60,7 +60,8 @@ function paginationReducer(state: PaginationState, action: Action): PaginationSt
     }
 
     case 'good': {
-      let remaining = state.list.length - state.pages.reduce((a, b) => a + b, 0)
+      let remaining =
+        state.list.length - state.pages.slice(0, state.workingPage + 1).reduce((a, b) => a + b, 0)
 
       // If we've handled all the pages, then we're done
       if (remaining === 0) {
@@ -85,17 +86,25 @@ function paginationReducer(state: PaginationState, action: Action): PaginationSt
         // Prepare the next page
         return {
           ...state,
-          pages: [...state.pages, remaining],
+          // @ts-expect-error TypeScript doesn't know about `with` yet...
+          pages: state.pages.with(state.workingPage + 1, remaining),
           workingPage: state.workingPage + 1,
           between: [0, remaining],
         }
       }
 
+      // @ts-expect-error TypeScript doesn't know about `with` yet...
+      let newPages = state.pages.with(state.workingPage, Math.ceil((min + max) / 2))
+      // Move the remaining to the next page
+      newPages[state.workingPage + 1] ??= Math.max(
+        0,
+        state.list.length - state.pages.slice(0, state.workingPage + 1).reduce((a, b) => a + b, 0),
+      )
+
       // We didn't settle on a number yet, let's keep going
       return {
         ...state,
-        // @ts-expect-error TypeScript doesn't know about `with` yet...
-        pages: state.pages.with(state.workingPage, Math.ceil((min + max) / 2)),
+        pages: newPages,
         between: [state.pages[state.workingPage], max],
       }
     }
@@ -114,12 +123,20 @@ function paginationReducer(state: PaginationState, action: Action): PaginationSt
         }
       }
 
+      // @ts-expect-error TypeScript doesn't know about `with` yet...
+      let newPages = state.pages.with(state.workingPage, Math.floor((min + max) / 2))
+
+      // Move the remaining to the next page
+      newPages[state.workingPage + 1] ??= Math.max(
+        0,
+        state.list.length - state.pages.slice(0, state.workingPage + 1).reduce((a, b) => a + b, 0),
+      )
+
       // When it's "bad", we know it doesn't fit, which means that we should always move to the
       // left.
       return {
         ...state,
-        // @ts-expect-error TypeScript doesn't know about `with` yet...
-        pages: state.pages.with(state.workingPage, Math.floor((min + max) / 2)),
+        pages: newPages,
         between: [min, state.pages[state.workingPage]],
       }
     }
