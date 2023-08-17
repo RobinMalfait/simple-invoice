@@ -40,7 +40,7 @@ export class InvoiceBuilder {
   private _items: InvoiceItem[] = []
   private _note: string | null = null
   private _issueDate: Date | null = null
-  private _dueDate: Date | null = null
+  private _dueDate: Date | ((issueDate: Date) => Date) | null = null
   private _discounts: Discount[] = []
   private _attachments: Document[] = []
   private _quote: Quote | null = null
@@ -100,8 +100,12 @@ export class InvoiceBuilder {
   }
 
   private get computeDueDate() {
-    if (this._dueDate) return this._dueDate
+    if (this._dueDate instanceof Date) return this._dueDate
     if (!this._issueDate) return null // Let the validation handle this
+    if (typeof this._dueDate === 'function') {
+      this._dueDate = this._dueDate(this._issueDate)
+      return this._dueDate
+    }
 
     return config().invoice.defaultNetStrategy(this._issueDate)
   }
@@ -170,18 +174,7 @@ export class InvoiceBuilder {
     if (this._status !== InvoiceStatus.Draft) {
       throw new Error('Cannot edit an invoice that is not in draft status')
     }
-
-    if (typeof dueDate === 'function') {
-      if (this._issueDate === null) {
-        throw new Error('Issue date is not configured yet.')
-      }
-      this._dueDate = dueDate(this._issueDate)
-    } else if (typeof dueDate === 'string') {
-      this._issueDate = parseISO(dueDate)
-    } else {
-      this._issueDate = this._issueDate
-    }
-
+    this._dueDate = typeof dueDate === 'string' ? parseISO(dueDate) : dueDate
     return this
   }
 
