@@ -20,6 +20,10 @@ export function isReceipt(entity: Entity): entity is Receipt {
   return entity.type === 'receipt'
 }
 
+export function isAccepted(quote: Quote) {
+  return quote.status === QuoteStatus.Accepted
+}
+
 export function isLayeredEntity(entity: Entity) {
   return match(
     entity.type,
