@@ -12,8 +12,16 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { classNames } from '~/ui/class-names'
 
-let navigation = [
-  { name: 'Dashboard', icon: HomeIcon, href: '/' },
+type Navigation = {
+  name: string
+  icon: typeof HomeIcon
+  href: string
+  exact?: boolean
+  children?: Navigation[]
+}
+
+let navigation: Navigation[] = [
+  { name: 'Dashboard', icon: HomeIcon, href: '/', exact: true },
   {
     name: 'Invoices',
     icon: RectangleStackIcon,
@@ -51,7 +59,7 @@ export default function Layout({ children }: React.PropsWithChildren<{}>) {
                         <Link
                           href={item.href}
                           className={classNames(
-                            item.href === pathname
+                            (item.exact ? item.href === pathname : pathname?.startsWith(item.href))
                               ? 'bg-zinc-700 text-white'
                               : 'text-gray-400 hover:bg-zinc-700 hover:text-white',
                             'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6',
@@ -67,7 +75,11 @@ export default function Layout({ children }: React.PropsWithChildren<{}>) {
                                 <Link
                                   href={item.href}
                                   className={classNames(
-                                    item.href === pathname
+                                    (
+                                      item.exact
+                                        ? item.href === pathname
+                                        : pathname?.startsWith(item.href)
+                                    )
                                       ? 'bg-zinc-700 text-white'
                                       : 'text-gray-400 hover:bg-zinc-700 hover:text-white',
                                     'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6',
