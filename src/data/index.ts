@@ -1,10 +1,8 @@
-import { compareAsc } from 'date-fns'
 import { Account } from '~/domain/account/account'
 import { isInvoice, isQuote, isReceipt } from '~/domain/entity-filters'
 import { Invoice } from '~/domain/invoice/invoice'
 import { Quote } from '~/domain/quote/quote'
 import { Receipt } from '~/domain/receipt/receipt'
-import { resolveRelevantEntityDate } from '~/domain/relevant-entity-date'
 
 type Entity = Quote | Invoice | Receipt
 
@@ -56,14 +54,12 @@ for (let entity of invoices) {
   }
 }
 
+let order = ['quote', 'invoice', 'receipt']
 for (let stack of stacks.values()) {
   stack.sort((aId, zId) => {
     let a = invoices.find((e) => e.id === aId)!
     let z = invoices.find((e) => e.id === zId)!
 
-    return (
-      compareAsc(resolveRelevantEntityDate(a), resolveRelevantEntityDate(z)) ||
-      a.number.localeCompare(z.number)
-    )
+    return order.indexOf(a.type) - order.indexOf(z.type) || a.number.localeCompare(z.number)
   })
 }

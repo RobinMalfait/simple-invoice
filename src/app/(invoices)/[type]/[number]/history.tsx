@@ -10,6 +10,7 @@ import { Quote } from '~/domain/quote/quote'
 import { Receipt } from '~/domain/receipt/receipt'
 import { classNames } from '~/ui/class-names'
 import { InvoiceProvider } from '~/ui/hooks/use-invoice'
+import { useInvoiceStacks } from '~/ui/hooks/use-invoice-stacks'
 import { match } from '~/utils/match'
 
 type Entity = Quote | Invoice | Receipt
@@ -20,18 +21,11 @@ let HistoryContext = React.createContext<{
   setEntity: (entity: Entity) => void
 } | null>(null)
 
-export function History(props: React.PropsWithChildren<{ entity: Entity }>) {
-  let options: Entity[] = []
-  if (props.entity.type === 'quote') {
-    options.push(props.entity)
-  } else if (props.entity.type === 'invoice') {
-    if (props.entity.quote) options.push(props.entity.quote)
-    options.push(props.entity)
-  } else if (props.entity.type === 'receipt') {
-    if (props.entity.invoice.quote) options.push(props.entity.invoice.quote)
-    options.push(props.entity.invoice)
-    options.push(props.entity)
-  }
+export function History(props: React.PropsWithChildren<{ entity: Entity; entities: Entity[] }>) {
+  let stacks = useInvoiceStacks()
+  let options = (stacks.get(props.entity.id) ?? []).map(
+    (id) => props.entities.find((e) => e.id === id)!,
+  )
 
   let [entity, setEntity] = React.useState<Entity>(props.entity)
 
@@ -61,7 +55,7 @@ export function HistoryDropdown() {
           />
           History{' '}
           <span className="tabular-nums">
-            ({options.indexOf(entity) + 1}/{options.length})
+            ({options.findIndex((option) => option.id === entity.id) + 1}/{options.length})
           </span>
           <ChevronDownIcon
             className="-mr-1 h-5 w-5 text-gray-400 dark:text-gray-500"
@@ -82,7 +76,7 @@ export function HistoryDropdown() {
         <Menu.Items className="absolute right-0 z-10 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-zinc-900">
           <div className="py-1">
             {options.map((e) => {
-              let Icon = e === entity ? CheckCircleIcon : 'span'
+              let Icon = e.id === entity.id ? CheckCircleIcon : 'span'
 
               return (
                 <Menu.Item key={e.id}>

@@ -28,7 +28,7 @@ export default function Invoice({
 
   return (
     <div className="flex h-full flex-1 overflow-hidden [--spacing:theme(spacing.8)]">
-      <History entity={entity}>
+      <History entity={entity} entities={invoices}>
         <div className="flex overflow-auto bg-gray-950/10 shadow-inner dark:bg-zinc-600">
           <div className="mb-8">
             <div className="px-4 py-8 sm:px-6 lg:px-8">
