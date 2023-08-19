@@ -11,6 +11,7 @@ import {
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Account } from '~/domain/account/account'
+import { entityHasWarning } from '~/domain/entity-filters'
 import { Invoice } from '~/domain/invoice/invoice'
 import { Quote } from '~/domain/quote/quote'
 import { Receipt } from '~/domain/receipt/receipt'
@@ -108,22 +109,38 @@ export default function Layout({
 
                                 return data.invoices.some((entity) => entity.type === item.entity)
                               })
-                              .map((item) => (
-                                <li key={item.name}>
-                                  <Link
-                                    href={item.href}
-                                    className={classNames(
-                                      isActive(item)
-                                        ? 'bg-zinc-700 text-white'
-                                        : 'text-gray-400 hover:bg-zinc-700 hover:text-white',
-                                      'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6',
-                                    )}
-                                  >
-                                    <item.icon className="h-6 w-6 shrink-0" aria-hidden="true" />
-                                    {item.name}
-                                  </Link>
-                                </li>
-                              ))}
+                              .map((item) => {
+                                let attentionCount = item.entity
+                                  ? data.invoices.filter(
+                                      (entity) =>
+                                        entity.type === item.entity && entityHasWarning(entity),
+                                    ).length
+                                  : 0
+
+                                return (
+                                  <li key={item.name}>
+                                    <Link
+                                      href={item.href}
+                                      className={classNames(
+                                        isActive(item)
+                                          ? 'bg-zinc-700 text-white'
+                                          : 'text-gray-400 hover:bg-zinc-700 hover:text-white',
+                                        'group relative flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6',
+                                      )}
+                                    >
+                                      <item.icon className="h-6 w-6 shrink-0" aria-hidden="true" />
+                                      {item.name}
+                                      {attentionCount > 0 && (
+                                        <div className="absolute right-4 top-1/2 z-50 -translate-y-1/2">
+                                          <span className="inline-flex items-center gap-3 rounded-md bg-red-400/10 px-3 py-1 text-xs font-medium text-red-200 ring-1 ring-inset ring-red-400/50">
+                                            {attentionCount}
+                                          </span>
+                                        </div>
+                                      )}
+                                    </Link>
+                                  </li>
+                                )
+                              })}
                           </ul>
                         )}
                       </li>
