@@ -1,13 +1,29 @@
 'use client'
 
-import { CubeIcon, DocumentTextIcon, HomeIcon } from '@heroicons/react/24/outline'
+import {
+  CalculatorIcon,
+  CubeIcon,
+  DocumentCheckIcon,
+  DocumentTextIcon,
+  HomeIcon,
+  RectangleStackIcon,
+} from '@heroicons/react/24/outline'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { classNames } from '~/ui/class-names'
 
 let navigation = [
   { name: 'Dashboard', icon: HomeIcon, href: '/' },
-  { name: 'Invoices', icon: DocumentTextIcon, href: '/invoices' },
+  {
+    name: 'Invoices',
+    icon: RectangleStackIcon,
+    href: '/invoices',
+    children: [
+      { name: 'Quotes', icon: CalculatorIcon, href: '/quote' },
+      { name: 'Invoices', icon: DocumentTextIcon, href: '/invoice' },
+      { name: 'Receipts', icon: DocumentCheckIcon, href: '/receipt' },
+    ],
+  },
 ]
 
 export default function Layout({ children }: React.PropsWithChildren<{}>) {
@@ -44,6 +60,26 @@ export default function Layout({ children }: React.PropsWithChildren<{}>) {
                           <item.icon className="h-6 w-6 shrink-0" aria-hidden="true" />
                           {item.name}
                         </Link>
+                        {item.children && (
+                          <ul className="ml-4 space-y-1 py-1">
+                            {item.children.map((item) => (
+                              <li key={item.name}>
+                                <Link
+                                  href={item.href}
+                                  className={classNames(
+                                    item.href === pathname
+                                      ? 'bg-zinc-700 text-white'
+                                      : 'text-gray-400 hover:bg-zinc-700 hover:text-white',
+                                    'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6',
+                                  )}
+                                >
+                                  <item.icon className="h-6 w-6 shrink-0" aria-hidden="true" />
+                                  {item.name}
+                                </Link>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
                       </li>
                     ))}
                   </ul>
