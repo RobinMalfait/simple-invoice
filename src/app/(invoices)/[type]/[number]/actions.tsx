@@ -196,8 +196,8 @@ function PromoteToInvoicePanel() {
             name="issueDate"
             label="Issue date"
             type="datetime-local"
-            value={issueDate?.toISOString().slice(0, 16)}
-            onChange={(e) => setIssueDate(parseISO(e.target.value))}
+            value={issueDate?.toISOString().slice(0, 16) ?? ''}
+            onChange={(e) => setIssueDate(e.target.value === '' ? null : parseISO(e.target.value))}
           />
 
           <InputField
