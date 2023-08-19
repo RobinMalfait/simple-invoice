@@ -16,6 +16,9 @@ import { Invoice } from '~/domain/invoice/invoice'
 import { Quote } from '~/domain/quote/quote'
 import { Receipt } from '~/domain/receipt/receipt'
 import { classNames } from '~/ui/class-names'
+import { InvoiceStacksProvider } from '../hooks/use-invoice-stacks'
+
+type Entity = Quote | Invoice | Receipt
 
 type Navigation = {
   name: string
@@ -46,7 +49,8 @@ export default function Layout({
 }: React.PropsWithChildren<{
   data: {
     me: Account
-    invoices: (Quote | Invoice | Receipt)[]
+    invoices: Entity[]
+    stacks: Map<Entity, Entity[]>
   }
 }>) {
   let pathname = usePathname()
@@ -72,7 +76,7 @@ export default function Layout({
   }
 
   return (
-    <>
+    <InvoiceStacksProvider value={data.stacks}>
       <div className="flex flex-1 flex-col overflow-hidden">
         <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
           <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-zinc-900 px-6 pb-4">
@@ -158,6 +162,6 @@ export default function Layout({
           </main>
         </div>
       </div>
-    </>
+    </InvoiceStacksProvider>
   )
 }

@@ -24,23 +24,6 @@ export function isAccepted(quote: Quote) {
   return quote.status === QuoteStatus.Accepted
 }
 
-export function isLayeredEntity(entity: Entity) {
-  return match(
-    entity.type,
-    {
-      // Lowest layer, no layer below
-      quote: () => false,
-
-      // An invoice is layered if it has a quote
-      invoice: (e: Invoice) => e.quote !== null,
-
-      // All receipts start from an invoice, therefore always layered
-      receipt: () => true,
-    },
-    entity,
-  )
-}
-
 export function entityHasWarning(entity: Entity) {
   return match(
     entity.type,

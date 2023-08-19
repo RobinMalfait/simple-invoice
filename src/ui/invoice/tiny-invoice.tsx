@@ -2,17 +2,13 @@
 
 import { CalendarIcon, PaperClipIcon, RectangleStackIcon } from '@heroicons/react/24/outline'
 import { format } from 'date-fns'
-import {
-  entityHasAttachments,
-  entityHasWarning,
-  isLayeredEntity,
-  isQuote,
-} from '~/domain/entity-filters'
+import { entityHasAttachments, entityHasWarning, isQuote } from '~/domain/entity-filters'
 import { Invoice } from '~/domain/invoice/invoice'
 import { Quote } from '~/domain/quote/quote'
 import { QuoteStatus } from '~/domain/quote/quote-status'
 import { Receipt } from '~/domain/receipt/receipt'
 import { classNames } from '~/ui/class-names'
+import { useInvoiceStacks } from '~/ui/hooks/use-invoice-stacks'
 import { useTranslation } from '~/ui/hooks/use-translation'
 import { StatusDisplay as InvoiceStatusDisplay } from '~/ui/invoice/status'
 import { total } from '~/ui/invoice/total'
@@ -24,7 +20,8 @@ type Entity = Quote | Invoice | Receipt
 
 export function TinyInvoice({ invoice }: { invoice: Entity }) {
   let t = useTranslation()
-  let isLayered = isLayeredEntity(invoice)
+  let stacks = useInvoiceStacks()
+  let isLayered = (stacks.get(invoice.id)?.length ?? 0) > 1
   let hasAttachments = entityHasAttachments(invoice, 'any')
   let warning = entityHasWarning(invoice)
 

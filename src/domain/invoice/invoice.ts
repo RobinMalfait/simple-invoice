@@ -28,6 +28,7 @@ export let Invoice = z.object({
   attachments: z.array(Document).default([]),
   status: z.nativeEnum(InvoiceStatus).default(InvoiceStatus.Draft),
   events: z.array(Event),
+
   quote: Quote.nullable(),
 })
 
