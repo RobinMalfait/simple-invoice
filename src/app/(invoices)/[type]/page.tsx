@@ -8,7 +8,6 @@ import { Invoice } from '~/domain/invoice/invoice'
 import { Quote } from '~/domain/quote/quote'
 import { Receipt } from '~/domain/receipt/receipt'
 import { resolveRelevantEntityDate } from '~/domain/relevant-entity-date'
-import { squashEntities } from '~/domain/squash-entities'
 import { classNames } from '~/ui/class-names'
 import { Empty } from '~/ui/empty'
 import { Disclosure, DisclosureButton, DisclosurePanel } from '~/ui/headlessui'
@@ -63,7 +62,7 @@ function groupByCurrency(invoices: Entity[]) {
 }
 
 export default async function Home({ params: { type } }: { params: { type: string } }) {
-  let squashedInvoices = squashEntities(invoices).filter((e) => e.type === type)
+  let filteredEntities = invoices.filter((e) => e.type === type)
 
   return (
     <I18NProvider
@@ -75,9 +74,9 @@ export default async function Home({ params: { type } }: { params: { type: strin
     >
       <div className="fixed inset-x-0 top-0 z-10 h-8 bg-gray-100/75 backdrop-blur dark:bg-zinc-800/75"></div>
       <div className="space-y-8 px-4 py-8 sm:px-6 lg:px-8">
-        {squashedInvoices.length > 0 ? (
+        {filteredEntities.length > 0 ? (
           <>
-            {groupByQuarter(squashedInvoices).map(([title, invoices], idx) => (
+            {groupByQuarter(filteredEntities).map(([title, invoices], idx) => (
               <Disclosure
                 defaultOpen={!invoices.every((e) => isFuture(resolveRelevantEntityDate(e)))}
                 as="div"
