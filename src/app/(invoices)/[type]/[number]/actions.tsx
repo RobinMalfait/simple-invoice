@@ -99,6 +99,35 @@ function CheckboxField({
 
 export function Actions() {
   let entity = useInvoice()
+
+  return (
+    <div className="flex w-full flex-col gap-4">
+      <div className="flex items-center justify-between text-center">
+        <DownloadLink
+          className="inline-flex items-center justify-center"
+          href={`/${entity.type}/${entity.number}/pdf`}
+        >
+          Download PDF
+        </DownloadLink>
+
+        <a
+          className="inline-flex items-center justify-center"
+          target="_blank"
+          href={`/${entity.type}/${entity.number}/pdf?preview`}
+        >
+          <EyeIcon className="mr-2 h-4 w-4" />
+          <span>Preview PDF</span>
+        </a>
+      </div>
+
+      {isQuote(entity) && isAccepted(entity) && <PromoteToInvoicePanel />}
+    </div>
+  )
+}
+
+function PromoteToInvoicePanel() {
+  let entity = useInvoice()
+
   let [data, controls] = useSidePanel()
   let [copyStatus, setCopyStatus] = useState<'idle' | 'copied'>('idle')
   let formatter = useCurrencyFormatter()
@@ -110,7 +139,7 @@ export function Actions() {
         .format(
           ts`
             invoices.push(InvoiceBuilder.fromQuote(
-              // ${entity.client.name} — (${entity.number}, ${formatter.format(
+              // ${entity.client.name} — (#${entity.number}, ${formatter.format(
                 total(entity) / 100,
               )})
               invoices.find(entity => entity.type === 'quote' && entity.number === "${
@@ -139,79 +168,65 @@ export function Actions() {
     [entity, formatter],
   )
 
+  let [issueDate, setIssueDate] = useState<Date | null>(new Date())
+
+  if (!isQuote(entity) || !isAccepted(entity)) {
+    return null
+  }
+
   return (
-    <div className="flex w-full flex-col gap-4">
-      <div className="flex items-center justify-between text-center">
-        <DownloadLink
-          className="inline-flex items-center justify-center"
-          href={`/${entity.type}/${entity.number}/pdf`}
-        >
-          Download PDF
-        </DownloadLink>
+    <div>
+      <button
+        onClick={controls.open}
+        className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-zinc-800 dark:text-zinc-400 dark:ring-zinc-700 dark:hover:bg-zinc-900"
+      >
+        Promote to Invoice
+      </button>
 
-        <a
-          className="inline-flex items-center justify-center"
-          target="_blank"
-          href={`/${entity.type}/${entity.number}/pdf?preview`}
+      <SidePanel data={data} controls={controls} title="Promote to Invoice">
+        <form
+          className="flex flex-col gap-8"
+          onSubmit={(e) => {
+            e.preventDefault()
+            copyInvoiceCode(Object.fromEntries(new FormData(e.target as HTMLFormElement)))
+          }}
         >
-          <EyeIcon className="mr-2 h-4 w-4" />
-          <span>Preview PDF</span>
-        </a>
-      </div>
+          <InputField
+            id="issueDate"
+            name="issueDate"
+            label="Issue date"
+            type="datetime-local"
+            value={issueDate?.toISOString().slice(0, 16)}
+            onChange={(e) => setIssueDate(parseISO(e.target.value))}
+          />
 
-      {isQuote(entity) && isAccepted(entity) && (
-        <div>
-          <button
-            onClick={controls.open}
-            className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-zinc-800 dark:text-zinc-400 dark:ring-zinc-700 dark:hover:bg-zinc-900"
-          >
-            Promote to Invoice
+          <InputField
+            optional
+            id="dueDate"
+            name="dueDate"
+            label="Due date"
+            type="datetime-local"
+            min={issueDate?.toISOString().slice(0, 16)}
+          />
+
+          {entity.attachments.length > 0 && (
+            <CheckboxField
+              defaultChecked
+              id="withAttachments"
+              name="withAttachments"
+              label="With attachments"
+              description="Whether or not the attachments from the quote should be inherited by the invoice."
+            />
+          )}
+
+          <button className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-zinc-800 dark:text-zinc-400 dark:ring-zinc-700 dark:hover:bg-zinc-900">
+            {match(copyStatus, {
+              idle: () => 'Copy code to clipboard',
+              copied: () => 'Copied!',
+            })}
           </button>
-
-          <SidePanel data={data} controls={controls} title="Promote to Invoice">
-            <form
-              className="flex flex-col gap-8"
-              onSubmit={(e) => {
-                e.preventDefault()
-                copyInvoiceCode(Object.fromEntries(new FormData(e.target as HTMLFormElement)))
-              }}
-            >
-              <InputField
-                id="issueDate"
-                name="issueDate"
-                label="Issue date"
-                type="datetime-local"
-                defaultValue={new Date().toISOString().slice(0, 16)}
-              />
-
-              <InputField
-                optional
-                id="dueDate"
-                name="dueDate"
-                label="Due date"
-                type="datetime-local"
-              />
-
-              {entity.attachments.length > 0 && (
-                <CheckboxField
-                  defaultChecked
-                  id="withAttachments"
-                  name="withAttachments"
-                  label="With attachments"
-                  description="Whether or not the attachments from the quote should be inherited by the invoice."
-                />
-              )}
-
-              <button className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-zinc-800 dark:text-zinc-400 dark:ring-zinc-700 dark:hover:bg-zinc-900">
-                {match(copyStatus, {
-                  idle: () => 'Copy code to clipboard',
-                  copied: () => 'Copied!',
-                })}
-              </button>
-            </form>
-          </SidePanel>
-        </div>
-      )}
+        </form>
+      </SidePanel>
     </div>
   )
 }
