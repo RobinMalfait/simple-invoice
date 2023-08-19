@@ -86,7 +86,7 @@ export default function Layout({ children }: React.PropsWithChildren<{}>) {
                           {item.name}
                         </Link>
                         {item.children && (
-                          <ul className="ml-4 space-y-1 py-1">
+                          <ul className="ml-8 space-y-1 py-1">
                             {item.children.map((item) => (
                               <li key={item.name}>
                                 <Link
