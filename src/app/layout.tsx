@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import * as data from '~/data'
 import Layout from '~/ui/layout/main'
 import './globals.css'
 
@@ -14,7 +15,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Layout>{children}</Layout>
+        <Layout data={data}>{children}</Layout>
       </body>
     </html>
   )

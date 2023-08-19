@@ -10,6 +10,10 @@ import {
 } from '@heroicons/react/24/outline'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { Account } from '~/domain/account/account'
+import { Invoice } from '~/domain/invoice/invoice'
+import { Quote } from '~/domain/quote/quote'
+import { Receipt } from '~/domain/receipt/receipt'
 import { classNames } from '~/ui/class-names'
 
 type Navigation = {
@@ -17,6 +21,7 @@ type Navigation = {
   icon: typeof HomeIcon
   href: string
   exact?: boolean
+  entity?: 'quote' | 'invoice' | 'receipt'
   children?: Navigation[]
 }
 
@@ -27,14 +32,22 @@ let navigation: Navigation[] = [
     icon: RectangleStackIcon,
     href: '/invoices',
     children: [
-      { name: 'Quotes', icon: CalculatorIcon, href: '/quote' },
-      { name: 'Invoices', icon: DocumentTextIcon, href: '/invoice' },
-      { name: 'Receipts', icon: DocumentCheckIcon, href: '/receipt' },
+      { name: 'Quotes', icon: CalculatorIcon, href: '/quote', entity: 'quote' },
+      { name: 'Invoices', icon: DocumentTextIcon, href: '/invoice', entity: 'invoice' },
+      { name: 'Receipts', icon: DocumentCheckIcon, href: '/receipt', entity: 'receipt' },
     ],
   },
 ]
 
-export default function Layout({ children }: React.PropsWithChildren<{}>) {
+export default function Layout({
+  children,
+  data,
+}: React.PropsWithChildren<{
+  data: {
+    me: Account
+    invoices: (Quote | Invoice | Receipt)[]
+  }
+}>) {
   let pathname = usePathname()
   if (pathname?.includes('/raw')) {
     return <>{children}</>
@@ -87,22 +100,30 @@ export default function Layout({ children }: React.PropsWithChildren<{}>) {
                         </Link>
                         {item.children && (
                           <ul className="ml-8 space-y-1 py-1">
-                            {item.children.map((item) => (
-                              <li key={item.name}>
-                                <Link
-                                  href={item.href}
-                                  className={classNames(
-                                    isActive(item)
-                                      ? 'bg-zinc-700 text-white'
-                                      : 'text-gray-400 hover:bg-zinc-700 hover:text-white',
-                                    'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6',
-                                  )}
-                                >
-                                  <item.icon className="h-6 w-6 shrink-0" aria-hidden="true" />
-                                  {item.name}
-                                </Link>
-                              </li>
-                            ))}
+                            {item.children
+                              .filter((item) => {
+                                if (!item.entity) {
+                                  return true
+                                }
+
+                                return data.invoices.some((entity) => entity.type === item.entity)
+                              })
+                              .map((item) => (
+                                <li key={item.name}>
+                                  <Link
+                                    href={item.href}
+                                    className={classNames(
+                                      isActive(item)
+                                        ? 'bg-zinc-700 text-white'
+                                        : 'text-gray-400 hover:bg-zinc-700 hover:text-white',
+                                      'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6',
+                                    )}
+                                  >
+                                    <item.icon className="h-6 w-6 shrink-0" aria-hidden="true" />
+                                    {item.name}
+                                  </Link>
+                                </li>
+                              ))}
                           </ul>
                         )}
                       </li>
