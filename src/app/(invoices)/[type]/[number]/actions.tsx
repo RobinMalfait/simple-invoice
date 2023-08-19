@@ -1,7 +1,7 @@
 'use client'
 
 import { EyeIcon } from '@heroicons/react/24/outline'
-import { formatISO9075, parseISO } from 'date-fns'
+import { format, formatISO9075, parseISO } from 'date-fns'
 // @ts-expect-error
 import estreePlugin from 'prettier/plugins/estree'
 import tsPlugin from 'prettier/plugins/typescript'
@@ -196,7 +196,7 @@ function PromoteToInvoicePanel() {
             name="issueDate"
             label="Issue date"
             type="datetime-local"
-            value={issueDate?.toISOString().slice(0, 16) ?? ''}
+            value={issueDate ? format(issueDate, "yyyy-MM-dd'T'HH:mm") : ''}
             onChange={(e) => setIssueDate(e.target.value === '' ? null : parseISO(e.target.value))}
           />
 
