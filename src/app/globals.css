@@ -4,11 +4,11 @@
 
 @layer base {
   html {
-    @apply h-full bg-black/90;
+    @apply h-full overflow-hidden;
   }
 
   body {
-    @apply flex min-h-full flex-col bg-gray-100 font-sans text-gray-900 antialiased dark:bg-zinc-900;
+    @apply flex h-full flex-col bg-gray-100 font-sans text-gray-900 antialiased dark:bg-zinc-800;
   }
 
   @page {

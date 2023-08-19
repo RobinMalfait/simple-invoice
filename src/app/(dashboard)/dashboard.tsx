@@ -114,12 +114,12 @@ export function Dashboard({ me, invoices }: { me: Account; invoices: Entity[] })
           currency: me.currency,
         }}
       >
-        <main className="isolate mx-auto w-full max-w-7xl space-y-[--gap] px-4 py-[--gap] [--gap:theme(spacing.4)] sm:px-6 lg:px-8">
-          <div className="sticky top-16 z-10 -mx-2 -mb-[--gap] -mt-[--gap] flex items-center justify-between bg-gray-100/20 px-2 py-[--gap] backdrop-blur dark:bg-zinc-900/20">
+        <main className="space-y-[--gap] px-4 py-8 [--gap:theme(spacing.4)] sm:px-6 lg:px-8">
+          <div className="sticky top-0 z-10 -mx-2 -mb-[--gap] -mt-[--gap] flex items-center justify-between bg-gray-100/20 px-2 py-[--gap] backdrop-blur dark:bg-zinc-800/20">
             <div>
               <div className="flex items-center gap-2">
                 <button
-                  className="aspect-square rounded-md bg-white px-2 py-1.5 text-sm shadow ring-1 ring-black/10 dark:bg-zinc-800/75 dark:text-zinc-300"
+                  className="aspect-square rounded-md bg-white px-2 py-1.5 text-sm shadow ring-1 ring-black/10 dark:bg-zinc-900/75 dark:text-zinc-300"
                   onClick={() =>
                     setRange(([start, end]) => [
                       previous(start, [start, end]),
@@ -131,7 +131,7 @@ export function Dashboard({ me, invoices }: { me: Account; invoices: Entity[] })
                 </button>
 
                 <button
-                  className="aspect-square rounded-md bg-white px-2 py-1.5 text-sm shadow ring-1 ring-black/10 dark:bg-zinc-800/75 dark:text-zinc-300"
+                  className="aspect-square rounded-md bg-white px-2 py-1.5 text-sm shadow ring-1 ring-black/10 dark:bg-zinc-900/75 dark:text-zinc-300"
                   onClick={() =>
                     setRange(([start, end]) => [next(start, [start, end]), next(end, [start, end])])
                   }
@@ -195,12 +195,12 @@ export function Dashboard({ me, invoices }: { me: Account; invoices: Entity[] })
             return (
               <div
                 className={classNames(
-                  'flex flex-1 flex-col overflow-auto rounded-md bg-white shadow ring-1 ring-black/5 dark:bg-zinc-800',
+                  'flex flex-1 flex-col overflow-auto rounded-md bg-white shadow ring-1 ring-black/5 dark:bg-zinc-900',
                   data.length === 0 &&
                     'opacity-50 transition-opacity duration-300 hover:opacity-100',
                 )}
               >
-                <div className="border-b p-4 dark:border-zinc-900/75 dark:text-zinc-400">
+                <div className="border-b p-4 dark:border-zinc-700/75 dark:text-zinc-400">
                   Active quotes / invoices ({data.length})
                 </div>
                 {data.length > 0 ? (
@@ -401,19 +401,19 @@ export function Dashboard({ me, invoices }: { me: Account; invoices: Entity[] })
                 return (
                   <div
                     className={classNames(
-                      'flex-1 overflow-auto rounded-md bg-white shadow ring-1 ring-black/5 dark:bg-zinc-800',
+                      'flex-1 overflow-auto rounded-md bg-white shadow ring-1 ring-black/5 dark:bg-zinc-900',
                       data.length === 0 &&
                         'opacity-50 transition-opacity duration-300 hover:opacity-100',
                     )}
                   >
-                    <div className="border-b p-4 dark:border-zinc-900/75 dark:text-zinc-400">
+                    <div className="border-b p-4 dark:border-zinc-700/75 dark:text-zinc-400">
                       Top paying clients
                     </div>
                     {data.length > 0 ? (
                       <div className="flex-1 divide-y divide-gray-100 dark:divide-zinc-900">
                         {data.map(([id, { client, total }], idx) => (
                           <I18NProvider key={id} value={client}>
-                            <div className="group relative flex items-center p-3 first:border-t-[1px] first:border-t-transparent focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 dark:border-zinc-800">
+                            <div className="group relative flex items-center p-3 first:border-t-[1px] first:border-t-transparent focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 dark:border-zinc-700">
                               <div className="absolute inset-2 z-0 flex">
                                 <div
                                   className="rounded-md bg-blue-200/30 dark:bg-blue-400/25"
@@ -595,11 +595,11 @@ function ComparisonChart({
   return (
     <div
       className={classNames(
-        'flex h-full flex-1 flex-col overflow-auto rounded-md bg-white shadow ring-1 ring-black/5 dark:bg-zinc-800',
+        'flex h-full flex-1 flex-col overflow-auto rounded-md bg-white shadow ring-1 ring-black/5 dark:bg-zinc-900',
         !hasData && 'opacity-50 transition-opacity duration-300 hover:opacity-100',
       )}
     >
-      <div className="border-b p-4 dark:border-zinc-900/75 dark:text-zinc-400">
+      <div className="border-b p-4 dark:border-zinc-700/75 dark:text-zinc-400">
         Paid invoices compared to previous period
       </div>
       {hasData ? (
@@ -740,7 +740,7 @@ function CompareBlock<T = Entity[]>({
   return (
     <div
       className={classNames(
-        'relative flex gap-2 rounded-md bg-white p-4 shadow ring-1 ring-black/5 dark:bg-zinc-800',
+        'relative flex gap-2 rounded-md bg-white p-4 shadow ring-1 ring-black/5 dark:bg-zinc-900',
         currentValue === null && 'opacity-50 transition-opacity duration-300 hover:opacity-100',
       )}
     >

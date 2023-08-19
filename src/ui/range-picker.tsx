@@ -135,7 +135,7 @@ export function RangePicker({
     <Menu as="div" className="relative isolate">
       <MenuButton
         ref={refs.setReference}
-        className="rounded-md bg-white px-2 py-1.5 shadow ring-1 ring-black/10 dark:bg-zinc-800/75"
+        className="rounded-md bg-white px-2 py-1.5 shadow ring-1 ring-black/10 dark:bg-zinc-900/75"
       >
         <div className="flex items-center gap-1 text-sm dark:text-zinc-300">
           <CalendarIcon className="h-4 w-4" />

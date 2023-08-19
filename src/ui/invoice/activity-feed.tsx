@@ -92,11 +92,11 @@ function ActivityItem({
           <div className="w-px bg-gray-200 dark:bg-zinc-600" />
         </div>
 
-        <div className="relative flex h-6 w-6 flex-none items-center justify-center bg-white dark:bg-zinc-800">
+        <div className="relative flex h-6 w-6 flex-none items-center justify-center bg-white dark:bg-zinc-900">
           {isLast ? (
             <ActivityIndicator item={item} />
           ) : (
-            <div className="h-1.5 w-1.5 rounded-full bg-gray-100 ring-1 ring-gray-300 dark:bg-zinc-800 dark:ring-gray-500" />
+            <div className="h-1.5 w-1.5 rounded-full bg-gray-100 ring-1 ring-gray-300 dark:bg-zinc-900 dark:ring-gray-500" />
           )}
         </div>
 
@@ -165,7 +165,7 @@ function ActivityIndicator({ item }: { item: Event }) {
 
     default:
       return (
-        <div className="h-1.5 w-1.5 rounded-full bg-gray-100 ring-1 ring-gray-300 dark:bg-zinc-800 dark:ring-gray-500" />
+        <div className="h-1.5 w-1.5 rounded-full bg-gray-100 ring-1 ring-gray-300 dark:bg-zinc-900 dark:ring-gray-500" />
       )
   }
 }
