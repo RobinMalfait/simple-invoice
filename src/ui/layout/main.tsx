@@ -40,6 +40,23 @@ export default function Layout({ children }: React.PropsWithChildren<{}>) {
     return <>{children}</>
   }
 
+  function isActive(item: Navigation) {
+    if (item.exact) {
+      return item.href === pathname
+    }
+
+    let paths = pathname?.split('/').filter(Boolean)
+    let myPaths = item.href.split('/').filter(Boolean)
+
+    for (let [idx, path] of myPaths.entries()) {
+      if (path !== paths[idx]) {
+        return false
+      }
+    }
+
+    return true
+  }
+
   return (
     <>
       <div className="flex flex-1 flex-col overflow-hidden">
@@ -59,7 +76,7 @@ export default function Layout({ children }: React.PropsWithChildren<{}>) {
                         <Link
                           href={item.href}
                           className={classNames(
-                            (item.exact ? item.href === pathname : pathname?.startsWith(item.href))
+                            isActive(item)
                               ? 'bg-zinc-700 text-white'
                               : 'text-gray-400 hover:bg-zinc-700 hover:text-white',
                             'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6',
@@ -75,11 +92,7 @@ export default function Layout({ children }: React.PropsWithChildren<{}>) {
                                 <Link
                                   href={item.href}
                                   className={classNames(
-                                    (
-                                      item.exact
-                                        ? item.href === pathname
-                                        : pathname?.startsWith(item.href)
-                                    )
+                                    isActive(item)
                                       ? 'bg-zinc-700 text-white'
                                       : 'text-gray-400 hover:bg-zinc-700 hover:text-white',
                                     'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6',
