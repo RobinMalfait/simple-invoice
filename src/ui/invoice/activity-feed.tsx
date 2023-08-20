@@ -9,6 +9,7 @@ import {
   XCircleIcon,
 } from '@heroicons/react/24/outline'
 import { formatDistanceStrict, formatDistanceToNow } from 'date-fns'
+import { Fragment } from 'react'
 import { Event } from '~/domain/events/event'
 import { Invoice } from '~/domain/invoice/invoice'
 import { Quote } from '~/domain/quote/quote'
@@ -18,51 +19,59 @@ import { useInvoice } from '~/ui/hooks/use-invoice'
 import { Money } from '~/ui/money'
 import { assertNever } from '~/utils/assert-never'
 import { match } from '~/utils/match'
+import { useInvoiceStacks } from '../hooks/use-invoice-stacks'
 
 type Entity = Quote | Invoice | Receipt
 
-export function ActivityFeed({ latestVersionEntity }: { latestVersionEntity: Entity }) {
+export function ActivityFeed(props: React.PropsWithChildren<{ entities: Entity[] }>) {
+  let stacks = useInvoiceStacks()
   let entity = useInvoice()
-  let activity = entity.events
-  let missing = latestVersionEntity.events.filter(
-    (event) => !activity.some((e) => e.id === event.id),
-  )
+  let entities = (stacks.get(entity.id) ?? []).map((id) => props.entities.find((e) => e.id === id)!)
+
+  let activeEntityIdx = stacks.get(entity.id)?.indexOf(entity.id) ?? -1
 
   return (
     <>
       <ul role="list" className="space-y-6">
-        {activity.map((activityItem, activityItemIdx, all) => (
-          <ActivityItem
-            key={activityItem.id}
-            previous={all[activityItemIdx - 1]}
-            item={activityItem}
-            isLast={activityItemIdx === activity.length - 1}
-          />
-        ))}
+        {entities.map((entity, idx) => {
+          return (
+            <Fragment key={entity.id}>
+              <li
+                className={classNames(
+                  'relative flex items-center text-sm',
+                  idx > activeEntityIdx && 'opacity-50 grayscale',
+                )}
+              >
+                <span className="pr-3">
+                  {match(entity.type, {
+                    quote: () => 'Quote',
+                    invoice: () => 'Invoice',
+                    receipt: () => 'Receipt',
+                  })}
+                </span>
+                <span className="h-px w-full bg-gray-200 dark:bg-zinc-600"></span>
+              </li>
+
+              <ul
+                role="list"
+                className={classNames(
+                  'relative mt-6 flex flex-col gap-6',
+                  idx > activeEntityIdx && 'opacity-50 grayscale',
+                )}
+              >
+                {entity.events.map((activityItem, activityItemIdx, all) => (
+                  <ActivityItem
+                    key={activityItem.id}
+                    previous={all[activityItemIdx - 1]}
+                    item={activityItem}
+                    isLast={activityItemIdx === entity.events.length - 1}
+                  />
+                ))}
+              </ul>
+            </Fragment>
+          )
+        })}
       </ul>
-      {missing.length > 0 && (
-        <ul role="list" className="relative mt-6 flex flex-col gap-6 opacity-50 grayscale">
-          <li className="relative flex items-center text-sm">
-            <span className="pr-3">
-              {match(entity.type, {
-                // Given the entity type, what is the _next_ step
-                quote: () => 'Invoice',
-                invoice: () => 'Receipt',
-                receipt: () => null,
-              })}
-            </span>
-            <span className="h-px w-full bg-gray-200 dark:bg-zinc-600"></span>
-          </li>
-          {missing.map((activityItem, activityItemIdx, all) => (
-            <ActivityItem
-              key={activityItem.id}
-              previous={all[activityItemIdx - 1]}
-              item={activityItem}
-              isLast={activityItemIdx === missing.length - 1}
-            />
-          ))}
-        </ul>
-      )}
     </>
   )
 }

@@ -73,7 +73,7 @@ export default function Invoice({
 
             <div className="flex flex-col gap-4 rounded-lg bg-white p-4 shadow ring-1 ring-black/5 dark:bg-zinc-900 dark:text-gray-300">
               <span className="text-sm font-medium text-gray-900 dark:text-gray-300">Activity</span>
-              <ActivityFeed latestVersionEntity={entity} />
+              <ActivityFeed entities={invoices} />
             </div>
 
             <div className="flex flex-col gap-4 rounded-lg bg-white p-4 shadow ring-1 ring-black/5 dark:bg-zinc-900 dark:text-gray-300">

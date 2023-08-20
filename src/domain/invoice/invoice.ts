@@ -87,8 +87,7 @@ export class InvoiceBuilder {
     if (withAttachments) {
       builder._attachments = quote.attachments.slice()
     }
-    builder.events = quote.events.slice()
-    builder.events.push(Event.parse({ type: 'invoice-drafted', from: 'quote' }))
+    builder.events = [Event.parse({ type: 'invoice-drafted', from: 'quote' })]
     builder._quote = quote
     return builder
   }

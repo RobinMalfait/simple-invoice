@@ -37,7 +37,7 @@ export class ReceiptBuilder {
   private _receiptDate: Date | null = null
   private _discounts: Discount[] = []
   private _attachments: Document[] = []
-  private events: Receipt['events'] = [Event.parse({ type: 'quote-drafted' })]
+  private events: Receipt['events'] = []
 
   public build(): Receipt {
     return Receipt.parse({
@@ -70,7 +70,6 @@ export class ReceiptBuilder {
     if (withAttachments) {
       builder._attachments = invoice.attachments.slice()
     }
-    builder.events = invoice.events.slice()
     builder.events.push(Event.parse({ type: 'receipt-created' }))
     return builder
   }
