@@ -201,7 +201,7 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
                   Active quotes / invoices ({data.length})
                 </div>
                 {data.length > 0 ? (
-                  <div className="grid auto-cols-[280px] grid-flow-col grid-cols-[repeat(auto-fill,280px)] grid-rows-1 gap-4 overflow-x-auto p-4">
+                  <div className="grid auto-cols-[280px] grid-flow-col grid-cols-[repeat(auto-fill,280px)] grid-rows-1 gap-4 overflow-x-auto p-4 [scrollbar-width:auto]">
                     {data.map((record) => (
                       <I18NProvider
                         key={record.id}

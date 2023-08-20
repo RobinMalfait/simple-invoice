@@ -27,6 +27,10 @@
   *::-webkit-scrollbar {
     @apply hidden;
   }
+
+  * {
+    scrollbar-width: none;
+  }
 }
 
 @layer components {
