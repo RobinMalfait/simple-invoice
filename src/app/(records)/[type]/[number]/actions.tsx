@@ -7,7 +7,7 @@ import estreePlugin from 'prettier/plugins/estree'
 import tsPlugin from 'prettier/plugins/typescript'
 import * as prettier from 'prettier/standalone'
 import { useCallback, useState } from 'react'
-import { isAccepted, isInvoice, isQuote, isReceipt } from '~/domain/record/filters'
+import { isAccepted, isDeadRecord, isInvoice, isQuote, isReceipt } from '~/domain/record/filters'
 import { DownloadLink } from '~/ui/download-link'
 import { useCurrencyFormatter } from '~/ui/hooks/use-currency-formatter'
 import { useRecord } from '~/ui/hooks/use-record'
@@ -123,6 +123,7 @@ export function Actions() {
       </div>
 
       {isQuote(record) && isAccepted(record) && <PromoteToInvoicePanel />}
+      {isQuote(record) && isDeadRecord(record) && <TryNewQuotePanel />}
     </div>
   )
 }
@@ -230,6 +231,101 @@ function PromoteToInvoicePanel() {
               description="Whether or not the attachments from the quote should be inherited by the invoice."
             />
           )}
+
+          <button className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-zinc-800 dark:text-zinc-400 dark:ring-zinc-700 dark:hover:bg-zinc-900">
+            {match(copyStatus, {
+              idle: () => 'Copy code to clipboard',
+              copied: () => 'Copied!',
+            })}
+          </button>
+        </form>
+      </SidePanel>
+    </div>
+  )
+}
+
+function TryNewQuotePanel() {
+  let records = useRecords()
+  let record = useRecord()
+
+  let [data, controls] = useSidePanel()
+  let [copyStatus, setCopyStatus] = useState<'idle' | 'copied'>('idle')
+  let formatter = useCurrencyFormatter()
+  let stacks = useRecordStacks()
+
+  let copyInvoiceCode = useCallback(
+    (data: { quoteDate?: string }) => {
+      prettier
+        .format(
+          ts`
+            records.push(QuoteBuilder.fromQuote(
+              // ${record.client.name} — (#${record.number}, ${formatter.format(
+                total(record) / 100,
+              )})
+              records.find(record => record.type === 'quote' && record.number === "${
+                record.number
+              }") as Quote
+            )${
+              data.quoteDate ? `.quoteDate('${formatISO9075(parseISO(data.quoteDate))}')` : ''
+            }.build())
+          `,
+          {
+            parser: 'typescript',
+            plugins: [estreePlugin, tsPlugin],
+            singleQuote: true,
+            semi: false,
+          },
+        )
+        .then((code) => {
+          navigator.clipboard.writeText(code)
+        })
+        .then(() => {
+          setCopyStatus('copied')
+          setTimeout(() => setCopyStatus('idle'), 3000)
+        })
+    },
+    [record, formatter],
+  )
+
+  let isAlreadyPromoted = stacks[record.id]
+    .slice(stacks[record.id].indexOf(record.id) + 1)
+    .some((id) => {
+      let record = records.find((record) => record.id === id)
+      return record && isQuote(record)
+    })
+  if (isAlreadyPromoted) {
+    return null
+  }
+
+  if (!isQuote(record) || !isDeadRecord(record)) {
+    return null
+  }
+
+  return (
+    <div>
+      <button
+        onClick={controls.open}
+        className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 dark:ring-zinc-900"
+      >
+        Try with a new Quote
+      </button>
+
+      <SidePanel data={data} controls={controls} title="Try with a new Quote">
+        <form
+          className="flex flex-col gap-8"
+          onSubmit={(e) => {
+            e.preventDefault()
+            copyInvoiceCode(Object.fromEntries(new FormData(e.target as HTMLFormElement)))
+          }}
+        >
+          <InputField
+            id="quoteDate"
+            name="quoteDate"
+            label="Quote date"
+            type="datetime-local"
+            defaultValue={format(new Date(), "yyyy-MM-dd'T'HH:mm")}
+            min={format(new Date(), "yyyy-MM-dd'T'HH:mm")}
+          />
 
           <button className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-zinc-800 dark:text-zinc-400 dark:ring-zinc-700 dark:hover:bg-zinc-900">
             {match(copyStatus, {

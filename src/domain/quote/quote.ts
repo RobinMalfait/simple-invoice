@@ -75,7 +75,7 @@ export class QuoteBuilder {
   }
 
   public static fromQuote(quote: Quote): QuoteBuilder {
-    if (![QuoteStatus.Closed, QuoteStatus.Expired, QuoteStatus.Rejected].includes(quote.status)) {
+    if (![QuoteStatus.Expired, QuoteStatus.Rejected].includes(quote.status)) {
       throw new Error(`Cannot create a quote from another quote that is currently ${quote.status}`)
     }
 
