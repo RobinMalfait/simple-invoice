@@ -616,6 +616,22 @@ export const invoices: (Quote | Invoice | Receipt)[] = [
     )
     .build(),
 
+  // Quote from another quote
+  QuoteBuilder.fromQuote(
+    new QuoteBuilder()
+      .account(me)
+      .client(Client1)
+      .quoteDate(inThePast(2))
+      .item(new InvoiceItemBuilder().description('Item #1').unitPrice(123).build())
+      .send(nextDay())
+      .reject(nextDay())
+      .build(),
+  )
+    .quoteDate(nextDay())
+    .send(nextDay())
+    .accept(nextDay())
+    .build(),
+
   // Invoice from Quote
   InvoiceBuilder.fromQuote(
     new QuoteBuilder()
