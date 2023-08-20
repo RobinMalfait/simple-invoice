@@ -7,7 +7,7 @@ import { Invoice } from '~/domain/invoice/invoice'
 import { Quote } from '~/domain/quote/quote'
 import { Receipt } from '~/domain/receipt/receipt'
 import { isPaidRecord } from '~/domain/record/filters'
-import { Record, resolveRelevantRecordDate, squashRecords } from '~/domain/record/record'
+import { Record, combineRecords, resolveRelevantRecordDate } from '~/domain/record/record'
 import { classNames } from '~/ui/class-names'
 import { Empty } from '~/ui/empty'
 import { Disclosure, DisclosureButton, DisclosurePanel } from '~/ui/headlessui'
@@ -60,7 +60,7 @@ function groupByCurrency(records: Record[]) {
 }
 
 export default async function Home() {
-  let squashedRecords = squashRecords(records)
+  let combinedRecords = combineRecords(records)
 
   return (
     <I18NProvider
@@ -72,9 +72,9 @@ export default async function Home() {
     >
       <div className="fixed inset-x-0 top-0 z-10 h-8 bg-gray-100/75 backdrop-blur dark:bg-zinc-800/75"></div>
       <div className="relative space-y-8 px-4 py-8 sm:px-6 lg:px-8">
-        {squashedRecords.length > 0 ? (
+        {combinedRecords.length > 0 ? (
           <>
-            {groupByQuarter(squashedRecords).map(([title, records], idx) => (
+            {groupByQuarter(combinedRecords).map(([title, records], idx) => (
               <Disclosure
                 defaultOpen={!records.every((e) => isFuture(resolveRelevantRecordDate(e)))}
                 as="div"

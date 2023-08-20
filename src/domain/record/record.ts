@@ -1,25 +1,49 @@
 import { Invoice } from '~/domain/invoice/invoice'
 import { Quote } from '~/domain/quote/quote'
 import { Receipt } from '~/domain/receipt/receipt'
+import { isInvoice, isQuote, isReceipt } from '~/domain/record/filters'
 import { match } from '~/utils/match'
 
 export type Record = Quote | Invoice | Receipt
 
-// We have 1 big list of all the quotes, invoices and receipts. However, when we show the overview,
-// we only want 1 record to be present for each invoice. So we squash the list such that only 1
-// record is present instead of 2 or 3 (quote, invoice, receipt).
-export function squashRecords(records: Record[]): Record[] {
-  let all = records.slice()
-  let toRemove = new Set<string>()
-
+function* _separateRecords(records: Record[]): Generator<Record> {
   for (let record of records) {
-    if (record.type === 'invoice' && record.quote) {
-      toRemove.add(record.quote.id)
-    } else if (record.type === 'receipt') {
-      toRemove.add(record.invoice.id)
-      if (record.invoice.quote) toRemove.add(record.invoice.quote.id)
+    yield record
+
+    if (isQuote(record) && record.quote) {
+      yield* _separateRecords([record.quote])
+    } else if (isInvoice(record) && record.quote) {
+      yield* _separateRecords([record.quote])
+    } else if (isReceipt(record) && record.invoice) {
+      yield* _separateRecords([record.invoice])
     }
   }
+}
+
+export function separateRecords(records: Record[]) {
+  return Array.from(_separateRecords(records)).filter(
+    (record, idx, all) => all.findIndex((other) => other.id === record.id) === idx,
+  )
+}
+
+function* _combineRecords(records: Record[]): Generator<string> {
+  for (let record of records) {
+    if (isQuote(record) && record.quote) {
+      yield record.quote.id
+      yield* _combineRecords([record.quote])
+    } else if (isInvoice(record) && record.quote) {
+      yield record.quote.id
+      yield* _combineRecords([record.quote])
+    } else if (isReceipt(record) && record.invoice) {
+      yield record.invoice.id
+      yield* _combineRecords([record.invoice])
+    }
+  }
+}
+
+export function combineRecords(records: Record[]): Record[] {
+  let all = records.slice()
+  let toRemove = new Set<string>(_combineRecords(records))
 
   for (let record of toRemove) {
     let idx = all.findIndex((e) => e.id === record)
