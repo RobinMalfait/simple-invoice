@@ -1,5 +1,5 @@
-import { useRecord } from '~/ui/hooks/use-record'
 import { usePaginationInfo } from '~/ui/hooks/use-pagination-info'
+import { useRecord } from '~/ui/hooks/use-record'
 import { useTranslation } from '~/ui/hooks/use-translation'
 
 export function SmallFooter() {

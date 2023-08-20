@@ -1,6 +1,6 @@
 import { CubeIcon } from '@heroicons/react/24/outline'
-import { useRecord } from '~/ui/hooks/use-record'
 import { usePaginationInfo } from '~/ui/hooks/use-pagination-info'
+import { useRecord } from '~/ui/hooks/use-record'
 import { useTranslation } from '~/ui/hooks/use-translation'
 import { match } from '~/utils/match'
 
