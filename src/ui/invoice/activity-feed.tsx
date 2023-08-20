@@ -8,7 +8,7 @@ import {
   PencilSquareIcon,
   XCircleIcon,
 } from '@heroicons/react/24/outline'
-import { formatDistanceStrict, formatDistanceToNow } from 'date-fns'
+import { format, formatDistanceStrict, formatDistanceToNow } from 'date-fns'
 import { Fragment } from 'react'
 import { Event } from '~/domain/events/event'
 import { Invoice } from '~/domain/invoice/invoice'
@@ -124,8 +124,8 @@ function ActivityItem({
 
         {item.at && (
           <time
-            title={item.at.toLocaleString()}
-            dateTime={item.at.toISOString()}
+            title={format(item.at, 'PPPpp')}
+            dateTime={format(item.at, 'PPPpp')}
             className="flex-none py-0.5 text-xs leading-5 text-gray-500 dark:text-gray-300"
           >
             {formatDistanceToNow(item.at, { addSuffix: true })}
