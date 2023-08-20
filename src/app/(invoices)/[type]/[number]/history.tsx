@@ -3,13 +3,14 @@
 import { Menu, Transition } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import { CheckCircleIcon, ClockIcon } from '@heroicons/react/24/outline'
+import Link from 'next/link'
 import * as React from 'react'
 import { Fragment } from 'react'
 import { Invoice } from '~/domain/invoice/invoice'
 import { Quote } from '~/domain/quote/quote'
 import { Receipt } from '~/domain/receipt/receipt'
 import { classNames } from '~/ui/class-names'
-import { InvoiceProvider } from '~/ui/hooks/use-invoice'
+import { InvoiceProvider, useInvoice } from '~/ui/hooks/use-invoice'
 import { useInvoiceStacks } from '~/ui/hooks/use-invoice-stacks'
 import { match } from '~/utils/match'
 
@@ -17,8 +18,6 @@ type Entity = Quote | Invoice | Receipt
 
 let HistoryContext = React.createContext<{
   options: Entity[]
-  entity: Entity
-  setEntity: (entity: Entity) => void
 } | null>(null)
 
 export function History(props: React.PropsWithChildren<{ entity: Entity; entities: Entity[] }>) {
@@ -27,13 +26,9 @@ export function History(props: React.PropsWithChildren<{ entity: Entity; entitie
     (id) => props.entities.find((e) => e.id === id)!,
   )
 
-  let [entity, setEntity] = React.useState<Entity>(props.entity)
-
   return (
-    <InvoiceProvider invoice={entity}>
-      <HistoryContext.Provider value={{ options, entity, setEntity }}>
-        {props.children}
-      </HistoryContext.Provider>
+    <InvoiceProvider invoice={props.entity}>
+      <HistoryContext.Provider value={{ options }}>{props.children}</HistoryContext.Provider>
     </InvoiceProvider>
   )
 }
@@ -41,7 +36,8 @@ export function History(props: React.PropsWithChildren<{ entity: Entity; entitie
 export function HistoryDropdown() {
   let ctx = React.useContext(HistoryContext)
   if (!ctx) throw new Error('HistoryAction must be used within History')
-  let { options, entity, setEntity } = ctx
+  let entity = useInvoice()
+  let { options } = ctx
 
   if (options.length <= 1) return null
 
@@ -81,8 +77,8 @@ export function HistoryDropdown() {
               return (
                 <Menu.Item key={e.id}>
                   {({ active }) => (
-                    <button
-                      onClick={() => setEntity(e)}
+                    <Link
+                      href={`/${e.type}/${e.number}`}
                       className={classNames(
                         active
                           ? 'bg-gray-100 text-gray-900 dark:bg-zinc-950 dark:text-gray-200'
@@ -94,12 +90,17 @@ export function HistoryDropdown() {
                         className="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500 dark:text-gray-500 dark:group-hover:text-gray-400"
                         aria-hidden="true"
                       />
-                      {match(e.type, {
-                        quote: () => 'Quote',
-                        invoice: () => 'Invoice',
-                        receipt: () => 'Receipt',
-                      })}
-                    </button>
+                      <span className="inline-flex w-full items-center justify-between gap-2">
+                        <span>
+                          {match(e.type, {
+                            quote: () => 'Quote',
+                            invoice: () => 'Invoice',
+                            receipt: () => 'Receipt',
+                          })}
+                        </span>
+                        <span>#{e.number}</span>
+                      </span>
+                    </Link>
                   )}
                 </Menu.Item>
               )
