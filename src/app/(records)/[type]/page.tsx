@@ -7,7 +7,7 @@ import { Invoice } from '~/domain/invoice/invoice'
 import { Quote } from '~/domain/quote/quote'
 import { Receipt } from '~/domain/receipt/receipt'
 import { isPaidRecord } from '~/domain/record/filters'
-import { Record, resolveRelevantRecordDate } from '~/domain/record/record'
+import { Record, combineRecords, resolveRelevantRecordDate } from '~/domain/record/record'
 import { classNames } from '~/ui/class-names'
 import { Empty } from '~/ui/empty'
 import { Disclosure, DisclosureButton, DisclosurePanel } from '~/ui/headlessui'
@@ -60,7 +60,7 @@ function groupByCurrency(records: Record[]) {
 }
 
 export default async function Home({ params: { type } }: { params: { type: string } }) {
-  let filteredRecords = records.filter((e) => e.type === type)
+  let filteredRecords = combineRecords(records.filter((e) => e.type === type))
 
   return (
     <I18NProvider
