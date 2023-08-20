@@ -36,27 +36,30 @@ export function ActivityFeed(props: React.PropsWithChildren<{ entities: Entity[]
         {entities.map((entity, idx) => {
           return (
             <Fragment key={entity.id}>
-              <li
-                className={classNames(
-                  'relative flex items-center text-sm',
-                  idx > activeEntityIdx && 'opacity-50 grayscale',
-                )}
-              >
-                <span className="pr-3">
-                  {match(entity.type, {
-                    quote: () => 'Quote',
-                    invoice: () => 'Invoice',
-                    receipt: () => 'Receipt',
-                  })}
-                </span>
-                <span className="h-px w-full bg-gray-200 dark:bg-zinc-600"></span>
-              </li>
+              {entities.length !== 1 && (
+                <li
+                  className={classNames(
+                    'relative flex items-center text-sm',
+                    idx > activeEntityIdx && 'opacity-50 grayscale',
+                  )}
+                >
+                  <span className="pr-3">
+                    {match(entity.type, {
+                      quote: () => 'Quote',
+                      invoice: () => 'Invoice',
+                      receipt: () => 'Receipt',
+                    })}
+                  </span>
+                  <span className="h-px w-full bg-gray-200 dark:bg-zinc-600"></span>
+                </li>
+              )}
 
               <ul
                 role="list"
                 className={classNames(
-                  'relative mt-6 flex flex-col gap-6',
+                  'relative flex flex-col gap-6',
                   idx > activeEntityIdx && 'opacity-50 grayscale',
+                  entities.length !== 1 && 'mt-6',
                 )}
               >
                 {entity.events.map((activityItem, activityItemIdx, all) => (
