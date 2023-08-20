@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
-import { invoices } from '~/data'
-import { InvoiceProvider } from '~/ui/hooks/use-invoice'
+import { records } from '~/data'
+import { RecordProvider } from '~/ui/hooks/use-record'
 import { Invoice as InvoicePreview } from '~/ui/invoice/design'
 
 export default function Raw({
@@ -8,15 +8,15 @@ export default function Raw({
 }: {
   params: { type: string; number: string }
 }) {
-  let invoice = invoices.find((invoice) => invoice.type === type && invoice.number === number)
+  let record = records.find((record) => record.type === type && record.number === number)
 
-  if (!invoice) {
+  if (!record) {
     return redirect('/')
   }
 
   return (
-    <InvoiceProvider invoice={invoice}>
+    <RecordProvider record={record}>
       <InvoicePreview />
-    </InvoiceProvider>
+    </RecordProvider>
   )
 }

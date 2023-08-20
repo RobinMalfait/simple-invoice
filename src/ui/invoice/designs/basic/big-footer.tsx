@@ -1,6 +1,6 @@
 import * as HI from '@heroicons/react/24/outline'
 import { BanknotesIcon } from '@heroicons/react/24/outline'
-import { useInvoice } from '~/ui/hooks/use-invoice'
+import { useRecord } from '~/ui/hooks/use-record'
 import { useTranslation } from '~/ui/hooks/use-translation'
 import { PaypalIcon } from '~/ui/icons/payment'
 import * as SocialIcons from '~/ui/icons/social'
@@ -10,7 +10,7 @@ import { Money } from '~/ui/money'
 import { match } from '~/utils/match'
 
 export function BigFooter() {
-  let invoice = useInvoice()
+  let record = useRecord()
   let t = useTranslation()
 
   return (
@@ -21,9 +21,9 @@ export function BigFooter() {
             <span>{t((x) => x.summary.total)}</span>
             <div className="-mx-4 -my-2 rounded-full bg-black px-4 py-2 text-white dark:bg-zinc-50 dark:text-zinc-800">
               <Money
-                amount={match(invoice.type, {
-                  quote: () => total(invoice),
-                  invoice: () => total(invoice),
+                amount={match(record.type, {
+                  quote: () => total(record),
+                  invoice: () => total(record),
                   receipt: () => 0,
                 })}
               />
@@ -31,7 +31,7 @@ export function BigFooter() {
           </div>
 
           <div className="flex items-start gap-8">
-            {invoice.account.contactFields.length > 0 && (
+            {record.account.contactFields.length > 0 && (
               <table className="text-sm">
                 <thead>
                   <tr>
@@ -44,7 +44,7 @@ export function BigFooter() {
                   </tr>
                 </thead>
                 <tbody>
-                  {invoice.account.contactFields.map((field) => {
+                  {record.account.contactFields.map((field) => {
                     let Icon =
                       field.icon === null
                         ? 'div'
@@ -73,7 +73,7 @@ export function BigFooter() {
               </table>
             )}
 
-            {invoice.account.paymentMethods.length > 0 && (
+            {record.account.paymentMethods.length > 0 && (
               <table className="text-sm">
                 <thead>
                   <tr>
@@ -86,7 +86,7 @@ export function BigFooter() {
                   </tr>
                 </thead>
                 <tbody>
-                  {invoice.account.paymentMethods.map((paymentMethod) => {
+                  {record.account.paymentMethods.map((paymentMethod) => {
                     return (
                       <tr key={paymentMethod.id}>
                         <td className="text-center">

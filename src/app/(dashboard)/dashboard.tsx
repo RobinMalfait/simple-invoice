@@ -40,41 +40,38 @@ import {
 } from 'recharts'
 import { Account } from '~/domain/account/account'
 import { Client } from '~/domain/client/client'
-import { isActiveEntity, isDeadEntity, isPaidEntity, isQuote } from '~/domain/entity-filters'
-import { Invoice } from '~/domain/invoice/invoice'
-import { Quote } from '~/domain/quote/quote'
 import { QuoteStatus } from '~/domain/quote/quote-status'
-import { Receipt } from '~/domain/receipt/receipt'
-import { resolveRelevantEntityDate } from '~/domain/relevant-entity-date'
+import { isActiveRecord, isDeadRecord, isPaidRecord, isQuote } from '~/domain/record/filters'
+import { Record, resolveRelevantRecordDate } from '~/domain/record/record'
 import { classNames } from '~/ui/class-names'
 import { FormatRange } from '~/ui/date-range'
 import { Empty } from '~/ui/empty'
 import { useCurrencyFormatter } from '~/ui/hooks/use-currency-formatter'
 import { useCurrentDate } from '~/ui/hooks/use-current-date'
 import { I18NProvider } from '~/ui/hooks/use-i18n'
-import { TinyInvoice } from '~/ui/invoice/tiny-invoice'
 import { total } from '~/ui/invoice/total'
 import { Money } from '~/ui/money'
 import { RangePicker, options } from '~/ui/range-picker'
+import { TinyRecord } from '~/ui/record/tiny-record'
 import { match } from '~/utils/match'
 
-export function Dashboard({ me, invoices }: { me: Account; invoices: Entity[] }) {
+export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
   let [, defaultRange, defaultPrevious, defaultNext] = options.find((e) => e[0] === 'This quarter')!
 
   let now = useCurrentDate()
 
   let [earliestDate = now, latestDate = now] = useMemo(() => {
-    if (invoices.length <= 0) return [undefined, undefined]
+    if (records.length <= 0) return [undefined, undefined]
 
-    let sortedInvoices = invoices
+    let sortedRecords = records
       .slice()
-      .sort((a, z) => compareAsc(resolveRelevantEntityDate(a), resolveRelevantEntityDate(z)))
+      .sort((a, z) => compareAsc(resolveRelevantRecordDate(a), resolveRelevantRecordDate(z)))
 
-    let earliest = sortedInvoices[0]
-    let latest = sortedInvoices[sortedInvoices.length - 1]
+    let earliest = sortedRecords[0]
+    let latest = sortedRecords[sortedRecords.length - 1]
 
-    return [resolveRelevantEntityDate(earliest), resolveRelevantEntityDate(latest)]
-  }, [invoices])
+    return [resolveRelevantRecordDate(earliest), resolveRelevantRecordDate(latest)]
+  }, [records])
 
   let [[start, end], setRange] = useState(() => {
     let [start, end] = defaultRange(now)
@@ -90,26 +87,26 @@ export function Dashboard({ me, invoices }: { me: Account; invoices: Entity[] })
   }
   let currentRange = { start, end }
 
-  let previousInvoices = invoices.filter((e) =>
-    isWithinInterval(resolveRelevantEntityDate(e), previousRange),
+  let previousRecords = records.filter((e) =>
+    isWithinInterval(resolveRelevantRecordDate(e), previousRange),
   )
-  let currentInvoices = invoices.filter((e) =>
-    isWithinInterval(resolveRelevantEntityDate(e), currentRange),
+  let currentRecords = records.filter((e) =>
+    isWithinInterval(resolveRelevantRecordDate(e), currentRange),
   )
 
-  let systemContainsQuotes = invoices.some((e) => isQuote(e))
+  let systemContainsQuotes = records.some((e) => isQuote(e))
 
   return (
     <CompareConfigContext.Provider
       value={{
-        previous: previousInvoices,
-        current: currentInvoices,
+        previous: previousRecords,
+        current: currentRecords,
         withDiff: isAfter(previousRange.end, earliestDate),
       }}
     >
       <I18NProvider
         value={{
-          // Prefer my language/currency when looking at the overview of invoices.
+          // Prefer my language/currency when looking at the overview of records.
           language: me.language,
           currency: me.currency,
         }}
@@ -175,14 +172,14 @@ export function Dashboard({ me, invoices }: { me: Account; invoices: Entity[] })
             <CompareBlock
               inverse
               title="Rejected / Expired"
-              value={(list) => list.filter((e) => isDeadEntity(e)).length}
+              value={(list) => list.filter((e) => isDeadRecord(e)).length}
             />
 
             <div className="col-span-2">
               <CompareBlock
                 title="Paid"
                 value={(list) =>
-                  list.filter((e) => isPaidEntity(e)).reduce((acc, e) => acc + total(e), 0)
+                  list.filter((e) => isPaidRecord(e)).reduce((acc, e) => acc + total(e), 0)
                 }
                 display={(value) => <Money amount={value} />}
               />
@@ -190,7 +187,7 @@ export function Dashboard({ me, invoices }: { me: Account; invoices: Entity[] })
           </div>
 
           {(() => {
-            let data = currentInvoices.filter((e) => isActiveEntity(e)).reverse()
+            let data = currentRecords.filter((e) => isActiveRecord(e)).reverse()
 
             return (
               <div
@@ -205,19 +202,19 @@ export function Dashboard({ me, invoices }: { me: Account; invoices: Entity[] })
                 </div>
                 {data.length > 0 ? (
                   <div className="grid auto-cols-[280px] grid-flow-col grid-cols-[repeat(auto-fill,280px)] grid-rows-1 gap-4 overflow-x-auto p-4">
-                    {data.map((invoice) => (
+                    {data.map((record) => (
                       <I18NProvider
-                        key={invoice.id}
+                        key={record.id}
                         value={{
                           // Prefer the language of the account when looking at the overview of invoices.
-                          language: invoice.account.language,
+                          language: record.account.language,
 
                           // Prefer the currency of the client when looking at the overview of invoices.
-                          currency: invoice.client.currency,
+                          currency: record.client.currency,
                         }}
                       >
-                        <Link href={`/${invoice.type}/${invoice.number}`}>
-                          <TinyInvoice invoice={invoice} />
+                        <Link href={`/${record.type}/${record.number}`}>
+                          <TinyRecord record={record} />
                         </Link>
                       </I18NProvider>
                     ))}
@@ -234,7 +231,7 @@ export function Dashboard({ me, invoices }: { me: Account; invoices: Entity[] })
               <div className="grid grid-cols-2 gap-[--gap]">
                 {systemContainsQuotes && (
                   <>
-                    <CompareBlock<readonly [Entity, number] | null>
+                    <CompareBlock<readonly [Record, number] | null>
                       inverse
                       title={'Fastest accepted quote'}
                       data={(list) =>
@@ -269,7 +266,7 @@ export function Dashboard({ me, invoices }: { me: Account; invoices: Entity[] })
                       }
                     />
 
-                    <CompareBlock<readonly [Entity, number] | null>
+                    <CompareBlock<readonly [Record, number] | null>
                       inverse
                       title={'Slowest accepted quote'}
                       data={(list) =>
@@ -306,12 +303,12 @@ export function Dashboard({ me, invoices }: { me: Account; invoices: Entity[] })
                   </>
                 )}
 
-                <CompareBlock<readonly [Entity, number] | null>
+                <CompareBlock<readonly [Record, number] | null>
                   inverse
                   title={'Fastest paying client'}
                   data={(list) =>
                     list
-                      .filter((e) => isPaidEntity(e))
+                      .filter((e) => isPaidRecord(e))
                       .flatMap((e) => {
                         let sentAt = e.events.find((e) => e.type === 'invoice-sent')?.at
                         if (!sentAt) return []
@@ -341,12 +338,12 @@ export function Dashboard({ me, invoices }: { me: Account; invoices: Entity[] })
                   }
                 />
 
-                <CompareBlock<readonly [Entity, number] | null>
+                <CompareBlock<readonly [Record, number] | null>
                   inverse
                   title={'Slowest paying client'}
                   data={(list) =>
                     list
-                      .filter((e) => isPaidEntity(e))
+                      .filter((e) => isPaidRecord(e))
                       .flatMap((e) => {
                         let sentAt = e.events.find((e) => e.type === 'invoice-sent')?.at
                         if (!sentAt) return []
@@ -378,14 +375,14 @@ export function Dashboard({ me, invoices }: { me: Account; invoices: Entity[] })
               </div>
 
               {(() => {
-                let totalInvoiceSales = currentInvoices
-                  .filter((e) => isPaidEntity(e))
+                let totalInvoiceSales = currentRecords
+                  .filter((e) => isPaidRecord(e))
                   .reduce((acc, e) => acc + total(e), 0)
 
                 let data = Array.from(
-                  currentInvoices
+                  currentRecords
                     .reduce((acc, e) => {
-                      if (!isPaidEntity(e)) return acc
+                      if (!isPaidRecord(e)) return acc
 
                       if (!acc.has(e.client.id)) {
                         acc.set(e.client.id, { client: e.client, total: 0 })
@@ -449,8 +446,8 @@ export function Dashboard({ me, invoices }: { me: Account; invoices: Entity[] })
             <div className="col-span-3">
               <ComparisonChart
                 currentRange={currentRange}
-                previousInvoices={previousInvoices}
-                currentInvoices={currentInvoices}
+                previousRecords={previousRecords}
+                currentRecords={currentRecords}
                 next={next}
               />
             </div>
@@ -463,13 +460,13 @@ export function Dashboard({ me, invoices }: { me: Account; invoices: Entity[] })
 
 function ComparisonChart({
   currentRange,
-  previousInvoices,
-  currentInvoices,
+  previousRecords,
+  currentRecords,
   next,
 }: {
   currentRange: { start: Date; end: Date }
-  previousInvoices: Entity[]
-  currentInvoices: Entity[]
+  previousRecords: Record[]
+  currentRecords: Record[]
   next: (value: Date, range: [start: Date, end: Date]) => Date
 }) {
   let currencyFormatter = useCurrencyFormatter()
@@ -541,21 +538,21 @@ function ComparisonChart({
     current: null as number | null,
   }))
 
-  for (let [period, entities] of [
-    ['previous', previousInvoices],
-    ['current', currentInvoices],
+  for (let [period, records] of [
+    ['previous', previousRecords],
+    ['current', currentRecords],
   ] as const) {
-    next: for (let entity of entities) {
-      if (!isPaidEntity(entity)) continue
+    next: for (let record of records) {
+      if (!isPaidRecord(record)) continue
 
-      let date = resolveRelevantEntityDate(entity)
+      let date = resolveRelevantRecordDate(record)
       if (period === 'previous') {
         date = next(date, [currentRange.start, currentRange.end])
       }
 
       for (let datum of data) {
         if (isWithinInterval(date, datum.range)) {
-          datum[period] = (datum[period] ?? 0) + total(entity)
+          datum[period] = (datum[period] ?? 0) + total(record)
           continue next
         }
       }
@@ -707,15 +704,13 @@ function ComparisonChart({
   )
 }
 
-type Entity = Quote | Invoice | Receipt
-
 let CompareConfigContext = createContext<{
   withDiff: boolean
-  previous: Entity[]
-  current: Entity[]
+  previous: Record[]
+  current: Record[]
 }>({ withDiff: true, previous: [], current: [] })
 
-function CompareBlock<T = Entity[]>({
+function CompareBlock<T = Record[]>({
   title,
   value,
   data = (i) => i as T,
@@ -724,7 +719,7 @@ function CompareBlock<T = Entity[]>({
   inverse = false,
 }: {
   title: string
-  data?: (values: Entity[]) => T
+  data?: (values: Record[]) => T
   value: (data: T) => number | null
   display?: (value: number) => React.ReactNode
   footer?: ((data: T) => React.ReactNode) | null

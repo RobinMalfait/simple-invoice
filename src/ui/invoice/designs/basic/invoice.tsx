@@ -3,7 +3,7 @@
 import { InformationCircleIcon } from '@heroicons/react/24/outline'
 import { Receipt } from '~/domain/receipt/receipt'
 import { useFittedPagination } from '~/ui/hooks/use-fitted-pagination'
-import { InvoiceProvider, useInvoice } from '~/ui/hooks/use-invoice'
+import { RecordProvider, useRecord } from '~/ui/hooks/use-record'
 import { PageProvider } from '~/ui/hooks/use-pagination-info'
 import { match } from '~/utils/match'
 import { Attachment } from './attachment'
@@ -15,12 +15,12 @@ import { SmallHeading } from './small-heading'
 import { Summary } from './summary'
 
 export function Invoice() {
-  let invoice = useInvoice()
-  let [pages, FitContent] = useFittedPagination(invoice.items)
-  let notes = [invoice.note, invoice.client.note, invoice.account.note].filter(Boolean)
+  let record = useRecord()
+  let [pages, FitContent] = useFittedPagination(record.items)
+  let notes = [record.note, record.client.note, record.account.note].filter(Boolean)
 
   return (
-    <InvoiceProvider invoice={invoice}>
+    <RecordProvider record={record}>
       <div className="grid w-full grid-flow-row gap-8 print:gap-0">
         {pages.map(([items], pageIdx) => (
           <PageProvider key={pageIdx} info={{ total: pages.length, current: pageIdx }}>
@@ -33,17 +33,17 @@ export function Invoice() {
                     {pageIdx === pages.length - 1 ? (
                       <>
                         <Summary
-                          items={invoice.items}
-                          discounts={invoice.discounts}
+                          items={record.items}
+                          discounts={record.discounts}
                           type="all"
                           status={match(
-                            invoice.type,
+                            record.type,
                             {
                               quote: () => null,
                               invoice: () => null,
-                              receipt: (e: Receipt) => e.invoice.status,
+                              receipt: (r: Receipt) => r.invoice.status,
                             },
-                            invoice,
+                            record,
                           )}
                         />
                       </>
@@ -72,10 +72,10 @@ export function Invoice() {
           </PageProvider>
         ))}
 
-        {invoice.attachments.map((document) => (
+        {record.attachments.map((document) => (
           <Attachment key={document.id} document={document} />
         ))}
       </div>
-    </InvoiceProvider>
+    </RecordProvider>
   )
 }

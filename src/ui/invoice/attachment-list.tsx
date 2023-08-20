@@ -1,15 +1,15 @@
 'use client'
 
 import { PaperClipIcon } from '@heroicons/react/24/outline'
-import { useInvoice } from '~/ui/hooks/use-invoice'
+import { useRecord } from '~/ui/hooks/use-record'
 
 export function AttachmentList() {
-  let entity = useInvoice()
+  let record = useRecord()
 
   return (
     <>
       <ul role="list" className="space-y-1">
-        {entity.attachments.map((document) => {
+        {record.attachments.map((document) => {
           return (
             <li key={document.id} className="relative flex gap-x-4">
               <button
@@ -33,7 +33,7 @@ export function AttachmentList() {
             </li>
           )
         })}
-        {entity.attachments.length === 0 && (
+        {record.attachments.length === 0 && (
           <li className="text-xs leading-5 text-gray-600 dark:text-gray-300">No attachments</li>
         )}
       </ul>

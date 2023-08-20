@@ -11,34 +11,30 @@ import {
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Account } from '~/domain/account/account'
-import { entityHasWarning } from '~/domain/entity-filters'
-import { Invoice } from '~/domain/invoice/invoice'
-import { Quote } from '~/domain/quote/quote'
-import { Receipt } from '~/domain/receipt/receipt'
+import { recordHasWarning } from '~/domain/record/filters'
+import { Record } from '~/domain/record/record'
 import { classNames } from '~/ui/class-names'
-import { InvoiceStacksProvider } from '../hooks/use-invoice-stacks'
-
-type Entity = Quote | Invoice | Receipt
+import { RecordStacksProvider } from '~/ui/hooks/use-record-stacks'
 
 type Navigation = {
   name: string
   icon: typeof HomeIcon
   href: string
   exact?: boolean
-  entity?: 'quote' | 'invoice' | 'receipt'
+  record?: 'quote' | 'invoice' | 'receipt'
   children?: Navigation[]
 }
 
 let navigation: Navigation[] = [
   { name: 'Dashboard', icon: HomeIcon, href: '/', exact: true },
   {
-    name: 'Invoices',
+    name: 'Records',
     icon: RectangleStackIcon,
-    href: '/invoices',
+    href: '/records',
     children: [
-      { name: 'Quotes', icon: CalculatorIcon, href: '/quote', entity: 'quote' },
-      { name: 'Invoices', icon: DocumentTextIcon, href: '/invoice', entity: 'invoice' },
-      { name: 'Receipts', icon: DocumentCheckIcon, href: '/receipt', entity: 'receipt' },
+      { name: 'Quotes', icon: CalculatorIcon, href: '/quote', record: 'quote' },
+      { name: 'Invoices', icon: DocumentTextIcon, href: '/invoice', record: 'invoice' },
+      { name: 'Receipts', icon: DocumentCheckIcon, href: '/receipt', record: 'receipt' },
     ],
   },
 ]
@@ -49,8 +45,8 @@ export default function Layout({
 }: React.PropsWithChildren<{
   data: {
     me: Account
-    invoices: Entity[]
-    stacks: Record<string, string[]>
+    records: Record[]
+    stacks: { [id: string]: string[] }
   }
 }>) {
   let pathname = usePathname()
@@ -76,7 +72,7 @@ export default function Layout({
   }
 
   return (
-    <InvoiceStacksProvider value={data.stacks}>
+    <RecordStacksProvider value={data.stacks}>
       <div className="flex flex-1 flex-col overflow-hidden">
         <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
           <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-zinc-900 px-6 pb-4">
@@ -107,17 +103,17 @@ export default function Layout({
                           <ul className="ml-8 space-y-1 py-1">
                             {item.children
                               .filter((item) => {
-                                if (!item.entity) {
+                                if (!item.record) {
                                   return true
                                 }
 
-                                return data.invoices.some((entity) => entity.type === item.entity)
+                                return data.records.some((record) => record.type === item.record)
                               })
                               .map((item) => {
-                                let attentionCount = item.entity
-                                  ? data.invoices.filter(
-                                      (entity) =>
-                                        entity.type === item.entity && entityHasWarning(entity),
+                                let attentionCount = item.record
+                                  ? data.records.filter(
+                                      (record) =>
+                                        record.type === item.record && recordHasWarning(record),
                                     ).length
                                   : 0
 
@@ -162,6 +158,6 @@ export default function Layout({
           </main>
         </div>
       </div>
-    </InvoiceStacksProvider>
+    </RecordStacksProvider>
   )
 }

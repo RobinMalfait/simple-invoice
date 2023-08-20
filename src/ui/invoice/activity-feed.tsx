@@ -11,45 +11,41 @@ import {
 import { format, formatDistanceStrict, formatDistanceToNow } from 'date-fns'
 import { Fragment } from 'react'
 import { Event } from '~/domain/events/event'
-import { Invoice } from '~/domain/invoice/invoice'
-import { Quote } from '~/domain/quote/quote'
-import { Receipt } from '~/domain/receipt/receipt'
+import type { Record } from '~/domain/record/record'
 import { classNames } from '~/ui/class-names'
-import { useInvoice } from '~/ui/hooks/use-invoice'
+import { useRecord } from '~/ui/hooks/use-record'
+import { useRecordStacks } from '~/ui/hooks/use-record-stacks'
 import { Money } from '~/ui/money'
 import { assertNever } from '~/utils/assert-never'
 import { match } from '~/utils/match'
-import { useInvoiceStacks } from '../hooks/use-invoice-stacks'
 
-type Entity = Quote | Invoice | Receipt
+export function ActivityFeed(props: React.PropsWithChildren<{ records: Record[] }>) {
+  let stacks = useRecordStacks()
+  let record = useRecord()
+  let records = (stacks[record.id] ?? []).map((id) => props.records.find((e) => e.id === id)!)
 
-export function ActivityFeed(props: React.PropsWithChildren<{ entities: Entity[] }>) {
-  let stacks = useInvoiceStacks()
-  let entity = useInvoice()
-  let entities = (stacks[entity.id] ?? []).map((id) => props.entities.find((e) => e.id === id)!)
-
-  let activeEntityIdx = stacks[entity.id]?.indexOf(entity.id) ?? -1
+  let activeRecordIdx = stacks[record.id]?.indexOf(record.id) ?? -1
 
   return (
     <>
       <ul role="list" className="space-y-6">
-        {entities.map((entity, idx) => {
+        {records.map((record, idx) => {
           return (
-            <Fragment key={entity.id}>
-              {entities.length !== 1 && (
+            <Fragment key={record.id}>
+              {records.length !== 1 && (
                 <li
                   className={classNames(
                     'relative flex items-center text-sm',
-                    idx > activeEntityIdx && 'opacity-50 grayscale',
+                    idx > activeRecordIdx && 'opacity-50 grayscale',
                   )}
                 >
                   <span className="whitespace-nowrap pr-3">
-                    {match(entity.type, {
+                    {match(record.type, {
                       quote: () => 'Quote',
                       invoice: () => 'Invoice',
                       receipt: () => 'Receipt',
                     })}{' '}
-                    (#{entity.number})
+                    (#{record.number})
                   </span>
                   <span className="h-px w-full bg-gray-200 dark:bg-zinc-600"></span>
                 </li>
@@ -59,16 +55,16 @@ export function ActivityFeed(props: React.PropsWithChildren<{ entities: Entity[]
                 role="list"
                 className={classNames(
                   'relative flex flex-col gap-6',
-                  idx > activeEntityIdx && 'opacity-50 grayscale',
-                  entities.length !== 1 && 'mt-6',
+                  idx > activeRecordIdx && 'opacity-50 grayscale',
+                  records.length !== 1 && 'mt-6',
                 )}
               >
-                {entity.events.map((activityItem, activityItemIdx, all) => (
+                {record.events.map((activityItem, activityItemIdx, all) => (
                   <ActivityItem
                     key={activityItem.id}
                     previous={all[activityItemIdx - 1]}
                     item={activityItem}
-                    isLast={activityItemIdx === entity.events.length - 1}
+                    isLast={activityItemIdx === record.events.length - 1}
                   />
                 ))}
               </ul>

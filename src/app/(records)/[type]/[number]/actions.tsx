@@ -7,11 +7,11 @@ import estreePlugin from 'prettier/plugins/estree'
 import tsPlugin from 'prettier/plugins/typescript'
 import * as prettier from 'prettier/standalone'
 import { useCallback, useState } from 'react'
-import { isAccepted, isQuote } from '~/domain/entity-filters'
+import { isAccepted, isQuote } from '~/domain/record/filters'
 import { DownloadLink } from '~/ui/download-link'
 import { useCurrencyFormatter } from '~/ui/hooks/use-currency-formatter'
-import { useInvoice } from '~/ui/hooks/use-invoice'
-import { useInvoiceStacks } from '~/ui/hooks/use-invoice-stacks'
+import { useRecord } from '~/ui/hooks/use-record'
+import { useRecordStacks } from '~/ui/hooks/use-record-stacks'
 import { total } from '~/ui/invoice/total'
 import { SidePanel, useSidePanel } from '~/ui/side-panel'
 import { match } from '~/utils/match'
@@ -99,14 +99,14 @@ function CheckboxField({
 }
 
 export function Actions() {
-  let entity = useInvoice()
+  let record = useRecord()
 
   return (
     <div className="flex w-full flex-col gap-4">
       <div className="flex items-center justify-between text-center">
         <DownloadLink
           className="inline-flex items-center justify-center"
-          href={`/${entity.type}/${entity.number}/pdf`}
+          href={`/${record.type}/${record.number}/pdf`}
         >
           Download PDF
         </DownloadLink>
@@ -114,38 +114,38 @@ export function Actions() {
         <a
           className="inline-flex items-center justify-center"
           target="_blank"
-          href={`/${entity.type}/${entity.number}/pdf?preview`}
+          href={`/${record.type}/${record.number}/pdf?preview`}
         >
           <EyeIcon className="mr-2 h-4 w-4" />
           <span>Preview PDF</span>
         </a>
       </div>
 
-      {isQuote(entity) && isAccepted(entity) && <PromoteToInvoicePanel />}
+      {isQuote(record) && isAccepted(record) && <PromoteToInvoicePanel />}
     </div>
   )
 }
 
 function PromoteToInvoicePanel() {
-  let entity = useInvoice()
+  let record = useRecord()
 
   let [data, controls] = useSidePanel()
   let [copyStatus, setCopyStatus] = useState<'idle' | 'copied'>('idle')
   let formatter = useCurrencyFormatter()
-  let stacks = useInvoiceStacks()
+  let stacks = useRecordStacks()
 
   let copyInvoiceCode = useCallback(
     (data: { issueDate?: string; dueDate?: string; withAttachments?: 'on' }) => {
-      let withAttachments = entity.attachments.length > 0 ? data.withAttachments === 'on' : null
+      let withAttachments = record.attachments.length > 0 ? data.withAttachments === 'on' : null
       prettier
         .format(
           ts`
-            invoices.push(InvoiceBuilder.fromQuote(
-              // ${entity.client.name} — (#${entity.number}, ${formatter.format(
-                total(entity) / 100,
+            records.push(InvoiceBuilder.fromQuote(
+              // ${record.client.name} — (#${record.number}, ${formatter.format(
+                total(record) / 100,
               )})
-              invoices.find(entity => entity.type === 'quote' && entity.number === "${
-                entity.number
+              records.find(record => record.type === 'quote' && record.number === "${
+                record.number
               }") as Quote
               ${withAttachments === false ? ',{withAttachments:false}' : ''}
             )${data.issueDate ? `.issueDate('${formatISO9075(parseISO(data.issueDate))}')` : ''}${
@@ -167,20 +167,20 @@ function PromoteToInvoicePanel() {
           setTimeout(() => setCopyStatus('idle'), 3000)
         })
     },
-    [entity, formatter],
+    [record, formatter],
   )
 
   let [issueDate, setIssueDate] = useState<Date | null>(new Date())
 
-  // TODO: Right now I'm assuming that if there are multiple linked invoices to this quote then we
+  // TODO: Right now I'm assuming that if there are multiple linked records to this quote then we
   // should not be able to promote this quote. However, this is not true if you created a quote from
   // another quote. (We don't have this functionality yet, but once we do, then this assumption will
   // fail).
-  if ((stacks[entity.id]?.length ?? 0) > 1) {
+  if ((stacks[record.id]?.length ?? 0) > 1) {
     return null
   }
 
-  if (!isQuote(entity) || !isAccepted(entity)) {
+  if (!isQuote(record) || !isAccepted(record)) {
     return null
   }
 
@@ -219,7 +219,7 @@ function PromoteToInvoicePanel() {
             min={issueDate?.toISOString().slice(0, 16)}
           />
 
-          {entity.attachments.length > 0 && (
+          {record.attachments.length > 0 && (
             <CheckboxField
               defaultChecked
               id="withAttachments"

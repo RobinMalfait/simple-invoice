@@ -4,40 +4,39 @@ import { InvoiceStatus } from '~/domain/invoice/invoice-status'
 import { Quote } from '~/domain/quote/quote'
 import { QuoteStatus } from '~/domain/quote/quote-status'
 import { Receipt } from '~/domain/receipt/receipt'
+import type { Record } from '~/domain/record/record'
 import { match } from '~/utils/match'
 
-type Entity = Quote | Invoice | Receipt
-
-export function isQuote(entity: Entity): entity is Quote {
-  return entity.type === 'quote'
+export function isQuote(record: Record): record is Quote {
+  return record.type === 'quote'
 }
 
-export function isInvoice(entity: Entity): entity is Invoice {
-  return entity.type === 'invoice'
+export function isInvoice(record: Record): record is Invoice {
+  return record.type === 'invoice'
 }
 
-export function isReceipt(entity: Entity): entity is Receipt {
-  return entity.type === 'receipt'
+export function isReceipt(record: Record): record is Receipt {
+  return record.type === 'receipt'
 }
 
 export function isAccepted(quote: Quote) {
   return quote.status === QuoteStatus.Accepted
 }
 
-export function entityHasWarning(entity: Entity) {
+export function recordHasWarning(record: Record) {
   return match(
-    entity.type,
+    record.type,
     {
       // When a quote is expired, it should be handled (probably closed)
-      quote: (e: Quote) => e.status === QuoteStatus.Expired,
+      quote: (r: Quote) => r.status === QuoteStatus.Expired,
 
-      invoice: (e: Invoice) => {
+      invoice: (r: Invoice) => {
         // Overdue invoices should be handled, probably closed (+ new invoice)
-        if (e.status === InvoiceStatus.Overdue) return true
+        if (r.status === InvoiceStatus.Overdue) return true
 
         // Draft invoices with an issue date in the past are void because they cannot be completed
         // since they were never sent before.
-        if (e.status === InvoiceStatus.Draft && isPast(e.issueDate)) return true
+        if (r.status === InvoiceStatus.Draft && isPast(r.issueDate)) return true
 
         return false
       },
@@ -45,62 +44,62 @@ export function entityHasWarning(entity: Entity) {
       // Receipts are in the final state, nothing to warn about
       receipt: () => false,
     },
-    entity,
+    record,
   )
 }
 
-export function entityHasAttachments(entity: Entity, type: 'any' | 'direct') {
+export function recordHasAttachments(record: Record, type: 'any' | 'direct') {
   return match(type, {
-    // Whether any of the entities in the chain has attachments
+    // Whether any of the records in the chain has attachments
     any: () =>
       match(
-        entity.type,
+        record.type,
         {
-          quote: (e: Quote) => e.attachments.length > 0,
-          invoice: (e: Invoice) => {
-            return e.attachments.length > 0 || (e.quote ? e.quote.attachments.length > 0 : false)
+          quote: (r: Quote) => r.attachments.length > 0,
+          invoice: (r: Invoice) => {
+            return r.attachments.length > 0 || (r.quote ? r.quote.attachments.length > 0 : false)
           },
-          receipt: (e: Receipt) => e.attachments.length > 0 || e.invoice.attachments.length > 0,
+          receipt: (r: Receipt) => r.attachments.length > 0 || r.invoice.attachments.length > 0,
         },
-        entity,
+        record,
       ),
 
-    // Whether the entity itself has attachments
+    // Whether the record itself has attachments
     direct: () =>
       match(
-        entity.type,
+        record.type,
         {
-          quote: (e: Quote) => e.attachments.length > 0,
-          invoice: (e: Invoice) => e.attachments.length > 0,
-          receipt: (e: Receipt) => e.attachments.length > 0,
+          quote: (r: Quote) => r.attachments.length > 0,
+          invoice: (r: Invoice) => r.attachments.length > 0,
+          receipt: (r: Receipt) => r.attachments.length > 0,
         },
-        entity,
+        record,
       ),
   })
 }
 
-export function warningMessageForEntity(entity: Entity): string | null {
+export function warningMessageForRecord(record: Record): string | null {
   return match(
-    entity.type,
+    record.type,
     {
       // When a quote is expired, it should be handled (probably closed)
-      quote: (e: Quote) => {
-        if (e.status === QuoteStatus.Expired) {
+      quote: (r: Quote) => {
+        if (r.status === QuoteStatus.Expired) {
           return 'This quote is expired. You probably want to close it.'
         }
 
         return null
       },
 
-      invoice: (e: Invoice) => {
+      invoice: (r: Invoice) => {
         // Overdue invoices should be handled, probably closed (+ new invoice)
-        if (e.status === InvoiceStatus.Overdue) {
+        if (r.status === InvoiceStatus.Overdue) {
           return 'This invoice is overdue. You probably want to close it and send a new invoice.'
         }
 
         // Draft invoices with an issue date in the past are void because they cannot be completed
         // since they were never sent before.
-        if (e.status === InvoiceStatus.Draft && isPast(e.issueDate)) {
+        if (r.status === InvoiceStatus.Draft && isPast(r.issueDate)) {
           return 'This invoice is void because the issue date is in the past and this invoice has never been sent.'
         }
 
@@ -110,32 +109,32 @@ export function warningMessageForEntity(entity: Entity): string | null {
       // Receipts are in the final state, nothing to warn about
       receipt: () => null,
     },
-    entity,
+    record,
   )
 }
 
-export function isPaidEntity(entity: Entity) {
+export function isPaidRecord(record: Record) {
   return match(
-    entity.type,
+    record.type,
     {
       // A quote can never be paid
       quote: () => false,
 
       // An invoice is paid if it is in the paid state
-      invoice: (e: Invoice) => e.status === InvoiceStatus.Paid,
+      invoice: (r: Invoice) => r.status === InvoiceStatus.Paid,
 
       // A receipt can only be build from a paid invoice, therefore it is always paid
       receipt: () => true,
     },
-    entity,
+    record,
   )
 }
 
-export function isActiveEntity(entity: Entity) {
+export function isActiveRecord(record: Record) {
   return match(
-    entity.type,
+    record.type,
     {
-      quote: (e: Quote) => {
+      quote: (r: Quote) => {
         return [
           // Still in draft mode
           QuoteStatus.Draft,
@@ -146,9 +145,9 @@ export function isActiveEntity(entity: Entity) {
 
           // Sent to the client, waiting for a response
           QuoteStatus.Sent,
-        ].includes(e.status)
+        ].includes(r.status)
       },
-      invoice: (e: Invoice) => {
+      invoice: (r: Invoice) => {
         return [
           // Still in draft mode
           InvoiceStatus.Draft,
@@ -158,29 +157,29 @@ export function isActiveEntity(entity: Entity) {
 
           // Partially paid, waiting for the remaining amount
           InvoiceStatus.PartiallyPaid,
-        ].includes(e.status)
+        ].includes(r.status)
       },
 
       // All receipts are considered "done"
       receipt: () => false,
     },
-    entity,
+    record,
   )
 }
 
-export function isDeadEntity(entity: Entity) {
+export function isDeadRecord(record: Record) {
   return match(
-    entity.type,
+    record.type,
     {
       // A quote is dead when it is rejected or expired
-      quote: (e: Quote) => [QuoteStatus.Rejected, QuoteStatus.Expired].includes(e.status),
+      quote: (r: Quote) => [QuoteStatus.Rejected, QuoteStatus.Expired].includes(r.status),
 
       // An invoice is dead when it is overdue
-      invoice: (e: Invoice) => [InvoiceStatus.Overdue].includes(e.status),
+      invoice: (r: Invoice) => [InvoiceStatus.Overdue].includes(r.status),
 
       // A receipt is never dead
       receipt: () => false,
     },
-    entity,
+    record,
   )
 }

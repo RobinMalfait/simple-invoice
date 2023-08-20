@@ -1,12 +1,12 @@
 import { CubeIcon } from '@heroicons/react/24/outline'
-import { useInvoice } from '~/ui/hooks/use-invoice'
+import { useRecord } from '~/ui/hooks/use-record'
 import { usePaginationInfo } from '~/ui/hooks/use-pagination-info'
 import { useTranslation } from '~/ui/hooks/use-translation'
 import { match } from '~/utils/match'
 
 export function SmallHeading() {
   let { total, current } = usePaginationInfo()
-  let invoice = useInvoice()
+  let record = useRecord()
   let t = useTranslation()
 
   return (
@@ -19,7 +19,7 @@ export function SmallHeading() {
             <span>
               <span className="font-medium text-gray-500 dark:text-zinc-100">
                 {t((x) =>
-                  match(invoice.type, {
+                  match(record.type, {
                     quote: () => x.quote.title,
                     invoice: () => x.invoice.title,
                     receipt: () => x.receipt.title,
@@ -30,7 +30,7 @@ export function SmallHeading() {
             </span>
             <span className="text-sm text-gray-300 dark:text-zinc-400">/</span>
             <span className="text-sm tabular-nums text-gray-500 dark:text-zinc-300">
-              {invoice.number}
+              {record.number}
             </span>
           </span>
         </div>

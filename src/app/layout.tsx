@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
-import { invoices, me, stacks } from '~/data'
+import { me, records, stacks } from '~/data'
 import Layout from '~/ui/layout/main'
 import './globals.css'
 
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  let data = { me, invoices, stacks }
+  let data = { me, records, stacks }
   return (
     <html lang="en">
       <body className={inter.className}>

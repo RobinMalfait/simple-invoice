@@ -6,37 +6,31 @@ import { CheckCircleIcon, ClockIcon } from '@heroicons/react/24/outline'
 import Link from 'next/link'
 import * as React from 'react'
 import { Fragment } from 'react'
-import { Invoice } from '~/domain/invoice/invoice'
-import { Quote } from '~/domain/quote/quote'
-import { Receipt } from '~/domain/receipt/receipt'
+import type { Record } from '~/domain/record/record'
 import { classNames } from '~/ui/class-names'
-import { InvoiceProvider, useInvoice } from '~/ui/hooks/use-invoice'
-import { useInvoiceStacks } from '~/ui/hooks/use-invoice-stacks'
+import { RecordProvider, useRecord } from '~/ui/hooks/use-record'
+import { useRecordStacks } from '~/ui/hooks/use-record-stacks'
 import { match } from '~/utils/match'
 
-type Entity = Quote | Invoice | Receipt
-
 let HistoryContext = React.createContext<{
-  options: Entity[]
+  options: Record[]
 } | null>(null)
 
-export function History(props: React.PropsWithChildren<{ entity: Entity; entities: Entity[] }>) {
-  let stacks = useInvoiceStacks()
-  let options = (stacks[props.entity.id] ?? []).map(
-    (id) => props.entities.find((e) => e.id === id)!,
-  )
+export function History(props: React.PropsWithChildren<{ record: Record; records: Record[] }>) {
+  let stacks = useRecordStacks()
+  let options = (stacks[props.record.id] ?? []).map((id) => props.records.find((e) => e.id === id)!)
 
   return (
-    <InvoiceProvider invoice={props.entity}>
+    <RecordProvider record={props.record}>
       <HistoryContext.Provider value={{ options }}>{props.children}</HistoryContext.Provider>
-    </InvoiceProvider>
+    </RecordProvider>
   )
 }
 
 export function HistoryDropdown() {
   let ctx = React.useContext(HistoryContext)
   if (!ctx) throw new Error('HistoryAction must be used within History')
-  let entity = useInvoice()
+  let record = useRecord()
   let { options } = ctx
 
   if (options.length <= 1) return null
@@ -51,7 +45,7 @@ export function HistoryDropdown() {
           />
           History{' '}
           <span className="tabular-nums">
-            ({options.findIndex((option) => option.id === entity.id) + 1}/{options.length})
+            ({options.findIndex((option) => option.id === record.id) + 1}/{options.length})
           </span>
           <ChevronDownIcon
             className="-mr-1 h-5 w-5 text-gray-400 dark:text-gray-500"
@@ -72,7 +66,7 @@ export function HistoryDropdown() {
         <Menu.Items className="absolute right-0 z-10 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-zinc-900">
           <div className="py-1">
             {options.map((e) => {
-              let Icon = e.id === entity.id ? CheckCircleIcon : 'span'
+              let Icon = e.id === record.id ? CheckCircleIcon : 'span'
 
               return (
                 <Menu.Item key={e.id}>

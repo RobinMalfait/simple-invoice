@@ -1,7 +1,7 @@
 import { ExclamationTriangleIcon } from '@heroicons/react/20/solid'
 import { redirect } from 'next/navigation'
-import { invoices, me } from '~/data'
-import { entityHasWarning, warningMessageForEntity } from '~/domain/entity-filters'
+import { me, records } from '~/data'
+import { recordHasWarning, warningMessageForRecord } from '~/domain/record/filters'
 import { Invoice as InvoiceType } from '~/domain/invoice/invoice'
 import { Quote as QuoteType } from '~/domain/quote/quote'
 import { Receipt as ReceiptType } from '~/domain/receipt/receipt'
@@ -20,15 +20,15 @@ export default function Invoice({
 }: {
   params: { type: string; number: string }
 }) {
-  let entity = invoices.find((invoice) => invoice.type === type && invoice.number === number)
+  let record = records.find((record) => record.type === type && record.number === number)
 
-  if (!entity) {
+  if (!record) {
     redirect('/')
   }
 
   return (
     <div className="flex h-full flex-1 overflow-hidden [--spacing:theme(spacing.8)]">
-      <History entity={entity} entities={invoices}>
+      <History record={record} records={records}>
         <div className="flex w-[calc(210mm+theme(spacing.10)*2)] snap-y snap-mandatory scroll-pt-8 overflow-auto scroll-smooth bg-gray-950/10 shadow-inner dark:bg-zinc-600">
           <div className="mx-auto mb-10">
             <div className="py-10">
@@ -39,7 +39,7 @@ export default function Invoice({
 
         <I18NProvider
           value={{
-            // Prefer my language/currency when looking at the overview of invoices.
+            // Prefer my language/currency when looking at the overview of records.
             language: me.language,
             currency: me.currency,
           }}
@@ -47,23 +47,23 @@ export default function Invoice({
           <div className="flex max-w-lg flex-1 shrink-0 flex-col gap-[--spacing] overflow-auto px-4 py-8 sm:px-6 lg:px-8">
             <div className="flex flex-col gap-4 rounded-lg bg-white p-4 shadow ring-1 ring-black/5 dark:bg-zinc-900 dark:text-gray-300">
               <h3 className="flex items-center justify-between text-xl">
-                <span>{entity.client.name}</span>
+                <span>{record.client.name}</span>
                 <span>
                   #
                   {match(
-                    entity.type,
+                    record.type,
                     {
-                      quote: (e: QuoteType) => e.number,
-                      invoice: (e: InvoiceType) => e.number,
-                      receipt: (e: ReceiptType) => e.invoice.number,
+                      quote: (r: QuoteType) => r.number,
+                      invoice: (r: InvoiceType) => r.number,
+                      receipt: (r: ReceiptType) => r.invoice.number,
                     },
-                    entity,
+                    record,
                   )}
                 </span>
               </h3>
               <div className="rounded-md border border-gray-200 bg-gray-100 p-4 dark:border-zinc-950 dark:bg-zinc-950">
                 <div className="p-4 py-8 text-center text-2xl font-bold text-gray-950 dark:text-gray-300">
-                  <Money amount={total(entity)} />
+                  <Money amount={total(record)} />
                 </div>
               </div>
               <div className="flex items-center justify-between text-center">
@@ -73,7 +73,7 @@ export default function Invoice({
 
             <div className="flex flex-col gap-4 rounded-lg bg-white p-4 shadow ring-1 ring-black/5 dark:bg-zinc-900 dark:text-gray-300">
               <span className="text-sm font-medium text-gray-900 dark:text-gray-300">Activity</span>
-              <ActivityFeed entities={invoices} />
+              <ActivityFeed records={records} />
             </div>
 
             <div className="flex flex-col gap-4 rounded-lg bg-white p-4 shadow ring-1 ring-black/5 dark:bg-zinc-900 dark:text-gray-300">
@@ -87,7 +87,7 @@ export default function Invoice({
               <HistoryDropdown />
             </div>
 
-            {entityHasWarning(entity) && (
+            {recordHasWarning(record) && (
               <div className="rounded-lg border-l-4 border-yellow-400 bg-yellow-50 p-4 dark:border-yellow-400/30 dark:bg-yellow-400/10">
                 <div className="flex">
                   <div className="flex-shrink-0">
@@ -98,7 +98,7 @@ export default function Invoice({
                   </div>
                   <div className="ml-3">
                     <p className="text-sm text-yellow-700 dark:text-yellow-500">
-                      {warningMessageForEntity(entity)}
+                      {warningMessageForRecord(record)}
                     </p>
                   </div>
                 </div>

@@ -1,35 +1,31 @@
 import { Account } from '~/domain/account/account'
-import { isInvoice, isQuote, isReceipt } from '~/domain/entity-filters'
-import { Invoice } from '~/domain/invoice/invoice'
-import { Quote } from '~/domain/quote/quote'
-import { Receipt } from '~/domain/receipt/receipt'
-
-type Entity = Quote | Invoice | Receipt
+import { isInvoice, isQuote, isReceipt } from '~/domain/record/filters'
+import type { Record } from '~/domain/record/record'
 
 let data = require(`./${process.env.DATA_SOURCE_FILE}.ts`)
 
-function flattenEntities(entities: Entity[], depth = 0) {
-  let result = entities.flatMap((entity) => {
-    let list = [entity]
+function flattenRecords(records: Record[], depth = 0) {
+  let result = records.flatMap((record) => {
+    let list = [record]
 
     //
-    if (isQuote(entity)) {
-      if (entity.quote) {
-        list.push(...flattenEntities([entity.quote], depth + 1))
+    if (isQuote(record)) {
+      if (record.quote) {
+        list.push(...flattenRecords([record.quote], depth + 1))
       }
     }
 
     //
-    else if (isInvoice(entity)) {
-      if (entity.quote) {
-        list.push(...flattenEntities([entity.quote], depth + 1))
+    else if (isInvoice(record)) {
+      if (record.quote) {
+        list.push(...flattenRecords([record.quote], depth + 1))
       }
     }
 
     //
-    else if (isReceipt(entity)) {
-      if (entity.invoice) {
-        list.push(...flattenEntities([entity.invoice], depth + 1))
+    else if (isReceipt(record)) {
+      if (record.invoice) {
+        list.push(...flattenRecords([record.invoice], depth + 1))
       }
     }
 
@@ -43,7 +39,7 @@ function flattenEntities(entities: Entity[], depth = 0) {
         new Set(result),
       )
         // Make unique using ID
-        .filter((entity, idx, all) => all.findIndex((other) => other.id === entity.id) === idx)
+        .filter((record, idx, all) => all.findIndex((other) => other.id === record.id) === idx)
     )
   }
 
@@ -51,26 +47,26 @@ function flattenEntities(entities: Entity[], depth = 0) {
 }
 
 export let me: Account = data.me
-export let invoices: Entity[] = flattenEntities(data.invoices)
+export let records: Record[] = flattenRecords(data.records)
 
-// For each entity in the system, we should be able to find all related entities in either layers
+// For each record in the system, we should be able to find all related records in either layers
 // below or layers above.
-export let stacks: Record<string, string[]> = {}
+export let stacks: { [id: string]: string[] } = {}
 
-for (let entity of invoices) {
-  stacks[entity.id] ??= [entity.id]
+for (let record of records) {
+  stacks[record.id] ??= [record.id]
 
-  let entities = flattenEntities([entity])
+  let records = flattenRecords([record])
 
-  for (let entity of entities) {
-    for (let other of entities) {
-      if (entity === other) continue
+  for (let record of records) {
+    for (let other of records) {
+      if (record === other) continue
 
-      stacks[entity.id] ??= [entity.id]
-      stacks[entity.id].push(other.id)
+      stacks[record.id] ??= [record.id]
+      stacks[record.id].push(other.id)
 
       stacks[other.id] ??= [other.id]
-      stacks[other.id].push(entity.id)
+      stacks[other.id].push(record.id)
     }
   }
 }
@@ -82,8 +78,8 @@ for (let [idx, stack] of Object.entries(stacks)) {
 let order = ['quote', 'invoice', 'receipt']
 for (let stack of Object.values(stacks)) {
   stack.sort((aId, zId) => {
-    let a = invoices.find((e) => e.id === aId)!
-    let z = invoices.find((e) => e.id === zId)!
+    let a = records.find((e) => e.id === aId)!
+    let z = records.find((e) => e.id === zId)!
 
     return order.indexOf(a.type) - order.indexOf(z.type) || a.number.localeCompare(z.number)
   })

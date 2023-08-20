@@ -2,7 +2,7 @@ import { kebab, lower, upper } from 'case'
 import { format } from 'date-fns'
 import { redirect } from 'next/navigation'
 import puppeteer from 'puppeteer'
-import { invoices } from '~/data'
+import { records } from '~/data'
 import { config } from '~/domain/configuration/configuration'
 import { match } from '~/utils/match'
 
@@ -11,22 +11,22 @@ export async function GET(
   { params }: { params: { type: string; number: string } },
 ) {
   let query = new URL(request.url).searchParams
-  let invoice = invoices.find(
-    (invoice) => invoice.type === params.type && invoice.number === params.number,
+  let record = records.find(
+    (record) => record.type === params.type && record.number === params.number,
   )
   const type = query.has('preview') ? 'preview' : 'download'
 
-  if (!invoice) {
+  if (!record) {
     return redirect(`/`)
   }
 
-  let filenameTemplate = config()[invoice.type].pdf.filename
+  let filenameTemplate = config()[record.type].pdf.filename
   let filename = filenameTemplate.replace(/{{([^}]+)}}/g, (_, value) => {
     let transformations: string[] = value.split('|')
     let [path, arg] = transformations.shift()?.split(':') ?? []
 
     let segments = path.split('.')
-    let next: any = invoice
+    let next: any = record
     for (let segment of segments) {
       next = next[segment]
       if (next === undefined || next === null) {

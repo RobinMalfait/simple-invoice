@@ -1,9 +1,9 @@
 import { classNames } from '~/ui/class-names'
-import { useInvoice } from '~/ui/hooks/use-invoice'
+import { useRecord } from '~/ui/hooks/use-record'
 
 export function Legal({ className }: { className?: string }) {
-  let invoice = useInvoice()
-  let legal = [invoice.client.legal, invoice.account.legal].filter(Boolean)
+  let record = useRecord()
+  let legal = [record.client.legal, record.account.legal].filter(Boolean)
   if (legal.length <= 0) return null
 
   return (

@@ -1,85 +1,82 @@
 import { compareDesc, format, isFuture } from 'date-fns'
 import Link from 'next/link'
 
-import { invoices, me } from '~/data'
+import { me, records } from '~/data'
 import { Currency } from '~/domain/currency/currency'
-import { isPaidEntity } from '~/domain/entity-filters'
 import { Invoice } from '~/domain/invoice/invoice'
 import { Quote } from '~/domain/quote/quote'
 import { Receipt } from '~/domain/receipt/receipt'
-import { resolveRelevantEntityDate } from '~/domain/relevant-entity-date'
-import { squashEntities } from '~/domain/squash-entities'
+import { isPaidRecord } from '~/domain/record/filters'
+import { Record, resolveRelevantRecordDate } from '~/domain/record/record'
 import { classNames } from '~/ui/class-names'
 import { Empty } from '~/ui/empty'
 import { Disclosure, DisclosureButton, DisclosurePanel } from '~/ui/headlessui'
 import { I18NProvider } from '~/ui/hooks/use-i18n'
-import { TinyInvoice } from '~/ui/invoice/tiny-invoice'
 import { total } from '~/ui/invoice/total'
 import { Money } from '~/ui/money'
+import { TinyRecord } from '~/ui/record/tiny-record'
 import { match } from '~/utils/match'
-
-type Entity = Quote | Invoice | Receipt
 
 function titleForQuarter(date: Date) {
   return [format(date, 'QQQ'), format(date, 'y')].join(' • ')
 }
 
-function groupByQuarter(invoices: Entity[]) {
+function groupByQuarter(records: Record[]) {
   return Array.from(
-    invoices
+    records
       .sort(
         (a, z) =>
-          compareDesc(resolveRelevantEntityDate(a), resolveRelevantEntityDate(z)) ||
+          compareDesc(resolveRelevantRecordDate(a), resolveRelevantRecordDate(z)) ||
           z.number.localeCompare(a.number),
       )
 
       // Group by quarter & year
-      .reduce((acc, entity) => {
+      .reduce((acc, record) => {
         let key = match(
-          entity.type,
+          record.type,
           {
-            quote: (entity: Quote) => titleForQuarter(entity.quoteDate),
-            invoice: (entity: Invoice) => titleForQuarter(entity.issueDate),
-            receipt: (entity: Receipt) => titleForQuarter(entity.receiptDate),
+            quote: (r: Quote) => titleForQuarter(r.quoteDate),
+            invoice: (r: Invoice) => titleForQuarter(r.issueDate),
+            receipt: (r: Receipt) => titleForQuarter(r.receiptDate),
           },
-          entity,
+          record,
         )
         if (!acc.has(key)) acc.set(key, [])
-        acc.get(key)!.push(entity)
+        acc.get(key)!.push(record)
         return acc
-      }, new Map<string, Entity[]>()),
+      }, new Map<string, Record[]>()),
   )
 }
 
-function groupByCurrency(invoices: Entity[]) {
+function groupByCurrency(records: Record[]) {
   return Array.from(
-    invoices.reduce((acc, invoice) => {
-      let key = invoice.client.currency
+    records.reduce((acc, record) => {
+      let key = record.client.currency
       if (!acc.has(key)) acc.set(key, [])
-      acc.get(key)!.push(invoice)
+      acc.get(key)!.push(record)
       return acc
-    }, new Map<Currency, Entity[]>()),
+    }, new Map<Currency, Record[]>()),
   )
 }
 
-export default async function Home() {
-  let squashedInvoices = squashEntities(invoices)
+export default async function Home({ params: { type } }: { params: { type: string } }) {
+  let filteredRecords = records.filter((e) => e.type === type)
 
   return (
     <I18NProvider
       value={{
-        // Prefer my language/currency when looking at the overview of invoices.
+        // Prefer my language/currency when looking at the overview of records.
         language: me.language,
         currency: me.currency,
       }}
     >
       <div className="fixed inset-x-0 top-0 z-10 h-8 bg-gray-100/75 backdrop-blur dark:bg-zinc-800/75"></div>
-      <div className="relative space-y-8 px-4 py-8 sm:px-6 lg:px-8">
-        {squashedInvoices.length > 0 ? (
+      <div className="space-y-8 px-4 py-8 sm:px-6 lg:px-8">
+        {filteredRecords.length > 0 ? (
           <>
-            {groupByQuarter(squashedInvoices).map(([title, invoices], idx) => (
+            {groupByQuarter(filteredRecords).map(([title, records], idx) => (
               <Disclosure
-                defaultOpen={!invoices.every((e) => isFuture(resolveRelevantEntityDate(e)))}
+                defaultOpen={!records.every((e) => isFuture(resolveRelevantRecordDate(e)))}
                 as="div"
                 key={title}
                 className="relative flex gap-x-4"
@@ -109,22 +106,23 @@ export default async function Home() {
                     <div className="relative z-20 -mx-1.5 flex justify-between rounded-md bg-white/95 px-[18px] py-3 text-gray-500 ring-1 ring-black/5 backdrop-blur dark:bg-zinc-900/95 dark:text-gray-400">
                       <span>{title}</span>
                       <span className="flex items-center gap-2">
-                        {groupByCurrency(invoices).map(([currency, invoices], idx) => (
+                        {groupByCurrency(records).map(([currency, records], idx) => (
                           <I18NProvider
                             key={currency}
                             value={{
-                              // Prefer my language when looking at the overview of invoices.
+                              // Prefer my language when looking at the overview of records.
                               language: me.language,
 
-                              // Prefer the currency of the client when looking at the overview of invoices.
+                              // Prefer the currency of the client when looking at the overview of
+                              // records.
                               currency,
                             }}
                           >
                             {idx !== 0 && <span className="text-gray-300">•</span>}
                             <Money
-                              amount={invoices
-                                .filter((e) => isPaidEntity(e))
-                                .reduce((acc, invoice) => acc + total(invoice), 0)}
+                              amount={records
+                                .filter((e) => isPaidRecord(e))
+                                .reduce((acc, record) => acc + total(record), 0)}
                             />
                           </I18NProvider>
                         ))}
@@ -133,19 +131,21 @@ export default async function Home() {
                   </DisclosureButton>
 
                   <DisclosurePanel className="grid grid-cols-[repeat(auto-fill,minmax(275px,1fr))] gap-4">
-                    {invoices.map((invoice) => (
+                    {records.map((record) => (
                       <I18NProvider
-                        key={invoice.id}
+                        key={record.id}
                         value={{
-                          // Prefer the language of the account when looking at the overview of invoices.
-                          language: invoice.account.language,
+                          // Prefer the language of the account when looking at the overview of
+                          // record.
+                          language: record.account.language,
 
-                          // Prefer the currency of the client when looking at the overview of invoices.
-                          currency: invoice.client.currency,
+                          // Prefer the currency of the client when looking at the overview of
+                          // record.
+                          currency: record.client.currency,
                         }}
                       >
-                        <Link href={`/${invoice.type}/${invoice.number}`}>
-                          <TinyInvoice invoice={invoice} />
+                        <Link href={`/${record.type}/${record.number}`}>
+                          <TinyRecord record={record} />
                         </Link>
                       </I18NProvider>
                     ))}
@@ -169,7 +169,7 @@ export default async function Home() {
             </div>
           </>
         ) : (
-          <Empty message="No invoices yet" />
+          <Empty message={`No ${type}s yet`} />
         )}
       </div>
     </I18NProvider>

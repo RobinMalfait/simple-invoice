@@ -7,13 +7,14 @@ import { ContactFieldBuilder } from '~/domain/contact-fields/contact-fields'
 import { Currency } from '~/domain/currency/currency'
 import { DiscountBuilder } from '~/domain/discount/discount'
 import { DocumentBuilder, md } from '~/domain/document/document'
-import { Invoice, InvoiceBuilder } from '~/domain/invoice/invoice'
+import { InvoiceBuilder } from '~/domain/invoice/invoice'
 import { InvoiceItemBuilder } from '~/domain/invoice/invoice-item'
 import { Language } from '~/domain/language/language'
 import { IncrementStrategy } from '~/domain/number-strategies'
 import { PaymentMethodBuilder } from '~/domain/payment-method/payment-method'
-import { Quote, QuoteBuilder } from '~/domain/quote/quote'
-import { Receipt, ReceiptBuilder } from '~/domain/receipt/receipt'
+import { QuoteBuilder } from '~/domain/quote/quote'
+import { ReceiptBuilder } from '~/domain/receipt/receipt'
+import type { Record } from '~/domain/record/record'
 import { TaxBuilder } from '~/domain/tax/tax'
 
 configure({
@@ -128,7 +129,7 @@ function inTheFuture(offset = 5) {
   return state.future
 }
 
-export const me: Account = new AccountBuilder()
+export let me: Account = new AccountBuilder()
   .name('Acme Inc.')
   .email('alice@acme.com')
   .phone('+32 123 45 67 89')
@@ -193,7 +194,7 @@ let Client2 = new ClientBuilder()
   .currency(Currency.USD)
   .build()
 
-export const invoices: (Quote | Invoice | Receipt)[] = [
+export let records: Record[] = [
   // Single item invoice, fully paid, via partial payments
   new InvoiceBuilder()
     .account(me)

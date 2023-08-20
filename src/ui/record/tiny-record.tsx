@@ -2,13 +2,14 @@
 
 import { CalendarIcon, PaperClipIcon, RectangleStackIcon } from '@heroicons/react/24/outline'
 import { format } from 'date-fns'
-import { entityHasAttachments, entityHasWarning, isQuote } from '~/domain/entity-filters'
 import { Invoice } from '~/domain/invoice/invoice'
 import { Quote } from '~/domain/quote/quote'
 import { QuoteStatus } from '~/domain/quote/quote-status'
 import { Receipt } from '~/domain/receipt/receipt'
+import { isQuote, recordHasAttachments, recordHasWarning } from '~/domain/record/filters'
+import type { Record } from '~/domain/record/record'
 import { classNames } from '~/ui/class-names'
-import { useInvoiceStacks } from '~/ui/hooks/use-invoice-stacks'
+import { useRecordStacks } from '~/ui/hooks/use-record-stacks'
 import { useTranslation } from '~/ui/hooks/use-translation'
 import { StatusDisplay as InvoiceStatusDisplay } from '~/ui/invoice/status'
 import { total } from '~/ui/invoice/total'
@@ -16,22 +17,18 @@ import { Money } from '~/ui/money'
 import { StatusDisplay as QuoteStatusDisplay } from '~/ui/quote/status'
 import { match } from '~/utils/match'
 
-type Entity = Quote | Invoice | Receipt
-
-export function TinyInvoice({ invoice }: { invoice: Entity }) {
+export function TinyRecord({ record }: { record: Record }) {
   let t = useTranslation()
-  let stacks = useInvoiceStacks()
-  let isLayered = (stacks[invoice.id]?.length ?? 0) > 1
-  let hasAttachments = entityHasAttachments(invoice, 'any')
-  let warning = entityHasWarning(invoice)
+  let stacks = useRecordStacks()
+  let isLayered = (stacks[record.id]?.length ?? 0) > 1
+  let hasAttachments = recordHasAttachments(record, 'any')
+  let warning = recordHasWarning(record)
 
   return (
     <div
       className={classNames(
         'group relative rounded-md bg-white shadow transition-[transform,opacity] duration-300 will-change-transform hover:-translate-y-1 dark:bg-zinc-950',
-        isQuote(invoice) &&
-          invoice.status === QuoteStatus.Rejected &&
-          'opacity-70 hover:opacity-100',
+        isQuote(record) && record.status === QuoteStatus.Rejected && 'opacity-70 hover:opacity-100',
       )}
     >
       {isLayered && (
@@ -54,17 +51,17 @@ export function TinyInvoice({ invoice }: { invoice: Entity }) {
 
       <div className="relative z-10 flex aspect-a4 w-full shrink-0 flex-col rounded-md bg-gradient-to-br from-rose-50/90 to-blue-50/90 ring-1 ring-black/5 dark:from-rose-200/90 dark:to-blue-200/90">
         <div className="flex items-center justify-between rounded-t-md bg-gray-50 p-3 text-gray-500 dark:bg-zinc-950/75 dark:text-gray-300">
-          <span className="relative z-50 truncate" title={invoice.client.name}>
-            {invoice.client.name}
+          <span className="relative z-50 truncate" title={record.client.name}>
+            {record.client.name}
           </span>
           {match(
-            invoice.type,
+            record.type,
             {
-              quote: (e: Quote) => <QuoteStatusDisplay status={e.status} />,
-              invoice: (e: Invoice) => <InvoiceStatusDisplay status={e.status} />,
-              receipt: (e: Receipt) => <InvoiceStatusDisplay status={e.invoice.status} />,
+              quote: (r: Quote) => <QuoteStatusDisplay status={r.status} />,
+              invoice: (r: Invoice) => <InvoiceStatusDisplay status={r.status} />,
+              receipt: (r: Receipt) => <InvoiceStatusDisplay status={r.invoice.status} />,
             },
-            invoice,
+            record,
           )}
         </div>
 
@@ -82,15 +79,15 @@ export function TinyInvoice({ invoice }: { invoice: Entity }) {
             )}
           </div>
           <div className="text-center">
-            {match(invoice.type, {
+            {match(record.type, {
               quote: () => <small className="lowercase">{t((x) => x.quote.title)}</small>,
               invoice: null,
               receipt: () => <small className="lowercase">{t((x) => x.receipt.title)}</small>,
             })}
-            <h3 className="text-xl font-medium text-gray-900">{invoice.number}</h3>
+            <h3 className="text-xl font-medium text-gray-900">{record.number}</h3>
             <div className="mt-1 flex flex-grow flex-col justify-between">
               <div className="text-sm text-gray-500">
-                <Money amount={total(invoice)} />
+                <Money amount={total(record)} />
               </div>
             </div>
           </div>
@@ -101,13 +98,13 @@ export function TinyInvoice({ invoice }: { invoice: Entity }) {
             <CalendarIcon className="h-4 w-4 text-gray-400 dark:text-white" />
             <span>
               {match(
-                invoice.type,
+                record.type,
                 {
-                  quote: (e: Quote) => format(e.quoteDate, 'PP'),
-                  invoice: (e: Invoice) => format(e.issueDate, 'PP'),
-                  receipt: (e: Receipt) => format(e.receiptDate, 'PP'),
+                  quote: (r: Quote) => format(r.quoteDate, 'PP'),
+                  invoice: (r: Invoice) => format(r.issueDate, 'PP'),
+                  receipt: (r: Receipt) => format(r.receiptDate, 'PP'),
                 },
-                invoice,
+                record,
               )}
             </span>
           </span>
@@ -120,13 +117,13 @@ export function TinyInvoice({ invoice }: { invoice: Entity }) {
             <CalendarIcon className="h-4 w-4 text-gray-400 dark:text-white" />
             <span>
               {match(
-                invoice.type,
+                record.type,
                 {
-                  quote: (e: Quote) => format(e.quoteExpirationDate, 'PP'),
-                  invoice: (e: Invoice) => format(e.dueDate, 'PP'),
-                  receipt: (e: Receipt) => format(e.receiptDate, 'PP'),
+                  quote: (r: Quote) => format(r.quoteExpirationDate, 'PP'),
+                  invoice: (r: Invoice) => format(r.dueDate, 'PP'),
+                  receipt: (r: Receipt) => format(r.receiptDate, 'PP'),
                 },
-                invoice,
+                record,
               )}
             </span>
           </span>
