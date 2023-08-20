@@ -77,7 +77,7 @@ export function Invoice() {
         ))}
 
         {record.attachments.length > 0 && (
-          <div className="paper relative mx-auto flex flex-col shadow-none print:hidden"></div>
+          <div className="paper relative mx-auto flex h-[calc(100vh-297mm-(theme(spacing.8)*2+theme(spacing.10)))] flex-col shadow-none print:hidden"></div>
         )}
       </div>
     </RecordProvider>
