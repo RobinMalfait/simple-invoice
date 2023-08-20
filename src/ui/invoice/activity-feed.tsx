@@ -43,12 +43,13 @@ export function ActivityFeed(props: React.PropsWithChildren<{ entities: Entity[]
                     idx > activeEntityIdx && 'opacity-50 grayscale',
                   )}
                 >
-                  <span className="pr-3">
+                  <span className="whitespace-nowrap pr-3">
                     {match(entity.type, {
                       quote: () => 'Quote',
                       invoice: () => 'Invoice',
                       receipt: () => 'Receipt',
-                    })}
+                    })}{' '}
+                    (#{entity.number})
                   </span>
                   <span className="h-px w-full bg-gray-200 dark:bg-zinc-600"></span>
                 </li>
