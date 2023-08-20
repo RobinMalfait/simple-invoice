@@ -32,7 +32,10 @@ export function Attachment({ document }: { document: Document }) {
 
         return (
           <PageProvider key={pageIdx} info={{ total: pages.length, current: pageIdx }}>
-            <div className="paper relative mx-auto flex flex-col overflow-hidden bg-white dark:bg-zinc-950/70 print:m-0">
+            <div
+              id={pageIdx === 0 ? `attachment-${document.id}` : undefined}
+              className="paper relative mx-auto flex flex-col overflow-hidden bg-white dark:bg-zinc-950/70 print:m-0"
+            >
               {!completed && (
                 <div className="absolute inset-0 z-20 bg-black/10 backdrop-blur">
                   <div className="p-4 text-xl dark:text-white">
