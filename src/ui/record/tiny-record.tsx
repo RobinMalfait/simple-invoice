@@ -80,9 +80,9 @@ export function TinyRecord({ record }: { record: Record }) {
           </div>
           <div className="text-center">
             {match(record.type, {
-              quote: () => <small className="lowercase">{t((x) => x.quote.title)}</small>,
+              quote: () => <small className="lowercase">quote</small>,
               invoice: null,
-              receipt: () => <small className="lowercase">{t((x) => x.receipt.title)}</small>,
+              receipt: () => <small className="lowercase">receipt</small>,
             })}
             <h3 className="text-xl font-medium text-gray-900">{record.number}</h3>
             <div className="mt-1 flex flex-grow flex-col justify-between">
