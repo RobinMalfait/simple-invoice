@@ -184,12 +184,26 @@ function ActivityIndicator({ item }: { item: Event }) {
 
 function ActivityText({ item }: { item: Event }) {
   switch (item.type) {
-    case 'quote-drafted':
+    case 'quote-drafted': {
+      if (item.from) {
+        return (
+          <>
+            <span className="font-medium text-gray-900 dark:text-gray-100">Drafted</span> the quote
+            from{' '}
+            {match(item.from, {
+              quote: () => 'another quote',
+            })}
+            .
+          </>
+        )
+      }
+
       return (
         <>
           <span className="font-medium text-gray-900 dark:text-gray-100">Drafted</span> the quote.
         </>
       )
+    }
 
     case 'quote-sent':
       return (

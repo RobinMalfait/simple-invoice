@@ -3,7 +3,7 @@ import { z } from 'zod'
 export let Event = z
   .discriminatedUnion('type', [
     // Quotes
-    z.object({ type: z.literal('quote-drafted') }),
+    z.object({ type: z.literal('quote-drafted'), from: z.enum(['quote']).optional() }),
     z.object({ type: z.literal('quote-sent') }),
     z.object({ type: z.literal('quote-accepted') }),
     z.object({ type: z.literal('quote-rejected') }),
