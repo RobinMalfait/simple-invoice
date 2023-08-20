@@ -3,8 +3,8 @@
 import { InformationCircleIcon } from '@heroicons/react/24/outline'
 import { Receipt } from '~/domain/receipt/receipt'
 import { useFittedPagination } from '~/ui/hooks/use-fitted-pagination'
-import { RecordProvider, useRecord } from '~/ui/hooks/use-record'
 import { PageProvider } from '~/ui/hooks/use-pagination-info'
+import { RecordProvider, useRecord } from '~/ui/hooks/use-record'
 import { match } from '~/utils/match'
 import { Attachment } from './attachment'
 import { BigFooter } from './big-footer'
@@ -75,6 +75,10 @@ export function Invoice() {
         {record.attachments.map((document) => (
           <Attachment key={document.id} document={document} />
         ))}
+
+        {record.attachments.length > 0 && (
+          <div className="paper relative mx-auto flex flex-col shadow-none print:hidden"></div>
+        )}
       </div>
     </RecordProvider>
   )
