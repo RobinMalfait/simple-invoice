@@ -8,50 +8,75 @@ type Entity = Quote | Invoice | Receipt
 
 let data = require(`./${process.env.DATA_SOURCE_FILE}.ts`)
 
+function flattenEntities(entities: Entity[], depth = 0) {
+  let result = entities.flatMap((entity) => {
+    let list = [entity]
+
+    //
+    if (isQuote(entity)) {
+      if (entity.quote) {
+        list.push(...flattenEntities([entity.quote], depth + 1))
+      }
+    }
+
+    //
+    else if (isInvoice(entity)) {
+      if (entity.quote) {
+        list.push(...flattenEntities([entity.quote], depth + 1))
+      }
+    }
+
+    //
+    else if (isReceipt(entity)) {
+      if (entity.invoice) {
+        list.push(...flattenEntities([entity.invoice], depth + 1))
+      }
+    }
+
+    return list.filter(Boolean)
+  })
+
+  if (depth === 0) {
+    return (
+      Array.from(
+        // Make unique using identity
+        new Set(result),
+      )
+        // Make unique using ID
+        .filter((entity, idx, all) => all.findIndex((other) => other.id === entity.id) === idx)
+    )
+  }
+
+  return result
+}
+
 export let me: Account = data.me
-export let invoices: Entity[] = (
-  Array.from(
-    new Set( // Make unique using identity
-      data.invoices.flatMap((entity: Entity) => {
-        if (isQuote(entity)) {
-          return [entity]
-        } else if (isInvoice(entity)) {
-          return [entity, entity.quote].filter(Boolean)
-        } else if (isReceipt(entity)) {
-          return [entity, entity.invoice, entity.invoice.quote].filter(Boolean)
-        }
-      }),
-    ),
-  ) as Entity[]
-)
-  // Make unique using ID
-  .filter((entity, idx, all) => all.findIndex((other) => other.id === entity.id) === idx)
+export let invoices: Entity[] = flattenEntities(data.invoices)
 
 // For each entity in the system, we should be able to find all related entities in either layers
 // below or layers above.
-export let stacks: Record<string, string[]> = Object.fromEntries(
-  invoices.map((entity) => [entity.id, [entity.id]]),
-)
+export let stacks: Record<string, string[]> = {}
 
 for (let entity of invoices) {
-  if (isInvoice(entity)) {
-    if (entity.quote) {
-      stacks[entity.id].push(entity.quote.id)
-      stacks[entity.quote.id].push(entity.id)
+  stacks[entity.id] ??= [entity.id]
+
+  let entities = flattenEntities([entity])
+
+  for (let entity of entities) {
+    for (let other of entities) {
+      if (entity === other) continue
+
+      stacks[entity.id] ??= [entity.id]
+      stacks[entity.id].push(other.id)
+
+      stacks[other.id] ??= [other.id]
+      stacks[other.id].push(entity.id)
     }
   }
+}
 
-  if (isReceipt(entity)) {
-    if (entity.invoice) {
-      stacks[entity.id].push(entity.invoice.id)
-      stacks[entity.invoice.id].push(entity.id)
-    }
-
-    if (entity.invoice?.quote) {
-      stacks[entity.id].push(entity.invoice.quote.id)
-      stacks[entity.invoice.quote.id].push(entity.id)
-    }
-  }
+for (let [idx, stack] of Object.entries(stacks)) {
+  stacks[idx] = Array.from(new Set(stack))
 }
 
 let order = ['quote', 'invoice', 'receipt']

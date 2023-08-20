@@ -11,7 +11,7 @@ import { InvoiceItem } from '~/domain/invoice/invoice-item'
 import { QuoteStatus } from '~/domain/quote/quote-status'
 import { match } from '~/utils/match'
 
-export let Quote = z.object({
+let BaseQuote = z.object({
   type: z.literal('quote').default('quote'),
   id: z.string().default(() => crypto.randomUUID()),
   number: z.string(),
@@ -27,7 +27,13 @@ export let Quote = z.object({
   events: z.array(Event),
 })
 
-export type Quote = z.infer<typeof Quote>
+export type Quote = z.infer<typeof BaseQuote> & {
+  quote: Quote | null
+}
+
+export let Quote = BaseQuote.extend({
+  quote: z.lazy(() => Quote.nullable()),
+}) as z.ZodType<Quote>
 
 export class QuoteBuilder {
   private _number: string | null = null
@@ -40,6 +46,7 @@ export class QuoteBuilder {
   private _discounts: Discount[] = []
   private _attachments: Document[] = []
   private events: Quote['events'] = [Event.parse({ type: 'quote-drafted' })]
+  private _quote: Quote | null = null
 
   private _status = QuoteStatus.Draft
 
@@ -56,6 +63,8 @@ export class QuoteBuilder {
       attachments: this._attachments,
       status: this.computeStatus,
       events: this.events,
+
+      quote: this._quote,
     }
 
     if (input.status === QuoteStatus.Expired) {
@@ -63,6 +72,23 @@ export class QuoteBuilder {
     }
 
     return Quote.parse(input)
+  }
+
+  public static fromQuote(quote: Quote): QuoteBuilder {
+    if (![QuoteStatus.Closed, QuoteStatus.Expired, QuoteStatus.Rejected].includes(quote.status)) {
+      throw new Error(`Cannot create a quote from another quote that is currently ${quote.status}`)
+    }
+
+    let builder = new QuoteBuilder()
+    builder._account = quote.account
+    builder._client = quote.client
+    builder._quote = quote
+    builder._items = quote.items.slice()
+    builder._note = quote.note
+    builder._discounts = quote.discounts.slice()
+    builder._attachments = quote.attachments.slice()
+    builder.events = [Event.parse({ type: 'quote-drafted', from: 'quote' })]
+    return builder
   }
 
   private get computeNumber() {
