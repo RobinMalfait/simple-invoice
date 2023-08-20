@@ -1,10 +1,10 @@
 import { ExclamationTriangleIcon } from '@heroicons/react/20/solid'
 import { redirect } from 'next/navigation'
 import { me, records } from '~/data'
-import { recordHasWarning, warningMessageForRecord } from '~/domain/record/filters'
 import { Invoice as InvoiceType } from '~/domain/invoice/invoice'
 import { Quote as QuoteType } from '~/domain/quote/quote'
 import { Receipt as ReceiptType } from '~/domain/receipt/receipt'
+import { recordHasWarning, warningMessageForRecord } from '~/domain/record/filters'
 import { I18NProvider } from '~/ui/hooks/use-i18n'
 import { ActivityFeed } from '~/ui/invoice/activity-feed'
 import { AttachmentList } from '~/ui/invoice/attachment-list'
@@ -13,7 +13,7 @@ import { total } from '~/ui/invoice/total'
 import { Money } from '~/ui/money'
 import { match } from '~/utils/match'
 import { Actions } from './actions'
-import { History, HistoryDropdown } from './history'
+import { History, HistoryActions } from './history'
 
 export default function Invoice({
   params: { type, number },
@@ -71,6 +71,10 @@ export default function Invoice({
               </div>
             </div>
 
+            <div className="-my-4 flex items-center justify-end empty:hidden">
+              <HistoryActions />
+            </div>
+
             <div className="flex flex-col gap-4 rounded-lg bg-white p-4 shadow ring-1 ring-black/5 dark:bg-zinc-900 dark:text-gray-300">
               <span className="text-sm font-medium text-gray-900 dark:text-gray-300">Activity</span>
               <ActivityFeed records={records} />
@@ -81,10 +85,6 @@ export default function Invoice({
                 Attachments
               </span>
               <AttachmentList />
-            </div>
-
-            <div className="flex items-center justify-end empty:hidden">
-              <HistoryDropdown />
             </div>
 
             {recordHasWarning(record) && (
