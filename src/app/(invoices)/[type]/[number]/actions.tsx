@@ -11,6 +11,7 @@ import { isAccepted, isQuote } from '~/domain/entity-filters'
 import { DownloadLink } from '~/ui/download-link'
 import { useCurrencyFormatter } from '~/ui/hooks/use-currency-formatter'
 import { useInvoice } from '~/ui/hooks/use-invoice'
+import { useInvoiceStacks } from '~/ui/hooks/use-invoice-stacks'
 import { total } from '~/ui/invoice/total'
 import { SidePanel, useSidePanel } from '~/ui/side-panel'
 import { match } from '~/utils/match'
@@ -131,6 +132,7 @@ function PromoteToInvoicePanel() {
   let [data, controls] = useSidePanel()
   let [copyStatus, setCopyStatus] = useState<'idle' | 'copied'>('idle')
   let formatter = useCurrencyFormatter()
+  let stacks = useInvoiceStacks()
 
   let copyInvoiceCode = useCallback(
     (data: { issueDate?: string; dueDate?: string; withAttachments?: 'on' }) => {
@@ -169,6 +171,14 @@ function PromoteToInvoicePanel() {
   )
 
   let [issueDate, setIssueDate] = useState<Date | null>(new Date())
+
+  // TODO: Right now I'm assuming that if there are multiple linked invoices to this quote then we
+  // should not be able to promote this quote. However, this is not true if you created a quote from
+  // another quote. (We don't have this functionality yet, but once we do, then this assumption will
+  // fail).
+  if ((stacks.get(entity.id)?.length ?? 0) > 1) {
+    return null
+  }
 
   if (!isQuote(entity) || !isAccepted(entity)) {
     return null
