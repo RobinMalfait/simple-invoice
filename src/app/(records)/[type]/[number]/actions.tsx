@@ -218,7 +218,7 @@ function PromoteToInvoicePanel() {
             name="dueDate"
             label="Due date"
             type="datetime-local"
-            min={issueDate?.toISOString().slice(0, 16)}
+            min={issueDate ? format(issueDate, "yyyy-MM-dd'T'HH:mm") : ''}
           />
 
           {record.attachments.length > 0 && (
