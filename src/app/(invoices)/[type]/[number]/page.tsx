@@ -29,9 +29,9 @@ export default function Invoice({
   return (
     <div className="flex h-full flex-1 overflow-hidden [--spacing:theme(spacing.8)]">
       <History entity={entity} entities={invoices}>
-        <div className="flex overflow-auto bg-gray-950/10 shadow-inner dark:bg-zinc-600">
-          <div className="mb-8">
-            <div className="px-4 py-8 sm:px-6 lg:px-8">
+        <div className="flex w-[calc(210mm+theme(spacing.10)*2)] overflow-auto bg-gray-950/10 shadow-inner dark:bg-zinc-600">
+          <div className="mx-auto mb-10">
+            <div className="py-10">
               <InvoicePreview />
             </div>
           </div>
