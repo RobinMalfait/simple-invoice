@@ -176,7 +176,7 @@ function PromoteToInvoicePanel() {
   // should not be able to promote this quote. However, this is not true if you created a quote from
   // another quote. (We don't have this functionality yet, but once we do, then this assumption will
   // fail).
-  if ((stacks.get(entity.id)?.length ?? 0) > 1) {
+  if ((stacks[entity.id]?.length ?? 0) > 1) {
     return null
   }
 

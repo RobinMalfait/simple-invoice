@@ -1,11 +1,11 @@
 import { createContext, useContext } from 'react'
 
-let InvoiceStacksContext = createContext<Map<string, string[]>>(new Map())
+let InvoiceStacksContext = createContext<Record<string, string[]>>({})
 
 export function InvoiceStacksProvider({
   value,
   ...props
-}: React.PropsWithChildren<{ value: Map<string, string[]> }>) {
+}: React.PropsWithChildren<{ value: Record<string, string[]> }>) {
   return <InvoiceStacksContext.Provider value={value} {...props} />
 }
 

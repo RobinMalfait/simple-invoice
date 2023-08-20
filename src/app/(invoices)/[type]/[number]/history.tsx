@@ -23,7 +23,7 @@ let HistoryContext = React.createContext<{
 
 export function History(props: React.PropsWithChildren<{ entity: Entity; entities: Entity[] }>) {
   let stacks = useInvoiceStacks()
-  let options = (stacks.get(props.entity.id) ?? []).map(
+  let options = (stacks[props.entity.id] ?? []).map(
     (id) => props.entities.find((e) => e.id === id)!,
   )
 

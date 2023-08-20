@@ -29,33 +29,33 @@ export let invoices: Entity[] = (
 
 // For each entity in the system, we should be able to find all related entities in either layers
 // below or layers above.
-export let stacks: Map<string, string[]> = new Map(
+export let stacks: Record<string, string[]> = Object.fromEntries(
   invoices.map((entity) => [entity.id, [entity.id]]),
 )
 
 for (let entity of invoices) {
   if (isInvoice(entity)) {
     if (entity.quote) {
-      stacks.get(entity.id)!.push(entity.quote.id)
-      stacks.get(entity.quote.id)!.push(entity.id)
+      stacks[entity.id].push(entity.quote.id)
+      stacks[entity.quote.id].push(entity.id)
     }
   }
 
   if (isReceipt(entity)) {
     if (entity.invoice) {
-      stacks.get(entity.id)!.push(entity.invoice.id)
-      stacks.get(entity.invoice.id)!.push(entity.id)
+      stacks[entity.id].push(entity.invoice.id)
+      stacks[entity.invoice.id].push(entity.id)
     }
 
     if (entity.invoice?.quote) {
-      stacks.get(entity.id)!.push(entity.invoice.quote.id)
-      stacks.get(entity.invoice.quote.id)!.push(entity.id)
+      stacks[entity.id].push(entity.invoice.quote.id)
+      stacks[entity.invoice.quote.id].push(entity.id)
     }
   }
 }
 
 let order = ['quote', 'invoice', 'receipt']
-for (let stack of stacks.values()) {
+for (let stack of Object.values(stacks)) {
   stack.sort((aId, zId) => {
     let a = invoices.find((e) => e.id === aId)!
     let z = invoices.find((e) => e.id === zId)!

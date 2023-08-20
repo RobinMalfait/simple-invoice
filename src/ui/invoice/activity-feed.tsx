@@ -26,9 +26,9 @@ type Entity = Quote | Invoice | Receipt
 export function ActivityFeed(props: React.PropsWithChildren<{ entities: Entity[] }>) {
   let stacks = useInvoiceStacks()
   let entity = useInvoice()
-  let entities = (stacks.get(entity.id) ?? []).map((id) => props.entities.find((e) => e.id === id)!)
+  let entities = (stacks[entity.id] ?? []).map((id) => props.entities.find((e) => e.id === id)!)
 
-  let activeEntityIdx = stacks.get(entity.id)?.indexOf(entity.id) ?? -1
+  let activeEntityIdx = stacks[entity.id]?.indexOf(entity.id) ?? -1
 
   return (
     <>

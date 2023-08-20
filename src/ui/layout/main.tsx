@@ -50,7 +50,7 @@ export default function Layout({
   data: {
     me: Account
     invoices: Entity[]
-    stacks: Map<Entity, Entity[]>
+    stacks: Record<string, string[]>
   }
 }>) {
   let pathname = usePathname()

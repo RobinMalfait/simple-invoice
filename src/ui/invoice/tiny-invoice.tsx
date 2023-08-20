@@ -21,7 +21,7 @@ type Entity = Quote | Invoice | Receipt
 export function TinyInvoice({ invoice }: { invoice: Entity }) {
   let t = useTranslation()
   let stacks = useInvoiceStacks()
-  let isLayered = (stacks.get(invoice.id)?.length ?? 0) > 1
+  let isLayered = (stacks[invoice.id]?.length ?? 0) > 1
   let hasAttachments = entityHasAttachments(invoice, 'any')
   let warning = entityHasWarning(invoice)
 
