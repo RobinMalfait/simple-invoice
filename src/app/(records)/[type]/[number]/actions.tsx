@@ -7,11 +7,12 @@ import estreePlugin from 'prettier/plugins/estree'
 import tsPlugin from 'prettier/plugins/typescript'
 import * as prettier from 'prettier/standalone'
 import { useCallback, useState } from 'react'
-import { isAccepted, isQuote } from '~/domain/record/filters'
+import { isAccepted, isInvoice, isQuote, isReceipt } from '~/domain/record/filters'
 import { DownloadLink } from '~/ui/download-link'
 import { useCurrencyFormatter } from '~/ui/hooks/use-currency-formatter'
 import { useRecord } from '~/ui/hooks/use-record'
 import { useRecordStacks } from '~/ui/hooks/use-record-stacks'
+import { useRecords } from '~/ui/hooks/use-records'
 import { total } from '~/ui/invoice/total'
 import { SidePanel, useSidePanel } from '~/ui/side-panel'
 import { match } from '~/utils/match'
@@ -127,6 +128,7 @@ export function Actions() {
 }
 
 function PromoteToInvoicePanel() {
+  let records = useRecords()
   let record = useRecord()
 
   let [data, controls] = useSidePanel()
@@ -172,11 +174,11 @@ function PromoteToInvoicePanel() {
 
   let [issueDate, setIssueDate] = useState<Date | null>(new Date())
 
-  // TODO: Right now I'm assuming that if there are multiple linked records to this quote then we
-  // should not be able to promote this quote. However, this is not true if you created a quote from
-  // another quote. (We don't have this functionality yet, but once we do, then this assumption will
-  // fail).
-  if ((stacks[record.id]?.length ?? 0) > 1) {
+  let isAlreadyPromoted = stacks[record.id].some((id) => {
+    let record = records.find((record) => record.id === id)
+    return record && (isInvoice(record) || isReceipt(record))
+  })
+  if (isAlreadyPromoted) {
     return null
   }
 
