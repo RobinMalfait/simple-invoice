@@ -41,7 +41,15 @@ import {
 import { Account } from '~/domain/account/account'
 import { Client } from '~/domain/client/client'
 import { QuoteStatus } from '~/domain/quote/quote-status'
-import { isActiveRecord, isDeadRecord, isPaidRecord, isQuote } from '~/domain/record/filters'
+import {
+  isActiveRecord,
+  isDeadRecord,
+  isInvoice,
+  isPaidRecord,
+  isPartiallyPaid,
+  isQuote,
+  isSent,
+} from '~/domain/record/filters'
 import { Record, resolveRelevantRecordDate } from '~/domain/record/record'
 import { classNames } from '~/ui/class-names'
 import { FormatRange } from '~/ui/date-range'
@@ -49,7 +57,7 @@ import { Empty } from '~/ui/empty'
 import { useCurrencyFormatter } from '~/ui/hooks/use-currency-formatter'
 import { useCurrentDate } from '~/ui/hooks/use-current-date'
 import { I18NProvider } from '~/ui/hooks/use-i18n'
-import { total } from '~/ui/invoice/total'
+import { total, totalUnpaid } from '~/ui/invoice/total'
 import { Money } from '~/ui/money'
 import { RangePicker, options } from '~/ui/range-picker'
 import { TinyRecord } from '~/ui/record/tiny-record'
@@ -156,7 +164,7 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
             </div>
           </div>
 
-          <div className="grid grid-cols-5 gap-[--gap]">
+          <div className="grid grid-cols-6 gap-[--gap]">
             <CompareBlock
               title="Quotes"
               value={(list) => list.filter((e) => e.type === 'quote').length}
@@ -173,6 +181,17 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
               inverse
               title="Rejected / Expired"
               value={(list) => list.filter((e) => isDeadRecord(e)).length}
+            />
+
+            <CompareBlock
+              inverse
+              title="Outstanding"
+              value={(list) =>
+                list
+                  .filter((e) => isInvoice(e) && (isSent(e) || isPartiallyPaid(e)))
+                  .reduce((acc, r) => acc + totalUnpaid(r), 0)
+              }
+              display={(value) => <Money amount={value} />}
             />
 
             <div className="col-span-2">

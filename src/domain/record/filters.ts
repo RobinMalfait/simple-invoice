@@ -23,6 +23,14 @@ export function isAccepted(quote: Quote) {
   return quote.status === QuoteStatus.Accepted
 }
 
+export function isSent(invoice: Invoice) {
+  return invoice.status === InvoiceStatus.Sent
+}
+
+export function isPartiallyPaid(invoice: Invoice) {
+  return invoice.status === InvoiceStatus.PartiallyPaid
+}
+
 export function recordHasWarning(record: Record) {
   return match(
     record.type,
