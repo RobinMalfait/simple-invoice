@@ -7,6 +7,8 @@ import { Receipt } from '~/domain/receipt/receipt'
 import type { Record } from '~/domain/record/record'
 import { match } from '~/utils/match'
 
+//
+
 export function isQuote(record: Record): record is Quote {
   return record.type === 'quote'
 }
@@ -19,17 +21,66 @@ export function isReceipt(record: Record): record is Receipt {
   return record.type === 'receipt'
 }
 
+// ---
+
+export function isDraft(record: Quote | Invoice) {
+  return match(
+    record.type,
+    {
+      quote: (r: Quote) => r.status === QuoteStatus.Draft,
+      invoice: (r: Invoice) => r.status === InvoiceStatus.Draft,
+    },
+    record,
+  )
+}
+
+export function isSent(record: Quote | Invoice) {
+  return match(
+    record.type,
+    {
+      quote: (r: Quote) => r.status === QuoteStatus.Sent,
+      invoice: (r: Invoice) => r.status === InvoiceStatus.Sent,
+    },
+    record,
+  )
+}
+
 export function isAccepted(quote: Quote) {
   return quote.status === QuoteStatus.Accepted
 }
 
-export function isSent(invoice: Invoice) {
-  return invoice.status === InvoiceStatus.Sent
+export function isRejected(quote: Quote) {
+  return quote.status === QuoteStatus.Rejected
+}
+
+export function isExpired(quote: Quote) {
+  return quote.status === QuoteStatus.Expired
+}
+
+export function isClosed(record: Invoice | Quote) {
+  return match(
+    record.type,
+    {
+      quote: (r: Quote) => r.status === QuoteStatus.Closed,
+      invoice: (r: Invoice) => r.status === InvoiceStatus.Closed,
+    },
+    record,
+  )
+}
+
+export function isPaid(invoice: Invoice) {
+  return invoice.status === InvoiceStatus.Paid
 }
 
 export function isPartiallyPaid(invoice: Invoice) {
   return invoice.status === InvoiceStatus.PartiallyPaid
 }
+
+export function isOverdue(invoice: Invoice) {
+  return invoice.status === InvoiceStatus.Overdue
+}
+
+// ---
 
 export function recordHasWarning(record: Record) {
   return match(

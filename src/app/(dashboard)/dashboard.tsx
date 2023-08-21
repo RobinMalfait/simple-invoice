@@ -40,17 +40,23 @@ import {
 } from 'recharts'
 import { Account } from '~/domain/account/account'
 import { Client } from '~/domain/client/client'
-import { QuoteStatus } from '~/domain/quote/quote-status'
 import {
+  isAccepted,
   isActiveRecord,
-  isDeadRecord,
+  isClosed,
+  isDraft,
+  isExpired,
   isInvoice,
+  isOverdue,
+  isPaid,
   isPaidRecord,
   isPartiallyPaid,
   isQuote,
+  isReceipt,
+  isRejected,
   isSent,
 } from '~/domain/record/filters'
-import { Record, resolveRelevantRecordDate } from '~/domain/record/record'
+import { Record, resolveRelevantRecordDate, separateRecords } from '~/domain/record/record'
 import { classNames } from '~/ui/class-names'
 import { FormatRange } from '~/ui/date-range'
 import { Empty } from '~/ui/empty'
@@ -95,14 +101,16 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
   }
   let currentRange = { start, end }
 
-  let previousRecords = records.filter((e) =>
-    isWithinInterval(resolveRelevantRecordDate(e), previousRange),
+  let previousRecords = records.filter((r) =>
+    isWithinInterval(resolveRelevantRecordDate(r), previousRange),
   )
-  let currentRecords = records.filter((e) =>
-    isWithinInterval(resolveRelevantRecordDate(e), currentRange),
+  let currentRecords = records.filter((r) =>
+    isWithinInterval(resolveRelevantRecordDate(r), currentRange),
   )
 
-  let systemContainsQuotes = records.some((e) => isQuote(e))
+  let allRecords = separateRecords(records)
+  let systemContainsQuotes = allRecords.some((r) => isQuote(r))
+  let systemContainsInvoices = allRecords.some((r) => isInvoice(r))
 
   return (
     <CompareConfigContext.Provider
@@ -120,7 +128,7 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
         }}
       >
         <main className="space-y-[--gap] px-4 py-8 [--gap:theme(spacing.4)] sm:px-6 lg:px-8">
-          <div className="sticky top-0 z-10 -mx-2 -mb-[--gap] -mt-[--gap] flex items-center justify-between bg-gray-100/20 px-2 py-[--gap] backdrop-blur dark:bg-zinc-800/20">
+          <div className="sticky top-0 z-10 -mx-2 -mb-[calc(var(--gap)-1px)] -mt-[--gap] flex items-center justify-between bg-gray-100/20 px-2 py-[--gap] backdrop-blur dark:bg-zinc-800/20">
             <div>
               <div className="flex items-center gap-2">
                 <button
@@ -164,38 +172,182 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
             </div>
           </div>
 
-          <div className="grid grid-cols-6 gap-[--gap]">
-            <CompareBlock
-              title="Quotes"
-              value={(list) => list.filter((e) => e.type === 'quote').length}
-            />
+          <div
+            style={
+              {
+                '--cols': `repeat(${
+                  4 - (systemContainsQuotes ? 0 : 1) - (systemContainsInvoices ? 0 : 1)
+                }, minmax(0, 1fr))`,
+              } as React.CSSProperties
+            }
+            className="grid grid-cols-2 gap-[--gap] 2xl:grid-cols-[--cols]"
+          >
+            {systemContainsQuotes && (
+              <CompareGroup>
+                <CompareBlock
+                  title="Quotes"
+                  value={(list) => separateRecords(list).filter((r) => isQuote(r)).length}
+                />
+                <CompareBlock
+                  variant="tiny"
+                  title="Draft"
+                  value={(list) =>
+                    separateRecords(list).filter((r) => isQuote(r) && isDraft(r)).length
+                  }
+                />
+                <CompareBlock
+                  variant="tiny"
+                  title="Sent"
+                  value={(list) =>
+                    separateRecords(list).filter((r) => isQuote(r) && isSent(r)).length
+                  }
+                />
+                <CompareBlock
+                  variant="tiny"
+                  title="Accepted"
+                  value={(list) =>
+                    separateRecords(list).filter((r) => isQuote(r) && isAccepted(r)).length
+                  }
+                />
+                <CompareBlock
+                  variant="tiny"
+                  title="Rejected"
+                  value={(list) =>
+                    separateRecords(list).filter((r) => isQuote(r) && isRejected(r)).length
+                  }
+                />
+                <CompareBlock
+                  variant="tiny"
+                  title="Expired"
+                  value={(list) =>
+                    separateRecords(list).filter((r) => isQuote(r) && isExpired(r)).length
+                  }
+                />
+                <CompareBlock
+                  variant="tiny"
+                  title="Closed"
+                  value={(list) =>
+                    separateRecords(list).filter((r) => isQuote(r) && isClosed(r)).length
+                  }
+                />
+              </CompareGroup>
+            )}
 
-            <CompareBlock
-              title="Invoices / Receipts"
-              value={(list) =>
-                list.filter((e) => e.type === 'invoice' || e.type === 'receipt').length
-              }
-            />
+            {systemContainsInvoices && (
+              <CompareGroup>
+                <CompareBlock
+                  title="Invoices"
+                  value={(list) => separateRecords(list).filter((r) => isInvoice(r)).length}
+                />
+                <CompareBlock
+                  variant="tiny"
+                  title="Draft"
+                  value={(list) =>
+                    separateRecords(list).filter((r) => isInvoice(r) && isDraft(r)).length
+                  }
+                />
+                <CompareBlock
+                  variant="tiny"
+                  title="Sent"
+                  value={(list) =>
+                    separateRecords(list).filter((r) => isInvoice(r) && isSent(r)).length
+                  }
+                />
+                <CompareBlock
+                  variant="tiny"
+                  title="Paid"
+                  value={(list) =>
+                    separateRecords(list).filter((r) => isInvoice(r) && isPaid(r)).length
+                  }
+                />
+                <CompareBlock
+                  variant="tiny"
+                  title="Partially paid"
+                  value={(list) =>
+                    separateRecords(list).filter((r) => isInvoice(r) && isPartiallyPaid(r)).length
+                  }
+                />
+                <CompareBlock
+                  variant="tiny"
+                  title="Overdue"
+                  value={(list) =>
+                    separateRecords(list).filter((r) => isInvoice(r) && isOverdue(r)).length
+                  }
+                />
+                <CompareBlock
+                  variant="tiny"
+                  title="Closed"
+                  value={(list) =>
+                    separateRecords(list).filter((r) => isInvoice(r) && isClosed(r)).length
+                  }
+                />
+              </CompareGroup>
+            )}
 
-            <CompareBlock
-              inverse
-              title="Rejected / Expired"
-              value={(list) => list.filter((e) => isDeadRecord(e)).length}
-            />
-
-            <CompareBlock
-              inverse
-              title="Outstanding"
-              value={(list) =>
-                list
-                  .filter((e) => isInvoice(e) && (isSent(e) || isPartiallyPaid(e)))
-                  .reduce((acc, r) => acc + totalUnpaid(r), 0)
-              }
-              display={(value) => <Money amount={value} />}
-            />
-
-            <div className="col-span-2">
+            <div className="col-span-2 grid grid-cols-4 items-stretch gap-[--gap]">
               <CompareBlock
+                title="Receipts"
+                value={(list) => separateRecords(list).filter((r) => isReceipt(r)).length}
+              />
+
+              <CompareBlock
+                title="Unique clients"
+                value={(list) => new Set(separateRecords(list).map((r) => r.client.id)).size}
+              />
+
+              <CompareBlock<readonly [Client | null, number | null]>
+                className="col-span-2 row-start-2"
+                title="Best paying client"
+                data={(list) => {
+                  let interestingRecords = separateRecords(list).filter(
+                    (r) => isInvoice(r) && (isPaid(r) || isPartiallyPaid(r)),
+                  )
+                  let winner: string | null = null
+                  let clients = []
+                  let byClient = new Map()
+                  for (let record of interestingRecords) {
+                    clients.push(record.client)
+                    if (!byClient.has(record.client.id)) {
+                      byClient.set(record.client.id, 0)
+                    }
+                    byClient.set(record.client.id, byClient.get(record.client.id) + total(record))
+
+                    if (byClient.get(record.client.id) > (byClient.get(winner) ?? 0)) {
+                      winner = record.client.id
+                    }
+                  }
+                  clients = clients.filter(
+                    (c, idx, all) => all.findIndex((other) => other.id === c.id) === idx,
+                  )
+
+                  return [
+                    clients.find((c) => c.id === winner) ?? null,
+                    byClient.get(winner) ?? null,
+                  ] as const
+                }}
+                value={(data) => data?.[1] ?? null}
+                display={(value) => <Money amount={value} />}
+                footer={(data) =>
+                  data?.[0] && (
+                    <div className="text-xs text-gray-500 dark:text-zinc-400">{data[0].name} </div>
+                  )
+                }
+              />
+
+              <CompareBlock
+                className="col-span-2"
+                inverse
+                title="Outstanding"
+                value={(list) =>
+                  list
+                    .filter((e) => isInvoice(e) && (isSent(e) || isPartiallyPaid(e)))
+                    .reduce((acc, r) => acc + totalUnpaid(r), 0)
+                }
+                display={(value) => <Money amount={value} />}
+              />
+
+              <CompareBlock
+                className="col-span-2"
                 title="Paid"
                 value={(list) =>
                   list.filter((e) => isPaidRecord(e)).reduce((acc, e) => acc + total(e), 0)
@@ -247,23 +399,23 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
 
           <div className="grid grid-cols-5 gap-[--gap]">
             <div className="col-span-2 flex flex-1 flex-col gap-[--gap]">
-              <div className="grid grid-cols-2 gap-[--gap]">
+              <div className="grid grid-cols-1 gap-[--gap] xl:grid-cols-2">
                 {systemContainsQuotes && (
                   <>
                     <CompareBlock<readonly [Record, number] | null>
                       inverse
                       title={'Fastest accepted quote'}
                       data={(list) =>
-                        list
-                          .filter((e) => e.type === 'quote' && e.status === QuoteStatus.Accepted)
-                          .flatMap((e) => {
-                            let sentAt = e.events.find((e) => e.type === 'quote-sent')?.at
+                        separateRecords(list)
+                          .filter((r) => isQuote(r) && isAccepted(r))
+                          .flatMap((r) => {
+                            let sentAt = r.events.find((e) => e.type === 'quote-sent')?.at
                             if (!sentAt) return []
 
-                            let paidAt = e.events.find((e) => e.type === 'quote-accepted')?.at
+                            let paidAt = r.events.find((e) => e.type === 'quote-accepted')?.at
                             if (!paidAt) return []
 
-                            return [[e, differenceInMinutes(paidAt, sentAt)] as const]
+                            return [[r, differenceInMinutes(paidAt, sentAt)] as const]
                           })
                           .sort(([, a], [, z]) => z - a)
                           .pop() ?? null
@@ -289,16 +441,16 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
                       inverse
                       title={'Slowest accepted quote'}
                       data={(list) =>
-                        list
-                          .filter((e) => e.type === 'quote' && e.status === QuoteStatus.Accepted)
-                          .flatMap((e) => {
-                            let sentAt = e.events.find((e) => e.type === 'quote-sent')?.at
+                        separateRecords(list)
+                          .filter((r) => isQuote(r) && isAccepted(r))
+                          .flatMap((r) => {
+                            let sentAt = r.events.find((e) => e.type === 'quote-sent')?.at
                             if (!sentAt) return []
 
-                            let paidAt = e.events.find((e) => e.type === 'quote-accepted')?.at
+                            let paidAt = r.events.find((e) => e.type === 'quote-accepted')?.at
                             if (!paidAt) return []
 
-                            return [[e, differenceInMinutes(paidAt, sentAt)] as const]
+                            return [[r, differenceInMinutes(paidAt, sentAt)] as const]
                           })
                           .sort(([, a], [, z]) => a - z)
                           .pop() ?? null
@@ -326,16 +478,17 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
                   inverse
                   title={'Fastest paying client'}
                   data={(list) =>
-                    list
-                      .filter((e) => isPaidRecord(e))
-                      .flatMap((e) => {
-                        let sentAt = e.events.find((e) => e.type === 'invoice-sent')?.at
+                    separateRecords(list)
+                      .filter((r) => isPaidRecord(r))
+                      .map((r) => (isReceipt(r) ? r.invoice : r))
+                      .flatMap((r) => {
+                        let sentAt = r.events.find((e) => e.type === 'invoice-sent')?.at
                         if (!sentAt) return []
 
-                        let paidAt = e.events.find((e) => e.type === 'invoice-paid')?.at
+                        let paidAt = r.events.find((e) => e.type === 'invoice-paid')?.at
                         if (!paidAt) return []
 
-                        return [[e, differenceInMinutes(paidAt, sentAt)] as const]
+                        return [[r, differenceInMinutes(paidAt, sentAt)] as const]
                       })
                       .sort(([, a], [, z]) => z - a)
                       .pop() ?? null
@@ -361,8 +514,9 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
                   inverse
                   title={'Slowest paying client'}
                   data={(list) =>
-                    list
+                    separateRecords(list)
                       .filter((e) => isPaidRecord(e))
+                      .map((r) => (isReceipt(r) ? r.invoice : r))
                       .flatMap((e) => {
                         let sentAt = e.events.find((e) => e.type === 'invoice-sent')?.at
                         if (!sentAt) return []
@@ -729,6 +883,16 @@ let CompareConfigContext = createContext<{
   current: Record[]
 }>({ withDiff: true, previous: [], current: [] })
 
+function CompareGroup(props: React.PropsWithChildren<{}>) {
+  return (
+    <div
+      data-grouped={true}
+      className="group grid grid-cols-4 gap-[calc(var(--gap)/2)] rounded-xl bg-white p-2 shadow ring-1 ring-black/5 dark:bg-zinc-900 first:[&>*]:col-span-3 first:[&>*]:row-span-2"
+      {...props}
+    />
+  )
+}
+
 function CompareBlock<T = Record[]>({
   title,
   value,
@@ -736,6 +900,8 @@ function CompareBlock<T = Record[]>({
   display = (i) => <>{i}</>,
   footer = null,
   inverse = false,
+  variant = 'normal',
+  className,
 }: {
   title: string
   data?: (values: Record[]) => T
@@ -743,6 +909,8 @@ function CompareBlock<T = Record[]>({
   display?: (value: number) => React.ReactNode
   footer?: ((data: T) => React.ReactNode) | null
   inverse?: boolean
+  variant?: 'tiny' | 'normal'
+  className?: string
 }) {
   let { withDiff, previous, current } = useContext(CompareConfigContext)
   let previousValue = value(data(previous))
@@ -754,23 +922,55 @@ function CompareBlock<T = Record[]>({
   return (
     <div
       className={classNames(
-        'relative flex gap-2 rounded-md bg-white p-4 shadow ring-1 ring-black/5 dark:bg-zinc-900',
+        'relative flex flex-col gap-2 rounded-md shadow ring-1 ring-black/5 group-data-[grouped]:shadow-none group-data-[grouped]:ring-0',
+        match(variant, {
+          tiny: () => 'bg-gray-100 p-2 dark:bg-zinc-800',
+          normal: () => 'bg-white p-4 dark:bg-zinc-900',
+        }),
         currentValue === null && 'opacity-50 transition-opacity duration-300 hover:opacity-100',
+        className,
       )}
     >
-      <div className="flex flex-col gap-2">
-        <span className="text-sm text-gray-600 dark:text-zinc-400">{title}</span>
+      <div className="flex flex-1 flex-col gap-2">
+        <span
+          title={title}
+          className={classNames(
+            'truncate text-gray-600 dark:text-zinc-400',
+            match(variant, {
+              tiny: () => 'text-xs',
+              normal: () => 'text-sm',
+            }),
+          )}
+        >
+          {title}
+        </span>
         <div className="flex flex-1 flex-wrap items-baseline gap-2">
-          <span className="text-2xl font-semibold tabular-nums text-zinc-500 dark:text-zinc-400">
+          <span
+            className={classNames(
+              'font-semibold tabular-nums text-zinc-500 dark:text-zinc-400',
+              match(variant, {
+                tiny: () => 'text-base',
+                normal: () => 'text-2xl',
+              }),
+            )}
+          >
             {currentValue === null ? 'N/A' : display(currentValue)}
           </span>
           {showDiff && (
-            <span className="-translate-y-0.5">
+            <span
+              className={classNames(
+                '-translate-y-0.5',
+                match(variant, {
+                  tiny: () => 'text-xs [--icon-size:theme(spacing.3)]',
+                  normal: () => 'text-sm [--icon-size:theme(spacing.5)]',
+                }),
+              )}
+            >
               {match(Math.sign(currentValue! - previousValue!), {
                 [1]: () => (
                   <span
                     className={classNames(
-                      'flex items-baseline text-sm font-semibold',
+                      'flex items-baseline font-semibold',
                       inverse
                         ? 'text-red-600 dark:text-red-400'
                         : 'text-green-600 dark:text-green-400',
@@ -778,7 +978,7 @@ function CompareBlock<T = Record[]>({
                   >
                     <ArrowUpIcon
                       className={classNames(
-                        'h-5 w-5 shrink-0 self-center',
+                        'h-[--icon-size] w-[--icon-size] shrink-0 self-center',
                         inverse
                           ? 'text-red-500 dark:text-red-400'
                           : 'text-green-500 dark:text-green-400',
@@ -791,7 +991,7 @@ function CompareBlock<T = Record[]>({
                 [-1]: () => (
                   <span
                     className={classNames(
-                      'flex items-baseline text-sm font-semibold',
+                      'flex items-baseline font-semibold',
                       inverse
                         ? 'text-green-600 dark:text-green-400'
                         : 'text-red-600 dark:text-red-400',
@@ -799,7 +999,7 @@ function CompareBlock<T = Record[]>({
                   >
                     <ArrowDownIcon
                       className={classNames(
-                        'h-5 w-5 shrink-0 self-center',
+                        'h-[--icon-size] w-[--icon-size] shrink-0 self-center',
                         inverse
                           ? 'text-green-500 dark:text-green-400'
                           : 'text-red-500 dark:text-red-400',
