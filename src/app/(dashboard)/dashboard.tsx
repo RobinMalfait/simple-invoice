@@ -776,7 +776,7 @@ function ComparisonChart({
         <div className="flex min-h-[theme(spacing.96)] flex-1 gap-4 overflow-x-auto [--current:theme(colors.blue.500)] [--grid-color:theme(colors.zinc.200)] [--previous:theme(colors.zinc.400/.50)] dark:[--grid-color:theme(colors.zinc.900)]">
           <div className="h-full w-full flex-1 p-4">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={data} margin={{ left: 10, right: 10 }}>
+              <LineChart data={data} margin={{ left: 15, right: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--grid-color)" />
                 <Tooltip
                   content={({ payload = [] }) => (
