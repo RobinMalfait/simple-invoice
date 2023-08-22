@@ -773,7 +773,7 @@ function ComparisonChart({
         Paid invoices compared to previous period
       </div>
       {hasData ? (
-        <div className="flex min-h-[theme(spacing.96)] flex-1 gap-4 overflow-x-auto [--current:theme(colors.blue.500)] [--grid-color:theme(colors.zinc.200)] [--previous:theme(colors.zinc.400/.50)] dark:[--grid-color:theme(colors.zinc.900)]">
+        <div className="flex min-h-[theme(spacing.96)] flex-1 gap-4 overflow-x-auto [--current:theme(colors.blue.500)] [--dot-fill:theme(colors.white)] [--grid-color:theme(colors.zinc.200)] [--previous:theme(colors.zinc.400/.50)] dark:[--dot-fill:theme(colors.zinc.950)] dark:[--grid-color:theme(colors.zinc.900)]">
           <div className="h-full w-full flex-1 p-4">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={data} margin={{ left: 15, right: 10 }}>
@@ -856,6 +856,7 @@ function ComparisonChart({
                   name="Previous"
                   dataKey="previous"
                   stroke="var(--previous)"
+                  fill="var(--dot-fill)"
                   connectNulls
                 />
                 <Line
@@ -863,6 +864,7 @@ function ComparisonChart({
                   name="Current"
                   dataKey="current"
                   stroke="var(--current)"
+                  fill="var(--dot-fill)"
                   strokeWidth={2}
                   connectNulls
                 />
