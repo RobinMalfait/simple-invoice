@@ -193,7 +193,7 @@ export default function Layout({
                         size === 'large' && 'justify-between',
                       )}
                     >
-                      {size === 'large' && <span>Reduce sidebar</span>}
+                      {size === 'large' && <span>Collapse sidebar</span>}
                       <div className="h-4 w-4 rounded border border-gray-200">
                         <div
                           className={classNames(
