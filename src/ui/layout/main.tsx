@@ -10,11 +10,11 @@ import {
 } from '@heroicons/react/24/outline'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useState } from 'react'
 import { Account } from '~/domain/account/account'
 import { recordHasWarning } from '~/domain/record/filters'
 import { Record } from '~/domain/record/record'
 import { classNames } from '~/ui/class-names'
+import { useLocalStorageState } from '~/ui/hooks/use-local-storage'
 import { RecordStacksProvider } from '~/ui/hooks/use-record-stacks'
 import { RecordsProvider } from '~/ui/hooks/use-records'
 import { match } from '~/utils/match'
@@ -52,7 +52,7 @@ export default function Layout({
     stacks: { [id: string]: string[] }
   }
 }>) {
-  let [size, setSize] = useState<'small' | 'large'>('large')
+  let [size, setSize] = useLocalStorageState<'small' | 'large'>('sidebar', 'large')
   let pathname = usePathname()
   if (pathname?.includes('/raw')) {
     return <>{children}</>
