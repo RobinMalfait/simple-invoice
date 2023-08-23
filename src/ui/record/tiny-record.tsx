@@ -27,7 +27,7 @@ export function TinyRecord({ record }: { record: Record }) {
   return (
     <div
       className={classNames(
-        'group relative rounded-md bg-white shadow transition-[transform,opacity] duration-300 will-change-transform hover:-translate-y-1 dark:bg-zinc-950',
+        'group relative rounded-md bg-white text-gray-700 shadow transition-[transform,opacity] duration-300 will-change-transform hover:-translate-y-1 dark:bg-zinc-950',
         isQuote(record) && record.status === QuoteStatus.Rejected && 'opacity-70 hover:opacity-100',
       )}
     >
