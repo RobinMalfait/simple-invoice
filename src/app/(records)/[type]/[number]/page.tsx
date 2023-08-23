@@ -1,4 +1,5 @@
 import { ExclamationTriangleIcon } from '@heroicons/react/20/solid'
+import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { me, records } from '~/data'
 import { Invoice as InvoiceType } from '~/domain/invoice/invoice'
@@ -47,7 +48,12 @@ export default function Invoice({
           <div className="flex max-w-lg flex-1 shrink-0 flex-col gap-[--spacing] overflow-auto px-4 py-8 sm:px-6 lg:px-8">
             <div className="flex flex-col gap-4 rounded-lg bg-white p-4 shadow ring-1 ring-black/5 dark:bg-zinc-900 dark:text-gray-300">
               <h3 className="flex items-center justify-between text-xl">
-                <span>{record.client.name}</span>
+                <Link href={`/clients/${record.client.id}`} className="group relative">
+                  {record.client.name}
+                  <div className="absolute inset-x-0 bottom-0">
+                    <div className="h-px w-full border-b border-dashed border-gray-300 group-hover:border-solid dark:border-white/40"></div>
+                  </div>
+                </Link>
                 <span>
                   #
                   {match(

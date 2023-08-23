@@ -329,7 +329,12 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
                 display={(value) => <Money amount={value} />}
                 footer={(data) =>
                   data?.[0] && (
-                    <div className="text-xs text-gray-500 dark:text-zinc-400">{data[0].name} </div>
+                    <div className="text-xs text-gray-500 dark:text-zinc-400">
+                      <Link href={`/clients/${data[0].id}`}>
+                        <span className="absolute inset-0"></span>
+                        {data[0].name}
+                      </Link>
+                    </div>
                   )
                 }
               />

@@ -7,6 +7,7 @@ import {
   DocumentTextIcon,
   HomeIcon,
   RectangleStackIcon,
+  UserGroupIcon,
 } from '@heroicons/react/24/outline'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -32,6 +33,7 @@ type Navigation = {
 
 let navigation: Navigation[] = [
   { name: 'Dashboard', icon: HomeIcon, href: '/', exact: true },
+  { name: 'Clients', icon: UserGroupIcon, href: '/clients' },
   {
     name: 'Records',
     icon: RectangleStackIcon,
