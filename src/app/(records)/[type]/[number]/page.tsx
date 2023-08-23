@@ -29,7 +29,7 @@ export default function Invoice({
   return (
     <div className="flex h-full flex-1 overflow-hidden [--spacing:theme(spacing.8)]">
       <History record={record} records={records}>
-        <div className="flex w-[calc(210mm+theme(spacing.10)*2)] snap-y snap-mandatory scroll-pt-8 overflow-auto scroll-smooth bg-gray-950/10 shadow-inner dark:bg-zinc-600">
+        <div className="flex w-[calc(210mm+theme(spacing.10)*2)] snap-y snap-mandatory scroll-px-8 scroll-pt-8 overflow-auto scroll-smooth bg-gray-950/10 shadow-inner dark:bg-zinc-600">
           <div className="mx-auto mb-10">
             <div className="py-10">
               <InvoicePreview />
