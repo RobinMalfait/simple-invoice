@@ -1,9 +1,27 @@
 import { SquaresPlusIcon } from '@heroicons/react/24/outline'
 import { ReactNode } from 'react'
+import { match } from '~/utils/match'
+import { classNames } from './class-names'
 
-export function Empty({ message, footer }: { message: string; footer?: ReactNode }) {
+export function Empty({
+  message,
+  footer,
+  variant = 'standalone',
+}: {
+  message: string
+  footer?: ReactNode
+  variant?: 'standalone' | 'embedded'
+}) {
   return (
-    <div className="flex flex-1 flex-col overflow-hidden rounded-lg bg-white shadow dark:bg-zinc-900">
+    <div
+      className={classNames(
+        'flex flex-1 flex-col overflow-hidden bg-white dark:bg-zinc-900',
+        match(variant, {
+          standalone: 'rounded-lg shadow',
+          embedded: '',
+        }),
+      )}
+    >
       <div className="my-12 flex flex-1 flex-col px-4 py-5 sm:p-6">
         <div className="flex flex-1 flex-col items-center justify-center gap-4 text-gray-500">
           <SquaresPlusIcon className="h-8 w-8 text-gray-400" />
