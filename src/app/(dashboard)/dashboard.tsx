@@ -3,10 +3,10 @@
 import { ArrowDownIcon, ArrowUpIcon } from '@heroicons/react/20/solid'
 import { ArrowSmallLeftIcon, ArrowSmallRightIcon } from '@heroicons/react/24/outline'
 import {
-  addMinutes,
+  addSeconds,
   compareAsc,
   differenceInDays,
-  differenceInMinutes,
+  differenceInSeconds,
   eachDayOfInterval,
   eachHourOfInterval,
   eachMonthOfInterval,
@@ -415,14 +415,14 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
                             let paidAt = r.events.find((e) => e.type === 'quote-accepted')?.at
                             if (!paidAt) return []
 
-                            return [[r, differenceInMinutes(paidAt, sentAt)] as const]
+                            return [[r, differenceInSeconds(paidAt, sentAt)] as const]
                           })
                           .sort(([, a], [, z]) => z - a)
                           .pop() ?? null
                       }
                       value={(data) => data?.[1] ?? null}
                       display={(value) => (
-                        <span>{formatDistanceStrict(now, addMinutes(now, value))}</span>
+                        <span>{formatDistanceStrict(now, addSeconds(now, value))}</span>
                       )}
                       footer={(data) =>
                         data && (
@@ -450,14 +450,14 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
                             let paidAt = r.events.find((e) => e.type === 'quote-accepted')?.at
                             if (!paidAt) return []
 
-                            return [[r, differenceInMinutes(paidAt, sentAt)] as const]
+                            return [[r, differenceInSeconds(paidAt, sentAt)] as const]
                           })
                           .sort(([, a], [, z]) => a - z)
                           .pop() ?? null
                       }
                       value={(data) => data?.[1] ?? null}
                       display={(value) => (
-                        <span>{formatDistanceStrict(now, addMinutes(now, value))}</span>
+                        <span>{formatDistanceStrict(now, addSeconds(now, value))}</span>
                       )}
                       footer={(data) =>
                         data && (
@@ -488,14 +488,14 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
                         let paidAt = r.events.find((e) => e.type === 'invoice-paid')?.at
                         if (!paidAt) return []
 
-                        return [[r, differenceInMinutes(paidAt, sentAt)] as const]
+                        return [[r, differenceInSeconds(paidAt, sentAt)] as const]
                       })
                       .sort(([, a], [, z]) => z - a)
                       .pop() ?? null
                   }
                   value={(data) => data?.[1] ?? null}
                   display={(value) => (
-                    <span>{formatDistanceStrict(now, addMinutes(now, value))}</span>
+                    <span>{formatDistanceStrict(now, addSeconds(now, value))}</span>
                   )}
                   footer={(data) =>
                     data && (
@@ -524,14 +524,14 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
                         let paidAt = e.events.find((e) => e.type === 'invoice-paid')?.at
                         if (!paidAt) return []
 
-                        return [[e, differenceInMinutes(paidAt, sentAt)] as const]
+                        return [[e, differenceInSeconds(paidAt, sentAt)] as const]
                       })
                       .sort(([, a], [, z]) => a - z)
                       .pop() ?? null
                   }
                   value={(data) => data?.[1] ?? null}
                   display={(value) => (
-                    <span>{formatDistanceStrict(now, addMinutes(now, value))}</span>
+                    <span>{formatDistanceStrict(now, addSeconds(now, value))}</span>
                   )}
                   footer={(data) =>
                     data && (
