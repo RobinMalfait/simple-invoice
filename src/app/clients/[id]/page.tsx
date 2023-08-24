@@ -24,11 +24,9 @@ import { match } from '~/utils/match'
 
 type RecordTab<T extends Record> = {
   label: string
-  filter: (r: Record) => boolean
-  children?: Array<{
-    label: string
-    filter: (r: T) => boolean
-  }>
+  filter: (r: T) => boolean
+  default?: boolean
+  children?: Array<RecordTab<T>>
 }
 
 function tab<T extends Record>(tab: RecordTab<T>): RecordTab<T> {
@@ -59,7 +57,7 @@ export default async function Page({ params: { id } }: { params: { id: string } 
         children: [
           { label: 'Draft', filter: (r) => r.status === QuoteStatus.Draft },
           { label: 'Sent', filter: (r) => r.status === QuoteStatus.Sent },
-          { label: 'Accepted', filter: (r) => r.status === QuoteStatus.Accepted },
+          { label: 'Accepted', filter: (r) => r.status === QuoteStatus.Accepted, default: true },
           { label: 'Rejected', filter: (r) => r.status === QuoteStatus.Rejected },
           { label: 'Expired', filter: (r) => r.status === QuoteStatus.Expired },
           { label: 'Closed', filter: (r) => r.status === QuoteStatus.Closed },
@@ -72,7 +70,7 @@ export default async function Page({ params: { id } }: { params: { id: string } 
         children: [
           { label: 'Draft', filter: (r) => r.status === InvoiceStatus.Draft },
           { label: 'Sent', filter: (r) => r.status === InvoiceStatus.Sent },
-          { label: 'Paid', filter: (r) => r.status === InvoiceStatus.Paid },
+          { label: 'Paid', filter: (r) => r.status === InvoiceStatus.Paid, default: true },
           {
             label: 'Partially paid',
             filter: (r) => r.status === InvoiceStatus.PartiallyPaid,
@@ -135,7 +133,7 @@ export default async function Page({ params: { id } }: { params: { id: string } 
                         className="relative"
                         href={`https://www.google.com/maps/search/?${new URLSearchParams({
                           api: '1',
-                          query: formatAddress(client.billing),
+                          query: formatAddress(client.billing).replace(/\n/g, ', '),
                         })}`}
                       >
                         <span className="absolute -inset-3"></span>
@@ -191,8 +189,23 @@ export default async function Page({ params: { id } }: { params: { id: string } 
 }
 
 function RecordTabs({ records, tabs }: { records: Record[]; tabs: RecordTab<any>[] }) {
+  let defaultIndex = (() => {
+    for (let [idx, tab] of tabs.entries()) {
+      if (tab.default && records.some(tab.filter)) {
+        return idx
+      }
+    }
+
+    for (let [idx, tab] of tabs.entries()) {
+      if (records.some(tab.filter)) {
+        return idx
+      }
+    }
+
+    return 0
+  })()
   return (
-    <TabGroup>
+    <TabGroup defaultIndex={defaultIndex}>
       <TabList className="border-b border-gray-200 dark:border-zinc-700">
         <div className="-mb-px flex space-x-8 overflow-auto">
           {tabs.map((tab, idx) => {
