@@ -647,7 +647,6 @@ function ComparisonChart({
   currentRecords: Record[]
   next: (value: Date, range: [start: Date, end: Date]) => Date
 }) {
-  let currencyFormatter = useCurrencyFormatter()
   let shortCurrencyFormatter = useCurrencyFormatter({ type: 'short' })
 
   let days = differenceInDays(currentRange.end, currentRange.start)
@@ -829,14 +828,7 @@ function ComparisonChart({
                     </div>
                   )}
                 />
-                <YAxis
-                  tickFormatter={(x) => {
-                    if (x >= 100_000) {
-                      return `${shortCurrencyFormatter.format(x / 100_000)}k`
-                    }
-                    return currencyFormatter.format(x / 100)
-                  }}
-                />
+                <YAxis tickFormatter={(x) => shortCurrencyFormatter.format(x / 100)} />
                 <XAxis
                   tickMargin={16}
                   tickFormatter={(idx) => {

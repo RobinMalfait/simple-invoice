@@ -23,7 +23,11 @@ function createCurrencyFormatter(
         [Currency.USD]: 'USD',
         [Currency.EUR]: 'EUR',
       }),
+      notation: type === 'short' ? 'compact' : 'standard',
       minimumFractionDigits: type === 'short' ? 0 : 2,
+      maximumFractionDigits: type === 'short' ? 0 : 2,
+      // @ts-expect-error TypeScript is not aware of this yet
+      roundingMode: type === 'short' ? 'halfFloor' : 'halfExpand',
     },
   )
 }
