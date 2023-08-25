@@ -9,6 +9,7 @@ export let Client = z.object({
   name: z.string(),
   email: z.string().email().nullable(),
   phone: z.string().nullable(),
+  imageUrl: z.string().nullable(),
   billing: Address,
   currency: z.nativeEnum(Currency),
   language: z.nativeEnum(Language),
@@ -24,6 +25,7 @@ export class ClientBuilder {
   private _name: Client['name'] | null = null
   private _email: Client['email'] | null = null
   private _phone: Client['phone'] | null = null
+  private _imageUrl: Client['imageUrl'] | null = null
   private _billing: Client['billing'] | null = null
   private _currency: Client['currency'] | null = Currency.EUR
   private _language: Client['language'] | null = Language.NL
@@ -37,6 +39,7 @@ export class ClientBuilder {
       name: this._name,
       email: this._email,
       phone: this._phone,
+      imageUrl: this._imageUrl,
       billing: this._billing,
       currency: this._currency,
       language: this._language,
@@ -52,6 +55,7 @@ export class ClientBuilder {
     builder._name = client.name
     builder._email = client.email
     builder._phone = client.phone
+    builder._imageUrl = client.imageUrl
     builder._billing = client.billing
     builder._currency = client.currency
     builder._language = client.language
@@ -74,6 +78,11 @@ export class ClientBuilder {
 
   public phone(phone: Client['phone']): ClientBuilder {
     this._phone = phone
+    return this
+  }
+
+  public imageUrl(imageUrl: Client['imageUrl']): ClientBuilder {
+    this._imageUrl = imageUrl
     return this
   }
 

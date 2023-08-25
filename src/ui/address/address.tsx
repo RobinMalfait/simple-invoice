@@ -1,6 +1,6 @@
 import { Address as AddressType } from '~/domain/address/address'
 
-function formatAddress(address: AddressType) {
+export function formatAddress(address: AddressType) {
   return [
     address.street1,
     address.street2,
