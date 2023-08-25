@@ -6,7 +6,7 @@ import { Currency } from '~/domain/currency/currency'
 import { Invoice } from '~/domain/invoice/invoice'
 import { Quote } from '~/domain/quote/quote'
 import { Receipt } from '~/domain/receipt/receipt'
-import { isPaidRecord } from '~/domain/record/filters'
+import { isAccepted, isPaidRecord, isQuote } from '~/domain/record/filters'
 import { Record, combineRecords, resolveRelevantRecordDate } from '~/domain/record/record'
 import { classNames } from '~/ui/class-names'
 import { Empty } from '~/ui/empty'
@@ -106,6 +106,13 @@ export default async function Home({ params: { type } }: { params: { type: strin
                     <div className="relative z-20 -mx-1.5 flex justify-between rounded-md bg-white/95 px-[18px] py-3 text-gray-500 ring-1 ring-black/5 backdrop-blur dark:bg-zinc-900/95 dark:text-gray-400">
                       <span>{title}</span>
                       <span className="flex items-center gap-2">
+                        <span>
+                          {match(type, {
+                            quote: () => 'Expected',
+                            invoice: () => 'Paid',
+                            receipt: () => 'Paid',
+                          })}
+                        </span>
                         {groupByCurrency(records).map(([currency, records], idx) => (
                           <I18NProvider
                             key={currency}
@@ -120,9 +127,21 @@ export default async function Home({ params: { type } }: { params: { type: strin
                           >
                             {idx !== 0 && <span className="text-gray-300">•</span>}
                             <Money
-                              amount={records
-                                .filter((e) => isPaidRecord(e))
-                                .reduce((acc, record) => acc + total(record), 0)}
+                              amount={match(type, {
+                                quote: () =>
+                                  records
+                                    .filter((r) => isQuote(r) && isAccepted(r))
+                                    .reduce((acc, record) => acc + total(record), 0),
+
+                                invoice: () =>
+                                  records
+                                    .filter((r) => isPaidRecord(r))
+                                    .reduce((acc, record) => acc + total(record), 0),
+                                receipt: () =>
+                                  records
+                                    .filter((r) => isPaidRecord(r))
+                                    .reduce((acc, record) => acc + total(record), 0),
+                              })}
                             />
                           </I18NProvider>
                         ))}

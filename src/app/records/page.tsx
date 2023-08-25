@@ -106,6 +106,7 @@ export default async function Home() {
                     <div className="relative z-20 -mx-1.5 flex justify-between rounded-md bg-white/95 px-[18px] py-3 text-gray-500 ring-1 ring-black/5 backdrop-blur dark:bg-zinc-900/95 dark:text-gray-400">
                       <span>{title}</span>
                       <span className="flex items-center gap-2">
+                        <span>Paid</span>
                         {groupByCurrency(records).map(([currency, records], idx) => (
                           <I18NProvider
                             key={currency}
