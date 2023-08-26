@@ -5,23 +5,26 @@ import {
   CubeIcon,
   DocumentCheckIcon,
   DocumentTextIcon,
+  EyeIcon,
+  EyeSlashIcon,
   HomeIcon,
   RectangleStackIcon,
   UserGroupIcon,
 } from '@heroicons/react/24/outline'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { usePathname, useRouter } from 'next/navigation'
+import { Fragment, useEffect, useState } from 'react'
 import { Account } from '~/domain/account/account'
 import { recordHasWarning } from '~/domain/record/filters'
 import { Record } from '~/domain/record/record'
 import { classNames } from '~/ui/class-names'
+import { ClassifiedProvider } from '~/ui/classified'
+import { Action, CommandPalette, Group } from '~/ui/command-palette'
+import { useDisposables } from '~/ui/hooks/use-disposables'
 import { useLocalStorageState } from '~/ui/hooks/use-local-storage'
 import { RecordStacksProvider } from '~/ui/hooks/use-record-stacks'
 import { RecordsProvider } from '~/ui/hooks/use-records'
 import { match } from '~/utils/match'
-import { ClassifiedProvider } from '../classified'
-import { useDisposables } from '../hooks/use-disposables'
 
 type Navigation = {
   name: string
@@ -61,6 +64,8 @@ export default function Layout({
 }>) {
   let [size, setSize] = useLocalStorageState<'small' | 'large'>('sidebar', 'large')
   let [loading, setLoading] = useState(true)
+  let [classifiedMode, setClassifiedMode] = useState(isClassified)
+  let router = useRouter()
 
   let d = useDisposables()
   useEffect(() => {
@@ -90,7 +95,7 @@ export default function Layout({
   }
 
   return (
-    <ClassifiedProvider value={isClassified}>
+    <ClassifiedProvider value={classifiedMode}>
       <RecordsProvider records={data.records}>
         <RecordStacksProvider value={data.stacks}>
           {loading && (
@@ -300,6 +305,48 @@ export default function Layout({
               </main>
             </div>
           </div>
+
+          <CommandPalette>
+            <Group title="Quick links">
+              {navigation.map((item) => (
+                <Fragment key={item.href}>
+                  <Action invoke={() => router.push(item.href)} icon={item.icon} search={item.name}>
+                    {item.name}
+                  </Action>
+                </Fragment>
+              ))}
+            </Group>
+
+            {navigation
+              .filter((item) => item.children)
+              .map((item) => (
+                <Group key={item.href} title={item.name}>
+                  {item.children!.map((item) => {
+                    return (
+                      <Action
+                        key={item.href}
+                        invoke={() => router.push(item.href)}
+                        icon={item.icon}
+                        search={item.name}
+                      >
+                        {item.name}
+                      </Action>
+                    )
+                  })}
+                </Group>
+              ))}
+
+            <Group title="Actions">
+              <Action
+                icon={classifiedMode ? EyeIcon : EyeSlashIcon}
+                invoke={() => setClassifiedMode((v) => !v)}
+                search="toggle streamer mode"
+                close={false}
+              >
+                Toggle streamer mode
+              </Action>
+            </Group>
+          </CommandPalette>
         </RecordStacksProvider>
       </RecordsProvider>
     </ClassifiedProvider>
