@@ -13,6 +13,7 @@ import { Record, combineRecords, separateRecords } from '~/domain/record/record'
 import { Address, formatAddress } from '~/ui/address/address'
 import { Avatar } from '~/ui/avatar'
 import { classNames } from '~/ui/class-names'
+import { Classified } from '~/ui/classified'
 import { Empty } from '~/ui/empty'
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '~/ui/headlessui'
 import { I18NProvider } from '~/ui/hooks/use-i18n'
@@ -100,7 +101,9 @@ export default async function Page({ params: { id } }: { params: { id: string } 
 
           <div>
             <h3 className="text-2xl">{client.name}</h3>
-            <div className="text-sm">{client.email}</div>
+            <div className="text-sm">
+              <Classified>{client.email}</Classified>
+            </div>
           </div>
         </div>
 
@@ -121,8 +124,16 @@ export default async function Page({ params: { id } }: { params: { id: string } 
               </CardTitle>
 
               <CardBody variant="grid">
-                {client.email && <Field title="Email">{client.email}</Field>}
-                {client.phone && <Field title="Phone">{client.phone}</Field>}
+                {client.email && (
+                  <Field classified title="Email">
+                    {client.email}
+                  </Field>
+                )}
+                {client.phone && (
+                  <Field classified title="Phone">
+                    {client.phone}
+                  </Field>
+                )}
                 {client.billing && (
                   <Field variant="block" title="Billing address">
                     <div className="flex items-center justify-between">
@@ -143,7 +154,9 @@ export default async function Page({ params: { id } }: { params: { id: string } 
                   </Field>
                 )}
                 {client.tax && (
-                  <Field title={`Tax (${client.tax.id.toUpperCase()})`}>{client.tax.value}</Field>
+                  <Field classified title={`Tax (${client.tax.id.toUpperCase()})`}>
+                    {client.tax.value}
+                  </Field>
                 )}
                 {client.timezone && (
                   <Field title="Timezone">
@@ -157,7 +170,7 @@ export default async function Page({ params: { id } }: { params: { id: string } 
                   </Field>
                 )}
                 {client.legal && (
-                  <Field title="Legal" variant="block">
+                  <Field classified title="Legal" variant="block">
                     {client.legal}
                   </Field>
                 )}
@@ -326,8 +339,10 @@ function CardBody({
 function Field({
   title,
   children,
+  classified = false,
   variant = 'text',
-}: React.PropsWithChildren<{ title: string; variant?: 'text' | 'block' }>) {
+}: React.PropsWithChildren<{ title: string; variant?: 'text' | 'block'; classified?: boolean }>) {
+  let Wrapper = classified ? Classified : React.Fragment
   return (
     <div>
       <div className="text-sm font-medium">{title}</div>
@@ -340,7 +355,7 @@ function Field({
           }),
         )}
       >
-        {children}
+        <Wrapper>{children}</Wrapper>
       </div>
     </div>
   )

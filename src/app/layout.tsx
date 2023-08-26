@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { me, records, stacks } from '~/data'
 import Layout from '~/ui/layout/main'
+import { env } from '~/utils/env'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -16,7 +17,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Layout data={data}>{children}</Layout>
+        <Layout data={data} isClassified={env.CLASSIFIED_MODE}>
+          {children}
+        </Layout>
       </body>
     </html>
   )

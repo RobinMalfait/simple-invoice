@@ -1,4 +1,5 @@
 import { Address as AddressType } from '~/domain/address/address'
+import { Classified } from '~/ui/classified'
 
 export function formatAddress(address: AddressType) {
   return [
@@ -13,5 +14,9 @@ export function formatAddress(address: AddressType) {
 }
 
 export function Address({ address }: { address: AddressType }) {
-  return <div className="whitespace-pre-wrap">{formatAddress(address)}</div>
+  return (
+    <div className="whitespace-pre-wrap">
+      <Classified>{formatAddress(address)}</Classified>
+    </div>
+  )
 }

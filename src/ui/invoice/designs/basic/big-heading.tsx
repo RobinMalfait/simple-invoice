@@ -4,6 +4,7 @@ import { Invoice } from '~/domain/invoice/invoice'
 import { Quote } from '~/domain/quote/quote'
 import { Receipt } from '~/domain/receipt/receipt'
 import { Address } from '~/ui/address/address'
+import { Classified } from '~/ui/classified'
 import { useLocale } from '~/ui/hooks/use-locale'
 import { useRecord } from '~/ui/hooks/use-record'
 import { useTranslation } from '~/ui/hooks/use-translation'
@@ -102,7 +103,9 @@ export function BigHeading() {
                 <div className="text-sm font-medium text-gray-900 dark:text-zinc-50">
                   {t((x) => x.account.vat)}
                 </div>
-                <div>{record.account.tax.value}</div>
+                <div>
+                  <Classified>{record.account.tax.value}</Classified>
+                </div>
               </div>
             )}
           </div>
@@ -122,7 +125,9 @@ export function BigHeading() {
                 <div className="text-sm font-medium text-gray-900 dark:text-zinc-50">
                   {t((x) => x.client.vat)}
                 </div>
-                <div>{record.client.tax.value}</div>
+                <div>
+                  <Classified>{record.client.tax.value}</Classified>
+                </div>
               </div>
             )}
           </div>

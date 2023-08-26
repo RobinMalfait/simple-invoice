@@ -1,7 +1,8 @@
 import { Account } from '~/domain/account/account'
 import { Record, separateRecords } from '~/domain/record/record'
+import { env } from '~/utils/env'
 
-let data = require(`./${process.env.DATA_SOURCE_FILE}.ts`)
+let data = require(`./${env.DATA_SOURCE_FILE}.ts`)
 
 export let me: Account = data.me
 export let records: Record[] = separateRecords(data.records)

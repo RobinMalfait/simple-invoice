@@ -3,6 +3,7 @@ import { records } from '~/data'
 import { isQuote } from '~/domain/record/filters'
 import { combineRecords } from '~/domain/record/record'
 import { Avatar } from '~/ui/avatar'
+import { Classified } from '~/ui/classified'
 
 export default async function Page() {
   let combined = combineRecords(records)
@@ -34,7 +35,9 @@ export default async function Page() {
               <Avatar url={client.imageUrl} name={client.name} />
               <div className="flex flex-1 flex-col">
                 <span className="truncate">{client.name}</span>
-                <span className="text-xs">{client.email}</span>
+                <span className="text-xs">
+                  <Classified>{client.email}</Classified>
+                </span>
               </div>
               <div className="grid aspect-square h-full place-content-center rounded border p-2 dark:border-zinc-800">
                 {recordCountByClientId[client.id]}

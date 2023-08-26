@@ -1,5 +1,6 @@
 import * as HI from '@heroicons/react/24/outline'
 import { BanknotesIcon } from '@heroicons/react/24/outline'
+import { Classified } from '~/ui/classified'
 import { useRecord } from '~/ui/hooks/use-record'
 import { useTranslation } from '~/ui/hooks/use-translation'
 import { PaypalIcon } from '~/ui/icons/payment'
@@ -65,7 +66,9 @@ export function BigFooter() {
                         <td className="text-center">
                           <Icon className="h-4 w-4 text-gray-500 grayscale dark:text-gray-400" />
                         </td>
-                        <td className="px-3">{field.value}</td>
+                        <td className="px-3">
+                          <Classified>{field.value}</Classified>
+                        </td>
                       </tr>
                     )
                   })}
@@ -99,7 +102,9 @@ export function BigFooter() {
                             ),
                           })}
                         </td>
-                        <td className="px-3">{paymentMethod.value}</td>
+                        <td className="px-3">
+                          <Classified>{paymentMethod.value}</Classified>
+                        </td>
                       </tr>
                     )
                   })}

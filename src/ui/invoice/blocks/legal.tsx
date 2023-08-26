@@ -1,4 +1,5 @@
 import { classNames } from '~/ui/class-names'
+import { Classified } from '~/ui/classified'
 import { useRecord } from '~/ui/hooks/use-record'
 
 export function Legal({ className }: { className?: string }) {
@@ -9,7 +10,9 @@ export function Legal({ className }: { className?: string }) {
   return (
     <div className={classNames('whitespace-pre-wrap empty:hidden', className)}>
       {legal.map((line) => (
-        <p key={line}>{line}</p>
+        <p key={line}>
+          <Classified>{line}</Classified>
+        </p>
       ))}
     </div>
   )

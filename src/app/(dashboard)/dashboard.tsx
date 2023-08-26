@@ -58,6 +58,7 @@ import {
 } from '~/domain/record/filters'
 import { Record, resolveRelevantRecordDate, separateRecords } from '~/domain/record/record'
 import { classNames } from '~/ui/class-names'
+import { useIsClassified } from '~/ui/classified'
 import { FormatRange } from '~/ui/date-range'
 import { Empty } from '~/ui/empty'
 import { useCurrencyFormatter } from '~/ui/hooks/use-currency-formatter'
@@ -648,6 +649,7 @@ function ComparisonChart({
   next: (value: Date, range: [start: Date, end: Date]) => Date
 }) {
   let shortCurrencyFormatter = useCurrencyFormatter({ type: 'short' })
+  let isClassified = useIsClassified()
 
   let days = differenceInDays(currentRange.end, currentRange.start)
 
@@ -828,7 +830,11 @@ function ComparisonChart({
                     </div>
                   )}
                 />
-                <YAxis tickFormatter={(x) => shortCurrencyFormatter.format(x / 100)} />
+                <YAxis
+                  tickFormatter={(x) =>
+                    isClassified ? 'XXX' : shortCurrencyFormatter.format(x / 100)
+                  }
+                />
                 <XAxis
                   tickMargin={16}
                   tickFormatter={(idx) => {
