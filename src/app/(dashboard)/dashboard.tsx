@@ -58,7 +58,7 @@ import {
 } from '~/domain/record/filters'
 import { Record, resolveRelevantRecordDate, separateRecords } from '~/domain/record/record'
 import { classNames } from '~/ui/class-names'
-import { useIsClassified } from '~/ui/classified'
+import { Classified, useIsClassified } from '~/ui/classified'
 import { FormatRange } from '~/ui/date-range'
 import { Empty } from '~/ui/empty'
 import { useCurrencyFormatter } from '~/ui/hooks/use-currency-formatter'
@@ -333,7 +333,7 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
                     <div className="text-xs text-gray-500 dark:text-zinc-400">
                       <Link href={`/clients/${data[0].id}`}>
                         <span className="absolute inset-0"></span>
-                        {data[0].name}
+                        <Classified>{data[0].name}</Classified>
                       </Link>
                     </div>
                   )
@@ -435,7 +435,7 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
                           <div className="text-xs text-gray-500 dark:text-zinc-400">
                             <Link href={`/${data[0].type}/${data[0].number}`}>
                               <span className="absolute inset-0"></span>
-                              {data[0].client.name}{' '}
+                              <Classified>{data[0].client.name}</Classified>{' '}
                               <small className="tabular-nums">— {data[0].number}</small>
                             </Link>
                           </div>
@@ -470,7 +470,7 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
                           <div className="text-xs text-gray-500 dark:text-zinc-400">
                             <Link href={`/${data[0].type}/${data[0].number}`}>
                               <span className="absolute inset-0"></span>
-                              {data[0].client.name}{' '}
+                              <Classified>{data[0].client.name}</Classified>{' '}
                               <small className="tabular-nums">— {data[0].number}</small>
                             </Link>
                           </div>
@@ -508,7 +508,7 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
                       <div className="text-xs text-gray-500 dark:text-zinc-400">
                         <Link href={`/${data[0].type}/${data[0].number}`}>
                           <span className="absolute inset-0"></span>
-                          {data[0].client.name}{' '}
+                          <Classified>{data[0].client.name}</Classified>{' '}
                           <small className="tabular-nums">— {data[0].number}</small>
                         </Link>
                       </div>
@@ -544,7 +544,7 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
                       <div className="text-xs text-gray-500 dark:text-zinc-400">
                         <Link href={`/${data[0].type}/${data[0].number}`}>
                           <span className="absolute inset-0"></span>
-                          {data[0].client.name}{' '}
+                          <Classified>{data[0].client.name}</Classified>{' '}
                           <small className="tabular-nums">— {data[0].number}</small>
                         </Link>
                       </div>
@@ -601,7 +601,9 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
                                   {idx + 1}.
                                 </span>
                                 <div className="flex flex-1 items-center justify-between space-x-2 truncate dark:text-zinc-300">
-                                  <span className="truncate">{client.name}</span>
+                                  <span className="truncate">
+                                    <Classified>{client.name}</Classified>
+                                  </span>
                                   <span className="text-xs">
                                     <Money amount={total} />
                                     <small className="mx-1 inline-block w-[4ch] flex-shrink-0 text-right">
