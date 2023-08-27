@@ -66,7 +66,7 @@ export default function Layout({
 }>) {
   let [size, setSize] = useLocalStorageState<'small' | 'large'>('sidebar', 'large')
   let [loading, setLoading] = useState(true)
-  let [classifiedMode, setClassifiedMode] = useState(isClassified)
+  let [classifiedMode, setClassifiedMode] = useLocalStorageState('classified', isClassified)
   let router = useRouter()
   let params = useParams()
 
