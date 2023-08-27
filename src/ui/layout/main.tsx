@@ -345,6 +345,30 @@ export default function Layout({
               >
                 Toggle streamer mode
               </Action>
+              <Action
+                icon={
+                  <div className="mr-3 h-4 w-4 rounded border border-gray-200">
+                    <div
+                      className={classNames(
+                        'h-full w-1 border-r border-gray-200',
+                        size === 'large' && 'bg-gray-200',
+                      )}
+                    ></div>
+                  </div>
+                }
+                invoke={() =>
+                  setSize((current) =>
+                    match(current, {
+                      large: 'small',
+                      small: 'large',
+                    }),
+                  )
+                }
+                search="toggle sidebar"
+                close={false}
+              >
+                Toggle sidebar
+              </Action>
             </Group>
           </CommandPalette>
         </RecordStacksProvider>
