@@ -48,7 +48,7 @@ export function CommandPalette({ children }: PropsWithChildren<{}>) {
             leaveFrom="opacity-100 scale-100"
             leaveTo="opacity-0 scale-95"
           >
-            <Dialog.Panel className="mx-auto max-w-2xl transform divide-y divide-zinc-500 divide-opacity-20 overflow-hidden rounded-xl bg-zinc-900 shadow-2xl transition-all">
+            <Dialog.Panel className="mx-auto max-w-2xl transform divide-y divide-zinc-500 divide-opacity-20 overflow-hidden rounded-xl bg-white/80 shadow-2xl ring-1 ring-black/5 backdrop-blur transition-all dark:bg-zinc-900 dark:ring-0 dark:backdrop-blur-none">
               <Combobox<CommandPaletteOption>
                 by="id"
                 nullable
@@ -64,7 +64,7 @@ export function CommandPalette({ children }: PropsWithChildren<{}>) {
                     aria-hidden="true"
                   />
                   <Combobox.Input
-                    className="h-12 w-full border-0 bg-transparent pl-11 pr-4 text-white focus:ring-0 sm:text-sm"
+                    className="h-12 w-full border-0 bg-transparent pl-11 pr-4 text-gray-900 focus:ring-0 dark:text-white sm:text-sm"
                     placeholder="Search..."
                     onChange={(event) => setQuery(event.target.value)}
                   />
@@ -99,8 +99,10 @@ export function CommandPalette({ children }: PropsWithChildren<{}>) {
 export function Group({ title, children }: PropsWithChildren<{ title: string }>) {
   return (
     <li className="p-2 [&:has([data-children]:empty)]:hidden">
-      <h2 className="mb-2 mt-4 px-3 text-xs font-semibold text-zinc-200">{title}</h2>
-      <ul data-children className="text-sm text-zinc-400">
+      <h2 className="mb-2 mt-4 px-3 text-xs font-semibold text-gray-900 dark:text-zinc-200">
+        {title}
+      </h2>
+      <ul data-children className="text-sm text-gray-700 dark:text-zinc-400">
         {children}
       </ul>
     </li>
@@ -143,7 +145,7 @@ export function Action({
       className={({ active }) =>
         classNames(
           'flex cursor-default select-none items-center rounded-md px-3 py-2',
-          active && 'bg-zinc-800 text-white',
+          active && 'bg-gray-900/5 text-gray-900 dark:bg-zinc-800 dark:text-white',
         )
       }
     >
@@ -153,7 +155,7 @@ export function Action({
             <Icon
               className={classNames(
                 'mr-3 h-6 w-6 flex-none',
-                active ? 'text-white' : 'text-zinc-500',
+                active ? 'text-gray-900 dark:text-white' : 'text-gray-900/40 dark:text-zinc-500',
               )}
               aria-hidden="true"
             />
@@ -161,7 +163,7 @@ export function Action({
           <span className="flex-auto truncate">{children}</span>
           {false && active && <span className="ml-3 flex-none text-zinc-400">Jump to...</span>}
           {shortcut && (
-            <span className="ml-3 flex-none text-xs font-semibold text-gray-400">
+            <span className="ml-3 flex-none text-xs font-semibold text-gray-500 dark:text-gray-400">
               {shortcut.map((key, idx) => (
                 <Fragment key={key}>
                   {!isMac && idx > 0 && ' + '}
