@@ -556,7 +556,7 @@ export let records: Record[] = [
 
           ### Text
 
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin vel mi cursus, convallis lorem efficitur, commodo nibh. Morbi venenatis velit at bibendum pulvinar. Vivamus sollicitudin lacus in dui varius, id efficitur quam congue. Mauris non mauris molestie, ullamcorper dolor ut, fringilla nunc. Vivamus vulputate laoreet quam, blandit tincidunt mi condimentum vitae. Aenean interdum dolor vel tincidunt blandit. Maecenas facilisis imperdiet porta.
+          ||Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin vel mi cursus, convallis lorem efficitur, commodo nibh. Morbi venenatis velit at bibendum pulvinar. Vivamus sollicitudin lacus in dui varius, id efficitur quam congue. Mauris non mauris molestie, ullamcorper dolor ut, fringilla nunc. Vivamus vulputate laoreet quam, blandit tincidunt mi condimentum vitae. Aenean interdum dolor vel tincidunt blandit. Maecenas facilisis imperdiet porta.||
 
           You can also use **bold** in your text, or _italic_ or even ~~strikethrough~~. Some people prefer some \`code\` highlights. Sometimes, you just require a good old [link](https://example.com).
 
@@ -572,7 +572,7 @@ export let records: Record[] = [
           #### Ordered lists
 
           1. List items
-          1. Can be used
+          1. ||Can be used||
           1. They can also be used
              1. With nested numbers
              1. And more nesting

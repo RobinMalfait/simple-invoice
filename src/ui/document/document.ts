@@ -2,7 +2,39 @@ import { randomUUID } from 'crypto'
 import type { ChildNode } from 'domhandler'
 import * as htmlparser2 from 'htmlparser2'
 import * as marked from 'marked'
+import { TokenizerAndRendererExtension } from 'marked'
 import { dedent } from '~/utils/dedent'
+
+let classified: TokenizerAndRendererExtension = {
+  name: 'classified',
+  level: 'inline' as const,
+  start(src: string) {
+    return src.match(/\|\|/)?.index
+  },
+  tokenizer(src: string) {
+    let match = src.match(/\|\|(.+?)\|\|/)
+    if (!match) return undefined
+
+    let end = src.indexOf('||', match.index! + 2)
+    if (end === -1) return undefined
+
+    return {
+      type: 'classified',
+      raw: match[0],
+      text: this.lexer.inlineTokens(match[1].trim()),
+    }
+  },
+  renderer(token) {
+    return `<span class="classified:rounded classified:select-none classified:bg-zinc-950 classified:text-zinc-950 classified:ring-1 classified:ring-inset classified:ring-black/10 classified:dark:ring-white/10">${this.parser.parseInline(
+      token.text,
+    )}</span>`
+  },
+  childTokens: [],
+}
+
+marked.use({
+  extensions: [classified],
+})
 
 export function parseMarkdown(value: string): string {
   return marked.parse(dedent(value)).trim()

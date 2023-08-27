@@ -1,12 +1,19 @@
 'use client'
 
-import { createContext, Fragment, useContext, useRef } from 'react'
+import { createContext, Fragment, useContext, useEffect, useRef } from 'react'
 import { classNames } from '~/ui/class-names'
 import { useClientRect } from '~/ui/hooks/use-client-rect'
 
 let ClassifiedContext = createContext(true)
 
 export function ClassifiedProvider(props: { children: React.ReactNode; value: boolean }) {
+  useEffect(() => {
+    if (props.value) {
+      document.documentElement.dataset.classified = 'true'
+    } else {
+      delete document.documentElement.dataset.classified
+    }
+  }, [props.value])
   return (
     <ClassifiedContext.Provider value={props.value}>{props.children}</ClassifiedContext.Provider>
   )

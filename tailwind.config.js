@@ -18,5 +18,9 @@ module.exports = {
     require('@headlessui/tailwindcss'),
     require('@tailwindcss/typography'),
     require('@tailwindcss/forms'),
+
+    function ({ addVariant }) {
+      addVariant('classified', 'html[data-classified] &')
+    },
   ],
 }
