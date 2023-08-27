@@ -341,7 +341,6 @@ export default function Layout({
                 icon={classifiedMode ? EyeIcon : EyeSlashIcon}
                 invoke={() => setClassifiedMode((v) => !v)}
                 search="toggle streamer mode"
-                close={false}
               >
                 Toggle streamer mode
               </Action>
@@ -365,7 +364,6 @@ export default function Layout({
                   )
                 }
                 search="toggle sidebar"
-                close={false}
               >
                 Toggle sidebar
               </Action>
