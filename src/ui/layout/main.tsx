@@ -387,16 +387,23 @@ export default function Layout({
                 Toggle streamer mode
               </Action>
               <Action
-                icon={
-                  <div className="mr-3 h-4 w-4 rounded border border-gray-200">
+                icon={({ className, ...rest }) => {
+                  return (
                     <div
-                      className={classNames(
-                        'h-full w-1 border-r border-gray-200',
-                        size === 'large' && 'bg-gray-200',
-                      )}
-                    ></div>
-                  </div>
-                }
+                      className={classNames('flex items-center justify-center', className)}
+                      {...rest}
+                    >
+                      <div className="h-4 w-4 rounded border border-current">
+                        <div
+                          className={classNames(
+                            'h-full w-1 border-r border-current',
+                            size === 'large' && 'bg-current',
+                          )}
+                        ></div>
+                      </div>
+                    </div>
+                  )
+                }}
                 invoke={() =>
                   setSize((current) =>
                     match(current, {

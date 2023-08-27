@@ -1,15 +1,7 @@
 import { Combobox, Dialog, Transition } from '@headlessui/react'
 import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
 import { FolderIcon } from '@heroicons/react/24/outline'
-import {
-  Fragment,
-  PropsWithChildren,
-  createContext,
-  isValidElement,
-  useContext,
-  useId,
-  useState,
-} from 'react'
+import { Fragment, PropsWithChildren, createContext, useContext, useId, useState } from 'react'
 import { classNames } from '~/ui/class-names'
 import { useWindowEvent } from '~/ui/hooks/use-window-event'
 
@@ -149,7 +141,7 @@ export function Action({
   close,
 }: PropsWithChildren<{
   search: string
-  icon?: React.ReactChild | typeof MagnifyingGlassIcon | null
+  icon?: React.ComponentType<any> | null
   shortcut?: string[]
   invoke: () => void
   close?: boolean
@@ -174,19 +166,15 @@ export function Action({
     >
       {({ active }) => (
         <>
-          {Icon &&
-            (!isValidElement(Icon) ? (
-              // @ts-expect-error This is fine
-              <Icon
-                className={classNames(
-                  'mr-3 h-6 w-6 flex-none',
-                  active ? 'text-white' : 'text-zinc-500',
-                )}
-                aria-hidden="true"
-              />
-            ) : (
-              <>{Icon}</>
-            ))}
+          {Icon && (
+            <Icon
+              className={classNames(
+                'mr-3 h-6 w-6 flex-none',
+                active ? 'text-white' : 'text-zinc-500',
+              )}
+              aria-hidden="true"
+            />
+          )}
           <span className="flex-auto truncate">{children}</span>
           {false && active && <span className="ml-3 flex-none text-zinc-400">Jump to...</span>}
           {shortcut && (
