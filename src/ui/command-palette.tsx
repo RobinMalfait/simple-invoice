@@ -4,6 +4,7 @@ import { FolderIcon } from '@heroicons/react/24/outline'
 import { Fragment, PropsWithChildren, createContext, useContext, useId, useState } from 'react'
 import { classNames } from '~/ui/class-names'
 import { useWindowEvent } from '~/ui/hooks/use-window-event'
+import { fuzzyMatch } from '~/utils/fuzzy'
 
 let CommandPaletteContext = createContext<{ query: string }>({ query: '' })
 function useCommandPalette() {
@@ -114,24 +115,6 @@ type CommandPaletteOption = {
   invoke: () => void
 }
 
-function matches(needle: string, haystack: string) {
-  let lastIdx = -1
-
-  needle = needle.toLowerCase()
-  haystack = haystack.toLowerCase()
-
-  for (let c of needle) {
-    if (c === ' ') continue
-
-    let pos = haystack.indexOf(c, lastIdx + 1)
-    if (pos === -1) return false
-
-    lastIdx = pos
-  }
-
-  return true
-}
-
 export function Action({
   children,
   search,
@@ -150,7 +133,7 @@ export function Action({
   let isMac = navigator.userAgent.indexOf('Mac OS X') !== -1
   let { query } = useCommandPalette()
 
-  if (!matches(query, search)) {
+  if (!fuzzyMatch(query, search)) {
     return null
   }
 
