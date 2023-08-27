@@ -1,6 +1,7 @@
 'use client'
 
 import {
+  ArrowDownTrayIcon,
   CalculatorIcon,
   CubeIcon,
   DocumentCheckIcon,
@@ -10,9 +11,10 @@ import {
   HomeIcon,
   RectangleStackIcon,
   UserGroupIcon,
+  UserIcon,
 } from '@heroicons/react/24/outline'
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
+import { useParams, usePathname, useRouter } from 'next/navigation'
 import { Fragment, useEffect, useState } from 'react'
 import { Account } from '~/domain/account/account'
 import { recordHasWarning } from '~/domain/record/filters'
@@ -66,6 +68,7 @@ export default function Layout({
   let [loading, setLoading] = useState(true)
   let [classifiedMode, setClassifiedMode] = useState(isClassified)
   let router = useRouter()
+  let params = useParams()
 
   let d = useDisposables()
   useEffect(() => {
@@ -307,6 +310,45 @@ export default function Layout({
           </div>
 
           <CommandPalette>
+            {/* Page specific actions */}
+            {params.type &&
+              params.number &&
+              (() => {
+                let record = data.records.find(
+                  (record) => record.type === params.type && record.number === params.number,
+                )
+                if (!record) return null
+
+                return (
+                  <Group title="On this page">
+                    <Action
+                      icon={ArrowDownTrayIcon}
+                      invoke={() => window.open(`${window.location.href}/pdf`, '_blank')}
+                      search={'download pdf'}
+                    >
+                      Download PDF
+                    </Action>
+
+                    <Action
+                      icon={EyeIcon}
+                      invoke={() => window.open(`${window.location.href}/pdf?preview`, '_blank')}
+                      search={'preview pdf'}
+                    >
+                      Preview PDF
+                    </Action>
+
+                    <Action
+                      icon={UserIcon}
+                      invoke={() => router.push(`/clients/${record!.client.id}`)}
+                      search={'go to client'}
+                    >
+                      Go to client — {record.client.name}
+                    </Action>
+                  </Group>
+                )
+              })()}
+
+            {/* Generic sections */}
             <Group title="Quick links">
               {navigation.map((item) => (
                 <Fragment key={item.href}>
