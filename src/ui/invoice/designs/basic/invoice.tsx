@@ -21,7 +21,7 @@ export function Invoice() {
 
   return (
     <RecordProvider record={record}>
-      <div className="grid w-full grid-flow-row gap-8 print:gap-0">
+      <div className="grid w-full grid-flow-row gap-8 font-pdf print:gap-0">
         {pages.map(([items], pageIdx) => (
           <PageProvider key={pageIdx} info={{ total: pages.length, current: pageIdx }}>
             <div className="paper relative mx-auto flex flex-col bg-white dark:bg-zinc-950/70 print:m-0">
