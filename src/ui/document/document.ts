@@ -12,11 +12,9 @@ let classified: TokenizerAndRendererExtension = {
     return src.match(/\|\|/)?.index
   },
   tokenizer(src: string) {
-    let match = src.match(/\|\|(.+?)\|\|/)
+    let match = src.match(/\|\|([\s\S]+?)\|\|/)
     if (!match) return undefined
 
-    let end = src.indexOf('||', match.index! + 2)
-    if (end === -1) return undefined
 
     return {
       type: 'classified',
@@ -25,7 +23,7 @@ let classified: TokenizerAndRendererExtension = {
     }
   },
   renderer(token) {
-    return `<span class="classified:rounded classified:select-none classified:bg-zinc-950 classified:text-zinc-950 classified:ring-1 classified:ring-inset classified:ring-black/10 classified:dark:ring-white/10">${this.parser.parseInline(
+    return `<span class="relative classified:[&_img]:brightness-0 classified:select-none classified:rounded classified:bg-zinc-950 classified:text-zinc-950 classified:ring-1 classified:ring-inset classified:ring-black/10 classified:dark:ring-white/10">${this.parser.parseInline(
       token.text,
     )}</span>`
   },
