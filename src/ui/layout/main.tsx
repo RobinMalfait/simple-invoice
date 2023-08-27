@@ -77,7 +77,7 @@ export default function Layout({
 
   let pathname = usePathname()
   if (pathname?.includes('/raw')) {
-    return <>{children}</>
+    return <ClassifiedProvider value={classifiedMode}>{children}</ClassifiedProvider>
   }
 
   function isActive(item: Navigation) {
