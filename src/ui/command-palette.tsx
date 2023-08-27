@@ -1,10 +1,20 @@
 import { Combobox, Dialog, Transition } from '@headlessui/react'
 import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
 import { FolderIcon } from '@heroicons/react/24/outline'
-import { Fragment, PropsWithChildren, createContext, useContext, useId, useState } from 'react'
+import {
+  Fragment,
+  PropsWithChildren,
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useId,
+  useState,
+} from 'react'
 import { classNames } from '~/ui/class-names'
 import { useWindowEvent } from '~/ui/hooks/use-window-event'
 import { fuzzyMatch } from '~/utils/fuzzy'
+import { tap } from '~/utils/tap'
 
 let CommandPaletteContext = createContext<{ query: string }>({ query: '' })
 function useCommandPalette() {
@@ -96,16 +106,28 @@ export function CommandPalette({ children }: PropsWithChildren<{}>) {
   )
 }
 
+let CommandPaletteGroupContext = createContext<{
+  register: (id: string, matches: boolean) => void
+}>({
+  register() {},
+})
 export function Group({ title, children }: PropsWithChildren<{ title: string }>) {
+  let [visibleChildren, setVisibleChildren] = useState(() => new Set<string>())
+
+  let register = useCallback((id: string, matches: boolean) => {
+    setVisibleChildren((x) => tap(new Set(x), (v) => (matches ? v.add(id) : v.delete(id))))
+    return () => setVisibleChildren((x) => tap(new Set(x), (v) => v.delete(id)))
+  }, [])
+
   return (
-    <li className="p-2 [&:has([data-children]:empty)]:hidden">
-      <h2 className="mb-2 mt-4 px-3 text-xs font-semibold text-gray-900 dark:text-zinc-200">
-        {title}
-      </h2>
-      <ul data-children className="text-sm text-gray-700 dark:text-zinc-400">
-        {children}
-      </ul>
-    </li>
+    <CommandPaletteGroupContext.Provider value={{ register }}>
+      <li className={classNames('p-2', visibleChildren.size === 0 && 'hidden')}>
+        <h2 className="mb-2 mt-4 px-3 text-xs font-semibold text-gray-900 dark:text-zinc-200">
+          {title}
+        </h2>
+        <ul className="text-sm text-gray-700 dark:text-zinc-400">{children}</ul>
+      </li>
+    </CommandPaletteGroupContext.Provider>
   )
 }
 
@@ -135,7 +157,12 @@ export function Action({
   let isMac = navigator.userAgent.indexOf('Mac OS X') !== -1
   let { query } = useCommandPalette()
 
-  if (!fuzzyMatch(query, search)) {
+  let { register } = useContext(CommandPaletteGroupContext)
+  let matches = fuzzyMatch(query, search)
+
+  useEffect(() => register(id, matches), [register, id, matches])
+
+  if (!matches) {
     return null
   }
 
