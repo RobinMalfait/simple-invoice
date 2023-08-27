@@ -37,7 +37,7 @@ export function Classified(props: { children: React.ReactNode }) {
               width: width + padding,
               height: height + padding,
             }}
-            className="pointer-events-none absolute inset-0 z-50 h-full w-full select-none rounded bg-zinc-950/50 ring-1 ring-inset ring-black/10 backdrop-blur dark:ring-white/10 print:bg-zinc-950"
+            className="pointer-events-none absolute inset-0 z-50 h-full w-full select-none rounded bg-zinc-950/50 ring-1 ring-inset ring-black/10 backdrop-blur dark:ring-white/10 print:hidden print:bg-zinc-950"
           />
         )}
       </span>
