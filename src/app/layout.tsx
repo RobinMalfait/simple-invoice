@@ -5,7 +5,7 @@ import Layout from '~/ui/layout/main'
 import { env } from '~/utils/env'
 import './globals.css'
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' })
 
 export const metadata: Metadata = {
   title: 'Simple Invoice',
@@ -16,7 +16,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   let data = { me, records, stacks }
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={inter.variable}>
         <Layout data={data} isClassified={env.CLASSIFIED_MODE}>
           {children}
         </Layout>
