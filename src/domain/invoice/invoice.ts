@@ -146,14 +146,6 @@ export class InvoiceBuilder {
     return this
   }
 
-  public items(items: InvoiceItem[]): InvoiceBuilder {
-    if (this._status !== InvoiceStatus.Draft) {
-      throw new Error('Cannot edit an invoice that is not in draft status')
-    }
-    this._items = items
-    return this
-  }
-
   public note(note: string | null): InvoiceBuilder {
     if (this._status !== InvoiceStatus.Draft) {
       throw new Error('Cannot edit an invoice that is not in draft status')
@@ -191,6 +183,15 @@ export class InvoiceBuilder {
     return this
   }
 
+  public attachments(attachments: Document[]): InvoiceBuilder {
+    if (this._status !== InvoiceStatus.Draft) {
+      throw new Error('Cannot edit an invoice that is not in draft status')
+    }
+
+    this._attachments = attachments.slice()
+    return this
+  }
+
   public attachment(attachment: Document): InvoiceBuilder {
     if (this._status !== InvoiceStatus.Draft) {
       throw new Error('Cannot edit an invoice that is not in draft status')
@@ -200,12 +201,40 @@ export class InvoiceBuilder {
     return this
   }
 
+  public items(items: InvoiceItem[]): InvoiceBuilder {
+    if (this._status !== InvoiceStatus.Draft) {
+      throw new Error('Cannot edit an invoice that is not in draft status')
+    }
+
+    this._items = items.slice()
+
+    if (
+      this._discounts.length > 0 &&
+      new Set(this._items.map((item) => item.taxRate).filter((rate) => rate !== 0)).size > 1
+    ) {
+      throw new Error(
+        'You already had discounts configured, but this is not supported for mixed tax rates right now',
+      )
+    }
+    return this
+  }
+
   public item(item: InvoiceItem): InvoiceBuilder {
     if (this._status !== InvoiceStatus.Draft) {
       throw new Error('Cannot edit an invoice that is not in draft status')
     }
 
     this._items.push(item)
+
+    if (
+      this._discounts.length > 0 &&
+      new Set(this._items.map((item) => item.taxRate).filter((rate) => rate !== 0)).size > 1
+    ) {
+      throw new Error(
+        'You already had discounts configured, but this is not supported for mixed tax rates right now',
+      )
+    }
+
     return this
   }
 

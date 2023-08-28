@@ -74,7 +74,7 @@ export class QuoteBuilder {
     return Quote.parse(input)
   }
 
-  public static fromQuote(quote: Quote): QuoteBuilder {
+  public static fromQuote(quote: Quote, { withAttachments = true } = {}): QuoteBuilder {
     if (![QuoteStatus.Expired, QuoteStatus.Rejected].includes(quote.status)) {
       throw new Error(`Cannot create a quote from another quote that is currently ${quote.status}`)
     }
@@ -86,7 +86,9 @@ export class QuoteBuilder {
     builder._items = quote.items.slice()
     builder._note = quote.note
     builder._discounts = quote.discounts.slice()
-    builder._attachments = quote.attachments.slice()
+    if (withAttachments) {
+      builder._attachments = quote.attachments.slice()
+    }
     builder.events = [Event.parse({ type: 'quote-drafted', from: 'quote' })]
     return builder
   }
@@ -141,14 +143,6 @@ export class QuoteBuilder {
     return this
   }
 
-  public items(items: InvoiceItem[]): QuoteBuilder {
-    if (this._status !== QuoteStatus.Draft) {
-      throw new Error('Cannot edit an quote that is not in draft status')
-    }
-    this._items = items
-    return this
-  }
-
   public note(note: string | null): QuoteBuilder {
     if (this._status !== QuoteStatus.Draft) {
       throw new Error('Cannot edit an quote that is not in draft status')
@@ -187,6 +181,15 @@ export class QuoteBuilder {
     return this
   }
 
+  public attachments(attachments: Document[]): QuoteBuilder {
+    if (this._status !== QuoteStatus.Draft) {
+      throw new Error('Cannot edit an quote that is not in draft status')
+    }
+
+    this._attachments = attachments.slice()
+    return this
+  }
+
   public attachment(attachment: Document): QuoteBuilder {
     if (this._status !== QuoteStatus.Draft) {
       throw new Error('Cannot edit an quote that is not in draft status')
@@ -196,12 +199,41 @@ export class QuoteBuilder {
     return this
   }
 
+  public items(items: InvoiceItem[]): QuoteBuilder {
+    if (this._status !== QuoteStatus.Draft) {
+      throw new Error('Cannot edit an quote that is not in draft status')
+    }
+
+    this._items = items.slice()
+
+    if (
+      this._discounts.length > 0 &&
+      new Set(this._items.map((item) => item.taxRate).filter((rate) => rate !== 0)).size > 1
+    ) {
+      throw new Error(
+        'You already had discounts configured, but this is not supported for mixed tax rates right now',
+      )
+    }
+
+    return this
+  }
+
   public item(item: InvoiceItem): QuoteBuilder {
     if (this._status !== QuoteStatus.Draft) {
       throw new Error('Cannot edit an quote that is not in draft status')
     }
 
     this._items.push(item)
+
+    if (
+      this._discounts.length > 0 &&
+      new Set(this._items.map((item) => item.taxRate).filter((rate) => rate !== 0)).size > 1
+    ) {
+      throw new Error(
+        'You already had discounts configured, but this is not supported for mixed tax rates right now',
+      )
+    }
+
     return this
   }
 
