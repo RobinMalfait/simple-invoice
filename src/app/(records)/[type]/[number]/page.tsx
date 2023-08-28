@@ -86,12 +86,14 @@ export default function Invoice({
               <ActivityFeed records={records} />
             </div>
 
-            <div className="flex flex-col gap-4 rounded-lg bg-white p-4 shadow ring-1 ring-black/5 dark:bg-zinc-900 dark:text-gray-300">
-              <span className="text-sm font-medium text-gray-900 dark:text-gray-300">
-                Attachments
-              </span>
-              <AttachmentList />
-            </div>
+            {record.attachments.length > 0 && (
+              <div className="flex flex-col gap-4 rounded-lg bg-white p-4 shadow ring-1 ring-black/5 dark:bg-zinc-900 dark:text-gray-300">
+                <span className="text-sm font-medium text-gray-900 dark:text-gray-300">
+                  Attachments
+                </span>
+                <AttachmentList />
+              </div>
+            )}
 
             {recordHasWarning(record) && (
               <div className="rounded-lg border-l-4 border-yellow-400 bg-yellow-50 p-4 dark:border-yellow-400/30 dark:bg-yellow-400/10">

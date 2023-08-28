@@ -33,9 +33,6 @@ export function AttachmentList() {
             </li>
           )
         })}
-        {record.attachments.length === 0 && (
-          <li className="text-xs leading-5 text-gray-600 dark:text-gray-300">No attachments</li>
-        )}
       </ul>
     </>
   )
