@@ -16,6 +16,7 @@ import {
 import Link from 'next/link'
 import { useParams, usePathname, useRouter } from 'next/navigation'
 import { Fragment, useEffect, useState } from 'react'
+import { DB, toggleClassified, toggleSidebar } from '~/app/(db)/actions'
 import { Account } from '~/domain/account/account'
 import { recordHasWarning } from '~/domain/record/filters'
 import { Record } from '~/domain/record/record'
@@ -23,7 +24,6 @@ import { classNames } from '~/ui/class-names'
 import { ClassifiedProvider } from '~/ui/classified'
 import { Action, CommandPalette, Group } from '~/ui/command-palette'
 import { useDisposables } from '~/ui/hooks/use-disposables'
-import { useLocalStorageState } from '~/ui/hooks/use-local-storage'
 import { RecordStacksProvider } from '~/ui/hooks/use-record-stacks'
 import { RecordsProvider } from '~/ui/hooks/use-records'
 import { match } from '~/utils/match'
@@ -55,18 +55,16 @@ let navigation: Navigation[] = [
 export default function Layout({
   children,
   data,
-  isClassified,
+  config,
 }: React.PropsWithChildren<{
   data: {
     me: Account
     records: Record[]
     stacks: { [id: string]: string[] }
   }
-  isClassified: boolean
+  config: DB
 }>) {
-  let [size, setSize] = useLocalStorageState<'small' | 'large'>('sidebar', 'large')
   let [loading, setLoading] = useState(true)
-  let [classifiedMode, setClassifiedMode] = useLocalStorageState('classified', isClassified)
   let router = useRouter()
   let params = useParams()
 
@@ -77,7 +75,7 @@ export default function Layout({
 
   let pathname = usePathname()
   if (pathname?.includes('/raw')) {
-    return <ClassifiedProvider value={classifiedMode}>{children}</ClassifiedProvider>
+    return <ClassifiedProvider value={config.ui.classified}>{children}</ClassifiedProvider>
   }
 
   function isActive(item: Navigation) {
@@ -98,7 +96,7 @@ export default function Layout({
   }
 
   return (
-    <ClassifiedProvider value={classifiedMode}>
+    <ClassifiedProvider value={config.ui.classified}>
       <RecordsProvider records={data.records}>
         <RecordStacksProvider value={data.stacks}>
           {loading && (
@@ -165,7 +163,7 @@ export default function Layout({
             <div
               className={classNames(
                 'hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:flex-col',
-                match(size, {
+                match(config.ui.sidebar, {
                   large: 'lg:w-72',
                   small: 'lg:w-20',
                 }),
@@ -175,12 +173,12 @@ export default function Layout({
                 <div
                   className={classNames(
                     'flex h-16 shrink-0 items-center',
-                    size === 'small' && 'justify-center',
+                    config.ui.sidebar === 'small' && 'justify-center',
                   )}
                 >
                   <Link href="/" className="inline-flex items-center gap-2 text-lg text-white">
                     <CubeIcon className="h-6 w-6 text-gray-200" />
-                    {size === 'large' && <> Simple Invoice.</>}
+                    {config.ui.sidebar === 'large' && <> Simple Invoice.</>}
                   </Link>
                 </div>
                 <nav className="flex flex-1 flex-col">
@@ -196,15 +194,18 @@ export default function Layout({
                                   ? 'bg-zinc-700 text-white'
                                   : 'text-gray-400 hover:bg-zinc-700 hover:text-white',
                                 'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6',
-                                size === 'small' && 'justify-center',
+                                config.ui.sidebar === 'small' && 'justify-center',
                               )}
                             >
                               <item.icon className="h-6 w-6 shrink-0" aria-hidden="true" />
-                              {size === 'large' && <>{item.name}</>}
+                              {config.ui.sidebar === 'large' && <>{item.name}</>}
                             </Link>
                             {item.children && (
                               <ul
-                                className={classNames('space-y-1 py-1', size === 'large' && 'ml-8')}
+                                className={classNames(
+                                  'space-y-1 py-1',
+                                  config.ui.sidebar === 'large' && 'ml-8',
+                                )}
                               >
                                 {item.children
                                   .filter((item) => {
@@ -233,14 +234,14 @@ export default function Layout({
                                               ? 'bg-zinc-700 text-white'
                                               : 'text-gray-400 hover:bg-zinc-700 hover:text-white',
                                             'group relative flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6',
-                                            size === 'small' && 'justify-center',
+                                            config.ui.sidebar === 'small' && 'justify-center',
                                           )}
                                         >
                                           <item.icon
                                             className="h-6 w-6 shrink-0"
                                             aria-hidden="true"
                                           />
-                                          {size === 'large' && (
+                                          {config.ui.sidebar === 'large' && (
                                             <>
                                               {item.name}
                                               {attentionCount > 0 && (
@@ -264,26 +265,19 @@ export default function Layout({
                     </li>
                     <li className="mt-auto">
                       <button
-                        onClick={() =>
-                          setSize((current) =>
-                            match(current, {
-                              large: 'small',
-                              small: 'large',
-                            }),
-                          )
-                        }
+                        onClick={() => toggleSidebar()}
                         className={classNames(
                           'flex w-full items-center gap-2 text-white opacity-50 transition-opacity hover:opacity-100',
-                          size === 'small' && 'justify-center',
-                          size === 'large' && 'justify-between',
+                          config.ui.sidebar === 'small' && 'justify-center',
+                          config.ui.sidebar === 'large' && 'justify-between',
                         )}
                       >
-                        {size === 'large' && <span>Collapse sidebar</span>}
+                        {config.ui.sidebar === 'large' && <span>Collapse sidebar</span>}
                         <div className="h-4 w-4 rounded border border-gray-200">
                           <div
                             className={classNames(
                               'h-full w-1 border-r border-gray-200',
-                              size === 'large' && 'bg-gray-200',
+                              config.ui.sidebar === 'large' && 'bg-gray-200',
                             )}
                           ></div>
                         </div>
@@ -297,7 +291,7 @@ export default function Layout({
             <div
               className={classNames(
                 'flex flex-1 flex-col overflow-hidden',
-                match(size, {
+                match(config.ui.sidebar, {
                   small: 'lg:pl-20',
                   large: 'lg:pl-72',
                 }),
@@ -380,8 +374,8 @@ export default function Layout({
 
             <Group title="Actions">
               <Action
-                icon={classifiedMode ? EyeIcon : EyeSlashIcon}
-                invoke={() => setClassifiedMode((v) => !v)}
+                icon={config.ui.classified ? EyeIcon : EyeSlashIcon}
+                invoke={() => toggleClassified()}
                 search="toggle streamer mode"
               >
                 Toggle streamer mode
@@ -397,21 +391,14 @@ export default function Layout({
                         <div
                           className={classNames(
                             'h-full w-1 border-r border-current',
-                            size === 'large' && 'bg-current',
+                            config.ui.sidebar === 'large' && 'bg-current',
                           )}
                         ></div>
                       </div>
                     </div>
                   )
                 }}
-                invoke={() =>
-                  setSize((current) =>
-                    match(current, {
-                      large: 'small',
-                      small: 'large',
-                    }),
-                  )
-                }
+                invoke={() => toggleSidebar()}
                 search="toggle sidebar"
               >
                 Toggle sidebar

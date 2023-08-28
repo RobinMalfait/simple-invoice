@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { me, records, stacks } from '~/data'
 import Layout from '~/ui/layout/main'
-import { env } from '~/utils/env'
+import { load } from './(db)/actions'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' })
@@ -12,12 +12,13 @@ export const metadata: Metadata = {
   description: 'Generate simple invoices with ease.',
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
   let data = { me, records, stacks }
+  let config = await load()
   return (
     <html lang="en">
       <body className={inter.variable}>
-        <Layout data={data} isClassified={env.CLASSIFIED_MODE}>
+        <Layout data={data} config={config}>
           {children}
         </Layout>
       </body>
