@@ -84,6 +84,11 @@ export class ReceiptBuilder {
     return this
   }
 
+  public attachments(attachments: Document[]): ReceiptBuilder {
+    this._attachments = attachments.slice()
+    return this
+  }
+
   public attachment(attachment: Document): ReceiptBuilder {
     this._attachments.push(attachment)
     return this
