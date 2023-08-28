@@ -82,7 +82,7 @@ export function CommandPalette({ children }: PropsWithChildren<{}>) {
 
                 <Combobox.Options
                   static
-                  className="max-h-80 scroll-py-2 divide-y divide-zinc-500 divide-opacity-20 overflow-y-auto"
+                  className="max-h-[50vh] scroll-py-2 divide-y divide-zinc-500 divide-opacity-20 overflow-y-auto"
                 >
                   <CommandPaletteContext.Provider value={{ query }}>
                     {children}
