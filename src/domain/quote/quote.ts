@@ -9,11 +9,14 @@ import { Document } from '~/domain/document/document'
 import { Event } from '~/domain/events/event'
 import { InvoiceItem } from '~/domain/invoice/invoice-item'
 import { QuoteStatus } from '~/domain/quote/quote-status'
+import { ScopedIDGenerator } from '~/utils/id'
 import { match } from '~/utils/match'
+
+let scopedId = new ScopedIDGenerator('quote')
 
 let BaseQuote = z.object({
   type: z.literal('quote').default('quote'),
-  id: z.string().default(() => crypto.randomUUID()),
+  id: z.string().default(() => scopedId.next()),
   number: z.string(),
   account: Account,
   client: Client,

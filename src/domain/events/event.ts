@@ -1,4 +1,7 @@
 import { z } from 'zod'
+import { ScopedIDGenerator } from '~/utils/id'
+
+let scopedId = new ScopedIDGenerator('event')
 
 export let Event = z
   .discriminatedUnion('type', [
@@ -27,7 +30,7 @@ export let Event = z
   ])
   .and(
     z.object({
-      id: z.string().default(() => crypto.randomUUID()),
+      id: z.string().default(() => scopedId.next()),
       at: z.date().nullable().default(null),
     }),
   )

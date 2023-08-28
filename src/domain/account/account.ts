@@ -5,9 +5,12 @@ import { Currency } from '~/domain/currency/currency'
 import { Language } from '~/domain/language/language'
 import { PaymentMethod } from '~/domain/payment-method/payment-method'
 import { Tax } from '~/domain/tax/tax'
+import { ScopedIDGenerator } from '~/utils/id'
+
+let scopedId = new ScopedIDGenerator('account')
 
 export let Account = z.object({
-  id: z.string().default(() => crypto.randomUUID()),
+  id: z.string().default(() => scopedId.next()),
   name: z.string(),
   email: z.string().email().nullable(),
   phone: z.string().nullable(),

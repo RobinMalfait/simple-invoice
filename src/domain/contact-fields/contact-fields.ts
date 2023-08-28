@@ -1,8 +1,11 @@
 import { z } from 'zod'
 import { icons, socialIcons } from '~/domain/contact-fields/icon-names'
+import { ScopedIDGenerator } from '~/utils/id'
+
+let scopedId = new ScopedIDGenerator('contact-field')
 
 export let ContactField = z.object({
-  id: z.string().default(() => crypto.randomUUID()),
+  id: z.string().default(() => scopedId.next()),
   name: z.string(),
   value: z.string(),
   icon: z

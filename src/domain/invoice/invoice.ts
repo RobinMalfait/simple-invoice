@@ -12,11 +12,14 @@ import { InvoiceStatus } from '~/domain/invoice/invoice-status'
 import { Quote } from '~/domain/quote/quote'
 import { QuoteStatus } from '~/domain/quote/quote-status'
 import { total } from '~/ui/invoice/total'
+import { ScopedIDGenerator } from '~/utils/id'
 import { match } from '~/utils/match'
+
+let scopedId = new ScopedIDGenerator('invoice')
 
 export let Invoice = z.object({
   type: z.literal('invoice').default('invoice'),
-  id: z.string().default(() => crypto.randomUUID()),
+  id: z.string().default(() => scopedId.next()),
   number: z.string(),
   account: Account,
   client: Client,

@@ -3,9 +3,12 @@ import { Address } from '~/domain/address/address'
 import { Currency } from '~/domain/currency/currency'
 import { Language } from '~/domain/language/language'
 import { Tax } from '~/domain/tax/tax'
+import { ScopedIDGenerator } from '~/utils/id'
+
+let scopedId = new ScopedIDGenerator('client')
 
 export let Client = z.object({
-  id: z.string().default(() => crypto.randomUUID()),
+  id: z.string().default(() => scopedId.next()),
   name: z.string(),
   email: z.string().email().nullable(),
   phone: z.string().nullable(),

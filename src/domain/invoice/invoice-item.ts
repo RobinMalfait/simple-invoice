@@ -1,8 +1,11 @@
 import { z } from 'zod'
 import { Discount } from '~/domain/discount/discount'
+import { ScopedIDGenerator } from '~/utils/id'
+
+let scopedId = new ScopedIDGenerator('invoice-item')
 
 export let InvoiceItem = z.object({
-  id: z.string().default(() => crypto.randomUUID()),
+  id: z.string().default(() => scopedId.next()),
   description: z.string(),
   quantity: z.number(),
   unitPrice: z.number(),

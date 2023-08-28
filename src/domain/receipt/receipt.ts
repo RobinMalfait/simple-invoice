@@ -9,10 +9,13 @@ import { Event } from '~/domain/events/event'
 import { Invoice } from '~/domain/invoice/invoice'
 import { InvoiceItem } from '~/domain/invoice/invoice-item'
 import { InvoiceStatus } from '~/domain/invoice/invoice-status'
+import { ScopedIDGenerator } from '~/utils/id'
+
+let scopedId = new ScopedIDGenerator('receipt')
 
 export let Receipt = z.object({
   type: z.literal('receipt').default('receipt'),
-  id: z.string().default(() => crypto.randomUUID()),
+  id: z.string().default(() => scopedId.next()),
   number: z.string(),
   invoice: Invoice,
   account: Account,
