@@ -43,6 +43,7 @@
     "date-fns": "^2.30.0",
     "date-fns-tz": "^2.0.0",
     "htmlparser2": "^9.0.0",
+    "ics": "^3.4.0",
     "marked": "^7.0.2",
     "next": "^13.4.13",
     "puppeteer": "^20.8.2",
