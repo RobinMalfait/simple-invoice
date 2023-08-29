@@ -10,22 +10,24 @@ import { I18NProvider } from '~/ui/hooks/use-i18n'
 import { ActivityFeed } from '~/ui/invoice/activity-feed'
 import { AttachmentList } from '~/ui/invoice/attachment-list'
 import { Invoice as InvoicePreview } from '~/ui/invoice/design'
+import { TemplateList } from '~/ui/invoice/template-list'
 import { total } from '~/ui/invoice/total'
 import { Money } from '~/ui/money'
 import { match } from '~/utils/match'
-import { Actions } from './actions'
+import { loadTemplates } from './actions'
+import { Actions } from './components'
 import { History, HistoryActions } from './history'
 
-export default function Invoice({
+export default async function Invoice({
   params: { type, number },
 }: {
   params: { type: string; number: string }
 }) {
   let record = records.find((record) => record.type === type && record.number === number)
-
   if (!record) {
     redirect('/')
   }
+  let templates = await loadTemplates(record)
 
   return (
     <div className="flex h-full flex-1 overflow-hidden [--spacing:theme(spacing.8)]">
@@ -92,6 +94,15 @@ export default function Invoice({
                   Attachments
                 </span>
                 <AttachmentList />
+              </div>
+            )}
+
+            {templates.length > 0 && (
+              <div className="flex flex-col gap-4 rounded-lg bg-white p-4 shadow ring-1 ring-black/5 dark:bg-zinc-900 dark:text-gray-300">
+                <span className="text-sm font-medium text-gray-900 dark:text-gray-300">
+                  Templates
+                </span>
+                <TemplateList templates={templates} />
               </div>
             )}
 

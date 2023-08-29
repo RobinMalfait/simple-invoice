@@ -2,18 +2,29 @@ import { kebab } from 'case'
 import { format } from 'date-fns'
 import { match } from '~/utils/match'
 
+type Configuration = {
+  transformations?: {
+    [key: string]: (value: any) => string
+  }
+}
+
 // Small custom template language, handlebars based
-export function render<T>(template: string, input: T): string {
-  return template.replace(/{{([^}]+)}}/g, (_, value) => {
+export function render<T>(template: string, input: T, config: Configuration = {}): string {
+  return template.replace(/{{(.+?)}}/g, (_, value) => {
     let transformations: string[] = value.split('|')
     let [path, arg] = transformations.shift()?.split(':') ?? []
 
     let segments = path.split('.')
     let next: any = input
     for (let segment of segments) {
+      let current = next
       next = next[segment]
       if (next === undefined || next === null) {
-        throw new Error(`Could not find property ${segment} in ${path}`)
+        throw new Error(
+          `Could not find property \`${segment}\` in ${Object.keys(current)
+            .map((x) => `\`${x}\``)
+            .join(', ')}`,
+        )
       }
     }
 
@@ -27,6 +38,13 @@ export function render<T>(template: string, input: T): string {
           lower: () => next.toLowerCase(),
           upper: () => next.toUpperCase(),
           kebab: () => kebab(next),
+
+          // Transform the transformations itself to pass in the `next` value.
+          ...Object.fromEntries(
+            Object.entries(config.transformations ?? {}).map(
+              ([key, value]) => [key, () => value(next)] as const,
+            ),
+          ),
         })
       }
     }
