@@ -1,4 +1,4 @@
-import { isPast } from 'date-fns'
+import { endOfDay, isPast } from 'date-fns'
 import { Invoice } from '~/domain/invoice/invoice'
 import { InvoiceStatus } from '~/domain/invoice/invoice-status'
 import { Quote } from '~/domain/quote/quote'
@@ -158,8 +158,12 @@ export function warningMessageForRecord(record: Record): string | null {
 
         // Draft invoices with an issue date in the past are void because they cannot be completed
         // since they were never sent before.
-        if (r.status === InvoiceStatus.Draft && isPast(r.issueDate)) {
-          return 'This invoice is void because the issue date is in the past and this invoice has never been sent.'
+        if (r.status === InvoiceStatus.Draft) {
+          if (isPast(endOfDay(r.issueDate))) {
+            return 'This invoice is void because the issue date is in the past and this invoice has never been sent.'
+          } else {
+            return "Today is your lucky day, don't forget to send this invoice!"
+          }
         }
 
         return null
