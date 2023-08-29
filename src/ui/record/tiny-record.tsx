@@ -10,7 +10,6 @@ import { isQuote, recordHasAttachments, recordHasWarning } from '~/domain/record
 import type { Record } from '~/domain/record/record'
 import { classNames } from '~/ui/class-names'
 import { useRecordStacks } from '~/ui/hooks/use-record-stacks'
-import { useTranslation } from '~/ui/hooks/use-translation'
 import { StatusDisplay as InvoiceStatusDisplay } from '~/ui/invoice/status'
 import { total } from '~/ui/invoice/total'
 import { Money } from '~/ui/money'
@@ -18,7 +17,6 @@ import { StatusDisplay as QuoteStatusDisplay } from '~/ui/quote/status'
 import { match } from '~/utils/match'
 
 export function TinyRecord({ record }: { record: Record }) {
-  let t = useTranslation()
   let stacks = useRecordStacks()
   let isLayered = (stacks[record.id]?.length ?? 0) > 1
   let hasAttachments = recordHasAttachments(record, 'any')
