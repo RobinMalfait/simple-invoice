@@ -47,7 +47,7 @@ export function StatusDisplay({ status }: { status: InvoiceStatus }) {
   return (
     <span
       className={classNames(
-        'inline-flex items-center gap-2 rounded-md px-2 py-1 text-xs font-medium capitalize ring-1 ring-inset',
+        'inline-flex shrink-0 items-center gap-2 rounded-md px-2 py-1 text-xs font-medium capitalize ring-1 ring-inset',
         statusClassMap[status],
       )}
     >
