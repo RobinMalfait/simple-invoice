@@ -1,6 +1,7 @@
 import { title } from 'case'
 import { addDays, addMonths, format, isWithinInterval, subMonths } from 'date-fns'
 import { EventAttributes, createEvents } from 'ics'
+import { NextRequest } from 'next/server'
 import { records as allRecords, me } from '~/data'
 import { Invoice } from '~/domain/invoice/invoice'
 import { Quote } from '~/domain/quote/quote'
@@ -8,7 +9,7 @@ import { resolveRelevantRecordDate } from '~/domain/record/record'
 import { total } from '~/ui/invoice/total'
 import { match } from '~/utils/match'
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   if (params.id !== me.id) {
     return new Response('Not found.', { status: 404 })
   }
@@ -94,7 +95,7 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
         },
       ],
       categories: [record.type],
-      url: `${req.url.replace('/ics', `/${record.type}/${record.number}`)}`,
+      url: `${req.nextUrl.origin}/${record.type}/${record.number}`,
       location: record.client.name,
       productId: 'invoice.simple/ics',
       uid: `invoice.simple.ics.record.${record.account.id}.${record.type}.${record.number}`,
