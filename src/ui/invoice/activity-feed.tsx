@@ -8,7 +8,7 @@ import {
   PencilSquareIcon,
   XCircleIcon,
 } from '@heroicons/react/24/outline'
-import { format, formatDistanceStrict, formatDistanceToNow } from 'date-fns'
+import { format, formatDistance, formatDistanceStrict, isFuture } from 'date-fns'
 import { Fragment } from 'react'
 import { Event } from '~/domain/events/event'
 import type { Record } from '~/domain/record/record'
@@ -18,6 +18,7 @@ import { useRecordStacks } from '~/ui/hooks/use-record-stacks'
 import { Money } from '~/ui/money'
 import { assertNever } from '~/utils/assert-never'
 import { match } from '~/utils/match'
+import { useCurrentDate } from '../hooks/use-current-date'
 
 export function ActivityFeed(props: React.PropsWithChildren<{ records: Record[] }>) {
   let stacks = useRecordStacks()
@@ -85,10 +86,13 @@ function ActivityItem({
   previous?: Event
   isLast: boolean
 }) {
+  let now = useCurrentDate()
+
   let diff: string | null = null
   if (previous && previous.at !== null && item.at !== null) {
     diff = formatDistanceStrict(previous.at, item.at)
   }
+
   return (
     <>
       <li className="relative flex gap-x-4">
@@ -124,7 +128,7 @@ function ActivityItem({
             dateTime={format(item.at, 'PPPpp')}
             className="flex-none py-0.5 text-xs leading-5 text-gray-500 dark:text-gray-300"
           >
-            {formatDistanceToNow(item.at, { addSuffix: true })}
+            {formatDistance(item.at, now, { addSuffix: true })}
           </time>
         )}
       </li>
@@ -180,6 +184,8 @@ function ActivityIndicator({ item }: { item: Event }) {
 }
 
 function ActivityText({ item }: { item: Event }) {
+  let now = useCurrentDate()
+
   switch (item.type) {
     case 'quote-drafted': {
       if (item.from) {
@@ -203,7 +209,12 @@ function ActivityText({ item }: { item: Event }) {
     }
 
     case 'quote-sent':
-      return (
+      return item.at && isFuture(item.at) ? (
+        <>
+          The quote will be{' '}
+          <span className="font-medium text-gray-900 dark:text-gray-100">sent</span>.
+        </>
+      ) : (
         <>
           <span className="font-medium text-gray-900 dark:text-gray-100">Sent</span> the quote.
         </>
@@ -261,9 +272,14 @@ function ActivityText({ item }: { item: Event }) {
       )
 
     case 'invoice-sent':
-      return (
+      return item.at && isFuture(item.at) ? (
         <>
-          <span className="font-medium text-gray-900 dark:text-gray-100">Sent</span> the invoice.
+          The invoice will be{' '}
+          <span className="font-medium text-gray-900 dark:text-gray-100">sent</span>.
+        </>
+      ) : (
+        <>
+          <span className="font-medium text-gray-900 dark:text-gray-100">Sent</span> the quote.
         </>
       )
 
