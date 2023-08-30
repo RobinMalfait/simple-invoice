@@ -77,6 +77,15 @@ export function CommandPalette({ children }: PropsWithChildren<{}>) {
                     className="h-12 w-full border-0 bg-transparent pl-11 pr-4 text-gray-900 focus:ring-0 dark:text-white sm:text-sm"
                     placeholder="Search..."
                     onChange={(event) => setQuery(event.target.value)}
+                    onFocus={(e) => {
+                      e.target.dispatchEvent(
+                        new KeyboardEvent('keydown', {
+                          key: 'ArrowDown',
+                          keyCode: 40,
+                          bubbles: true,
+                        }),
+                      )
+                    }}
                   />
                 </div>
 
