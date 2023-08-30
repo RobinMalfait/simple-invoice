@@ -2,17 +2,26 @@ import { title } from 'case'
 import { addDays, addMonths, format, isWithinInterval, subMonths } from 'date-fns'
 import { EventAttributes, createEvents } from 'ics'
 import { NextRequest } from 'next/server'
+import { load } from '~/app/(db)/actions'
 import { records as allRecords, me } from '~/data'
 import { Invoice } from '~/domain/invoice/invoice'
 import { Quote } from '~/domain/quote/quote'
 import { resolveRelevantRecordDate } from '~/domain/record/record'
 import { total } from '~/ui/invoice/total'
+import { createCurrencyFormatter } from '~/utils/currency-formatter'
 import { match } from '~/utils/match'
 
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   if (params.id !== me.id) {
     return new Response('Not found.', { status: 404 })
   }
+
+  let money = createCurrencyFormatter({
+    currency: me.currency,
+    language: me.language,
+    type: 'long',
+  })
+  let { classified } = (await load()).ui
 
   let now = new Date()
   let startRange = subMonths(now, 2)
@@ -58,8 +67,8 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
           ),
         )}`,
         '',
-        `Client: ${record.client.name}`,
         `${title(record.type)}: #${record.number}`,
+        `Client: ${record.client.name}`,
         '',
         ...match(
           record.type,
@@ -74,10 +83,11 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
           record,
         ),
         '',
-        `Total: ${(total(record) / 100).toLocaleString('nl-NL', {
-          style: 'currency',
-          currency: 'EUR',
-        })}`,
+        `Total: ${
+          classified
+            ? money.format(total(record) / 100).replace(/\d/g, 'X')
+            : money.format(total(record) / 100)
+        }`,
       ].join('\n'),
       status: 'CONFIRMED',
       busyStatus: 'FREE',
