@@ -1,3 +1,5 @@
+import { MailTemplate } from '~/domain/mail-template/mail-template'
+
 export type Configuration = {
   /**
    * The configuration for PDF generation.
@@ -12,10 +14,20 @@ export type Configuration = {
      */
     filename: string
   }
+
+  /**
+   * The configuration for sending emails.
+   */
+  mail: {
+    templates: MailTemplate[]
+  }
 }
 
 export let defaultConfiguration: Configuration = {
   pdf: {
     filename: 'receipt-{{invoice.number}}.pdf',
+  },
+  mail: {
+    templates: [],
   },
 }

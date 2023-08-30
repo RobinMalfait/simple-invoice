@@ -10,6 +10,7 @@ import {
   Configuration as ReceiptConfiguration,
   defaultConfiguration as defaultReceiptConfiguration,
 } from '~/domain/receipt/configuration'
+import { merge } from '~/utils/merge'
 
 export type Configuration = {
   quote: QuoteConfiguration
@@ -34,14 +35,11 @@ type DeepPartial<T> = T extends (...args: any[]) => void
   : T
 
 export function configure(configuration: DeepPartial<Configuration>) {
-  state.configuration = Object.assign(
-    {},
-    {
-      quote: { ...defaultQuoteConfiguration, ...configuration.quote },
-      invoice: { ...defaultInvoiceConfiguration, ...configuration.invoice },
-      receipt: { ...defaultReceiptConfiguration, ...configuration.receipt },
-    },
-  ) as Configuration
+  state.configuration = {
+    quote: merge({}, defaultQuoteConfiguration, configuration.quote),
+    invoice: merge({}, defaultInvoiceConfiguration, configuration.invoice),
+    receipt: merge({}, defaultReceiptConfiguration, configuration.receipt),
+  } as Configuration
 }
 
 export function config(): Configuration {

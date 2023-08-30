@@ -7,13 +7,14 @@ import { ContactFieldBuilder } from '~/domain/contact-fields/contact-fields'
 import { Currency } from '~/domain/currency/currency'
 import { DiscountBuilder } from '~/domain/discount/discount'
 import { DocumentBuilder, md } from '~/domain/document/document'
-import { InvoiceBuilder } from '~/domain/invoice/invoice'
+import { Invoice, InvoiceBuilder } from '~/domain/invoice/invoice'
 import { InvoiceItemBuilder } from '~/domain/invoice/invoice-item'
 import { Language } from '~/domain/language/language'
+import { MailTemplateBuilder } from '~/domain/mail-template/mail-template'
 import { IncrementStrategy } from '~/domain/number-strategies'
 import { PaymentMethodBuilder } from '~/domain/payment-method/payment-method'
-import { QuoteBuilder } from '~/domain/quote/quote'
-import { ReceiptBuilder } from '~/domain/receipt/receipt'
+import { Quote, QuoteBuilder } from '~/domain/quote/quote'
+import { Receipt, ReceiptBuilder } from '~/domain/receipt/receipt'
 import type { Record } from '~/domain/record/record'
 import { TaxBuilder } from '~/domain/tax/tax'
 
@@ -46,6 +47,25 @@ configure({
        */
       filename: 'quote-{{number}}.pdf',
     },
+
+    mail: {
+      templates: [
+        new MailTemplateBuilder<Quote>()
+          .name('Default')
+          .subject('Ready for some business, {{client.name}}?')
+          .body(md`
+            Hi {{client.name}},
+
+            I hope you are doing well. I would like to do business with you. Please find attached a quote for **{{total|money}}**.
+
+            Let me know if you have any questions.
+
+            Kind regards,
+            {{account.name}}
+          `)
+          .build(),
+      ],
+    },
   },
 
   invoice: {
@@ -75,6 +95,32 @@ configure({
        */
       filename: 'invoice-{{number}}.pdf',
     },
+
+    mail: {
+      templates: [
+        new MailTemplateBuilder<Invoice>()
+          .name('Default')
+          .subject('Invoice — {{number}}')
+          .body(md`
+            Hi {{client.name}},
+
+            Attached you will find invoice **{{number}}**.
+
+            Summary of the invoice:
+
+            - Invoice number: **{{number}}**
+            - Total amount to be paid: **{{total|money}}**
+            - Issue date: **{{issueDate:PPP}}**
+            - Due date: **{{dueDate:PPP}}**
+
+            > **_Thank you for doing business together!_**
+
+            Kind regards,
+            {{account.name}}
+          `)
+          .build(),
+      ],
+    },
   },
 
   receipt: {
@@ -90,6 +136,25 @@ configure({
        *  - For dates, you can use a format string, for example `{{receiptDate:dd-MM-yyyy}}`
        */
       filename: 'receipt-{{number}}.pdf',
+    },
+
+    mail: {
+      templates: [
+        new MailTemplateBuilder<Receipt>()
+          .name('Default')
+          .subject('Thanks for doing business, {{client.name}}')
+          .body(md`
+            Hi {{client.name}},
+
+            Attached you will find a receipt for invoice **{{invoice.number}}**.
+
+            > **_Thank you for doing business together!_**
+
+            Kind regards,
+            {{account.name}}
+          `)
+          .build(),
+      ],
     },
   },
 })

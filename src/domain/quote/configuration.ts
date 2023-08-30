@@ -1,4 +1,5 @@
 import { addDays } from 'date-fns'
+import { MailTemplate } from '~/domain/mail-template/mail-template'
 import { IncrementStrategy } from '~/domain/number-strategies'
 
 export type Configuration = {
@@ -29,6 +30,13 @@ export type Configuration = {
      */
     filename: string
   }
+
+  /**
+   * The configuration for sending emails.
+   */
+  mail: {
+    templates: MailTemplate[]
+  }
 }
 
 export let defaultConfiguration: Configuration = {
@@ -36,5 +44,8 @@ export let defaultConfiguration: Configuration = {
   numberStrategy: new IncrementStrategy().next,
   pdf: {
     filename: 'quote-{{number}}.pdf',
+  },
+  mail: {
+    templates: [],
   },
 }
