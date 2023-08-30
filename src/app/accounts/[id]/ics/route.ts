@@ -91,6 +91,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
       ].join('\n'),
       status: 'CONFIRMED',
       busyStatus: 'FREE',
+      classification: 'CONFIDENTIAL',
       organizer: {
         name: me.name,
         email: me.email!,
