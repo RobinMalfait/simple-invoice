@@ -1,8 +1,9 @@
 import { kebab } from 'case'
-import { format } from 'date-fns'
+import { format, type Locale } from 'date-fns'
 import { match } from '~/utils/match'
 
 type Configuration = {
+  locale?: Locale
   transformations?: {
     [key: string]: (value: any) => string
   }
@@ -28,12 +29,12 @@ export function render<T>(template: string, input: T, config: Configuration = {}
       }
     }
 
-    if (next instanceof Date) {
-      next = format(next, arg ?? 'yyyy-MM-dd')
-    }
-
     // Fallback to empty string for nullish values
     next ??= ''
+
+    if (next instanceof Date) {
+      next = format(next, arg ?? 'yyyy-MM-dd', { locale: config.locale })
+    }
 
     if (transformations.length > 0) {
       for (let transform of transformations) {

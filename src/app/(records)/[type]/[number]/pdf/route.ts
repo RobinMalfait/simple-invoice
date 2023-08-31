@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import puppeteer from 'puppeteer'
 import { records } from '~/data'
 import { config } from '~/domain/configuration/configuration'
+import { languageToLocale } from '~/utils/language-to-locale'
 import { render } from '~/utils/tl'
 
 export async function GET(
@@ -19,7 +20,9 @@ export async function GET(
   }
 
   let filenameTemplate = config()[record.type].pdf.filename
-  let filename = render(filenameTemplate, record)
+  let filename = render(filenameTemplate, record, {
+    locale: languageToLocale(record.client.language),
+  })
 
   return presentPDF(filename, await generatePDF(request.url.replace('/pdf', '/raw')), type)
 }

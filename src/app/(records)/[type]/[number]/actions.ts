@@ -5,6 +5,7 @@ import { parseMarkdown as _parseMarkdown } from '~/ui/document/document'
 import { total } from '~/ui/invoice/total'
 import { createCurrencyFormatter } from '~/utils/currency-formatter'
 import { dedent } from '~/utils/dedent'
+import { languageToLocale } from '~/utils/language-to-locale'
 import { render } from '~/utils/tl'
 
 function parseMarkdown(value: string) {
@@ -58,6 +59,7 @@ function renderTemplate(template: string, record: Record, { classified = false }
       },
     }),
     {
+      locale: languageToLocale(record.client.language),
       transformations: {
         money(value: number) {
           let result = money.format(value / 100)
