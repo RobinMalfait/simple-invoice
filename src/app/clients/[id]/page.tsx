@@ -26,6 +26,7 @@ import { match } from '~/utils/match'
 type RecordTab<T extends Record> = {
   label: string
   filter: (r: T) => boolean
+  map?: (records: T[]) => T[]
   default?: boolean
   children?: Array<RecordTab<T>>
 }
@@ -84,6 +85,7 @@ export default async function Page({ params: { id } }: { params: { id: string } 
       tab<Receipt>({
         label: 'Receipts',
         filter: isReceipt,
+        map: (list) => list.slice().reverse(),
       }),
   ].filter(Boolean) as RecordTab<any>[]
 
@@ -222,7 +224,9 @@ function RecordTabs({ records, tabs }: { records: Record[]; tabs: RecordTab<any>
       <TabList className="border-b border-gray-200 dark:border-zinc-700">
         <div className="-mb-px flex space-x-8 overflow-auto">
           {tabs.map((tab, idx) => {
-            let scopedRecords = records.filter(tab.filter)
+            let scopedRecords = tab.map
+              ? tab.map(records.filter(tab.filter))
+              : records.filter(tab.filter)
             return (
               <Tab
                 key={idx}
@@ -251,7 +255,9 @@ function RecordTabs({ records, tabs }: { records: Record[]; tabs: RecordTab<any>
       </TabList>
       <TabPanels>
         {tabs.map((tab, idx) => {
-          let scopedRecords = records.filter(tab.filter)
+          let scopedRecords = tab.map
+            ? tab.map(records.filter(tab.filter))
+            : records.filter(tab.filter)
           return (
             <TabPanel key={idx}>
               {tab.children ? (
