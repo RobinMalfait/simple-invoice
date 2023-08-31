@@ -32,6 +32,9 @@ export function render<T>(template: string, input: T, config: Configuration = {}
       next = format(next, arg ?? 'yyyy-MM-dd')
     }
 
+    // Fallback to empty string for nullish values
+    next ??= ''
+
     if (transformations.length > 0) {
       for (let transform of transformations) {
         next = match(transform, {
