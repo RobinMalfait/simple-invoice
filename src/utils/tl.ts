@@ -19,7 +19,7 @@ export function render<T>(template: string, input: T, config: Configuration = {}
     for (let segment of segments) {
       let current = next
       next = next[segment]
-      if (next === undefined || next === null) {
+      if (!(segment in current)) {
         throw new Error(
           `Could not find property \`${segment}\` in ${Object.keys(current)
             .map((x) => `\`${x}\``)
