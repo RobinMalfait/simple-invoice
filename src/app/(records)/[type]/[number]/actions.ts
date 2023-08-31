@@ -9,7 +9,7 @@ import { render } from '~/utils/tl'
 
 function parseMarkdown(value: string) {
   let context = { nested: 0 }
-  return _parseMarkdown(value)
+  let markdown = _parseMarkdown(value)
     .split('\n')
     .map((line, idx, all) => {
       let nextLine = all[idx + 1] ?? ''
@@ -36,8 +36,11 @@ function parseMarkdown(value: string) {
     })
     .map((line) => line.replace(/\s{2,}/g, (spaces) => '&nbsp;'.repeat(spaces.length)))
     .join('\n')
-    .trim()
-    .replace(/(<br>)+$/g, '')
+
+    // Cleanup
+    .replace(/<p><\/p>/g, '')
+    .replace(/(<br>|\n)+$/g, '')
+  return markdown
 }
 
 function renderTemplate(template: string, record: Record, { classified = false } = {}) {

@@ -9,10 +9,10 @@ let classified: TokenizerAndRendererExtension = {
   name: 'classified',
   level: 'inline' as const,
   start(src: string) {
-    return src.match(/\|\|([\s\S]+?)\|\|/)?.index
+    return src.match(/\|\|([\s\S]*?)\|\|/)?.index
   },
   tokenizer(src: string) {
-    let rule = /^\|\|([\s\S]+?)\|\|$/
+    let rule = /^\|\|([\s\S]*?)\|\|$/
     let match = rule.exec(src)
     if (!match) return undefined
 
@@ -23,6 +23,7 @@ let classified: TokenizerAndRendererExtension = {
     }
   },
   renderer(token) {
+    if (token.text.trim() === '') return ''
     return `<span class="relative classified:[&_img]:brightness-0 classified:select-none classified:bg-zinc-950 classified:text-zinc-950">${token.text}</span>`
   },
 }
@@ -32,7 +33,8 @@ marked.use({
 })
 
 export function parseMarkdown(value: string): string {
-  return marked.parse(dedent(value), { breaks: true }).trim()
+  let html = marked.parse(dedent(value), { breaks: true }).trim()
+  return html
 }
 
 type JSXNode = { tag: string; props: Record<string | symbol, any>; children: JSX[] }
