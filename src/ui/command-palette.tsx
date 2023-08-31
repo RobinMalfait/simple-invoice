@@ -1,6 +1,5 @@
 import { Combobox, Dialog, Transition } from '@headlessui/react'
 import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
-import { FolderIcon } from '@heroicons/react/24/outline'
 import {
   Fragment,
   PropsWithChildren,
@@ -33,6 +32,16 @@ export function CommandPalette({ children }: PropsWithChildren<{}>) {
     }
   })
 
+  // Escape
+  useWindowEvent(
+    'keydown',
+    (event) => {
+      if (!open) return
+      if (event.key === 'Escape') setOpen(false)
+    },
+    { capture: true },
+  )
+
   return (
     <Transition.Root show={open} as={Fragment} afterLeave={() => setQuery('')} appear>
       <Dialog as="div" className="relative z-10" onClose={setOpen}>
@@ -62,6 +71,7 @@ export function CommandPalette({ children }: PropsWithChildren<{}>) {
               <Combobox<CommandPaletteOption>
                 by="id"
                 nullable
+                immediate
                 onChange={async (item) => {
                   if (item === null) return
                   await Promise.resolve().then(() => item.invoke())
@@ -77,35 +87,14 @@ export function CommandPalette({ children }: PropsWithChildren<{}>) {
                     className="h-12 w-full border-0 bg-transparent pl-11 pr-4 text-gray-900 focus:ring-0 dark:text-white sm:text-sm"
                     placeholder="Search..."
                     onChange={(event) => setQuery(event.target.value)}
-                    onFocus={(e) => {
-                      e.target.dispatchEvent(
-                        new KeyboardEvent('keydown', {
-                          key: 'ArrowDown',
-                          keyCode: 40,
-                          bubbles: true,
-                        }),
-                      )
-                    }}
                   />
                 </div>
 
-                <Combobox.Options
-                  static
-                  className="max-h-[50vh] scroll-py-2 divide-y divide-zinc-500 divide-opacity-20 overflow-y-auto"
-                >
+                <Combobox.Options className="max-h-[50vh] scroll-py-2 divide-y divide-zinc-500 divide-opacity-20 overflow-y-auto">
                   <CommandPaletteContext.Provider value={{ query }}>
                     {children}
                   </CommandPaletteContext.Provider>
                 </Combobox.Options>
-
-                {false && query !== '' && [].length === 0 && (
-                  <div className="px-6 py-14 text-center sm:px-14">
-                    <FolderIcon className="mx-auto h-6 w-6 text-zinc-500" aria-hidden="true" />
-                    <p className="mt-4 text-sm text-zinc-200">
-                      We couldn&apos;t find any projects with that term. Please try again.
-                    </p>
-                  </div>
-                )}
               </Combobox>
             </Dialog.Panel>
           </Transition.Child>
