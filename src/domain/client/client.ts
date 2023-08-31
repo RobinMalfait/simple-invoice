@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { Address } from '~/domain/address/address'
+import { Contact } from '~/domain/contact/contact'
 import { Currency } from '~/domain/currency/currency'
 import { Language } from '~/domain/language/language'
 import { Tax } from '~/domain/tax/tax'
@@ -21,6 +22,7 @@ export let Client = z.object({
   timezone: z.string(),
   note: z.string().nullable(),
   legal: z.string().nullable(),
+  contacts: z.array(Contact).default([]),
 })
 
 export type Client = z.infer<typeof Client>
@@ -37,6 +39,7 @@ export class ClientBuilder {
   private _timezone: Client['timezone'] | null = Intl.DateTimeFormat().resolvedOptions().timeZone
   private _note: Client['note'] | null = null
   private _legal: Client['legal'] | null = null
+  private _contacts: Client['contacts'] = []
 
   public build(): Client {
     return Client.parse({
@@ -51,6 +54,7 @@ export class ClientBuilder {
       timezone: this._timezone,
       note: this._note,
       legal: this._legal,
+      contacts: this._contacts,
     })
   }
 
@@ -67,6 +71,7 @@ export class ClientBuilder {
     builder._timezone = client.timezone
     builder._note = client.note
     builder._legal = client.legal
+    builder._contacts = client.contacts.slice()
     return builder
   }
 
@@ -140,6 +145,16 @@ export class ClientBuilder {
 
   public legal(legal: Client['legal']): ClientBuilder {
     this._legal = legal
+    return this
+  }
+
+  public contacts(contacts: Client['contacts']): ClientBuilder {
+    this._contacts = contacts.slice()
+    return this
+  }
+
+  public contact(contact: Client['contacts'][number]): ClientBuilder {
+    this._contacts.push(contact)
     return this
   }
 }
