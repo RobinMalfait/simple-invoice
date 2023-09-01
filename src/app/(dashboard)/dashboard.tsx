@@ -864,6 +864,7 @@ function ComparisonChart({
                   }}
                 />
                 <Line
+                  dot={false}
                   type="natural"
                   name="Previous"
                   dataKey="previous"
@@ -872,6 +873,7 @@ function ComparisonChart({
                   connectNulls
                 />
                 <Line
+                  dot={false}
                   type="natural"
                   name="Current"
                   dataKey="current"
