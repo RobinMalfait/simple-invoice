@@ -9,25 +9,41 @@ type Configuration = {
   }
 }
 
+function dot<T>(path: string, input: T) {
+  let segments = path.split('.')
+  let next: any = input
+  for (let segment of segments) {
+    let current = next
+    next = next[segment]
+    if (!(segment in current)) {
+      throw new Error(
+        `Could not find property \`${segment}\` in ${Object.keys(current)
+          .map((x) => `\`${x}\``)
+          .join(', ')}`,
+      )
+    }
+  }
+  return next
+}
+
 // Small custom template language, handlebars based
 export function render<T>(template: string, input: T, config: Configuration = {}): string {
+  let language = config.locale?.code?.slice(0, 2) ?? 'en'
+  let or = new Intl.ListFormat(language, {
+    style: 'long',
+    type: 'disjunction',
+  })
+
+  let and = new Intl.ListFormat(language, {
+    style: 'long',
+    type: 'conjunction',
+  })
+
   return template.replace(/{{(.+?)}}/g, (_, value) => {
     let transformations: string[] = value.split('|')
     let [path, arg] = transformations.shift()?.split(':') ?? []
 
-    let segments = path.split('.')
-    let next: any = input
-    for (let segment of segments) {
-      let current = next
-      next = next[segment]
-      if (!(segment in current)) {
-        throw new Error(
-          `Could not find property \`${segment}\` in ${Object.keys(current)
-            .map((x) => `\`${x}\``)
-            .join(', ')}`,
-        )
-      }
-    }
+    let next = dot(path, input)
 
     // Fallback to empty string for nullish values
     next ??= ''
@@ -38,10 +54,14 @@ export function render<T>(template: string, input: T, config: Configuration = {}
 
     if (transformations.length > 0) {
       for (let transform of transformations) {
+        ;[transform, arg] = transform.split(':')
         next = match(transform, {
           lower: () => next.toLowerCase(),
           upper: () => next.toUpperCase(),
           kebab: () => kebab(next),
+          pick: () => next.map((x: any) => dot(arg, x)),
+          and: () => and.format(next),
+          or: () => or.format(next),
 
           // Transform the transformations itself to pass in the `next` value.
           ...Object.fromEntries(
