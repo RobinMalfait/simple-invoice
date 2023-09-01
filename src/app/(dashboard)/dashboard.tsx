@@ -363,45 +363,52 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
             </div>
           </div>
 
-          {(() => {
-            let data = currentRecords.filter((e) => isActiveRecord(e)).reverse()
+          <div className="grid grid-cols-1 gap-[--gap] 2xl:grid-cols-2">
+            {(() => {
+              let data = currentRecords.filter((e) => isActiveRecord(e)).reverse()
 
-            return (
-              <div
-                className={classNames(
-                  'flex flex-1 flex-col overflow-auto rounded-md bg-white shadow ring-1 ring-black/5 dark:bg-zinc-900',
-                  data.length === 0 &&
-                    'opacity-50 transition-opacity duration-300 hover:opacity-100',
-                )}
-              >
-                <div className="border-b p-4 dark:border-zinc-700/75 dark:text-zinc-400">
-                  Active quotes / invoices ({data.length})
-                </div>
-                {data.length > 0 ? (
-                  <div className="grid auto-cols-[280px] grid-flow-col grid-cols-[repeat(auto-fill,280px)] grid-rows-1 gap-4 overflow-x-auto p-4 [scrollbar-width:auto]">
-                    {data.map((record) => (
-                      <I18NProvider
-                        key={record.id}
-                        value={{
-                          // Prefer the language of the account when looking at the overview of invoices.
-                          language: record.account.language,
-
-                          // Prefer the currency of the client when looking at the overview of invoices.
-                          currency: record.client.currency,
-                        }}
-                      >
-                        <Link href={`/${record.type}/${record.number}`}>
-                          <TinyRecord record={record} />
-                        </Link>
-                      </I18NProvider>
-                    ))}
+              return (
+                <div
+                  className={classNames(
+                    'flex flex-1 flex-col overflow-auto rounded-md bg-white shadow ring-1 ring-black/5 dark:bg-zinc-900',
+                    data.length === 0 &&
+                      'opacity-50 transition-opacity duration-300 hover:opacity-100',
+                  )}
+                >
+                  <div className="border-b p-4 dark:border-zinc-700/75 dark:text-zinc-400">
+                    Active quotes / invoices ({data.length})
                   </div>
-                ) : (
-                  <Empty message="No active quotes / invoices available" />
-                )}
-              </div>
-            )
-          })()}
+                  {data.length > 0 ? (
+                    <div className="grid auto-cols-[280px] grid-flow-col grid-cols-[repeat(auto-fill,280px)] grid-rows-1 gap-4 overflow-x-auto p-4 [scrollbar-width:auto]">
+                      {data.map((record) => (
+                        <I18NProvider
+                          key={record.id}
+                          value={{
+                            // Prefer the language of the account when looking at the overview of invoices.
+                            language: record.account.language,
+
+                            // Prefer the currency of the client when looking at the overview of invoices.
+                            currency: record.client.currency,
+                          }}
+                        >
+                          <Link href={`/${record.type}/${record.number}`}>
+                            <TinyRecord record={record} />
+                          </Link>
+                        </I18NProvider>
+                      ))}
+                    </div>
+                  ) : (
+                    <Empty message="No active quotes / invoices available" />
+                  )}
+                </div>
+              )
+            })()}
+
+            <AccumulativePaidInvoicesChart
+              currentRange={currentRange}
+              currentRecords={currentRecords}
+            />
+          </div>
 
           <div className="grid grid-cols-5 gap-[--gap]">
             <div className="col-span-2 flex flex-1 flex-col gap-[--gap]">
@@ -1021,6 +1028,133 @@ function CompareBlock<T = Record[]>({
         </div>
         {footer && currentData && footer(currentData)}
       </div>
+    </div>
+  )
+}
+
+function AccumulativePaidInvoicesChart({
+  currentRange,
+  currentRecords,
+}: {
+  currentRange: { start: Date; end: Date }
+  currentRecords: Record[]
+}) {
+  let shortCurrencyFormatter = useCurrencyFormatter({ type: 'short' })
+  let isClassified = useIsClassified()
+
+  let data = eachDayOfInterval(currentRange).map((start) => ({
+    start,
+    end: endOfDay(start),
+    total: 0,
+  }))
+
+  let accumulator = 0
+  for (let record of currentRecords
+    .slice()
+    .sort((a, z) => compareAsc(resolveRelevantRecordDate(a), resolveRelevantRecordDate(z)))) {
+    if (!isPaidRecord(record)) continue
+
+    let date = resolveRelevantRecordDate(record)
+    if (isWithinInterval(date, currentRange)) {
+      let datum = data.find((d) => isWithinInterval(date, d))
+      if (!datum) continue
+      accumulator += total(record)
+      datum.total = accumulator
+    }
+  }
+
+  data = data.filter((d) => d.total !== 0)
+
+  let hasData = data.length > 1
+
+  return (
+    <div
+      className={classNames(
+        'flex h-full flex-1 flex-col overflow-auto rounded-md bg-white shadow ring-1 ring-black/5 dark:bg-zinc-900',
+        !hasData && 'opacity-50 transition-opacity duration-300 hover:opacity-100',
+      )}
+    >
+      <div className="border-b p-4 dark:border-zinc-700/75 dark:text-zinc-400">
+        Accumulative paid invoices
+      </div>
+      {hasData ? (
+        <div className="flex min-h-[theme(spacing.96)] flex-1 gap-4 overflow-x-auto [--current:theme(colors.blue.500)] [--dot-fill:theme(colors.white)] [--grid-color:theme(colors.zinc.200)] [--previous:theme(colors.zinc.400/.50)] dark:[--dot-fill:theme(colors.zinc.950)] dark:[--grid-color:theme(colors.zinc.900)]">
+          <div className="h-full w-full flex-1 p-4">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={data} margin={{ left: 15, right: 10 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--grid-color)" />
+                <Tooltip
+                  content={({ payload = [] }) => (
+                    <div className="flex flex-col gap-2 rounded-md bg-white p-4 shadow ring-1 ring-black/10 dark:bg-zinc-900/75">
+                      {payload.map((entry, index) => {
+                        return (
+                          <Fragment key={`item-${index}`}>
+                            {index === 0 && (
+                              <div className="text-sm font-semibold text-gray-500 dark:text-zinc-400">
+                                <FormatRange start={entry.payload.start} end={entry.payload.end} />
+                              </div>
+                            )}
+                            <div className="flex items-center gap-2">
+                              <div
+                                className="h-3 w-3 rounded-full"
+                                style={{ backgroundColor: entry.color }}
+                              />
+                              <span className="text-sm font-medium text-gray-400 dark:text-zinc-400">
+                                <Money amount={Number(entry.value)} />
+                              </span>
+                            </div>
+                          </Fragment>
+                        )
+                      })}
+                    </div>
+                  )}
+                />
+                <Legend
+                  content={({ payload = [] }) => (
+                    <div className="mt-4 flex items-center justify-end gap-8">
+                      {payload.map((entry, index) => (
+                        <div key={`item-${index}`} className="flex items-center gap-2">
+                          <div
+                            className="h-3 w-3 rounded-full"
+                            style={{ backgroundColor: entry.color }}
+                          />
+                          <span className="text-sm font-medium text-gray-400 dark:text-zinc-400">
+                            {entry.value}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                />
+                <YAxis
+                  tickFormatter={(x) =>
+                    isClassified ? 'XXX' : shortCurrencyFormatter.format(x / 100)
+                  }
+                />
+                <XAxis
+                  tickMargin={16}
+                  tickFormatter={(idx) => {
+                    let { start } = data[idx]
+                    return format(start, 'dd MMM')
+                  }}
+                />
+                <Line
+                  dot={false}
+                  type="basis"
+                  name="Total"
+                  dataKey="total"
+                  stroke="var(--current)"
+                  fill="var(--dot-fill)"
+                  strokeWidth={2}
+                  connectNulls
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      ) : (
+        <Empty message="No data available" />
+      )}
     </div>
   )
 }
