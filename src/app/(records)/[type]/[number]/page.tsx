@@ -1,4 +1,4 @@
-import { ExclamationTriangleIcon } from '@heroicons/react/20/solid'
+import { ExclamationTriangleIcon, EyeIcon } from '@heroicons/react/20/solid'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { me, records } from '~/data'
@@ -10,11 +10,10 @@ import { I18NProvider } from '~/ui/hooks/use-i18n'
 import { ActivityFeed } from '~/ui/invoice/activity-feed'
 import { AttachmentList } from '~/ui/invoice/attachment-list'
 import { Invoice as InvoicePreview } from '~/ui/invoice/design'
-import { TemplateList } from '~/ui/invoice/template-list'
 import { total } from '~/ui/invoice/total'
 import { Money } from '~/ui/money'
 import { match } from '~/utils/match'
-import { loadTemplates } from './actions'
+import { loadTemplateList } from './actions'
 import { Actions } from './components'
 import { History, HistoryActions } from './history'
 
@@ -27,7 +26,8 @@ export default async function Invoice({
   if (!record) {
     redirect('/')
   }
-  let templates = await loadTemplates(record)
+
+  let templates = await loadTemplateList(record)
 
   return (
     <div className="flex h-full flex-1 overflow-hidden [--spacing:theme(spacing.8)]">
@@ -102,7 +102,29 @@ export default async function Invoice({
                 <span className="text-sm font-medium text-gray-900 dark:text-gray-300">
                   Templates
                 </span>
-                <TemplateList templates={templates} />
+                <ul role="list" className="space-y-1">
+                  {templates.map((template) => {
+                    return (
+                      <li key={template.id} className="relative flex gap-x-4">
+                        <Link
+                          href={`/${record!.type}/${record!.number}/mail-templates/${template.id}`}
+                          className="absolute inset-0 h-full w-full"
+                        />
+
+                        <div className="relative flex h-6 w-6 flex-none items-center justify-center bg-white dark:bg-zinc-900">
+                          <EyeIcon
+                            className="h-4 w-4 text-gray-600 dark:text-gray-300"
+                            aria-hidden="true"
+                          />
+                        </div>
+
+                        <p className="flex-auto py-0.5 text-xs leading-5 text-gray-600 dark:text-gray-300">
+                          {template.name}
+                        </p>
+                      </li>
+                    )
+                  })}
+                </ul>
               </div>
             )}
 
