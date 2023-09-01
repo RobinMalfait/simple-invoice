@@ -4,6 +4,7 @@ import { Currency } from '~/domain/currency/currency'
 import { Language } from '~/domain/language/language'
 import { Tax } from '~/domain/tax/tax'
 import { ScopedIDGenerator } from '~/utils/id'
+import { tap } from '~/utils/tap'
 
 let scopedId = new ScopedIDGenerator('client')
 
@@ -67,6 +68,24 @@ export class ClientBuilder {
     builder._note = client.note
     builder._legal = client.legal
     return builder
+  }
+
+  private static mutate(client: Client, mutator: (builder: ClientBuilder) => void): Client {
+    return Object.assign(client, tap(ClientBuilder.from(client), mutator).build(), {
+      id: client.id,
+    })
+  }
+
+  public static rebrand(
+    client: Client,
+    handle: (builder: ClientBuilder) => void,
+    { mutate = true } = {},
+  ): Client {
+    if (mutate) {
+      return ClientBuilder.mutate(client, handle)
+    } else {
+      return tap(ClientBuilder.from(client), handle).build()
+    }
   }
 
   public name(name: Client['name']): ClientBuilder {
