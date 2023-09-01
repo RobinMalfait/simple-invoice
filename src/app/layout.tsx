@@ -16,7 +16,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   let data = { me, records, stacks }
   let config = await load()
   return (
-    <html lang="en">
+    <html lang="en" data-classified={config.ui.classified}>
       <body className={inter.variable}>
         <Layout data={data} config={config}>
           {children}
