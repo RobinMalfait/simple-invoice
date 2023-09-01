@@ -4,6 +4,7 @@ import { AddressBuilder } from '~/domain/address/address'
 import { ClientBuilder } from '~/domain/client/client'
 import { configure } from '~/domain/configuration/configuration'
 import { ContactFieldBuilder } from '~/domain/contact-fields/contact-fields'
+import { ContactBuilder } from '~/domain/contact/contact'
 import { Currency } from '~/domain/currency/currency'
 import { DiscountBuilder } from '~/domain/discount/discount'
 import { DocumentBuilder, md } from '~/domain/document/document'
@@ -52,9 +53,9 @@ configure({
       templates: [
         new MailTemplateBuilder<Quote>()
           .name('Default')
-          .subject('Ready for some business, {{client.name}}?')
+          .subject('Ready for some business, {{client.contacts|pick:nickname|and}}?')
           .body(md`
-            Hi {{client.name}},
+            Hi {{client.contacts|pick:nickname|and}},
 
             I hope you are doing well. I would like to do business with you. Please find attached a quote for **{{total|money}}**.
 
@@ -102,7 +103,7 @@ configure({
           .name('Default')
           .subject('Invoice — {{number}}')
           .body(md`
-            Hi {{client.name}},
+            Hi {{client.contacts|pick:nickname|and}},
 
             Attached you will find invoice **{{number}}**.
 
@@ -142,9 +143,9 @@ configure({
       templates: [
         new MailTemplateBuilder<Receipt>()
           .name('Default')
-          .subject('Thanks for doing business, {{client.name}}')
+          .subject('Thanks for doing business, {{client.contacts|pick:nickname|and}}')
           .body(md`
-            Hi {{client.name}},
+            Hi {{client.contacts|pick:nickname|and}},
 
             Attached you will find a receipt for invoice **{{invoice.number}}**.
 
@@ -239,6 +240,22 @@ let Client1 = new ClientBuilder()
       .build(),
   )
   .tax(new TaxBuilder().value('BE 9876 543 210').build())
+  .contact(
+    new ContactBuilder()
+      .name('Alice Anderson')
+      .nickname('Alice')
+      .email('alice@example.org')
+      .role('CEO')
+      .build(),
+  )
+  .contact(
+    new ContactBuilder()
+      .name('Bob Bobson')
+      .nickname('Bobby')
+      .email('bob@example.org')
+      .role('CTO')
+      .build(),
+  )
   .build()
 
 let Client2 = new ClientBuilder()
