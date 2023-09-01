@@ -1,5 +1,6 @@
 import { load } from '~/app/(db)/actions'
 import { config } from '~/domain/configuration/configuration'
+import { Contact } from '~/domain/contact/contact'
 import { Record } from '~/domain/record/record'
 import { parseMarkdown as _parseMarkdown } from '~/ui/document/document'
 import { total } from '~/ui/invoice/total'
@@ -75,21 +76,48 @@ function renderTemplate(template: string, record: Record, { classified = false }
   )
 }
 
-export async function loadTemplates(record: Record) {
+export async function loadTemplateList(record: Record) {
   let { classified } = (await load()).ui
 
   return config()[record.type].mail.templates.map((template) => {
-    let subject = dedent(renderTemplate(template.subject, record, { classified }))
-    let body = dedent(renderTemplate(template.body ?? '', record, { classified }))
-
     return {
       id: template.id,
       name: template.name,
-      subject,
-      body: {
-        text: body,
-        html: parseMarkdown(body),
-      },
+      subject: dedent(renderTemplate(template.subject, record, { classified })),
     }
   })
+}
+
+type Configuration = {
+  recipients: Contact['id'][]
+}
+
+export async function loadTemplate(record: Record, id: string, configuration: Configuration) {
+  let { classified } = (await load()).ui
+
+  record = Object.assign({}, record, {
+    client: Object.assign({}, record.client, {
+      contacts: record.client.contacts.filter((contact) =>
+        configuration.recipients.includes(contact.id),
+      ),
+    }),
+  })
+
+  let template = config()[record.type].mail.templates.find((template) => template.id === id)
+  if (!template) {
+    return null
+  }
+
+  let subject = dedent(renderTemplate(template.subject, record, { classified }))
+  let body = dedent(renderTemplate(template.body ?? '', record, { classified }))
+
+  return {
+    id: template.id,
+    name: template.name,
+    subject,
+    body: {
+      text: body,
+      html: parseMarkdown(body),
+    },
+  }
 }

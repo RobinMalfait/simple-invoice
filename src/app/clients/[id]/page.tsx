@@ -196,7 +196,47 @@ export default async function Page({ params: { id } }: { params: { id: string } 
             </Card>
           </div>
 
-          <div className="col-span-1"></div>
+          <div className="col-span-1">
+            {client.contacts.length > 0 && (
+              <Card>
+                <CardTitle>Contacts</CardTitle>
+                <CardBody>
+                  <ul className="flex flex-col divide-y divide-gray-100 dark:divide-zinc-800">
+                    {client.contacts.map((client) => {
+                      return (
+                        <li key={client.id} className="py-2 first:pt-0 last:pb-0">
+                          <div className="flex items-center gap-4">
+                            <Avatar size="sm" url={client.imageUrl} name={client.name} />
+                            <div className="flex w-full flex-col justify-center">
+                              <div className="flex w-full items-center justify-between gap-2">
+                                <span className="flex flex-col">{client.name}</span>
+                                {client.role && (
+                                  <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10 dark:bg-blue-400/10 dark:text-blue-400 dark:ring-blue-400/30 ">
+                                    {client.role}
+                                  </span>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-2">
+                                {client.name !== client.nickname && (
+                                  <>
+                                    <span className="text-xs">{client.nickname}</span>
+                                    {client.email && <span>&middot;</span>}
+                                  </>
+                                )}
+                                <div className="select-all text-xs">
+                                  <Classified>{client.email}</Classified>{' '}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </li>
+                      )
+                    })}
+                  </ul>
+                </CardBody>
+              </Card>
+            )}
+          </div>
         </div>
       </div>
     </I18NProvider>
