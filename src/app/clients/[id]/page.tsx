@@ -1,7 +1,7 @@
 import { MapIcon } from '@heroicons/react/24/outline'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import React from 'react'
+import React, { Fragment } from 'react'
 import { me, records } from '~/data'
 import { Invoice } from '~/domain/invoice/invoice'
 import { InvoiceStatus } from '~/domain/invoice/invoice-status'
@@ -165,15 +165,15 @@ export default async function Page({ params: { id } }: { params: { id: string } 
                       let isDifferentType = prev && prev.type !== type
 
                       return (
-                        <>
+                        <Fragment key={`${type}-${status}`}>
                           {isDifferentType && (
                             <span className="text-black/10 dark:text-white/10">|</span>
                           )}
                           {/* @ts-expect-error TypeScript doesn't like this polymorphism shenanigans. */}
-                          <Component key={status} status={status}>
+                          <Component status={status}>
                             <Money amount={total} />
                           </Component>
-                        </>
+                        </Fragment>
                       )
                     })}
                   </div>
