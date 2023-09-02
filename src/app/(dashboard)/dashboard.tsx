@@ -71,7 +71,10 @@ import { TinyRecord } from '~/ui/record/tiny-record'
 import { match } from '~/utils/match'
 
 export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
-  let [, defaultRange, defaultPrevious, defaultNext] = options.find((e) => e[0] === 'This quarter')!
+  let defaultPreset = options.find((e) => e[0] === 'This quarter')!
+  let [, defaultRange, defaultPrevious, defaultNext] = defaultPreset
+
+  let [preset, setPreset] = useState(defaultPreset)
 
   let now = useCurrentDate()
 
@@ -154,9 +157,11 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
                 </button>
 
                 <RangePicker
+                  value={preset}
                   start={start}
                   end={end}
-                  onChange={([x, y], previous, next) => {
+                  onChange={(preset, [x, y], previous, next) => {
+                    setPreset(preset)
                     setRange([x ?? earliestDate, y ?? latestDate])
                     setPrevious(() => previous)
                     setNext(() => next)

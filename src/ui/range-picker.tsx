@@ -23,14 +23,16 @@ import {
   subYears,
 } from 'date-fns'
 import { FormatRange } from '~/ui/date-range'
-import { Menu, MenuButton, MenuItem, MenuItems } from '~/ui/headlessui'
+import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from '~/ui/headlessui'
 
-export let options: [
+type Preset = [
   string,
   (now: Date) => [Date | null, Date | null],
   (value: Date, range: [start: Date, end: Date]) => Date,
   (value: Date, range: [start: Date, end: Date]) => Date,
-][] = [
+]
+
+export let options: Preset[] = [
   [
     'Today',
     (now) => [startOfDay(now), endOfDay(now)],
@@ -96,11 +98,14 @@ export let options: [
 export function RangePicker({
   start,
   end,
+  value,
   onChange,
 }: {
   start: Date | null
   end: Date | null
+  value: Preset
   onChange(
+    preset: Preset,
     range: [start: Date | null, end: Date | null],
     previous: (value: Date, range: [start: Date, end: Date]) => Date,
     next: (value: Date, range: [start: Date, end: Date]) => Date,
@@ -114,8 +119,18 @@ export function RangePicker({
   })
 
   return (
-    <Menu as="div" className="relative isolate">
-      <MenuButton
+    <Listbox
+      as="div"
+      className="relative isolate"
+      value={value[0]}
+      onChange={(label) => {
+        let preset = options.find(([l]) => l === label)
+        if (!preset) return
+        let [, handle, previous, next] = preset
+        onChange(preset, handle(now), previous, next)
+      }}
+    >
+      <ListboxButton
         ref={refs.setReference}
         className="rounded-md bg-white px-2 py-1.5 shadow ring-1 ring-black/10 dark:bg-zinc-900/75"
       >
@@ -123,28 +138,28 @@ export function RangePicker({
           <CalendarIcon className="h-4 w-4" />
           <FormatRange start={start} end={end} />
         </div>
-      </MenuButton>
+      </ListboxButton>
       <Portal>
-        <MenuItems
+        <ListboxOptions
           ref={refs.setFloating}
           style={floatingStyles}
           className="z-50 w-64 rounded-md bg-white/75 py-2 shadow ring-1 ring-black/10 backdrop-blur focus:outline-none dark:bg-zinc-950/75"
         >
           <span className="px-4 text-xs font-semibold dark:text-zinc-400">Presets</span>
           <div className="flex w-full flex-col px-2">
-            {options.map(([label, handle, previous, next]) => (
-              <MenuItem
+            {options.map(([label]) => (
+              <ListboxOption
                 key={label}
                 as="button"
-                onClick={() => onChange(handle(now), previous, next)}
+                value={label}
                 className="relative w-full rounded-lg px-2 py-2 text-left text-sm ui-active:bg-gray-100 ui-not-active:bg-transparent dark:text-zinc-400 dark:ui-active:bg-white/10"
               >
                 {label}
-              </MenuItem>
+              </ListboxOption>
             ))}
           </div>
-        </MenuItems>
+        </ListboxOptions>
       </Portal>
-    </Menu>
+    </Listbox>
   )
 }
