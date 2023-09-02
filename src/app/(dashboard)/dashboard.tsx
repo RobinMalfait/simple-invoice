@@ -4,6 +4,7 @@ import { ArrowDownIcon, ArrowUpIcon } from '@heroicons/react/20/solid'
 import { ArrowSmallLeftIcon, ArrowSmallRightIcon } from '@heroicons/react/24/outline'
 import {
   addSeconds,
+  addYears,
   compareAsc,
   differenceInDays,
   differenceInSeconds,
@@ -687,7 +688,15 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
                 currentRange={currentRange}
                 previousRecords={previousRecords}
                 currentRecords={currentRecords}
-                next={next}
+                previous={match(strategy, {
+                  'previous-period': () => (value: Date) =>
+                    previous(value, [earliestDate, latestDate]),
+                  'last-year': () => (value: Date) => subYears(value, 1),
+                })}
+                next={match(strategy, {
+                  'previous-period': () => (value: Date) => next(value, [earliestDate, latestDate]),
+                  'last-year': () => (value: Date) => addYears(value, 1),
+                })}
               />
             </div>
           </div>
@@ -701,12 +710,14 @@ function ComparisonChart({
   currentRange,
   previousRecords,
   currentRecords,
+  previous,
   next,
 }: {
   currentRange: { start: Date; end: Date }
   previousRecords: Record[]
   currentRecords: Record[]
-  next: (value: Date, range: [start: Date, end: Date]) => Date
+  previous: (value: Date) => Date
+  next: (value: Date) => Date
 }) {
   let shortCurrencyFormatter = useCurrencyFormatter({ type: 'short' })
   let isClassified = useIsClassified()
@@ -786,7 +797,7 @@ function ComparisonChart({
 
       let date = resolveRelevantRecordDate(record)
       if (period === 'previous') {
-        date = next(date, [currentRange.start, currentRange.end])
+        date = next(date)
       }
 
       for (let datum of data) {
@@ -846,18 +857,30 @@ function ComparisonChart({
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--grid-color)" />
                 <Tooltip
                   content={({ payload = [] }) => (
-                    <div className="flex flex-col gap-2 rounded-md bg-white p-4 shadow ring-1 ring-black/10 dark:bg-zinc-900/75">
+                    <div className="flex flex-col gap-4 rounded-md bg-white p-4 shadow ring-1 ring-black/10 dark:bg-zinc-900/75">
                       {payload.map((entry, index) => {
                         return (
-                          <Fragment key={`item-${index}`}>
-                            {index === 0 && (
-                              <div className="text-sm font-semibold text-gray-500 dark:text-zinc-400">
-                                <FormatRange
-                                  start={entry.payload.range.start}
-                                  end={entry.payload.range.end}
-                                />
-                              </div>
-                            )}
+                          <div key={`item-${index}`} className="flex flex-col gap-2">
+                            <div className="text-sm font-semibold text-gray-500 dark:text-zinc-400">
+                              {match(entry.dataKey as 'previous' | 'current', {
+                                previous: () => {
+                                  return (
+                                    <FormatRange
+                                      start={previous(entry.payload.range.start)}
+                                      end={previous(entry.payload.range.end)}
+                                    />
+                                  )
+                                },
+                                current: () => {
+                                  return (
+                                    <FormatRange
+                                      start={entry.payload.range.start}
+                                      end={entry.payload.range.end}
+                                    />
+                                  )
+                                },
+                              })}
+                            </div>
                             <div className="flex items-center gap-2">
                               <div
                                 className="h-3 w-3 rounded-full"
@@ -867,7 +890,7 @@ function ComparisonChart({
                                 <Money amount={Number(entry.value)} />
                               </span>
                             </div>
-                          </Fragment>
+                          </div>
                         )
                       })}
                     </div>
