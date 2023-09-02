@@ -93,6 +93,18 @@ export class ClientBuilder {
     }
   }
 
+  public static relocate(
+    client: Client,
+    handle: (builder: ClientBuilder) => void,
+    { mutate = true } = {},
+  ): Client {
+    if (mutate) {
+      return ClientBuilder.mutate(client, handle)
+    } else {
+      return tap(ClientBuilder.from(client), handle).build()
+    }
+  }
+
   public name(name: Client['name']): ClientBuilder {
     this._name = name
     return this
