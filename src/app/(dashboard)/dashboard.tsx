@@ -73,8 +73,7 @@ import { match } from '~/utils/match'
 
 export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
   let [presetName, setPresetName] = useLocalStorageState('dashboard.preset-name', 'This quarter')
-  let preset = options.find((e) => e[0] === presetName)!
-  let [, defaultRange, defaultPrevious, defaultNext] = preset
+  let [, range, previous, next] = options.find((e) => e[0] === presetName)!
 
   let now = useCurrentDate()
 
@@ -91,19 +90,14 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
     return [resolveRelevantRecordDate(earliest), resolveRelevantRecordDate(latest)]
   }, [records])
 
-  let [[start, end], setRange] = useState(() => {
-    let [start, end] = defaultRange(now)
-    return [start ?? earliestDate, end ?? latestDate]
-  })
+  let [[start = earliestDate, end = latestDate], setRange] = useState<[Date, Date]>(
+    () => range(now) as [Date, Date],
+  )
 
-  // TODO: Refactor this
   useEffect(() => {
-    let [start, end] = defaultRange(now)
-    setRange([start ?? earliestDate, end ?? latestDate])
-  }, [defaultRange, earliestDate, latestDate, now])
-
-  let [previous, setPrevious] = useState(() => defaultPrevious)
-  let [next, setNext] = useState(() => defaultNext)
+    let [start = earliestDate, end = latestDate] = range(now)
+    setRange([start, end])
+  }, [range, earliestDate, latestDate, now])
 
   let previousRange = {
     start: previous(start, [start, end]),
@@ -162,17 +156,7 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
                   <ArrowSmallRightIcon className="h-4 w-4" />
                 </button>
 
-                <RangePicker
-                  value={preset}
-                  start={start}
-                  end={end}
-                  onChange={(preset, [x, y], previous, next) => {
-                    setPresetName(preset[0])
-                    setRange([x ?? earliestDate, y ?? latestDate])
-                    setPrevious(() => previous)
-                    setNext(() => next)
-                  }}
-                />
+                <RangePicker value={presetName} start={start} end={end} onChange={setPresetName} />
 
                 <div className="flex items-center gap-2 text-xs dark:text-zinc-400">
                   <span>vs</span>

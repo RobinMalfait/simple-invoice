@@ -27,7 +27,7 @@ import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from '~/ui/head
 
 type Preset = [
   string,
-  (now: Date) => [Date | null, Date | null],
+  (now: Date) => [Date | undefined, Date | undefined],
   (value: Date, range: [start: Date, end: Date]) => Date,
   (value: Date, range: [start: Date, end: Date]) => Date,
 ]
@@ -89,7 +89,7 @@ export let options: Preset[] = [
   ],
   [
     'All',
-    (_now) => [null, null],
+    (_now) => [undefined, undefined],
     (_value, range) => subDays(min(range), 1),
     (_value, range) => addDays(min(range), 1),
   ],
@@ -103,33 +103,16 @@ export function RangePicker({
 }: {
   start: Date | null
   end: Date | null
-  value: Preset
-  onChange(
-    preset: Preset,
-    range: [start: Date | null, end: Date | null],
-    previous: (value: Date, range: [start: Date, end: Date]) => Date,
-    next: (value: Date, range: [start: Date, end: Date]) => Date,
-  ): void
+  value: string
+  onChange(preset: string): void
 }) {
-  let now = new Date()
-
   let { refs, floatingStyles } = useFloating({
     placement: 'bottom-end',
     middleware: [offset(10)],
   })
 
   return (
-    <Listbox
-      as="div"
-      className="relative isolate"
-      value={value[0]}
-      onChange={(label) => {
-        let preset = options.find(([l]) => l === label)
-        if (!preset) return
-        let [, handle, previous, next] = preset
-        onChange(preset, handle(now), previous, next)
-      }}
-    >
+    <Listbox as="div" className="relative isolate" value={value} onChange={onChange}>
       <ListboxButton
         ref={refs.setReference}
         className="rounded-md bg-white px-2 py-1.5 shadow ring-1 ring-black/10 dark:bg-zinc-900/75"
