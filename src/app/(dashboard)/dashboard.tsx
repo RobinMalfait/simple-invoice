@@ -4,6 +4,7 @@ import { ArrowDownIcon, ArrowUpIcon } from '@heroicons/react/20/solid'
 import { ArrowSmallLeftIcon, ArrowSmallRightIcon } from '@heroicons/react/24/outline'
 import {
   addSeconds,
+  addYears,
   compareAsc,
   differenceInDays,
   differenceInSeconds,
@@ -25,6 +26,7 @@ import {
   isSameMonth,
   isSameWeek,
   isWithinInterval,
+  subYears,
 } from 'date-fns'
 import Link from 'next/link'
 import { Fragment, createContext, useContext, useEffect, useMemo, useState } from 'react'
@@ -63,6 +65,7 @@ import { FormatRange } from '~/ui/date-range'
 import { Empty } from '~/ui/empty'
 import { useCurrencyFormatter } from '~/ui/hooks/use-currency-formatter'
 import { useCurrentDate } from '~/ui/hooks/use-current-date'
+import { useEvent } from '~/ui/hooks/use-event'
 import { I18NProvider } from '~/ui/hooks/use-i18n'
 import { useLocalStorageState } from '~/ui/hooks/use-local-storage'
 import { total, totalUnpaid } from '~/ui/invoice/total'
@@ -73,7 +76,22 @@ import { match } from '~/utils/match'
 
 export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
   let [presetName, setPresetName] = useLocalStorageState('dashboard.preset-name', 'This quarter')
-  let [, range, previous, next] = options.find((e) => e[0] === presetName)!
+  let [, range, defaultPrevious, defaultNext] = options.find((e) => e[0] === presetName)!
+
+  let [strategy, setStrategy] = useLocalStorageState<'previous-period' | 'last-year'>(
+    'dashboard.strategy',
+    'previous-period',
+  )
+
+  let previous = match(strategy, {
+    'previous-period': () => defaultPrevious,
+    'last-year': () => (value: Date) => subYears(value, 1),
+  })
+
+  let next = match(strategy, {
+    'previous-period': () => defaultNext,
+    'last-year': () => (value: Date) => addYears(value, 1),
+  })
 
   let now = useCurrentDate()
 
@@ -94,10 +112,12 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
     () => range(now) as [Date, Date],
   )
 
-  useEffect(() => {
+  // Reset when preset changes
+  let reset = useEvent(() => {
     let [start = earliestDate, end = latestDate] = range(now)
     setRange([start, end])
-  }, [range, earliestDate, latestDate, now])
+  })
+  useEffect(() => reset(), [presetName, reset])
 
   let previousRange = {
     start: previous(start, [start, end]),
@@ -133,7 +153,7 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
       >
         <main className="space-y-[--gap] px-4 py-8 [--gap:theme(spacing.4)] sm:px-6 lg:px-8">
           <div className="sticky top-0 z-10 -mx-2 -mb-[calc(var(--gap)-1px)] -mt-[--gap] flex items-center justify-between bg-gray-100/20 px-2 py-[--gap] backdrop-blur dark:bg-zinc-800/20">
-            <div>
+            <div className="flex flex-1 justify-between">
               <div className="flex items-center gap-2">
                 <button
                   className="aspect-square rounded-md bg-white px-2 py-1.5 text-sm shadow ring-1 ring-black/10 dark:bg-zinc-900/75 dark:text-zinc-300"
@@ -163,6 +183,30 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
                   <span className="text-sm dark:text-zinc-300">
                     <FormatRange start={previousRange.start} end={previousRange.end} />
                   </span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 self-end">
+                <span className="dark:text-zinc-300">Compare to:</span>
+                <div className="flex gap-2 rounded-lg bg-gray-200 p-1 shadow-inner dark:bg-zinc-700/50">
+                  {(
+                    [
+                      ['previous-period', 'Previous period'],
+                      ['last-year', 'Same period last year'],
+                    ] as [typeof strategy, string][]
+                  ).map(([key, label]) => (
+                    <button
+                      key={key}
+                      onClick={() => setStrategy(key)}
+                      className={classNames(
+                        'flex items-center gap-1 rounded-md px-2 py-1.5 text-sm dark:text-zinc-300',
+                        strategy === key &&
+                          'bg-white shadow ring-1 ring-black/10 dark:bg-zinc-900/75',
+                      )}
+                    >
+                      {label}
+                    </button>
+                  ))}
                 </div>
               </div>
             </div>
