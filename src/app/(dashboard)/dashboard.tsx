@@ -27,7 +27,7 @@ import {
   isWithinInterval,
 } from 'date-fns'
 import Link from 'next/link'
-import { Fragment, createContext, useContext, useMemo, useState } from 'react'
+import { Fragment, createContext, useContext, useEffect, useMemo, useState } from 'react'
 import {
   CartesianGrid,
   Legend,
@@ -64,6 +64,7 @@ import { Empty } from '~/ui/empty'
 import { useCurrencyFormatter } from '~/ui/hooks/use-currency-formatter'
 import { useCurrentDate } from '~/ui/hooks/use-current-date'
 import { I18NProvider } from '~/ui/hooks/use-i18n'
+import { useLocalStorageState } from '~/ui/hooks/use-local-storage'
 import { total, totalUnpaid } from '~/ui/invoice/total'
 import { Money } from '~/ui/money'
 import { RangePicker, options } from '~/ui/range-picker'
@@ -71,10 +72,9 @@ import { TinyRecord } from '~/ui/record/tiny-record'
 import { match } from '~/utils/match'
 
 export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
-  let defaultPreset = options.find((e) => e[0] === 'This quarter')!
-  let [, defaultRange, defaultPrevious, defaultNext] = defaultPreset
-
-  let [preset, setPreset] = useState(defaultPreset)
+  let [presetName, setPresetName] = useLocalStorageState('dashboard.preset-name', 'This quarter')
+  let preset = options.find((e) => e[0] === presetName)!
+  let [, defaultRange, defaultPrevious, defaultNext] = preset
 
   let now = useCurrentDate()
 
@@ -95,6 +95,12 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
     let [start, end] = defaultRange(now)
     return [start ?? earliestDate, end ?? latestDate]
   })
+
+  // TODO: Refactor this
+  useEffect(() => {
+    let [start, end] = defaultRange(now)
+    setRange([start ?? earliestDate, end ?? latestDate])
+  }, [defaultRange, earliestDate, latestDate, now])
 
   let [previous, setPrevious] = useState(() => defaultPrevious)
   let [next, setNext] = useState(() => defaultNext)
@@ -161,7 +167,7 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
                   start={start}
                   end={end}
                   onChange={(preset, [x, y], previous, next) => {
-                    setPreset(preset)
+                    setPresetName(preset[0])
                     setRange([x ?? earliestDate, y ?? latestDate])
                     setPrevious(() => previous)
                     setNext(() => next)
