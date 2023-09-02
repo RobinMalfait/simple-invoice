@@ -62,12 +62,6 @@ export let options: [
     (x) => addMonths(x, 1),
   ],
   [
-    'Last month',
-    (now) => [startOfMonth(subMonths(startOfDay(now), 1)), endOfMonth(subMonths(endOfDay(now), 1))],
-    (value) => subMonths(value, 1),
-    (value) => addMonths(value, 1),
-  ],
-  [
     'Quarter to date',
     (now) => [startOfQuarter(now), now],
     (value) => subQuarters(value, 1),
@@ -80,12 +74,6 @@ export let options: [
     (value) => addQuarters(value, 1),
   ],
   [
-    'Last quarter',
-    (now) => [subQuarters(startOfQuarter(now), 1), subQuarters(endOfQuarter(now), 1)],
-    (value) => subQuarters(value, 1),
-    (value) => addQuarters(value, 1),
-  ],
-  [
     'Year to date',
     (now) => [startOfYear(now), now],
     (value) => subYears(value, 1),
@@ -94,12 +82,6 @@ export let options: [
   [
     'This year',
     (now) => [startOfYear(now), endOfYear(now)],
-    (value) => subYears(value, 1),
-    (value) => addYears(value, 1),
-  ],
-  [
-    'Last year',
-    (now) => [subYears(startOfYear(now), 1), subYears(endOfYear(now), 1)],
     (value) => subYears(value, 1),
     (value) => addYears(value, 1),
   ],
