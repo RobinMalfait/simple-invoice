@@ -169,6 +169,18 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
 
                 <button
                   className="aspect-square rounded-md bg-white px-2 py-1.5 text-sm shadow ring-1 ring-black/10 dark:bg-zinc-900/75 dark:text-zinc-300"
+                  onClick={() => {
+                    let [start = earliestDate, end = latestDate] = range(now)
+                    setRange([start, end])
+                  }}
+                >
+                  <div className="flex h-4 w-4 items-center justify-center">
+                    <div className="h-2 w-2 rounded-full bg-gray-400" />
+                  </div>
+                </button>
+
+                <button
+                  className="aspect-square rounded-md bg-white px-2 py-1.5 text-sm shadow ring-1 ring-black/10 dark:bg-zinc-900/75 dark:text-zinc-300"
                   onClick={() =>
                     setRange(([start, end]) => [next(start, [start, end]), next(end, [start, end])])
                   }
