@@ -41,18 +41,25 @@ let statusClassMap: Record<InvoiceStatus, string> = {
     'bg-gray-50 text-gray-600 ring-gray-500/10 dark:bg-gray-400/10 dark:text-gray-400 dark:ring-gray-400/20',
 }
 
-export function StatusDisplay({ status }: { status: InvoiceStatus }) {
+export function StatusDisplay({
+  status,
+  children,
+}: {
+  status: InvoiceStatus
+  children?: React.ReactNode
+}) {
   let Icon = statusIconMap[status]
 
   return (
     <span
+      title={title(status)}
       className={classNames(
         'inline-flex shrink-0 items-center gap-2 rounded-md px-2 py-1 text-xs font-medium capitalize ring-1 ring-inset',
         statusClassMap[status],
       )}
     >
       <Icon className="h-4 w-4" />
-      <span className="pr-1">{title(status)}</span>
+      <span className="pr-1">{children || title(status)}</span>
     </span>
   )
 }

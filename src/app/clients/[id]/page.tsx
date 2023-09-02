@@ -1,4 +1,4 @@
-import { CheckCircleIcon, MapIcon } from '@heroicons/react/24/outline'
+import { MapIcon } from '@heroicons/react/24/outline'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import React from 'react'
@@ -8,7 +8,16 @@ import { InvoiceStatus } from '~/domain/invoice/invoice-status'
 import { Quote } from '~/domain/quote/quote'
 import { QuoteStatus } from '~/domain/quote/quote-status'
 import { Receipt } from '~/domain/receipt/receipt'
-import { isInvoice, isPaidRecord, isQuote, isReceipt } from '~/domain/record/filters'
+import {
+  isAccepted,
+  isDraft,
+  isInvoice,
+  isPaidRecord,
+  isPartiallyPaid,
+  isQuote,
+  isReceipt,
+  isSent,
+} from '~/domain/record/filters'
 import { Record, combineRecords, separateRecords } from '~/domain/record/record'
 import { Address, formatAddress } from '~/ui/address/address'
 import { Avatar } from '~/ui/avatar'
@@ -17,8 +26,10 @@ import { Classified } from '~/ui/classified'
 import { Empty } from '~/ui/empty'
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '~/ui/headlessui'
 import { I18NProvider } from '~/ui/hooks/use-i18n'
+import { StatusDisplay as InvoiceStatusDisplay } from '~/ui/invoice/status'
 import { total } from '~/ui/invoice/total'
 import { Money } from '~/ui/money'
+import { StatusDisplay as QuoteStatusDisplay } from '~/ui/quote/status'
 import { TinyRecord } from '~/ui/record/tiny-record'
 import { TimezoneDifference } from '~/ui/timezone-difference'
 import { match } from '~/utils/match'
@@ -42,9 +53,36 @@ export default async function Page({ params: { id } }: { params: { id: string } 
     redirect('/')
   }
   let recordsForClient = combined.filter((record) => record.client.id === id)
-  let totalPaid = recordsForClient
-    .filter((record) => isPaidRecord(record))
-    .reduce((acc, record) => acc + total(record), 0)
+  let totals = (
+    [
+      // Quotes
+      { type: 'quote', status: QuoteStatus.Draft, filter: (r) => isQuote(r) && isDraft(r) },
+      { type: 'quote', status: QuoteStatus.Sent, filter: (r) => isQuote(r) && isSent(r) },
+      { type: 'quote', status: QuoteStatus.Accepted, filter: (r) => isQuote(r) && isAccepted(r) },
+
+      // Invoices
+      { type: 'invoice', status: InvoiceStatus.Draft, filter: (r) => isInvoice(r) && isDraft(r) },
+      { type: 'invoice', status: InvoiceStatus.Sent, filter: (r) => isInvoice(r) && isSent(r) },
+      {
+        type: 'invoice',
+        status: InvoiceStatus.PartiallyPaid,
+        filter: (r) => isInvoice(r) && isPartiallyPaid(r),
+      },
+
+      // Covers both invoices and receipts
+      { type: 'invoice', status: InvoiceStatus.Paid, filter: (r) => isPaidRecord(r) },
+    ] satisfies {
+      type: 'quote' | 'invoice'
+      status: QuoteStatus | InvoiceStatus
+      filter: (record: Record) => boolean
+    }[]
+  )
+    .map((t) => ({
+      type: t.type,
+      status: t.status,
+      total: recordsForClient.filter(t.filter).reduce((acc, record) => acc + total(record), 0),
+    }))
+    .filter((t) => t.total > 0)
 
   let allRecords = separateRecords(records)
   let systemContainsQuotes = allRecords.some((r) => isQuote(r))
@@ -115,13 +153,30 @@ export default async function Page({ params: { id } }: { params: { id: string } 
               <CardTitle>
                 <div className="flex items-center justify-between">
                   <span>Details</span>
-                  <span
-                    title="Paid"
-                    className="inline-flex items-center gap-2 rounded-md bg-green-50 px-2 py-1 text-xs font-medium capitalize text-green-700 ring-1 ring-inset ring-green-600/20 dark:bg-green-500/10 dark:text-green-400 dark:ring-green-500/20"
-                  >
-                    <CheckCircleIcon className="h-4 w-4" />
-                    <Money amount={totalPaid} />
-                  </span>
+                  <div className="flex items-center gap-2">
+                    {totals.map(({ type, status, total }, idx, all) => {
+                      let Component = (() => {
+                        if (type === 'quote') return QuoteStatusDisplay
+                        if (type === 'invoice') return InvoiceStatusDisplay
+                        throw new Error(`Unknown type: ${type}`)
+                      })()
+
+                      let prev = all[idx - 1]
+                      let isDifferentType = prev && prev.type !== type
+
+                      return (
+                        <>
+                          {isDifferentType && (
+                            <span className="text-black/10 dark:text-white/10">|</span>
+                          )}
+                          {/* @ts-expect-error TypeScript doesn't like this polymorphism shenanigans. */}
+                          <Component key={status} status={status}>
+                            <Money amount={total} />
+                          </Component>
+                        </>
+                      )
+                    })}
+                  </div>
                 </div>
               </CardTitle>
 
