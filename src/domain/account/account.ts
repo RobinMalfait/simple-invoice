@@ -94,6 +94,18 @@ export class AccountBuilder {
     }
   }
 
+  public static relocate(
+    account: Account,
+    handle: (builder: AccountBuilder) => void,
+    { mutate = true } = {},
+  ): Account {
+    if (mutate) {
+      return AccountBuilder.mutate(account, handle)
+    } else {
+      return tap(AccountBuilder.from(account), handle).build()
+    }
+  }
+
   public name(name: Account['name']): AccountBuilder {
     this._name = name
     return this
