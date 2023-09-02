@@ -4,7 +4,6 @@ import { ArrowDownIcon, ArrowUpIcon } from '@heroicons/react/20/solid'
 import { ArrowSmallLeftIcon, ArrowSmallRightIcon } from '@heroicons/react/24/outline'
 import {
   addSeconds,
-  addYears,
   compareAsc,
   differenceInDays,
   differenceInSeconds,
@@ -76,22 +75,12 @@ import { match } from '~/utils/match'
 
 export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
   let [presetName, setPresetName] = useLocalStorageState('dashboard.preset-name', 'This quarter')
-  let [, range, defaultPrevious, defaultNext] = options.find((e) => e[0] === presetName)!
+  let [, range, previous, next] = options.find((e) => e[0] === presetName)!
 
   let [strategy, setStrategy] = useLocalStorageState<'previous-period' | 'last-year'>(
     'dashboard.strategy',
     'previous-period',
   )
-
-  let previous = match(strategy, {
-    'previous-period': () => defaultPrevious,
-    'last-year': () => (value: Date) => subYears(value, 1),
-  })
-
-  let next = match(strategy, {
-    'previous-period': () => defaultNext,
-    'last-year': () => (value: Date) => addYears(value, 1),
-  })
 
   let now = useCurrentDate()
 
@@ -119,10 +108,21 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
   })
   useEffect(() => reset(), [presetName, reset])
 
-  let previousRange = {
-    start: previous(start, [start, end]),
-    end: previous(end, [start, end]),
-  }
+  let previousRange = match(strategy, {
+    'previous-period': () => {
+      return {
+        start: previous(start, [start, end]),
+        end: previous(end, [start, end]),
+      }
+    },
+    'last-year': () => {
+      return {
+        start: subYears(start, 1),
+        end: subYears(end, 1),
+      }
+    },
+  })
+
   let currentRange = { start, end }
 
   let previousRecords = records.filter((r) =>
