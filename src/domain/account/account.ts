@@ -6,6 +6,7 @@ import { Language } from '~/domain/language/language'
 import { PaymentMethod } from '~/domain/payment-method/payment-method'
 import { Tax } from '~/domain/tax/tax'
 import { ScopedIDGenerator } from '~/utils/id'
+import { tap } from '~/utils/tap'
 
 let scopedId = new ScopedIDGenerator('account')
 
@@ -73,6 +74,24 @@ export class AccountBuilder {
     builder._note = account.note
     builder._legal = account.legal
     return builder
+  }
+
+  private static mutate(account: Account, mutator: (builder: AccountBuilder) => void): Account {
+    return Object.assign(account, tap(AccountBuilder.from(account), mutator).build(), {
+      id: account.id,
+    })
+  }
+
+  public static rebrand(
+    account: Account,
+    handle: (builder: AccountBuilder) => void,
+    { mutate = true } = {},
+  ): Account {
+    if (mutate) {
+      return AccountBuilder.mutate(account, handle)
+    } else {
+      return tap(AccountBuilder.from(account), handle).build()
+    }
   }
 
   public name(name: Account['name']): AccountBuilder {
