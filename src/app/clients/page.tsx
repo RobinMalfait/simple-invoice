@@ -30,7 +30,7 @@ export default async function Page() {
             key={client.id}
             className="relative flex flex-col gap-2 rounded-md bg-white p-4 shadow ring-1 ring-black/5 group-data-[grouped]:shadow-none group-data-[grouped]:ring-0 dark:bg-zinc-900"
           >
-            <Link href={`/clients/${client.id}`} className="absolute inset-0" />
+            <Link href={`/clients/${client.id}`} className="absolute inset-0 z-10" />
             <div className="flex items-center gap-4 text-gray-600 dark:text-zinc-400">
               <Avatar url={client.imageUrl} name={client.name} />
               <div className="flex flex-1 flex-col">
