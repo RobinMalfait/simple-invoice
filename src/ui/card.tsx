@@ -53,7 +53,7 @@ export function Field({
       <div className="text-sm font-medium">{title}</div>
       <div
         className={classNames(
-          'text-sm',
+          'mt-1 text-sm',
           match(variant, {
             text: '',
             block: 'font-mono',
