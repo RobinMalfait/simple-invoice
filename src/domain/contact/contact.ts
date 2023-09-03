@@ -8,6 +8,7 @@ export let Contact = z.object({
   name: z.string(),
   nickname: z.string().nullable(),
   email: z.string().email().nullable(),
+  phone: z.string().nullable(),
   role: z.string().nullable(),
   imageUrl: z.string().nullable(),
 })
@@ -18,6 +19,7 @@ export class ContactBuilder {
   private _name: Contact['name'] | null = null
   private _nickname: Contact['nickname'] | null = null
   private _email: Contact['email'] | null = null
+  private _phone: Contact['phone'] | null = null
   private _role: Contact['role'] | null = null
   private _imageUrl: Contact['imageUrl'] | null = null
 
@@ -26,6 +28,7 @@ export class ContactBuilder {
       name: this._name,
       nickname: this._nickname ?? this._name,
       email: this._email,
+      phone: this._phone,
       role: this._role,
       imageUrl: this._imageUrl,
     })
@@ -38,6 +41,11 @@ export class ContactBuilder {
 
   public nickname(nickname: Contact['nickname']): ContactBuilder {
     this._nickname = nickname
+    return this
+  }
+
+  public phone(phone: Contact['phone']): ContactBuilder {
+    this._phone = phone
     return this
   }
 

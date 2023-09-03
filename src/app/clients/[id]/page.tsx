@@ -258,6 +258,12 @@ export default async function Page({ params: { id } }: { params: { id: string } 
                 <CardBody>
                   <ul className="flex flex-col divide-y divide-gray-100 dark:divide-zinc-800">
                     {client.contacts.map((client) => {
+                      let fields = [
+                        client.nickname !== client.name ? client.nickname : null,
+                        client.phone,
+                        client.email,
+                      ].filter(Boolean)
+
                       return (
                         <li key={client.id} className="py-2 first:pt-0 last:pb-0">
                           <div className="flex items-center gap-4">
@@ -272,15 +278,17 @@ export default async function Page({ params: { id } }: { params: { id: string } 
                                 )}
                               </div>
                               <div className="flex items-center gap-2">
-                                {client.name !== client.nickname && (
-                                  <>
-                                    <span className="text-xs">{client.nickname}</span>
-                                    {client.email && <span>&middot;</span>}
-                                  </>
-                                )}
-                                <div className="select-all text-xs">
-                                  <Classified>{client.email}</Classified>{' '}
-                                </div>
+                                {fields.map((field, idx) => {
+                                  return (
+                                    <Fragment key={idx}>
+                                      {idx !== 0 && <span>&middot;</span>}
+
+                                      <div className="select-all text-xs">
+                                        <Classified>{field}</Classified>
+                                      </div>
+                                    </Fragment>
+                                  )
+                                })}
                               </div>
                             </div>
                           </div>
