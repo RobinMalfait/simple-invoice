@@ -154,7 +154,7 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
       >
         <main className="space-y-[--gap] px-4 py-8 [--gap:theme(spacing.4)] sm:px-6 lg:px-8">
           <div className="sticky top-0 z-10 -mx-2 -mb-[calc(var(--gap)-1px)] -mt-[--gap] flex items-center justify-between bg-gray-100/20 px-2 py-[--gap] backdrop-blur dark:bg-zinc-800/20">
-            <div className="flex flex-1 justify-between">
+            <div className="flex flex-1 flex-wrap justify-between gap-2">
               <div className="flex items-center gap-2">
                 <button
                   className="aspect-square rounded-md bg-white px-2 py-1.5 text-sm shadow ring-1 ring-black/10 dark:bg-zinc-900/75 dark:text-zinc-300"
