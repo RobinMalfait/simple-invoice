@@ -212,14 +212,14 @@ export let me: Account = new AccountBuilder()
   .contactField(
     new ContactFieldBuilder()
       .icon({ type: 'heroicon', heroicon: 'GlobeAltIcon' })
-      .name('website')
+      .name('Website')
       .value('https://acme.com')
       .build(),
   )
   .contactField(
     new ContactFieldBuilder()
       .icon({ type: 'socials', name: 'GitHub' })
-      .name('github')
+      .name('GitHub')
       .value('https://github.com')
       .build(),
   )
