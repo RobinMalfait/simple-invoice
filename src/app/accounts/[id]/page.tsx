@@ -1,4 +1,5 @@
-import { MapIcon } from '@heroicons/react/24/outline'
+import { CalendarIcon, MapIcon } from '@heroicons/react/24/outline'
+import { headers } from 'next/headers'
 import React from 'react'
 import { me } from '~/data'
 import { Address, formatAddress } from '~/ui/address/address'
@@ -10,6 +11,7 @@ import { TimezoneDifference } from '~/ui/timezone-difference'
 import { match } from '~/utils/match'
 
 export default async function Page({ params: { id } }: { params: { id: string } }) {
+  let base = headers().get('host')
   let account = me
 
   return (
@@ -97,6 +99,16 @@ export default async function Page({ params: { id } }: { params: { id: string } 
                     {account.language}
                   </span>
                 </div>
+
+                <Field title="iCal" variant="block">
+                  <a
+                    className="inline-flex items-center rounded-md border border-transparent bg-blue-600 px-3 py-2 text-sm font-medium leading-4 text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    href={`webcal://${base}/accounts/${account.id}/ics`}
+                  >
+                    <CalendarIcon className="-ml-0.5 mr-2 h-4 w-4" aria-hidden="true" />
+                    Add to calendar
+                  </a>
+                </Field>
               </CardBody>
             </Card>
           </div>
