@@ -157,6 +157,7 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
             <div className="flex flex-1 flex-wrap justify-between gap-2">
               <div className="flex items-center gap-2">
                 <button
+                  title="Previous period"
                   className="aspect-square rounded-md bg-white px-2 py-1.5 text-sm shadow ring-1 ring-black/10 dark:bg-zinc-900/75 dark:text-zinc-300"
                   onClick={() =>
                     setRange(([start, end]) => [
@@ -169,6 +170,7 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
                 </button>
 
                 <button
+                  title="Current period"
                   className="aspect-square rounded-md bg-white px-2 py-1.5 text-sm shadow ring-1 ring-black/10 dark:bg-zinc-900/75 dark:text-zinc-300"
                   onClick={() => {
                     let [start = earliestDate, end = latestDate] = range(now)
@@ -181,6 +183,7 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
                 </button>
 
                 <button
+                  title="Next period"
                   className="aspect-square rounded-md bg-white px-2 py-1.5 text-sm shadow ring-1 ring-black/10 dark:bg-zinc-900/75 dark:text-zinc-300"
                   onClick={() =>
                     setRange(([start, end]) => [next(start, [start, end]), next(end, [start, end])])
