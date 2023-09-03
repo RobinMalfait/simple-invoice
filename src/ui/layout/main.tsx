@@ -2,7 +2,6 @@
 
 import {
   ArrowDownTrayIcon,
-  BriefcaseIcon,
   CalculatorIcon,
   CubeIcon,
   DocumentCheckIcon,
@@ -11,8 +10,8 @@ import {
   EyeSlashIcon,
   HomeIcon,
   RectangleStackIcon,
+  UserGroupIcon,
   UserIcon,
-  UsersIcon,
 } from '@heroicons/react/24/outline'
 import Link from 'next/link'
 import { useParams, usePathname, useRouter } from 'next/navigation'
@@ -39,14 +38,16 @@ type Navigation = {
 
 let navigation: Navigation[] = [
   { name: 'Dashboard', icon: HomeIcon, href: '/', exact: true },
-  { name: 'Clients', icon: BriefcaseIcon, href: '/clients' },
-  {
-    name: 'Accounts',
-    icon: UsersIcon,
-    href: '/accounts',
-    exact: true,
-    children: [{ name: 'Me', icon: UserIcon, href: '/accounts/me' }],
-  },
+  { name: 'Clients', icon: UserGroupIcon, href: '/clients' },
+  // // Use this once we actually have more accounts
+  // {
+  //   name: 'Accounts',
+  //   icon: UsersIcon,
+  //   href: '/accounts',
+  //   exact: true,
+  //   children: [{ name: 'Me', icon: UserIcon, href: '/accounts/me' }],
+  // },
+  { name: 'My account', icon: UserIcon, href: '/accounts/me' },
   {
     name: 'Records',
     icon: RectangleStackIcon,
