@@ -648,7 +648,10 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
                       <div className="flex-1 divide-y divide-gray-100 dark:divide-zinc-900">
                         {data.map(([id, { client, total }], idx) => (
                           <I18NProvider key={id} value={client}>
-                            <div className="group relative flex items-center p-3 first:border-t-[1px] first:border-t-transparent focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 dark:border-zinc-700">
+                            <Link
+                              href={`/clients/${client.id}`}
+                              className="group relative flex items-center p-3 first:border-t-[1px] first:border-t-transparent focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 dark:border-zinc-700"
+                            >
                               <div className="absolute inset-2 z-0 flex">
                                 <div
                                   className="rounded-md bg-blue-200/30 dark:bg-blue-400/25"
@@ -671,7 +674,7 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
                                   </span>
                                 </div>
                               </div>
-                            </div>
+                            </Link>
                           </I18NProvider>
                         ))}
                       </div>
