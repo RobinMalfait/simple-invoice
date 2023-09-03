@@ -117,7 +117,7 @@ export default async function Page({ params: { id } }: { params: { id: string } 
           </div>
 
           <div className="col-span-1 flex w-full flex-col gap-[inherit]">
-            {account.paymentMethods.length > 0 && (
+            {account.contactFields.length > 0 && (
               <Card>
                 <CardTitle>Contact information</CardTitle>
                 <CardBody variant="grid">
@@ -138,12 +138,12 @@ export default async function Page({ params: { id } }: { params: { id: string } 
                         : 'div'
 
                     return (
-                      <Field key={field.id} title={field.name}>
-                        <div className="flex items-center gap-3 text-sm">
+                      <Field key={field.id} classified title={field.name}>
+                        <div title={field.value} className="flex items-center gap-3 text-sm">
                           <div className="text-center">
                             <Icon className="h-4 w-4 text-gray-500 grayscale dark:text-gray-400" />
                           </div>
-                          <Classified>{field.value}</Classified>
+                          <div className="truncate">{field.value}</div>
                         </div>
                       </Field>
                     )
@@ -160,12 +160,16 @@ export default async function Page({ params: { id } }: { params: { id: string } 
                     return (
                       <Field
                         key={paymentMethod.id}
+                        classified
                         title={match(paymentMethod.type, {
                           iban: () => 'IBAN',
                           paypal: () => 'PayPal',
                         })}
                       >
-                        <div className="flex items-center gap-3 text-sm">
+                        <div
+                          title={paymentMethod.value}
+                          className="flex items-center gap-3 text-sm"
+                        >
                           <div className="text-center">
                             {match(paymentMethod.type, {
                               iban: () => (
@@ -176,7 +180,7 @@ export default async function Page({ params: { id } }: { params: { id: string } 
                               ),
                             })}
                           </div>
-                          <Classified>{paymentMethod.value}</Classified>
+                          <div className="truncate">{paymentMethod.value}</div>
                         </div>
                       </Field>
                     )
