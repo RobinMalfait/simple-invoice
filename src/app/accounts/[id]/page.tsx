@@ -1,4 +1,5 @@
-import { CalendarIcon, MapIcon } from '@heroicons/react/24/outline'
+import * as HI from '@heroicons/react/24/outline'
+import { BanknotesIcon, CalendarIcon, MapIcon } from '@heroicons/react/24/outline'
 import { headers } from 'next/headers'
 import React from 'react'
 import { me } from '~/data'
@@ -7,6 +8,8 @@ import { Avatar } from '~/ui/avatar'
 import { classNames } from '~/ui/class-names'
 import { Classified } from '~/ui/classified'
 import { I18NProvider } from '~/ui/hooks/use-i18n'
+import { PaypalIcon } from '~/ui/icons/payment'
+import * as SocialIcons from '~/ui/icons/social'
 import { TimezoneDifference } from '~/ui/timezone-difference'
 import { match } from '~/utils/match'
 
@@ -113,7 +116,75 @@ export default async function Page({ params: { id } }: { params: { id: string } 
             </Card>
           </div>
 
-          <div className="col-span-1">...</div>
+          <div className="col-span-1 flex w-full flex-col gap-[inherit]">
+            {account.paymentMethods.length > 0 && (
+              <Card>
+                <CardTitle>Contact information</CardTitle>
+                <CardBody variant="grid">
+                  {account.contactFields.map((field) => {
+                    let Icon =
+                      field.icon === null
+                        ? 'div'
+                        : field.icon.type === 'heroicon'
+                        ? HI[field.icon.heroicon]
+                        : field.icon.type === 'socials'
+                        ? SocialIcons[field.icon.name]
+                        : field.icon.type === 'image'
+                        ? function ImageIcon(props: React.ComponentProps<'img'>) {
+                            // @ts-expect-error
+                            // eslint-disable-next-line @next/next/no-img-element
+                            return <img src={field.icon.imageUrl} alt="" {...props} />
+                          }
+                        : 'div'
+
+                    return (
+                      <Field key={field.id} title={field.name}>
+                        <div className="flex items-center gap-3 text-sm">
+                          <div className="text-center">
+                            <Icon className="h-4 w-4 text-gray-500 grayscale dark:text-gray-400" />
+                          </div>
+                          <Classified>{field.value}</Classified>
+                        </div>
+                      </Field>
+                    )
+                  })}
+                </CardBody>
+              </Card>
+            )}
+
+            {account.paymentMethods.length > 0 && (
+              <Card>
+                <CardTitle>Payment methods</CardTitle>
+                <CardBody variant="grid">
+                  {account.paymentMethods.map((paymentMethod) => {
+                    return (
+                      <Field
+                        key={paymentMethod.id}
+                        title={match(paymentMethod.type, {
+                          iban: () => 'IBAN',
+                          paypal: () => 'PayPal',
+                        })}
+                      >
+                        <div className="flex items-center gap-3 text-sm">
+                          <div className="text-center">
+                            {match(paymentMethod.type, {
+                              iban: () => (
+                                <BanknotesIcon className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                              ),
+                              paypal: () => (
+                                <PaypalIcon className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                              ),
+                            })}
+                          </div>
+                          <Classified>{paymentMethod.value}</Classified>
+                        </div>
+                      </Field>
+                    )
+                  })}
+                </CardBody>
+              </Card>
+            )}
+          </div>
         </div>
       </div>
     </I18NProvider>
