@@ -29,22 +29,22 @@ export function Classified(props: { children: React.ReactNode }) {
   let container = useRef<HTMLDivElement | null>(null)
   let { width = 0, height = 0 } = useClientRect(container)
 
-  let padding = 0
-
   return (
     <>
       <span
         ref={container}
-        className={classNames(classified && 'pointer-events-none relative select-none')}
+        className={classNames(
+          classified && 'pointer-events-none relative inline-block select-none',
+        )}
       >
         <Fragment>{props.children}</Fragment>
         {classified && (
           <span
             style={{
-              width: width + padding,
-              height: height + padding,
+              width: width + 8,
+              height: height + 4,
             }}
-            className="pointer-events-none absolute inset-0 z-50 h-full w-full select-none bg-zinc-950"
+            className="pointer-events-none absolute left-1/2 top-1/2 z-50 h-full w-full -translate-x-1/2 -translate-y-1/2 select-none bg-zinc-950"
           />
         )}
       </span>
