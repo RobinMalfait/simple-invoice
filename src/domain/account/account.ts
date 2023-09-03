@@ -15,6 +15,7 @@ export let Account = z.object({
   name: z.string(),
   email: z.string().email().nullable(),
   phone: z.string().nullable(),
+  imageUrl: z.string().url().nullable(),
   billing: Address,
   currency: z.nativeEnum(Currency),
   language: z.nativeEnum(Language),
@@ -32,6 +33,7 @@ export class AccountBuilder {
   private _name: Account['name'] | null = null
   private _email: Account['email'] | null = null
   private _phone: Account['phone'] | null = null
+  private _imageUrl: Account['imageUrl'] | null = null
   private _billing: Account['billing'] | null = null
   private _currency: Account['currency'] | null = Currency.EUR
   private _language: Account['language'] | null = Language.NL
@@ -47,6 +49,7 @@ export class AccountBuilder {
       name: this._name,
       email: this._email,
       phone: this._phone,
+      imageUrl: this._imageUrl,
       billing: this._billing,
       currency: this._currency,
       language: this._language,
@@ -64,6 +67,7 @@ export class AccountBuilder {
     builder._name = account.name
     builder._email = account.email
     builder._phone = account.phone
+    builder._imageUrl = account.imageUrl
     builder._billing = account.billing
     builder._currency = account.currency
     builder._language = account.language
@@ -136,6 +140,11 @@ export class AccountBuilder {
           .build(),
       )
     }
+    return this
+  }
+
+  public imageUrl(imageUrl: Account['imageUrl']): AccountBuilder {
+    this._imageUrl = imageUrl
     return this
   }
 
