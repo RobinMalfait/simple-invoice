@@ -58,44 +58,54 @@ export function ActivityItem({
     diff = formatDistanceStrict(previous.at, item.at)
   }
 
+  let [text, extra] = useActivityText(item)
+
   return (
     <>
       <li className="relative flex gap-x-4">
-        <div
-          className={classNames(
-            isLast ? 'h-6' : '-bottom-6',
-            'absolute left-0 top-0 flex w-6 justify-center',
-          )}
-        >
-          <div className="w-px bg-gray-200 dark:bg-zinc-600" />
-        </div>
-
-        <div className="relative flex h-6 w-6 flex-none items-center justify-center bg-white dark:bg-zinc-900">
-          {withIndicator ? (
-            <ActivityIndicator item={item} />
-          ) : (
-            <div className="h-1.5 w-1.5 rounded-full bg-gray-100 ring-1 ring-gray-300 dark:bg-zinc-900 dark:ring-gray-500" />
-          )}
-        </div>
-
-        <p className="flex-auto py-0.5 text-xs leading-5 text-gray-500 dark:text-gray-300">
-          <ActivityText item={item} />
-          {diff !== null && (
-            <span className="absolute -top-5 right-0 flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500">
-              <ClockIcon className="h-3 w-3" /> {diff}
-            </span>
-          )}
-        </p>
-
-        {item.at && (
-          <time
-            title={format(item.at, 'PPPpp')}
-            dateTime={format(item.at, 'PPPpp')}
-            className="flex-none py-0.5 text-xs leading-5 text-gray-500 dark:text-gray-300"
+        <div className="flex">
+          <div
+            className={classNames(
+              isLast ? 'h-6' : '-bottom-6',
+              'absolute left-0 top-0 flex w-6 justify-center',
+            )}
           >
-            {formatDistance(item.at, now, { addSuffix: true })}
-          </time>
-        )}
+            <div className="w-px bg-gray-200 dark:bg-zinc-600" />
+          </div>
+
+          <div className="relative flex h-6 w-6 flex-none items-center justify-center bg-white dark:bg-zinc-900">
+            {withIndicator ? (
+              <ActivityIndicator item={item} />
+            ) : (
+              <div className="h-1.5 w-1.5 rounded-full bg-gray-100 ring-1 ring-gray-300 dark:bg-zinc-900 dark:ring-gray-500" />
+            )}
+          </div>
+        </div>
+
+        <div className="flex flex-1 flex-col">
+          <div className="flex">
+            <div className="flex-auto py-0.5 text-xs leading-5 text-gray-500 dark:text-gray-300">
+              {text}
+            </div>
+
+            {diff !== null && (
+              <span className="absolute -top-5 right-0 flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500">
+                <ClockIcon className="h-3 w-3" /> {diff}
+              </span>
+            )}
+
+            {item.at && (
+              <time
+                title={format(item.at, 'PPPpp')}
+                dateTime={format(item.at, 'PPPpp')}
+                className="flex-none py-0.5 text-xs leading-5 text-gray-500 dark:text-gray-300"
+              >
+                {formatDistance(item.at, now, { addSuffix: true })}
+              </time>
+            )}
+          </div>
+          {extra}
+        </div>
       </li>
     </>
   )
@@ -158,18 +168,18 @@ function ActivityIndicator({ item }: { item: Event }) {
   }
 }
 
-function ActivityText({ item }: { item: Event }) {
+function useActivityText(item: Event) {
   switch (item.type) {
     case 'account-rebranded':
-      return (
+      return [
         <>
           {'"'}
           <span className="font-medium text-gray-900 dark:text-gray-100">{item.from}</span>
           {'" rebranded to "'}
           <span className="font-medium text-gray-900 dark:text-gray-100">{item.to}</span>
           {'".'}
-        </>
-      )
+        </>,
+      ]
 
     case 'account-relocated': {
       let encoded = new URLSearchParams({
@@ -177,7 +187,7 @@ function ActivityText({ item }: { item: Event }) {
         to: formatAddress(item.to).replace(/\n/g, ', '),
       })
 
-      return (
+      return [
         <>
           <span className="inline-flex w-full items-center justify-between pr-3">
             <span>
@@ -194,6 +204,8 @@ function ActivityText({ item }: { item: Event }) {
               <MapIcon className="h-5 w-5" />
             </a>
           </span>
+        </>,
+        <>
           <div className="-ml-3 mt-3 flex-auto rounded-md p-3 ring-1 ring-inset ring-gray-200 dark:ring-zinc-800">
             <div className="flex flex-col justify-center gap-4 text-sm leading-6 text-gray-500 dark:text-zinc-400">
               <div className="flex-1">
@@ -234,20 +246,20 @@ function ActivityText({ item }: { item: Event }) {
               </div>
             </div>
           </div>
-        </>
-      )
+        </>,
+      ]
     }
 
     case 'client-rebranded':
-      return (
+      return [
         <>
           {'"'}
           <span className="font-medium text-gray-900 dark:text-gray-100">{item.from}</span>
           {'" rebranded to "'}
           <span className="font-medium text-gray-900 dark:text-gray-100">{item.to}</span>
           {'".'}
-        </>
-      )
+        </>,
+      ]
 
     case 'client-relocated': {
       let encoded = new URLSearchParams({
@@ -255,7 +267,7 @@ function ActivityText({ item }: { item: Event }) {
         to: formatAddress(item.to).replace(/\n/g, ', '),
       })
 
-      return (
+      return [
         <>
           <span className="inline-flex w-full items-center justify-between pr-3">
             <span>
@@ -272,6 +284,8 @@ function ActivityText({ item }: { item: Event }) {
               <MapIcon className="h-5 w-5" />
             </a>
           </span>
+        </>,
+        <>
           <div className="-ml-3 mt-3 flex-auto rounded-md p-3 ring-1 ring-inset ring-gray-200 dark:ring-zinc-800">
             <div className="flex flex-col justify-center gap-4 text-sm leading-6 text-gray-500 dark:text-zinc-400">
               <div className="flex-1">
@@ -312,13 +326,13 @@ function ActivityText({ item }: { item: Event }) {
               </div>
             </div>
           </div>
-        </>
-      )
+        </>,
+      ]
     }
 
     case 'quote-drafted': {
       if (item.from) {
-        return (
+        return [
           <>
             <span className="font-medium text-gray-900 dark:text-gray-100">Drafted</span> the quote
             from{' '}
@@ -326,63 +340,65 @@ function ActivityText({ item }: { item: Event }) {
               quote: () => 'another quote',
             })}
             .
-          </>
-        )
+          </>,
+        ]
       }
 
-      return (
+      return [
         <>
           <span className="font-medium text-gray-900 dark:text-gray-100">Drafted</span> the quote.
-        </>
-      )
+        </>,
+      ]
     }
 
     case 'quote-sent':
-      return item.at && isFuture(item.at) ? (
-        <>
-          The quote will be{' '}
-          <span className="font-medium text-gray-900 dark:text-gray-100">sent</span>.
-        </>
-      ) : (
-        <>
-          <span className="font-medium text-gray-900 dark:text-gray-100">Sent</span> the quote.
-        </>
-      )
+      return item.at && isFuture(item.at)
+        ? [
+            <>
+              The quote will be{' '}
+              <span className="font-medium text-gray-900 dark:text-gray-100">sent</span>.
+            </>,
+          ]
+        : [
+            <>
+              <span className="font-medium text-gray-900 dark:text-gray-100">Sent</span> the quote.
+            </>,
+          ]
 
     case 'quote-accepted':
-      return (
+      return [
         <>
           The quote has been{' '}
           <span className="font-medium text-gray-900 dark:text-gray-100">accepted</span>.
-        </>
-      )
+        </>,
+      ]
 
     case 'quote-rejected':
-      return (
+      return [
         <>
           The quote has been{' '}
           <span className="font-medium text-gray-900 dark:text-gray-100">rejected</span>.
-        </>
-      )
+        </>,
+      ]
 
     case 'quote-expired':
-      return (
+      return [
         <>
           The quote <span className="font-medium text-gray-900 dark:text-gray-100">expired</span>.
-        </>
-      )
+        </>,
+      ]
 
     case 'quote-closed':
-      return (
+      return [
         <>
           The quote has been{' '}
           <span className="font-medium text-gray-900 dark:text-gray-100">closed</span>.
-        </>
-      )
+        </>,
+      ]
 
     case 'invoice-drafted':
       if (item.from) {
-        return (
+        return [
           <>
             <span className="font-medium text-gray-900 dark:text-gray-100">Drafted</span> the
             invoice from a{' '}
@@ -390,67 +406,69 @@ function ActivityText({ item }: { item: Event }) {
               quote: () => 'quote',
             })}
             .
-          </>
-        )
+          </>,
+        ]
       }
 
-      return (
+      return [
         <>
           <span className="font-medium text-gray-900 dark:text-gray-100">Drafted</span> the invoice.
-        </>
-      )
+        </>,
+      ]
 
     case 'invoice-sent':
-      return item.at && isFuture(item.at) ? (
-        <>
-          The invoice will be{' '}
-          <span className="font-medium text-gray-900 dark:text-gray-100">sent</span>.
-        </>
-      ) : (
-        <>
-          <span className="font-medium text-gray-900 dark:text-gray-100">Sent</span> the quote.
-        </>
-      )
+      return item.at && isFuture(item.at)
+        ? [
+            <>
+              The invoice will be{' '}
+              <span className="font-medium text-gray-900 dark:text-gray-100">sent</span>.
+            </>,
+          ]
+        : [
+            <>
+              <span className="font-medium text-gray-900 dark:text-gray-100">Sent</span> the quote.
+            </>,
+          ]
 
     case 'invoice-partially-paid':
-      return (
+      return [
         <>
           <span className="font-medium text-gray-900 dark:text-gray-100">Partially paid</span> with{' '}
           <Money amount={item.amount} />, outstanding amount of <Money amount={item.outstanding} />{' '}
           left.
-        </>
-      )
+        </>,
+      ]
 
     case 'invoice-paid':
-      return (
+      return [
         <>
           <span className="font-medium text-gray-900 dark:text-gray-100">Paid</span> the invoice.
-        </>
-      )
+        </>,
+      ]
 
     case 'invoice-overdue':
-      return (
+      return [
         <>
           The invoice is{' '}
           <span className="font-medium text-gray-900 dark:text-gray-100">overdue</span>.
-        </>
-      )
+        </>,
+      ]
 
     case 'invoice-closed':
-      return (
+      return [
         <>
           The invoice has been{' '}
           <span className="font-medium text-gray-900 dark:text-gray-100">closed</span>.
-        </>
-      )
+        </>,
+      ]
 
     case 'receipt-created':
-      return (
+      return [
         <>
           The receipt has been{' '}
           <span className="font-medium text-gray-900 dark:text-gray-100">created</span>.
-        </>
-      )
+        </>,
+      ]
 
     default:
       assertNever(item)
