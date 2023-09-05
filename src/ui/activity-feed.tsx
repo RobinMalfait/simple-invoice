@@ -31,6 +31,7 @@ export function ActivityFeed({ events }: { events: Event[] }) {
             previous={all[activityItemIdx - 1]}
             item={activityItem}
             isLast={activityItemIdx === all.length - 1}
+            withIndicator={true}
           />
         ))}
     </ul>
@@ -41,10 +42,12 @@ export function ActivityItem({
   item,
   previous,
   isLast,
+  withIndicator = isLast,
 }: {
   item: Event
   previous?: Event
   isLast: boolean
+  withIndicator?: boolean
 }) {
   let now = useCurrentDate()
 
@@ -66,7 +69,7 @@ export function ActivityItem({
         </div>
 
         <div className="relative flex h-6 w-6 flex-none items-center justify-center bg-white dark:bg-zinc-900">
-          {isLast ? (
+          {withIndicator ? (
             <ActivityIndicator item={item} />
           ) : (
             <div className="h-1.5 w-1.5 rounded-full bg-gray-100 ring-1 ring-gray-300 dark:bg-zinc-900 dark:ring-gray-500" />

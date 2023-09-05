@@ -2,11 +2,11 @@
 
 import { Fragment } from 'react'
 import type { Record } from '~/domain/record/record'
+import { ActivityItem } from '~/ui/activity-feed'
 import { classNames } from '~/ui/class-names'
 import { useRecord } from '~/ui/hooks/use-record'
 import { useRecordStacks } from '~/ui/hooks/use-record-stacks'
 import { match } from '~/utils/match'
-import { ActivityItem } from '../activity-feed'
 
 export function ActivityFeed(props: React.PropsWithChildren<{ records: Record[] }>) {
   let stacks = useRecordStacks()
