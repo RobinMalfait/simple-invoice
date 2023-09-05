@@ -1,3 +1,4 @@
+import { parseISO } from 'date-fns'
 import { z } from 'zod'
 import { Address } from '~/domain/address/address'
 import { ContactField, ContactFieldBuilder } from '~/domain/contact-fields/contact-fields'
@@ -96,7 +97,7 @@ export class AccountBuilder {
   public static rebrand(
     account: Account,
     handle: (builder: AccountBuilder) => void,
-    { mutate = true } = {},
+    { mutate = true, at }: { mutate?: boolean; at?: string | Date } = {},
   ): Account {
     let oldName = account.name
     return tap(
@@ -105,7 +106,12 @@ export class AccountBuilder {
         : tap(AccountBuilder.from(account), handle).build(),
       (newAccount) => {
         newAccount.events.push(
-          Event.parse({ type: 'account-rebranded', from: oldName, to: newAccount.name }),
+          Event.parse({
+            type: 'account-rebranded',
+            from: oldName,
+            to: newAccount.name,
+            at: typeof at === 'string' ? parseISO(at) : at,
+          }),
         )
       },
     )
@@ -114,7 +120,7 @@ export class AccountBuilder {
   public static relocate(
     account: Account,
     handle: (builder: AccountBuilder) => void,
-    { mutate = true } = {},
+    { mutate = true, at }: { mutate?: boolean; at?: string | Date } = {},
   ): Account {
     let oldAddress = account.billing
     return tap(
@@ -123,7 +129,12 @@ export class AccountBuilder {
         : tap(AccountBuilder.from(account), handle).build(),
       (newAccount) => {
         newAccount.events.push(
-          Event.parse({ type: 'account-relocated', from: oldAddress, to: newAccount.billing }),
+          Event.parse({
+            type: 'account-relocated',
+            from: oldAddress,
+            to: newAccount.billing,
+            at: typeof at === 'string' ? parseISO(at) : at,
+          }),
         )
       },
     )

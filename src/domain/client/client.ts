@@ -1,3 +1,4 @@
+import { parseISO } from 'date-fns'
 import { z } from 'zod'
 import { Address } from '~/domain/address/address'
 import { Contact } from '~/domain/contact/contact'
@@ -91,7 +92,7 @@ export class ClientBuilder {
   public static rebrand(
     client: Client,
     handle: (builder: ClientBuilder) => void,
-    { mutate = true } = {},
+    { mutate = true, at }: { mutate?: boolean; at?: string | Date } = {},
   ): Client {
     let oldName = client.name
     return tap(
@@ -100,7 +101,12 @@ export class ClientBuilder {
         : tap(ClientBuilder.from(client), handle).build(),
       (newClient) => {
         newClient.events.push(
-          Event.parse({ type: 'client-rebranded', from: oldName, to: newClient.name }),
+          Event.parse({
+            type: 'client-rebranded',
+            from: oldName,
+            to: newClient.name,
+            at: typeof at === 'string' ? parseISO(at) : at,
+          }),
         )
       },
     )
@@ -109,7 +115,7 @@ export class ClientBuilder {
   public static relocate(
     client: Client,
     handle: (builder: ClientBuilder) => void,
-    { mutate = true } = {},
+    { mutate = true, at }: { mutate?: boolean; at?: string | Date } = {},
   ): Client {
     let oldAddress = client.billing
     return tap(
@@ -118,7 +124,12 @@ export class ClientBuilder {
         : tap(ClientBuilder.from(client), handle).build(),
       (newClient) => {
         newClient.events.push(
-          Event.parse({ type: 'client-relocated', from: oldAddress, to: newClient.billing }),
+          Event.parse({
+            type: 'client-relocated',
+            from: oldAddress,
+            to: newClient.billing,
+            at: typeof at === 'string' ? parseISO(at) : at,
+          }),
         )
       },
     )
