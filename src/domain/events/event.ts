@@ -1,10 +1,19 @@
 import { z } from 'zod'
+import { Address } from '~/domain/address/address'
 import { ScopedIDGenerator } from '~/utils/id'
 
 let scopedId = new ScopedIDGenerator('event')
 
 export let Event = z
   .discriminatedUnion('type', [
+    // Account
+    z.object({ type: z.literal('account-rebranded'), from: z.string(), to: z.string() }),
+    z.object({ type: z.literal('account-relocated'), from: Address, to: Address }),
+
+    // Clients
+    z.object({ type: z.literal('client-rebranded'), from: z.string(), to: z.string() }),
+    z.object({ type: z.literal('client-relocated'), from: Address, to: Address }),
+
     // Quotes
     z.object({ type: z.literal('quote-drafted'), from: z.enum(['quote']).optional() }),
     z.object({ type: z.literal('quote-sent') }),

@@ -19,6 +19,7 @@ import {
   isSent,
 } from '~/domain/record/filters'
 import { Record, combineRecords, separateRecords } from '~/domain/record/record'
+import { ActivityFeed } from '~/ui/activity-feed'
 import { Address, formatAddress } from '~/ui/address/address'
 import { Avatar } from '~/ui/avatar'
 import { Card, CardBody, CardTitle, Field } from '~/ui/card'
@@ -251,7 +252,7 @@ export default async function Page({ params: { id } }: { params: { id: string } 
             </Card>
           </div>
 
-          <div className="col-span-1">
+          <div className="col-span-1 flex w-full flex-col gap-[inherit]">
             {client.contacts.length > 0 && (
               <Card>
                 <CardTitle>Contacts</CardTitle>
@@ -299,6 +300,13 @@ export default async function Page({ params: { id } }: { params: { id: string } 
                 </CardBody>
               </Card>
             )}
+
+            <Card>
+              <CardTitle>Activity feed</CardTitle>
+              <CardBody>
+                <ActivityFeed events={client.events} />
+              </CardBody>
+            </Card>
           </div>
         </div>
       </div>

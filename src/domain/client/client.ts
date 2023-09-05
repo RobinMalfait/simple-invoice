@@ -6,6 +6,7 @@ import { Language } from '~/domain/language/language'
 import { Tax } from '~/domain/tax/tax'
 import { ScopedIDGenerator } from '~/utils/id'
 import { tap } from '~/utils/tap'
+import { Event } from '../events/event'
 
 let scopedId = new ScopedIDGenerator('client')
 
@@ -23,6 +24,8 @@ export let Client = z.object({
   note: z.string().nullable(),
   legal: z.string().nullable(),
   contacts: z.array(Contact).default([]),
+
+  events: z.array(Event),
 })
 
 export type Client = z.infer<typeof Client>
@@ -41,6 +44,8 @@ export class ClientBuilder {
   private _legal: Client['legal'] | null = null
   private _contacts: Client['contacts'] = []
 
+  private _events: Client['events'] = []
+
   public build(): Client {
     return Client.parse({
       name: this._name,
@@ -55,6 +60,7 @@ export class ClientBuilder {
       note: this._note,
       legal: this._legal,
       contacts: this._contacts,
+      events: this._events,
     })
   }
 
@@ -72,6 +78,7 @@ export class ClientBuilder {
     builder._note = client.note
     builder._legal = client.legal
     builder._contacts = client.contacts.slice()
+    builder._events = client.events.slice() // TODO: should we copy events?
     return builder
   }
 
@@ -86,11 +93,17 @@ export class ClientBuilder {
     handle: (builder: ClientBuilder) => void,
     { mutate = true } = {},
   ): Client {
-    if (mutate) {
-      return ClientBuilder.mutate(client, handle)
-    } else {
-      return tap(ClientBuilder.from(client), handle).build()
-    }
+    let oldName = client.name
+    return tap(
+      mutate
+        ? ClientBuilder.mutate(client, handle)
+        : tap(ClientBuilder.from(client), handle).build(),
+      (newClient) => {
+        newClient.events.push(
+          Event.parse({ type: 'client-rebranded', from: oldName, to: newClient.name }),
+        )
+      },
+    )
   }
 
   public static relocate(
@@ -98,11 +111,17 @@ export class ClientBuilder {
     handle: (builder: ClientBuilder) => void,
     { mutate = true } = {},
   ): Client {
-    if (mutate) {
-      return ClientBuilder.mutate(client, handle)
-    } else {
-      return tap(ClientBuilder.from(client), handle).build()
-    }
+    let oldAddress = client.billing
+    return tap(
+      mutate
+        ? ClientBuilder.mutate(client, handle)
+        : tap(ClientBuilder.from(client), handle).build(),
+      (newClient) => {
+        newClient.events.push(
+          Event.parse({ type: 'client-relocated', from: oldAddress, to: newClient.billing }),
+        )
+      },
+    )
   }
 
   public name(name: Client['name']): ClientBuilder {

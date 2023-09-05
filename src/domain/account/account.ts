@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { Address } from '~/domain/address/address'
 import { ContactField, ContactFieldBuilder } from '~/domain/contact-fields/contact-fields'
 import { Currency } from '~/domain/currency/currency'
+import { Event } from '~/domain/events/event'
 import { Language } from '~/domain/language/language'
 import { PaymentMethod } from '~/domain/payment-method/payment-method'
 import { Tax } from '~/domain/tax/tax'
@@ -25,6 +26,8 @@ export let Account = z.object({
   contactFields: z.array(ContactField),
   note: z.string().nullable(),
   legal: z.string().nullable(),
+
+  events: z.array(Event),
 })
 
 export type Account = z.infer<typeof Account>
@@ -44,6 +47,8 @@ export class AccountBuilder {
   private _note: Account['note'] | null = null
   private _legal: Account['legal'] | null = null
 
+  private _events: Account['events'] = []
+
   public build(): Account {
     return Account.parse({
       name: this._name,
@@ -59,6 +64,7 @@ export class AccountBuilder {
       contactFields: this._contactFields,
       note: this._note,
       legal: this._legal,
+      events: this._events,
     })
   }
 
@@ -77,6 +83,7 @@ export class AccountBuilder {
     builder._contactFields = account.contactFields
     builder._note = account.note
     builder._legal = account.legal
+    builder._events = account.events.slice() // TODO: should we copy events?
     return builder
   }
 
@@ -91,11 +98,17 @@ export class AccountBuilder {
     handle: (builder: AccountBuilder) => void,
     { mutate = true } = {},
   ): Account {
-    if (mutate) {
-      return AccountBuilder.mutate(account, handle)
-    } else {
-      return tap(AccountBuilder.from(account), handle).build()
-    }
+    let oldName = account.name
+    return tap(
+      mutate
+        ? AccountBuilder.mutate(account, handle)
+        : tap(AccountBuilder.from(account), handle).build(),
+      (newAccount) => {
+        newAccount.events.push(
+          Event.parse({ type: 'account-rebranded', from: oldName, to: newAccount.name }),
+        )
+      },
+    )
   }
 
   public static relocate(
@@ -103,11 +116,17 @@ export class AccountBuilder {
     handle: (builder: AccountBuilder) => void,
     { mutate = true } = {},
   ): Account {
-    if (mutate) {
-      return AccountBuilder.mutate(account, handle)
-    } else {
-      return tap(AccountBuilder.from(account), handle).build()
-    }
+    let oldAddress = account.billing
+    return tap(
+      mutate
+        ? AccountBuilder.mutate(account, handle)
+        : tap(AccountBuilder.from(account), handle).build(),
+      (newAccount) => {
+        newAccount.events.push(
+          Event.parse({ type: 'account-relocated', from: oldAddress, to: newAccount.billing }),
+        )
+      },
+    )
   }
 
   public name(name: Account['name']): AccountBuilder {

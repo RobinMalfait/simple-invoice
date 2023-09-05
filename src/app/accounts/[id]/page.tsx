@@ -3,6 +3,7 @@ import { BanknotesIcon, CalendarIcon, MapIcon } from '@heroicons/react/24/outlin
 import { headers } from 'next/headers'
 import React from 'react'
 import { me } from '~/data'
+import { ActivityFeed } from '~/ui/activity-feed'
 import { Address, formatAddress } from '~/ui/address/address'
 import { Avatar } from '~/ui/avatar'
 import { Card, CardBody, CardTitle, Field } from '~/ui/card'
@@ -38,7 +39,7 @@ export default async function Page({ params: { id } }: { params: { id: string } 
         </div>
 
         <div className="mt-8 grid grid-cols-1 gap-8 xl:grid-cols-3">
-          <div className="col-span-2 grid grid-cols-1 gap-[inherit]">
+          <div className="col-span-2 grid grid-cols-1 items-start gap-[inherit]">
             <Card>
               <CardTitle>Details</CardTitle>
 
@@ -188,6 +189,13 @@ export default async function Page({ params: { id } }: { params: { id: string } 
                 </CardBody>
               </Card>
             )}
+
+            <Card>
+              <CardTitle>Activity feed</CardTitle>
+              <CardBody>
+                <ActivityFeed events={account.events} />
+              </CardBody>
+            </Card>
           </div>
         </div>
       </div>
