@@ -190,12 +190,14 @@ export default async function Page({ params: { id } }: { params: { id: string } 
               </Card>
             )}
 
-            <Card>
-              <CardTitle>Activity feed</CardTitle>
-              <CardBody>
-                <ActivityFeed events={account.events} />
-              </CardBody>
-            </Card>
+            {account.events.length > 0 && (
+              <Card>
+                <CardTitle>Activity feed</CardTitle>
+                <CardBody>
+                  <ActivityFeed events={account.events} />
+                </CardBody>
+              </Card>
+            )}
           </div>
         </div>
       </div>

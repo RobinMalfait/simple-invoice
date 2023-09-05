@@ -301,12 +301,14 @@ export default async function Page({ params: { id } }: { params: { id: string } 
               </Card>
             )}
 
-            <Card>
-              <CardTitle>Activity feed</CardTitle>
-              <CardBody>
-                <ActivityFeed events={client.events} />
-              </CardBody>
-            </Card>
+            {client.events.length > 0 && (
+              <Card>
+                <CardTitle>Activity feed</CardTitle>
+                <CardBody>
+                  <ActivityFeed events={client.events} />
+                </CardBody>
+              </Card>
+            )}
           </div>
         </div>
       </div>
