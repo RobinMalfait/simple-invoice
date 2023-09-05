@@ -8,6 +8,8 @@ import {
   MapIcon,
   MapPinIcon,
   PencilSquareIcon,
+  SparklesIcon,
+  TruckIcon,
   XCircleIcon,
 } from '@heroicons/react/24/outline'
 import { format, formatDistance, formatDistanceStrict, isFuture } from 'date-fns'
@@ -101,6 +103,16 @@ export function ActivityItem({
 
 function ActivityIndicator({ item }: { item: Event }) {
   switch (item.type) {
+    case 'account-relocated':
+    case 'client-relocated':
+      return <TruckIcon className="h-4 w-4 text-gray-600 dark:text-gray-300" aria-hidden="true" />
+
+    case 'account-rebranded':
+    case 'client-rebranded':
+      return (
+        <SparklesIcon className="h-4 w-4 text-gray-600 dark:text-gray-300" aria-hidden="true" />
+      )
+
     case 'quote-drafted':
     case 'invoice-drafted':
       return (
