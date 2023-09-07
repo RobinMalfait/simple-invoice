@@ -12,7 +12,7 @@ export function useCurrencyFormatter({ type = 'long' }: { type?: 'short' | 'long
   )
 
   useEffect(() => {
-    setFormatter(createCurrencyFormatter({ currency, language, type }))
+    setFormatter(() => createCurrencyFormatter({ currency, language, type }))
   }, [currency, language, type])
 
   return formatter
