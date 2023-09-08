@@ -27,6 +27,9 @@
     "transform": {
       "^.+\\.(js|jsx|ts|tsx)$": "@swc/jest"
     },
+    "transformIgnorePatterns": [
+      "node_modules/(?!lazy-collections)"
+    ],
     "moduleNameMapper": {
       "^~/(.*)$": "<rootDir>/src/$1"
     }
