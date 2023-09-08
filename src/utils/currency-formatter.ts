@@ -7,9 +7,9 @@ export function createCurrencyFormatter({
   language = Language.EN,
   type = 'long',
 }: {
-  currency: Currency
-  language: Language
-  type: 'short' | 'long'
+  currency?: Currency
+  language?: Language
+  type?: 'short' | 'long'
 }) {
   return new Intl.NumberFormat(
     match(language, {

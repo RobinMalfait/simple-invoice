@@ -10,6 +10,31 @@ export let Event = z
     z.object({ type: z.literal('account-rebranded'), from: z.string(), to: z.string() }),
     z.object({ type: z.literal('account-relocated'), from: Address, to: Address }),
 
+    // Account — Milestones
+    z.object({
+      type: z.literal('account-milestone:invoices'),
+      amount: z.number(),
+      future: z.boolean().optional(),
+    }),
+    z.object({
+      type: z.literal('account-milestone:revenue'),
+      amount: z.number(),
+      milestone: z.number(),
+      future: z.boolean().optional(),
+    }),
+    z.object({
+      type: z.literal('account-milestone:most-expensive-invoice'),
+      invoice: z.string(),
+      amount: z.number(),
+      increase: z.number(),
+      future: z.boolean().optional(),
+    }),
+    z.object({
+      type: z.literal('account-milestone:clients'),
+      amount: z.number(),
+      future: z.boolean().optional(),
+    }),
+
     // Clients
     z.object({ type: z.literal('client-rebranded'), from: z.string(), to: z.string() }),
     z.object({ type: z.literal('client-relocated'), from: Address, to: Address }),

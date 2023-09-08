@@ -1,18 +1,24 @@
 'use client'
 
 import {
+  ArrowTrendingUpIcon,
+  BanknotesIcon,
   CheckCircleIcon,
   ClockIcon,
   EllipsisHorizontalCircleIcon,
+  FlagIcon,
   LockClosedIcon,
   MapIcon,
   MapPinIcon,
   PencilSquareIcon,
   SparklesIcon,
   TruckIcon,
+  UserGroupIcon,
   XCircleIcon,
 } from '@heroicons/react/24/outline'
 import { format, formatDistance, formatDistanceStrict, isFuture } from 'date-fns'
+import Link from 'next/link'
+import { Fragment } from 'react'
 import { Event } from '~/domain/events/event'
 import { classNames } from '~/ui/class-names'
 import { useCurrentDate } from '~/ui/hooks/use-current-date'
@@ -21,21 +27,43 @@ import { assertNever } from '~/utils/assert-never'
 import { match } from '~/utils/match'
 import { Address, formatAddress } from './address/address'
 
+function isFutureEvent(event: Event) {
+  return 'future' in event && event.future
+}
+
 export function ActivityFeed({ events }: { events: Event[] }) {
   return (
-    <ul role="list" className="relative flex flex-col gap-6">
+    <ul role="list" className="relative flex flex-col gap-6 overflow-auto">
       {events
         .slice()
         .reverse()
-        .map((activityItem, activityItemIdx, all) => (
-          <ActivityItem
-            key={activityItem.id}
-            previous={all[activityItemIdx - 1]}
-            item={activityItem}
-            isLast={activityItemIdx === all.length - 1}
-            withIndicator={true}
-          />
-        ))}
+        .sort((a, z) => {
+          if (isFutureEvent(a) && isFutureEvent(z)) {
+            return 0
+          }
+
+          if (isFutureEvent(a)) {
+            return -1
+          }
+
+          if (isFutureEvent(z)) {
+            return 1
+          }
+
+          return 0
+        })
+        .map((activityItem, activityItemIdx, all) => {
+          return (
+            <Fragment key={activityItem.id}>
+              <ActivityItem
+                previous={all[activityItemIdx - 1]}
+                item={activityItem}
+                isLast={activityItemIdx === all.length - 1}
+                withIndicator={true}
+              />
+            </Fragment>
+          )
+        })}
     </ul>
   )
 }
@@ -56,13 +84,23 @@ export function ActivityItem({
   let diff: string | null = null
   if (previous && previous.at !== null && item.at !== null) {
     diff = formatDistanceStrict(previous.at, item.at)
+    if (diff === '0 seconds') {
+      diff = null
+    }
   }
 
   let [text, extra] = useActivityText(item)
+  let isPotentialFutureEvent = 'future' in item && item.future
 
   return (
     <>
-      <li className="relative flex gap-x-4">
+      <li
+        className={classNames(
+          'relative flex gap-x-4',
+          isPotentialFutureEvent &&
+            'opacity-50 grayscale transition hover:opacity-100 hover:grayscale-0',
+        )}
+      >
         <div className="flex">
           <div
             className={classNames(
@@ -83,7 +121,7 @@ export function ActivityItem({
         </div>
 
         <div className="flex flex-1 flex-col">
-          <div className="flex">
+          <div className="flex gap-2">
             <div className="flex-auto py-0.5 text-xs leading-5 text-gray-500 dark:text-gray-300">
               {text}
             </div>
@@ -122,6 +160,27 @@ function ActivityIndicator({ item }: { item: Event }) {
       return (
         <SparklesIcon className="h-4 w-4 text-gray-600 dark:text-gray-300" aria-hidden="true" />
       )
+
+    case 'account-milestone:most-expensive-invoice':
+      return (
+        <ArrowTrendingUpIcon
+          className="h-4 w-4 text-gray-600 dark:text-gray-300"
+          aria-hidden="true"
+        />
+      )
+
+    case 'account-milestone:clients':
+      return (
+        <UserGroupIcon className="h-4 w-4 text-gray-600 dark:text-gray-300" aria-hidden="true" />
+      )
+
+    case 'account-milestone:revenue':
+      return (
+        <BanknotesIcon className="h-4 w-4 text-gray-600 dark:text-gray-300" aria-hidden="true" />
+      )
+
+    case 'account-milestone:invoices':
+      return <FlagIcon className="h-4 w-4 text-gray-600 dark:text-gray-300" aria-hidden="true" />
 
     case 'quote-drafted':
     case 'invoice-drafted':
@@ -189,7 +248,7 @@ function useActivityText(item: Event) {
 
       return [
         <>
-          <span className="inline-flex w-full items-center justify-between pr-3">
+          <span className="inline-flex w-full items-center justify-between">
             <span>
               <span className="font-medium text-gray-900 dark:text-gray-100">Account</span>{' '}
               relocated.
@@ -250,6 +309,72 @@ function useActivityText(item: Event) {
       ]
     }
 
+    case 'account-milestone:invoices':
+      return [
+        item.amount === 1 ? (
+          <>
+            {'Your '}
+            <span className="font-medium text-gray-900 dark:text-gray-100">1st</span>
+            {' paid invoice!'}
+          </>
+        ) : (
+          <>
+            {item.future ? 'Will reach ' : 'Reached '}
+            <span className="font-medium text-gray-900 dark:text-gray-100">{item.amount}</span>
+            {' paid invoices!'}
+          </>
+        ),
+      ]
+
+    case 'account-milestone:revenue':
+      return [
+        <>
+          {item.future ? 'Will pass ' : 'Passed '}
+          <span className="font-medium text-gray-900 dark:text-gray-100">
+            <Money amount={item.milestone} />
+            {item.amount > item.milestone ? '+' : ''}
+          </span>
+          {' in total revenue!'}
+        </>,
+      ]
+
+    case 'account-milestone:most-expensive-invoice':
+      return [
+        <>
+          <Link
+            className="font-medium text-gray-900 dark:text-gray-100"
+            href={`/invoice/${item.invoice}`}
+          >
+            {`#${item.invoice}`}
+          </Link>
+          {item.future
+            ? ' will be your most expensive invoice ('
+            : ' is your most expensive invoice ('}
+          <span className="font-medium text-emerald-500 dark:text-emerald-400/60">
+            +{item.increase}%
+          </span>
+          {`).`}
+        </>,
+        <>
+          <span className="text-xs opacity-50">
+            This invoice was{' '}
+            <span className="font-medium text-gray-900 dark:text-gray-100">
+              <Money amount={item.amount} />
+            </span>
+            .
+          </span>
+        </>,
+      ]
+
+    case 'account-milestone:clients':
+      return [
+        <>
+          {item.future ? 'Will attract ' : 'Attracted '}
+          <span className="font-medium text-gray-900 dark:text-gray-100">{item.amount}</span>
+          {' paying clients!'}
+        </>,
+      ]
+
     case 'client-rebranded':
       return [
         <>
@@ -269,7 +394,7 @@ function useActivityText(item: Event) {
 
       return [
         <>
-          <span className="inline-flex w-full items-center justify-between pr-3">
+          <span className="inline-flex w-full items-center justify-between">
             <span>
               <span className="font-medium text-gray-900 dark:text-gray-100">Client</span>{' '}
               relocated.

@@ -6,6 +6,7 @@ import { Client } from '~/domain/client/client'
 import { config } from '~/domain/configuration/configuration'
 import { Discount } from '~/domain/discount/discount'
 import { Document } from '~/domain/document/document'
+import { bus } from '~/domain/event-bus/bus'
 import { Event } from '~/domain/events/event'
 import { InvoiceItem } from '~/domain/invoice/invoice-item'
 import { InvoiceStatus } from '~/domain/invoice/invoice-status'
@@ -248,6 +249,18 @@ export class InvoiceBuilder {
       [InvoiceStatus.Draft]: () => {
         this.events.push(Event.parse({ type: 'invoice-sent', at: parsedAt }))
         this._status = InvoiceStatus.Sent
+
+        this._number ??= this.computeNumber!
+        bus.emit('invoice:sent', {
+          client: this._client,
+          account: this._account,
+          invoice: {
+            number: this._number!,
+            total: total({ items: this._items, discounts: this._discounts }),
+          },
+          status: this._status,
+          at: parsedAt,
+        })
       },
       [InvoiceStatus.Sent]: () => {
         throw new Error('Cannot send an invoice that is already sent')
@@ -296,6 +309,18 @@ export class InvoiceBuilder {
         )
         this._status = InvoiceStatus.Paid
       }
+
+      this._number ??= this.computeNumber!
+      bus.emit('invoice:paid', {
+        client: this._client,
+        account: this._account,
+        invoice: {
+          number: this._number!,
+          total: total({ items: this._items, discounts: this._discounts }),
+        },
+        status: this._status,
+        at: parsedAt,
+      })
     }
 
     match(this._status, {

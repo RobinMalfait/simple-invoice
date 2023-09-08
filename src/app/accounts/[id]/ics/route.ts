@@ -6,7 +6,7 @@ import { load } from '~/app/(db)/actions'
 import { records as allRecords, me } from '~/data'
 import { Invoice } from '~/domain/invoice/invoice'
 import { Quote } from '~/domain/quote/quote'
-import { resolveRelevantRecordDate } from '~/domain/record/record'
+import { combineRecords, resolveRelevantRecordDate } from '~/domain/record/record'
 import { total } from '~/ui/invoice/total'
 import { createCurrencyFormatter } from '~/utils/currency-formatter'
 import { match } from '~/utils/match'
@@ -27,7 +27,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   let startRange = subMonths(now, 2)
   let endRange = addMonths(now, 3)
 
-  let records = allRecords.filter((record) => {
+  let records = combineRecords(allRecords).filter((record) => {
     return isWithinInterval(resolveRelevantRecordDate(record), {
       start: startRange,
       end: endRange,
