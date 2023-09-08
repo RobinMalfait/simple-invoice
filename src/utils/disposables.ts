@@ -1,3 +1,5 @@
+import EventEmitter from 'node:events'
+
 export type Disposables = ReturnType<typeof disposables>
 
 export function disposables() {
@@ -12,6 +14,11 @@ export function disposables() {
     ) {
       element.addEventListener(name, listener as any, options)
       return api.add(() => element.removeEventListener(name, listener as any, options))
+    },
+
+    on(emitter: EventEmitter, eventName: string | symbol, listener: (...args: any[]) => void) {
+      emitter.on(eventName, listener)
+      return api.add(() => emitter.off(eventName, listener))
     },
 
     setTimeout(...args: Parameters<typeof setTimeout>) {

@@ -72,6 +72,16 @@ export class InvoiceBuilder {
 
     if (input.status === InvoiceStatus.Overdue) {
       input.events.push(Event.parse({ type: 'invoice-overdue', at: input.dueDate }))
+      bus.emit('invoice:overdue', {
+        client: input.client,
+        account: input.account,
+        invoice: {
+          number: input.number,
+          total: total({ items: input.items, discounts: input.discounts }),
+        },
+        status: input.status,
+        at: input.dueDate,
+      })
     }
 
     return Invoice.parse(input)
@@ -388,6 +398,18 @@ export class InvoiceBuilder {
       [InvoiceStatus.Overdue]: () => {
         this.events.push(Event.parse({ type: 'invoice-closed', at: parsedAt }))
         this._status = InvoiceStatus.Closed
+
+        this._number ??= this.computeNumber!
+        bus.emit('invoice:closed', {
+          client: this._client,
+          account: this._account,
+          invoice: {
+            number: this._number!,
+            total: total({ items: this._items, discounts: this._discounts }),
+          },
+          status: this._status,
+          at: parsedAt,
+        })
       },
       [InvoiceStatus.Closed]: () => {
         throw new Error('Cannot close an invoice that is closed')
