@@ -1,3 +1,5 @@
+import EventEmitter from 'node:events'
+
 import { isPast, parseISO } from 'date-fns'
 import { z } from 'zod'
 
@@ -6,7 +8,7 @@ import { Client } from '~/domain/client/client'
 import { config } from '~/domain/configuration/configuration'
 import { Discount } from '~/domain/discount/discount'
 import { Document } from '~/domain/document/document'
-import { bus } from '~/domain/event-bus/bus'
+import { bus as defaultBus } from '~/domain/event-bus/bus'
 import { Event } from '~/domain/events/event'
 import { InvoiceItem } from '~/domain/invoice/invoice-item'
 import { InvoiceStatus } from '~/domain/invoice/invoice-status'
@@ -54,6 +56,28 @@ export class InvoiceBuilder {
   private paid: number = 0
   private events: Event[] = [Event.parse({ type: 'invoice-drafted' })]
 
+  public constructor(private bus: EventEmitter = defaultBus) {}
+
+  private emit(eventName: string, data: InvoiceBuilder | Invoice, at: Date | null = null) {
+    if (data instanceof InvoiceBuilder) {
+      data._number ??= data.computeNumber!
+    }
+
+    this.bus.emit(eventName, {
+      client: data instanceof InvoiceBuilder ? data._client : data.client,
+      account: data instanceof InvoiceBuilder ? data._account : data.account,
+      invoice: {
+        number: data instanceof InvoiceBuilder ? data._number : data.number,
+        total: total({
+          items: data instanceof InvoiceBuilder ? data._items : data.items,
+          discounts: data instanceof InvoiceBuilder ? data._discounts : data.discounts,
+        }),
+      },
+      status: data instanceof InvoiceBuilder ? data._status : data.status,
+      at,
+    })
+  }
+
   public build(): Invoice {
     let input = {
       number: this.computeNumber,
@@ -70,21 +94,14 @@ export class InvoiceBuilder {
       quote: this._quote,
     }
 
-    if (input.status === InvoiceStatus.Overdue) {
-      input.events.push(Event.parse({ type: 'invoice-overdue', at: input.dueDate }))
-      bus.emit('invoice:overdue', {
-        client: input.client,
-        account: input.account,
-        invoice: {
-          number: input.number,
-          total: total({ items: input.items, discounts: input.discounts }),
-        },
-        status: input.status,
-        at: input.dueDate,
-      })
+    let invoice = Invoice.parse(input)
+
+    if (invoice.status === InvoiceStatus.Overdue) {
+      invoice.events.push(Event.parse({ type: 'invoice-overdue', at: invoice.dueDate }))
+      this.emit('invoice:overdue', invoice, invoice.dueDate)
     }
 
-    return Invoice.parse(input)
+    return invoice
   }
 
   public static fromQuote(quote: Quote, { withAttachments = true } = {}): InvoiceBuilder {
@@ -103,6 +120,9 @@ export class InvoiceBuilder {
     }
     builder.events = [Event.parse({ type: 'invoice-drafted', from: 'quote' })]
     builder._quote = quote
+
+    builder.emit('invoice:drafted', builder)
+
     return builder
   }
 
@@ -260,17 +280,7 @@ export class InvoiceBuilder {
         this.events.push(Event.parse({ type: 'invoice-sent', at: parsedAt }))
         this._status = InvoiceStatus.Sent
 
-        this._number ??= this.computeNumber!
-        bus.emit('invoice:sent', {
-          client: this._client,
-          account: this._account,
-          invoice: {
-            number: this._number!,
-            total: total({ items: this._items, discounts: this._discounts }),
-          },
-          status: this._status,
-          at: parsedAt,
-        })
+        this.emit('invoice:sent', this, parsedAt)
       },
       [InvoiceStatus.Sent]: () => {
         throw new Error('Cannot send an invoice that is already sent')
@@ -320,17 +330,7 @@ export class InvoiceBuilder {
         this._status = InvoiceStatus.Paid
       }
 
-      this._number ??= this.computeNumber!
-      bus.emit('invoice:paid', {
-        client: this._client,
-        account: this._account,
-        invoice: {
-          number: this._number!,
-          total: total({ items: this._items, discounts: this._discounts }),
-        },
-        status: this._status,
-        at: parsedAt,
-      })
+      this.emit('invoice:paid', this, parsedAt)
     }
 
     match(this._status, {
@@ -356,11 +356,13 @@ export class InvoiceBuilder {
             }),
           )
           this._status = InvoiceStatus.PartiallyPaid
+          this.emit('invoice:partially-paid', this, parsedAt)
         } else {
           this.events.push(
             Event.parse({ type: 'invoice-paid', at: parsedAt, amount, outstanding: remaining }),
           )
           this._status = InvoiceStatus.Paid
+          this.emit('invoice:paid', this, parsedAt)
         }
       },
       [InvoiceStatus.Overdue]: () => {
@@ -399,17 +401,7 @@ export class InvoiceBuilder {
         this.events.push(Event.parse({ type: 'invoice-closed', at: parsedAt }))
         this._status = InvoiceStatus.Closed
 
-        this._number ??= this.computeNumber!
-        bus.emit('invoice:closed', {
-          client: this._client,
-          account: this._account,
-          invoice: {
-            number: this._number!,
-            total: total({ items: this._items, discounts: this._discounts }),
-          },
-          status: this._status,
-          at: parsedAt,
-        })
+        this.emit('invoice:closed', this, parsedAt)
       },
       [InvoiceStatus.Closed]: () => {
         throw new Error('Cannot close an invoice that is closed')
