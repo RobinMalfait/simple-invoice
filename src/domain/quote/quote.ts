@@ -1,3 +1,5 @@
+import EventEmitter from 'node:events'
+
 import { isPast, parseISO } from 'date-fns'
 import { z } from 'zod'
 
@@ -6,9 +8,11 @@ import { Client } from '~/domain/client/client'
 import { config } from '~/domain/configuration/configuration'
 import { Discount } from '~/domain/discount/discount'
 import { Document } from '~/domain/document/document'
+import { bus as defaultBus } from '~/domain/event-bus/bus'
 import { Event } from '~/domain/events/event'
 import { InvoiceItem } from '~/domain/invoice/invoice-item'
 import { QuoteStatus } from '~/domain/quote/quote-status'
+import { total } from '~/ui/invoice/total'
 import { ScopedIDGenerator } from '~/utils/id'
 import { match } from '~/utils/match'
 
@@ -53,6 +57,28 @@ export class QuoteBuilder {
 
   private _status = QuoteStatus.Draft
 
+  public constructor(private bus: EventEmitter = defaultBus) {}
+
+  private emit(eventName: string, data: QuoteBuilder | Quote, at: Date | null = null) {
+    if (data instanceof QuoteBuilder) {
+      data._number ??= data.computeNumber!
+    }
+
+    this.bus.emit(eventName, {
+      client: data instanceof QuoteBuilder ? data._client : data.client,
+      account: data instanceof QuoteBuilder ? data._account : data.account,
+      quote: {
+        number: data instanceof QuoteBuilder ? data._number : data.number,
+        total: total({
+          items: data instanceof QuoteBuilder ? data._items : data.items,
+          discounts: data instanceof QuoteBuilder ? data._discounts : data.discounts,
+        }),
+      },
+      status: data instanceof QuoteBuilder ? data._status : data.status,
+      at,
+    })
+  }
+
   public build(): Quote {
     let input = {
       number: this.computeNumber,
@@ -70,11 +96,14 @@ export class QuoteBuilder {
       quote: this._quote,
     }
 
-    if (input.status === QuoteStatus.Expired) {
-      input.events.push(Event.parse({ type: 'quote-expired', at: input.quoteExpirationDate }))
+    let quote = Quote.parse(input)
+
+    if (quote.status === QuoteStatus.Expired) {
+      quote.events.push(Event.parse({ type: 'quote-expired', at: quote.quoteExpirationDate }))
+      this.emit('quote:expired', quote, quote.quoteExpirationDate)
     }
 
-    return Quote.parse(input)
+    return quote
   }
 
   public static fromQuote(quote: Quote, { withAttachments = true } = {}): QuoteBuilder {
@@ -93,6 +122,9 @@ export class QuoteBuilder {
       builder._attachments = quote.attachments.slice()
     }
     builder.events = [Event.parse({ type: 'quote-drafted', from: 'quote' })]
+
+    builder.emit('quote:drafted', builder)
+
     return builder
   }
 
@@ -247,6 +279,7 @@ export class QuoteBuilder {
       [QuoteStatus.Draft]: () => {
         this.events.push(Event.parse({ type: 'quote-sent', at: parsedAt }))
         this._status = QuoteStatus.Sent
+        this.emit('quote:sent', this, parsedAt)
       },
       [QuoteStatus.Sent]: () => {
         throw new Error('Cannot send a quote that is already sent')
@@ -278,6 +311,7 @@ export class QuoteBuilder {
       [QuoteStatus.Sent]: () => {
         this.events.push(Event.parse({ type: 'quote-accepted', at: parsedAt }))
         this._status = QuoteStatus.Accepted
+        this.emit('quote:accepted', this, parsedAt)
       },
       [QuoteStatus.Accepted]: () => {
         throw new Error('Cannot accept a quote that is already accepted')
@@ -306,6 +340,7 @@ export class QuoteBuilder {
       [QuoteStatus.Sent]: () => {
         this.events.push(Event.parse({ type: 'quote-rejected', at: parsedAt }))
         this._status = QuoteStatus.Rejected
+        this.emit('quote:rejected', this, parsedAt)
       },
       [QuoteStatus.Accepted]: () => {
         throw new Error('Cannot reject a quote that is already accepted')
@@ -348,6 +383,7 @@ export class QuoteBuilder {
       [QuoteStatus.Expired]: () => {
         this.events.push(Event.parse({ type: 'quote-closed', at: parsedAt }))
         this._status = QuoteStatus.Closed
+        this.emit('quote:clsoed', this, parsedAt)
       },
       [QuoteStatus.Closed]: () => {
         throw new Error('Cannot close a quote that is closed')
