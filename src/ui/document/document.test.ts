@@ -7,6 +7,8 @@ import { collapse, expand, paginate, parseMarkdown, stringify } from './document
 global.DOMParser = window.DOMParser
 {
   let x = 0
+  // @ts-expect-error TypeScripts expects this to be a function that returns a string that _looks_
+  // like a UUID. We don't care about that here.
   global.window.crypto.randomUUID = () => (x++).toString()
 }
 global.structuredClone = (x: any) => JSON.parse(JSON.stringify(x))

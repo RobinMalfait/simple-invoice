@@ -76,7 +76,6 @@ function paginationReducer(state: PaginationState, action: Action): PaginationSt
         // Try the larger number first
         return {
           ...state,
-          // @ts-expect-error TypeScript doesn't know about `with` yet...
           pages: state.pages.with(state.workingPage, max),
           between: [max, max],
         }
@@ -86,14 +85,12 @@ function paginationReducer(state: PaginationState, action: Action): PaginationSt
         // Prepare the next page
         return {
           ...state,
-          // @ts-expect-error TypeScript doesn't know about `with` yet...
           pages: state.pages.with(state.workingPage + 1, remaining),
           workingPage: state.workingPage + 1,
           between: [0, remaining],
         }
       }
 
-      // @ts-expect-error TypeScript doesn't know about `with` yet...
       let newPages = state.pages.with(state.workingPage, Math.ceil((min + max) / 2))
       // Move the remaining to the next page
       newPages[state.workingPage + 1] ??= Math.max(
@@ -117,13 +114,11 @@ function paginationReducer(state: PaginationState, action: Action): PaginationSt
       if (min === max) {
         return {
           ...state,
-          // @ts-expect-error TypeScript doesn't know about `with` yet...
           pages: state.pages.with(state.workingPage, min - 1),
           between: [min - 1, min - 1],
         }
       }
 
-      // @ts-expect-error TypeScript doesn't know about `with` yet...
       let newPages = state.pages.with(state.workingPage, Math.floor((min + max) / 2))
 
       // Move the remaining to the next page
