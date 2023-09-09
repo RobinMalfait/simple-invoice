@@ -133,7 +133,7 @@ export default async function Page({ params: { id } }: { params: { id: string } 
       value={{
         // Prefer my language/currency when looking at the overview of records.
         language: me.language,
-        currency: me.currency,
+        currency: client.currency,
       }}
     >
       <div className="relative px-4 py-8 text-gray-700 dark:text-zinc-400 sm:px-6 lg:px-8">
