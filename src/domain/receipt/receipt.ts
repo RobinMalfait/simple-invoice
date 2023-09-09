@@ -1,14 +1,17 @@
 import { parseISO } from 'date-fns'
 import { z } from 'zod'
 
+import EventEmitter from 'node:events'
 import { Account } from '~/domain/account/account'
 import { Client } from '~/domain/client/client'
 import { Discount } from '~/domain/discount/discount'
 import { Document } from '~/domain/document/document'
+import { bus as defaultBus } from '~/domain/event-bus/bus'
 import { Event } from '~/domain/events/event'
 import { Invoice } from '~/domain/invoice/invoice'
 import { InvoiceItem } from '~/domain/invoice/invoice-item'
 import { InvoiceStatus } from '~/domain/invoice/invoice-status'
+import { total } from '~/ui/invoice/total'
 import { ScopedIDGenerator } from '~/utils/id'
 
 let scopedId = new ScopedIDGenerator('receipt')
@@ -42,6 +45,30 @@ export class ReceiptBuilder {
   private _attachments: Document[] = []
   private events: Receipt['events'] = []
 
+  public constructor(private bus: EventEmitter = defaultBus) {}
+
+  private emit(eventName: string, data: ReceiptBuilder | Receipt, at: Date | null = null) {
+    this.bus.emit(eventName, {
+      client: data instanceof ReceiptBuilder ? data._client : data.client,
+      account: data instanceof ReceiptBuilder ? data._account : data.account,
+      invoice: {
+        number: data instanceof ReceiptBuilder ? data._invoice?.number : data.invoice.number,
+        total: total({
+          items: data instanceof ReceiptBuilder ? data._items : data.items,
+          discounts: data instanceof ReceiptBuilder ? data._discounts : data.discounts,
+        }),
+      },
+      receipt: {
+        number: data instanceof ReceiptBuilder ? data._number : data.number,
+        total: total({
+          items: data instanceof ReceiptBuilder ? data._items : data.items,
+          discounts: data instanceof ReceiptBuilder ? data._discounts : data.discounts,
+        }),
+      },
+      at,
+    })
+  }
+
   public build(): Receipt {
     return Receipt.parse({
       number: this._number ?? `${this._invoice?.number}-01` ?? null,
@@ -74,6 +101,9 @@ export class ReceiptBuilder {
       builder._attachments = invoice.attachments.slice()
     }
     builder.events.push(Event.parse({ type: 'receipt-created' }))
+
+    builder.emit('receipt:created', builder)
+
     return builder
   }
 
