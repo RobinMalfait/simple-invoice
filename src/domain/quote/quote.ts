@@ -73,6 +73,7 @@ export class QuoteBuilder {
           items: data instanceof QuoteBuilder ? data._items : data.items,
           discounts: data instanceof QuoteBuilder ? data._discounts : data.discounts,
         }),
+        events: data instanceof QuoteBuilder ? data.events : data.events,
       },
       status: data instanceof QuoteBuilder ? data._status : data.status,
       at,

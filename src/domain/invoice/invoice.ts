@@ -72,6 +72,7 @@ export class InvoiceBuilder {
           items: data instanceof InvoiceBuilder ? data._items : data.items,
           discounts: data instanceof InvoiceBuilder ? data._discounts : data.discounts,
         }),
+        events: data instanceof InvoiceBuilder ? data.events : data.events,
       },
       status: data instanceof InvoiceBuilder ? data._status : data.status,
       at,

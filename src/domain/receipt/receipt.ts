@@ -58,6 +58,7 @@ export class ReceiptBuilder {
           discounts:
             data instanceof ReceiptBuilder ? data._invoice!.discounts : data.invoice.discounts,
         }),
+        events: data instanceof ReceiptBuilder ? data._invoice!.events : data.invoice.events,
       },
       receipt: {
         number: data instanceof ReceiptBuilder ? data._number : data.number,
@@ -65,6 +66,7 @@ export class ReceiptBuilder {
           items: data instanceof ReceiptBuilder ? data._items : data.items,
           discounts: data instanceof ReceiptBuilder ? data._discounts : data.discounts,
         }),
+        events: data instanceof ReceiptBuilder ? data.events : data.events,
       },
       at,
     })

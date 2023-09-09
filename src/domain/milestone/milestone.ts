@@ -23,6 +23,7 @@ type InvoiceEvent = {
   client: Client
   account: Account
   invoice: {
+    events: Event[]
     number: string
     total: number
   }
@@ -34,6 +35,7 @@ type QuoteEvent = {
   client: Client
   account: Account
   quote: {
+    events: Event[]
     number: string
     total: number
   }
@@ -95,18 +97,20 @@ export function fastestAcceptedQuoteMilestones(bus: EventEmitter) {
 
     state.max = duration
 
-    e.account.events.push(
-      Event.parse({
-        type: MILESTONE,
-        quote: e.quote.number,
-        client: {
-          id: e.client.id,
-          name: e.client.name,
-        },
-        durationInSeconds: duration,
-        at: e.at,
-      }),
-    )
+    let event = Event.parse({
+      type: MILESTONE,
+      quote: e.quote.number,
+      client: {
+        id: e.client.id,
+        name: e.client.name,
+      },
+      durationInSeconds: duration,
+      at: e.at,
+    })
+
+    e.account.events.push(event)
+    e.client.events.push(event)
+    e.quote.events.push(event)
   })
 }
 
@@ -191,18 +195,20 @@ export function fastestPaidInvoiceMilestones(bus: EventEmitter) {
 
     state.max = duration
 
-    e.account.events.push(
-      Event.parse({
-        type: MILESTONE,
-        invoice: e.invoice.number,
-        client: {
-          id: e.client.id,
-          name: e.client.name,
-        },
-        durationInSeconds: duration,
-        at: e.at,
-      }),
-    )
+    let event = Event.parse({
+      type: MILESTONE,
+      invoice: e.invoice.number,
+      client: {
+        id: e.client.id,
+        name: e.client.name,
+      },
+      durationInSeconds: duration,
+      at: e.at,
+    })
+
+    e.account.events.push(event)
+    e.client.events.push(event)
+    e.invoice.events.push(event)
   })
 }
 
