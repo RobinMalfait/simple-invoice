@@ -357,7 +357,7 @@ function useActivityText(item: Event) {
         </>,
         <>
           <span className="text-xs opacity-50">
-            This invoice was{' '}
+            This invoice {item.future ? 'is' : 'was'}{' '}
             <span className="font-medium text-gray-900 dark:text-gray-100">
               <Money amount={item.amount} />
             </span>
