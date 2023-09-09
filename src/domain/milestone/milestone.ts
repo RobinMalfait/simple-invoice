@@ -81,10 +81,6 @@ export function fastestAcceptedQuoteMilestones(bus: EventEmitter) {
   bus.on('quote:accepted', (e: QuoteEvent) => {
     let state = stateByAccount.get(e.account.id)!
 
-    if (!state.sentAt.has(e.quote.number)) {
-      return
-    }
-
     let duration = differenceInSeconds(e.at, state.sentAt.get(e.quote.number)!)
 
     if (state.max === null) {
