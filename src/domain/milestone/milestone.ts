@@ -64,7 +64,7 @@ function initState<T>(cb: () => T) {
   }))
 }
 
-function fastestAcceptedQuoteMilestones(bus: EventEmitter) {
+export function fastestAcceptedQuoteMilestones(bus: EventEmitter) {
   const MILESTONE = 'account-milestone:fastest-accepted-quote'
 
   let stateByAccount = new DefaultMap(() => ({
@@ -114,7 +114,7 @@ function fastestAcceptedQuoteMilestones(bus: EventEmitter) {
   })
 }
 
-function invoiceCountMilestones(bus: EventEmitter) {
+export function invoiceCountMilestones(bus: EventEmitter) {
   const MILESTONE = 'account-milestone:invoices'
 
   let stateByAccount = initState(() => ({
@@ -160,7 +160,7 @@ function invoiceCountMilestones(bus: EventEmitter) {
   }
 }
 
-function fastestPaidInvoiceMilestones(bus: EventEmitter) {
+export function fastestPaidInvoiceMilestones(bus: EventEmitter) {
   const MILESTONE = 'account-milestone:fastest-paid-invoice'
 
   let stateByAccount = new DefaultMap(() => ({
@@ -210,7 +210,7 @@ function fastestPaidInvoiceMilestones(bus: EventEmitter) {
   })
 }
 
-function clientCountMilestones(bus: EventEmitter) {
+export function clientCountMilestones(bus: EventEmitter) {
   const MILESTONE = 'account-milestone:clients'
 
   let stateByAccount = initState(() => ({
@@ -273,7 +273,7 @@ function clientCountMilestones(bus: EventEmitter) {
   }
 }
 
-function revenueMilestones(bus: EventEmitter) {
+export function revenueMilestones(bus: EventEmitter) {
   const MILESTONE = 'account-milestone:revenue'
 
   let stateByAccount = initState(() => ({
@@ -326,7 +326,7 @@ function revenueMilestones(bus: EventEmitter) {
   }
 }
 
-function mostExpensiveInvoiceMilestones(bus: EventEmitter) {
+export function mostExpensiveInvoiceMilestones(bus: EventEmitter) {
   const MILESTONE = 'account-milestone:most-expensive-invoice'
 
   let stateByAccount = initState(() => ({
