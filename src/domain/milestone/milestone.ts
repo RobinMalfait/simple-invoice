@@ -337,7 +337,7 @@ export function mostExpensiveInvoiceMilestones(bus: EventEmitter) {
       return
     }
 
-    if (e.invoice.total < Math.max(pending.max, paid.max ?? 0)) {
+    if (e.invoice.total <= Math.max(pending.max, paid.max ?? 0)) {
       return
     }
 
@@ -363,7 +363,7 @@ export function mostExpensiveInvoiceMilestones(bus: EventEmitter) {
       return
     }
 
-    if (e.invoice.total < paid.max) {
+    if (e.invoice.total <= paid.max) {
       return
     }
 
