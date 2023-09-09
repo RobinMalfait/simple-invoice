@@ -1,3 +1,4 @@
+import { differenceInSeconds } from 'date-fns'
 import * as lazy from 'lazy-collections'
 import EventEmitter from 'node:events'
 import { Account } from '~/domain/account/account'
@@ -8,6 +9,7 @@ import { DefaultMap } from '~/utils/default-map'
 
 export function trackMilestones(bus: EventEmitter) {
   invoiceCountMilestones(bus)
+  fastestPaidInvoiceMilestones(bus)
   revenueMilestones(bus)
   clientCountMilestones(bus)
   mostExpensiveInvoiceMilestones(bus)
@@ -93,6 +95,56 @@ function invoiceCountMilestones(bus: EventEmitter) {
       )
     })
   }
+}
+
+function fastestPaidInvoiceMilestones(bus: EventEmitter) {
+  const MILESTONE = 'account-milestone:fastest-paid-invoice'
+
+  let stateByAccount = new DefaultMap(() => ({
+    sentAt: new Map<string, Date>(),
+    max: null as number | null,
+  }))
+
+  bus.on('invoice:sent', (e: InvoiceEvent) => {
+    let state = stateByAccount.get(e.account.id)!
+
+    state.sentAt.set(e.invoice.number, e.at)
+  })
+
+  bus.on('invoice:paid', (e: InvoiceEvent) => {
+    let state = stateByAccount.get(e.account.id)!
+
+    if (!state.sentAt.has(e.invoice.number)) {
+      return
+    }
+
+    let duration = differenceInSeconds(e.at, state.sentAt.get(e.invoice.number)!)
+
+    if (state.max === null) {
+      state.max = duration
+      return
+    }
+
+    if (duration >= state.max) {
+      state.sentAt.delete(e.invoice.number)
+      return
+    }
+
+    state.max = duration
+
+    e.account.events.push(
+      Event.parse({
+        type: MILESTONE,
+        invoice: e.invoice.number,
+        client: {
+          id: e.client.id,
+          name: e.client.name,
+        },
+        durationInSeconds: duration,
+        at: e.at,
+      }),
+    )
+  })
 }
 
 function clientCountMilestones(bus: EventEmitter) {

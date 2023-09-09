@@ -16,7 +16,14 @@ import {
   UserGroupIcon,
   XCircleIcon,
 } from '@heroicons/react/24/outline'
-import { format, formatDistance, formatDistanceStrict, isFuture } from 'date-fns'
+import {
+  addSeconds,
+  format,
+  formatDistance,
+  formatDistanceStrict,
+  formatDistanceToNowStrict,
+  isFuture,
+} from 'date-fns'
 import Link from 'next/link'
 import { Fragment } from 'react'
 import { Event } from '~/domain/events/event'
@@ -182,6 +189,9 @@ function ActivityIndicator({ item }: { item: Event }) {
     case 'account-milestone:invoices':
       return <FlagIcon className="h-4 w-4 text-gray-600 dark:text-gray-300" aria-hidden="true" />
 
+    case 'account-milestone:fastest-paid-invoice':
+      return <ClockIcon className="h-4 w-4 text-gray-600 dark:text-gray-300" aria-hidden="true" />
+
     case 'quote-drafted':
     case 'invoice-drafted':
       return (
@@ -228,6 +238,8 @@ function ActivityIndicator({ item }: { item: Event }) {
 }
 
 function useActivityText(item: Event) {
+  let now = useCurrentDate()
+
   switch (item.type) {
     case 'account-rebranded':
       return [
@@ -372,6 +384,34 @@ function useActivityText(item: Event) {
           {item.future ? 'Will attract ' : 'Attracted '}
           <span className="font-medium text-gray-900 dark:text-gray-100">{item.amount}</span>
           {' paying clients!'}
+        </>,
+      ]
+
+    case 'account-milestone:fastest-paid-invoice':
+      return [
+        <>
+          {`Fastest paid invoice, took `}
+          <span className="font-medium text-gray-900 dark:text-gray-100">
+            {formatDistanceToNowStrict(addSeconds(now, item.durationInSeconds))}
+          </span>
+        </>,
+        <>
+          <span className="text-xs opacity-50">
+            <Link
+              className="font-medium text-gray-900 dark:text-gray-100"
+              href={`/clients/${item.client.id}`}
+            >
+              {item.client.name}
+            </Link>{' '}
+            paid invoice{' '}
+            <Link
+              href={`/invoice/${item.invoice}`}
+              className="font-medium text-gray-900 dark:text-gray-100"
+            >
+              #{item.invoice}
+            </Link>{' '}
+            in {formatDistanceToNowStrict(addSeconds(now, item.durationInSeconds))}.
+          </span>
         </>,
       ]
 
