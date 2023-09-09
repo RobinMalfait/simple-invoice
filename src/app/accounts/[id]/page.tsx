@@ -39,7 +39,7 @@ export default async function Page({ params: { id } }: { params: { id: string } 
         </div>
 
         <div className="mt-8 grid grid-cols-1 gap-8 xl:grid-cols-3">
-          <div className="col-span-2 grid grid-cols-1 items-start gap-[inherit]">
+          <div className="grid grid-cols-1 items-start gap-[inherit] xl:col-span-2">
             <Card>
               <CardTitle>Details</CardTitle>
 

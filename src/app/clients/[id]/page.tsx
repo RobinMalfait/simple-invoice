@@ -149,7 +149,7 @@ export default async function Page({ params: { id } }: { params: { id: string } 
         </div>
 
         <div className="mt-8 grid grid-cols-1 gap-8 xl:grid-cols-3">
-          <div className="col-span-2 grid grid-cols-1 gap-[inherit]">
+          <div className="grid grid-cols-1 gap-[inherit] xl:col-span-2">
             <Card>
               <CardTitle>
                 <div className="flex items-center justify-between">
