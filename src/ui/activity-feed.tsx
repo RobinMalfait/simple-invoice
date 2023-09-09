@@ -168,6 +168,9 @@ function ActivityIndicator({ item }: { item: Event }) {
         <SparklesIcon className="h-4 w-4 text-gray-600 dark:text-gray-300" aria-hidden="true" />
       )
 
+    case 'account-milestone:fastest-accepted-quote':
+      return <ClockIcon className="h-4 w-4 text-gray-600 dark:text-gray-300" aria-hidden="true" />
+
     case 'account-milestone:most-expensive-invoice':
       return (
         <ArrowTrendingUpIcon
@@ -320,6 +323,34 @@ function useActivityText(item: Event) {
         </>,
       ]
     }
+
+    case 'account-milestone:fastest-accepted-quote':
+      return [
+        <>
+          {`Fastest accepted quote, took `}
+          <span className="font-medium text-gray-900 dark:text-gray-100">
+            {formatDistanceToNowStrict(addSeconds(now, item.durationInSeconds))}
+          </span>
+        </>,
+        <>
+          <span className="text-xs opacity-50">
+            <Link
+              className="font-medium text-gray-900 dark:text-gray-100"
+              href={`/clients/${item.client.id}`}
+            >
+              {item.client.name}
+            </Link>{' '}
+            accepted quote{' '}
+            <Link
+              href={`/quote/${item.quote}`}
+              className="font-medium text-gray-900 dark:text-gray-100"
+            >
+              #{item.quote}
+            </Link>{' '}
+            in {formatDistanceToNowStrict(addSeconds(now, item.durationInSeconds))}.
+          </span>
+        </>,
+      ]
 
     case 'account-milestone:invoices':
       return [

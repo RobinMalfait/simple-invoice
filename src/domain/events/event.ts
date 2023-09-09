@@ -12,6 +12,12 @@ export let Event = z
 
     // Account — Milestones
     z.object({
+      type: z.literal('account-milestone:fastest-accepted-quote'),
+      quote: z.string(),
+      client: z.object({ id: z.string(), name: z.string() }),
+      durationInSeconds: z.number(),
+    }),
+    z.object({
       type: z.literal('account-milestone:invoices'),
       amount: z.number(),
       future: z.boolean().optional(),

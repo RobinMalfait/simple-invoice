@@ -6,8 +6,10 @@ import { Client } from '~/domain/client/client'
 import { Event } from '~/domain/events/event'
 import { InvoiceStatus } from '~/domain/invoice/invoice-status'
 import { DefaultMap } from '~/utils/default-map'
+import { QuoteStatus } from '../quote/quote-status'
 
 export function trackMilestones(bus: EventEmitter) {
+  fastestAcceptedQuoteMilestones(bus)
   invoiceCountMilestones(bus)
   fastestPaidInvoiceMilestones(bus)
   revenueMilestones(bus)
@@ -25,6 +27,17 @@ type InvoiceEvent = {
     total: number
   }
   status: InvoiceStatus
+  at: Date
+}
+
+type QuoteEvent = {
+  client: Client
+  account: Account
+  quote: {
+    number: string
+    total: number
+  }
+  status: QuoteStatus
   at: Date
 }
 
@@ -49,6 +62,56 @@ function initState<T>(cb: () => T) {
     pending: cb(),
     paid: cb(),
   }))
+}
+
+function fastestAcceptedQuoteMilestones(bus: EventEmitter) {
+  const MILESTONE = 'account-milestone:fastest-accepted-quote'
+
+  let stateByAccount = new DefaultMap(() => ({
+    sentAt: new Map<string, Date>(),
+    max: null as number | null,
+  }))
+
+  bus.on('quote:sent', (e: QuoteEvent) => {
+    let state = stateByAccount.get(e.account.id)!
+
+    state.sentAt.set(e.quote.number, e.at)
+  })
+
+  bus.on('quote:accepted', (e: QuoteEvent) => {
+    let state = stateByAccount.get(e.account.id)!
+
+    if (!state.sentAt.has(e.quote.number)) {
+      return
+    }
+
+    let duration = differenceInSeconds(e.at, state.sentAt.get(e.quote.number)!)
+
+    if (state.max === null) {
+      state.max = duration
+      return
+    }
+
+    if (duration >= state.max) {
+      state.sentAt.delete(e.quote.number)
+      return
+    }
+
+    state.max = duration
+
+    e.account.events.push(
+      Event.parse({
+        type: MILESTONE,
+        quote: e.quote.number,
+        client: {
+          id: e.client.id,
+          name: e.client.name,
+        },
+        durationInSeconds: duration,
+        at: e.at,
+      }),
+    )
+  })
 }
 
 function invoiceCountMilestones(bus: EventEmitter) {
