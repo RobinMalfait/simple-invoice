@@ -27,13 +27,13 @@ import {
 import Link from 'next/link'
 import { ContextType, createContext, useState } from 'react'
 import { Event } from '~/domain/events/event'
+import { Address, formatAddress } from '~/ui/address/address'
+import { useCardStructure } from '~/ui/card'
 import { classNames } from '~/ui/class-names'
 import { useCurrentDate } from '~/ui/hooks/use-current-date'
 import { Money } from '~/ui/money'
 import { assertNever } from '~/utils/assert-never'
 import { match } from '~/utils/match'
-import { Address, formatAddress } from './address/address'
-import { useCardStructure } from './card'
 
 function isFutureEvent(event: Event) {
   return 'future' in event && event.future
@@ -47,7 +47,7 @@ type MappedEvent = {
   isLast: boolean
 }
 
-let ViewContext = createContext<'account' | 'client' | 'record'>('account')
+export let ViewContext = createContext<'account' | 'client' | 'record'>('account')
 
 export function ActivityFeed({
   events,

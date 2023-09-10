@@ -2,7 +2,7 @@
 
 import { Fragment } from 'react'
 import type { Record } from '~/domain/record/record'
-import { ActivityItem } from '~/ui/activity-feed'
+import { ActivityItem, ViewContext } from '~/ui/activity-feed'
 import { classNames } from '~/ui/class-names'
 import { useRecord } from '~/ui/hooks/use-record'
 import { useRecordStacks } from '~/ui/hooks/use-record-stacks'
@@ -16,7 +16,7 @@ export function ActivityFeed(props: React.PropsWithChildren<{ records: Record[] 
   let activeRecordIdx = stacks[record.id]?.indexOf(record.id) ?? -1
 
   return (
-    <>
+    <ViewContext.Provider value="record">
       <ul role="list" className="space-y-6">
         {records.map((record, idx) => {
           return (
@@ -70,6 +70,6 @@ export function ActivityFeed(props: React.PropsWithChildren<{ records: Record[] 
           )
         })}
       </ul>
-    </>
+    </ViewContext.Provider>
   )
 }
