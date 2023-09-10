@@ -20,7 +20,7 @@ export let Event = z
     z.object({
       type: z.literal('account-milestone:invoices'),
       amount: z.number(),
-      future: z.boolean().optional(),
+      future: z.boolean().optional().default(false),
     }),
     z.object({
       type: z.literal('account-milestone:fastest-paid-invoice'),
@@ -32,19 +32,19 @@ export let Event = z
       type: z.literal('account-milestone:revenue'),
       amount: z.number(),
       milestone: z.number(),
-      future: z.boolean().optional(),
+      future: z.boolean().optional().default(false),
     }),
     z.object({
       type: z.literal('account-milestone:most-expensive-invoice'),
       invoice: z.string(),
       amount: z.number(),
       increase: z.number(),
-      future: z.boolean().optional(),
+      future: z.boolean().optional().default(false),
     }),
     z.object({
       type: z.literal('account-milestone:clients'),
       amount: z.number(),
-      future: z.boolean().optional(),
+      future: z.boolean().optional().default(false),
     }),
 
     // Clients
