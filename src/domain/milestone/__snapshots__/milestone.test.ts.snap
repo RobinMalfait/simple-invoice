@@ -96,6 +96,7 @@ exports[`fastestAcceptedQuoteMilestones should emit a milestone event for the fa
 [
   {
     "at": 2020-01-01T13:00:00.000Z,
+    "best": false,
     "client": {
       "id": Any<String>,
       "name": "Foo",
@@ -111,6 +112,7 @@ exports[`fastestAcceptedQuoteMilestones should emit a milestone event for the fa
   },
   {
     "at": 2020-01-01T12:00:00.000Z,
+    "best": false,
     "client": {
       "id": Any<String>,
       "name": "Foo",
@@ -126,6 +128,7 @@ exports[`fastestAcceptedQuoteMilestones should emit a milestone event for the fa
   },
   {
     "at": 2020-01-01T10:00:00.000Z,
+    "best": true,
     "client": {
       "id": Any<String>,
       "name": "Foo",
@@ -148,6 +151,7 @@ exports[`fastestPaidInvoiceMilestones should emit a milestone event for the fast
 [
   {
     "at": 2020-01-01T13:00:00.000Z,
+    "best": false,
     "client": {
       "id": Any<String>,
       "name": "Foo",
@@ -163,6 +167,7 @@ exports[`fastestPaidInvoiceMilestones should emit a milestone event for the fast
   },
   {
     "at": 2020-01-01T12:00:00.000Z,
+    "best": false,
     "client": {
       "id": Any<String>,
       "name": "Foo",
@@ -178,6 +183,7 @@ exports[`fastestPaidInvoiceMilestones should emit a milestone event for the fast
   },
   {
     "at": 2020-01-01T10:00:00.000Z,
+    "best": true,
     "client": {
       "id": Any<String>,
       "name": "Foo",
@@ -200,6 +206,7 @@ exports[`fastestPaidInvoiceMilestones should skip paid invoices that have not be
 [
   {
     "at": 2020-01-01T13:00:00.000Z,
+    "best": true,
     "client": {
       "id": Any<String>,
       "name": "Foo",
