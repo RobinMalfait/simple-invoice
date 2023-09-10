@@ -52,7 +52,7 @@ export function ActivityFeed(props: React.PropsWithChildren<{ records: Record[] 
                   let isLast = activityItemIdx === record.events.length - 1
                   let isLastNonMilestone = all
                     .slice(activityItemIdx + 1)
-                    .every((e) => e.type.includes('milestone'))
+                    .every((e) => e.tags.includes('milestone'))
 
                   return (
                     <ActivityItem
