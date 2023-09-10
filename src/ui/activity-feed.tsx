@@ -25,7 +25,7 @@ import {
   isFuture,
 } from 'date-fns'
 import Link from 'next/link'
-import { Fragment } from 'react'
+import { useState } from 'react'
 import { Event } from '~/domain/events/event'
 import { classNames } from '~/ui/class-names'
 import { useCurrentDate } from '~/ui/hooks/use-current-date'
@@ -39,41 +39,121 @@ function isFutureEvent(event: Event) {
   return 'future' in event && event.future
 }
 
+type MappedEvent = {
+  item: Event
+  previous: Event | null
+  idx: number
+  isFirst: boolean
+  isLast: boolean
+}
+
 export function ActivityFeed({ events }: { events: Event[] }) {
+  let grouped = events
+    .slice()
+    .reverse()
+    .sort((a, z) => {
+      if (isFutureEvent(a) && isFutureEvent(z)) {
+        return 0
+      }
+
+      if (isFutureEvent(a)) {
+        return -1
+      }
+
+      if (isFutureEvent(z)) {
+        return 1
+      }
+
+      return 0
+    })
+    .map((activityItem, activityItemIdx, all) => {
+      return {
+        item: activityItem,
+        previous: all[activityItemIdx - 1] ?? null,
+        idx: activityItemIdx,
+        isFirst: activityItemIdx === 0,
+        isLast: activityItemIdx === all.length - 1,
+      } satisfies MappedEvent
+    })
+    .reduce(
+      (acc, item) => {
+        if (acc.at(-1)!.length === 0 || acc.at(-1)!.at(0)!.item.type === item.item.type) {
+          acc.at(-1)!.push(item)
+          return acc
+        }
+
+        acc.push([item])
+        return acc
+      },
+      [[] as MappedEvent[]],
+    )
+
   return (
     <ul role="list" className="relative flex flex-col gap-6 overflow-auto">
-      {events
-        .slice()
-        .reverse()
-        .sort((a, z) => {
-          if (isFutureEvent(a) && isFutureEvent(z)) {
-            return 0
-          }
-
-          if (isFutureEvent(a)) {
-            return -1
-          }
-
-          if (isFutureEvent(z)) {
-            return 1
-          }
-
-          return 0
-        })
-        .map((activityItem, activityItemIdx, all) => {
-          return (
-            <Fragment key={activityItem.id}>
-              <ActivityItem
-                previous={all[activityItemIdx - 1]}
-                item={activityItem}
-                isFirst={activityItemIdx === 0}
-                isLast={activityItemIdx === all.length - 1}
-                withIndicator={true}
-              />
-            </Fragment>
-          )
-        })}
+      {grouped.map((group, idx, all) => {
+        return <GroupedActivities key={idx} group={group} isLast={idx === all.length - 1} />
+      })}
     </ul>
+  )
+}
+
+function GroupedActivities({ group, isLast }: { group: MappedEvent[]; isLast: boolean }) {
+  let limit = 2
+  let shouldCollapse = group.length > limit
+  let [collapsed, setCollapsed] = useState(true)
+
+  return (
+    <>
+      {group.slice(0, shouldCollapse && collapsed ? 1 : group.length).map((item) => {
+        return (
+          <ActivityItem
+            key={item.idx}
+            previous={item.previous}
+            item={item.item}
+            isFirst={item.isFirst}
+            isLast={item.isLast}
+            withIndicator={true}
+          />
+        )
+      })}
+
+      {shouldCollapse && (
+        <li className={classNames('relative -mt-4 flex gap-x-4')}>
+          <div className="flex">
+            <div
+              className={classNames(
+                isLast ? 'h-6' : '-bottom-6',
+                'absolute left-0 top-0 flex w-6 justify-center',
+              )}
+            >
+              <div className="w-px bg-gray-200 dark:bg-zinc-600" />
+            </div>
+
+            <div className="relative h-6 w-6">
+              <div className="absolute left-3 top-[5px] h-2 w-4 -translate-x-[0.5px] rounded-bl-lg border-b border-l border-gray-200 dark:border-zinc-600"></div>
+            </div>
+          </div>
+
+          <div className="flex flex-1 flex-col">
+            <div className="flex items-start gap-2">
+              <button
+                type="button"
+                className="w-auto py-0.5 text-left text-xs leading-5 text-gray-500 dark:text-gray-300"
+                onClick={() => setCollapsed((x) => !x)}
+              >
+                {collapsed ? (
+                  <>
+                    Show <span className="font-medium">{group.length - 1}</span> more
+                  </>
+                ) : (
+                  'Show less'
+                )}
+              </button>
+            </div>
+          </div>
+        </li>
+      )}
+    </>
   )
 }
 
@@ -85,7 +165,7 @@ export function ActivityItem({
   withIndicator = isLast,
 }: {
   item: Event
-  previous?: Event
+  previous?: Event | null
   isFirst: boolean
   isLast: boolean
   withIndicator?: boolean
