@@ -195,7 +195,7 @@ export default async function Page({ params: { id } }: { params: { id: string } 
                 <CardTitle>Activity feed ({account.events.length})</CardTitle>
                 <CardBody variant="filled-vertical">
                   <div className="max-h-96 overflow-auto">
-                    <ActivityFeed events={account.events} />
+                    <ActivityFeed events={account.events} viewContext="account" />
                   </div>
                 </CardBody>
               </Card>

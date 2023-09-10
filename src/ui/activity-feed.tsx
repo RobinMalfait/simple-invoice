@@ -25,7 +25,7 @@ import {
   isFuture,
 } from 'date-fns'
 import Link from 'next/link'
-import { useState } from 'react'
+import { ContextType, createContext, useState } from 'react'
 import { Event } from '~/domain/events/event'
 import { classNames } from '~/ui/class-names'
 import { useCurrentDate } from '~/ui/hooks/use-current-date'
@@ -47,7 +47,15 @@ type MappedEvent = {
   isLast: boolean
 }
 
-export function ActivityFeed({ events }: { events: Event[] }) {
+let ViewContext = createContext<'account' | 'client' | 'record'>('account')
+
+export function ActivityFeed({
+  events,
+  viewContext,
+}: {
+  events: Event[]
+  viewContext: ContextType<typeof ViewContext>
+}) {
   let grouped = events
     .slice()
     .reverse()
@@ -89,11 +97,13 @@ export function ActivityFeed({ events }: { events: Event[] }) {
     )
 
   return (
-    <ul role="list" className="relative flex flex-col gap-6 overflow-auto">
-      {grouped.map((group, idx, all) => {
-        return <GroupedActivities key={idx} group={group} isLast={idx === all.length - 1} />
-      })}
-    </ul>
+    <ViewContext.Provider value={viewContext}>
+      <ul role="list" className="relative flex flex-col gap-6 overflow-auto">
+        {grouped.map((group, idx, all) => {
+          return <GroupedActivities key={idx} group={group} isLast={idx === all.length - 1} />
+        })}
+      </ul>
+    </ViewContext.Provider>
   )
 }
 
