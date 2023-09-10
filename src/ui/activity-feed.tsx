@@ -429,7 +429,9 @@ function useActivityText(item: Event) {
     case 'milestone:fastest-accepted-quote':
       return [
         <>
-          {`Fastest accepted quote, took `}
+          {item.best || viewContext !== 'record'
+            ? `Fastest accepted quote, took `
+            : `Previously fasted accepted quote, took `}
           <span className="font-medium text-gray-900 dark:text-gray-100">
             {formatDistanceToNowStrict(addSeconds(now, item.durationInSeconds))}
           </span>
@@ -498,9 +500,11 @@ function useActivityText(item: Event) {
           )}
           {item.future
             ? ` will be ${viewContext === 'account' ? 'your' : 'the'} most expensive invoice (`
-            : ` ${item.best ? 'is ' : 'was '} ${
+            : ` ${item.best || viewContext !== 'record' ? 'is ' : 'was '} ${
                 viewContext === 'account' ? 'your' : 'the'
-              } most expensive invoice ${item.best ? '' : 'at this time '}(`}
+              } most expensive invoice ${
+                item.best || viewContext !== 'record' ? '' : 'at this time '
+              }(`}
           <span className="font-medium text-emerald-500 dark:text-emerald-400/60">
             +{item.increase}%
           </span>
@@ -531,7 +535,9 @@ function useActivityText(item: Event) {
     case 'milestone:fastest-paid-invoice':
       return [
         <>
-          {`Fastest paid invoice, took `}
+          {item.best || viewContext !== 'record'
+            ? `Fastest paid invoice, took `
+            : `Previously fasted paid invoice, took `}
           <span className="font-medium text-gray-900 dark:text-gray-100">
             {formatDistanceToNowStrict(addSeconds(now, item.durationInSeconds))}
           </span>

@@ -26,6 +26,7 @@ export let Event = z
       tags: z.array(z.string()).default(['account', 'milestone']),
       quote: z.string(),
       client: z.object({ id: z.string(), name: z.string() }),
+      best: z.boolean().optional().default(false),
       durationInSeconds: z.number(),
     }),
     z.object({
@@ -39,6 +40,7 @@ export let Event = z
       tags: z.array(z.string()).default(['account', 'milestone']),
       invoice: z.string(),
       client: z.object({ id: z.string(), name: z.string() }),
+      best: z.boolean().optional().default(false),
       durationInSeconds: z.number(),
     }),
     z.object({

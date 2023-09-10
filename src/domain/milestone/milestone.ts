@@ -105,8 +105,16 @@ export function fastestAcceptedQuoteMilestones(bus: EventEmitter) {
         name: e.client.name,
       },
       durationInSeconds: duration,
+      best: true,
       at: e.at,
     })
+
+    for (let ev of lazy.pipe(
+      lazy.concat(e.account.events, e.client.events),
+      lazy.filter((e: Event) => e.type === MILESTONE),
+    )()) {
+      ev.best = false
+    }
 
     e.account.events.push(event)
     e.client.events.push(event)
@@ -205,7 +213,15 @@ export function fastestPaidInvoiceMilestones(bus: EventEmitter) {
       },
       durationInSeconds: duration,
       at: e.at,
+      best: true,
     })
+
+    for (let ev of lazy.pipe(
+      lazy.concat(e.account.events, e.client.events),
+      lazy.filter((e: Event) => e.type === MILESTONE),
+    )()) {
+      ev.best = false
+    }
 
     e.account.events.push(event)
     e.client.events.push(event)
@@ -357,6 +373,7 @@ export function mostExpensiveInvoiceMilestones(bus: EventEmitter) {
       future: true,
       best: true,
     })
+
     e.account.events.push(event)
     e.client.events.push(event)
     e.invoice.events.push(event)
