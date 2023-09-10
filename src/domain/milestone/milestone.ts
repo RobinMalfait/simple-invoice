@@ -53,10 +53,10 @@ function sum(...streams: Iterable<number>[]) {
   return total
 }
 
-function remove<T>(arr: T[], condition: (t: T) => boolean): T | null {
+function milestones<T>(arr: T[], condition: (t: T) => boolean): T[] {
   let idx = arr.findIndex(condition)
-  if (idx === -1) return null
-  return arr.splice(idx).at(0)!
+  if (idx === -1) return []
+  return arr.splice(idx).splice(0, 1)
 }
 
 function initState<T>(cb: () => T) {
@@ -127,10 +127,12 @@ export function invoiceCountMilestones(bus: EventEmitter) {
 
     pending.count.add(e.invoice.number)
 
-    let milestone = remove(pending.milestones, (m) => m <= paid.count.size + pending.count.size)
-    if (milestone === null) return
-
-    e.account.events.push(Event.parse({ type: MILESTONE, amount: milestone, future: true }))
+    for (let milestone of milestones(
+      pending.milestones,
+      (m) => m <= paid.count.size + pending.count.size,
+    )) {
+      e.account.events.push(Event.parse({ type: MILESTONE, amount: milestone, future: true }))
+    }
   })
 
   bus.on('invoice:paid', (e: InvoiceEvent) => {
@@ -139,10 +141,9 @@ export function invoiceCountMilestones(bus: EventEmitter) {
     pending.count.delete(e.invoice.number)
     paid.count.add(e.invoice.number)
 
-    let milestone = remove(paid.milestones, (m) => m <= paid.count.size)
-    if (milestone === null) return
-
-    e.account.events.push(Event.parse({ type: MILESTONE, amount: milestone, at: e.at }))
+    for (let milestone of milestones(paid.milestones, (m) => m <= paid.count.size)) {
+      e.account.events.push(Event.parse({ type: MILESTONE, amount: milestone, at: e.at }))
+    }
   })
 
   // Cleanup future milestones if they are not relevant anymore
@@ -231,10 +232,9 @@ export function clientCountMilestones(bus: EventEmitter) {
       lazy.toLength(),
     )()
 
-    let milestone = remove(pending.milestones, (m) => m <= total)
-    if (milestone === null) return
-
-    e.account.events.push(Event.parse({ type: MILESTONE, amount: milestone, future: true }))
+    for (let milestone of milestones(pending.milestones, (m) => m <= total)) {
+      e.account.events.push(Event.parse({ type: MILESTONE, amount: milestone, future: true }))
+    }
   })
 
   bus.on('invoice:paid', (e: InvoiceEvent) => {
@@ -249,10 +249,9 @@ export function clientCountMilestones(bus: EventEmitter) {
       lazy.toLength(),
     )()
 
-    let milestone = remove(paid.milestones, (m) => m <= total)
-    if (milestone === null) return
-
-    e.account.events.push(Event.parse({ type: MILESTONE, amount: milestone, at: e.at }))
+    for (let milestone of milestones(paid.milestones, (m) => m <= total)) {
+      e.account.events.push(Event.parse({ type: MILESTONE, amount: milestone, at: e.at }))
+    }
   })
 
   // Cleanup future milestones if they are not relevant anymore
@@ -293,10 +292,11 @@ export function revenueMilestones(bus: EventEmitter) {
 
     let total = sum(pending.totalByInvoice.values(), paid.totalByInvoice.values())
 
-    let milestone = remove(pending.milestones, (m) => m <= total)
-    if (milestone === null) return
-
-    e.account.events.push(Event.parse({ type: MILESTONE, amount: total, milestone, future: true }))
+    for (let milestone of milestones(pending.milestones, (m) => m <= total)) {
+      e.account.events.push(
+        Event.parse({ type: MILESTONE, amount: total, milestone, future: true }),
+      )
+    }
   })
 
   bus.on('invoice:paid', (e: InvoiceEvent) => {
@@ -307,10 +307,9 @@ export function revenueMilestones(bus: EventEmitter) {
 
     let total = sum(paid.totalByInvoice.values())
 
-    let milestone = remove(paid.milestones, (m) => m <= total)
-    if (milestone === null) return
-
-    e.account.events.push(Event.parse({ type: MILESTONE, amount: total, milestone, at: e.at }))
+    for (let milestone of milestones(paid.milestones, (m) => m <= total)) {
+      e.account.events.push(Event.parse({ type: MILESTONE, amount: total, milestone, at: e.at }))
+    }
   })
 
   // Cleanup future milestones if they are not relevant anymore
