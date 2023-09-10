@@ -56,7 +56,7 @@ function sum(...streams: Iterable<number>[]) {
 function remove<T>(arr: T[], condition: (t: T) => boolean): T | null {
   let idx = arr.findIndex(condition)
   if (idx === -1) return null
-  return arr.splice(idx).pop()!
+  return arr.splice(idx).at(0)!
 }
 
 function initState<T>(cb: () => T) {
