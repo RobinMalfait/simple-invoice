@@ -20,36 +20,36 @@ export let Event = z
       to: Address,
     }),
 
-    // Account — Milestones
+    // Milestones
     z.object({
-      type: z.literal('account-milestone:fastest-accepted-quote'),
+      type: z.literal('milestone:fastest-accepted-quote'),
       tags: z.array(z.string()).default(['account', 'milestone']),
       quote: z.string(),
       client: z.object({ id: z.string(), name: z.string() }),
       durationInSeconds: z.number(),
     }),
     z.object({
-      type: z.literal('account-milestone:invoices'),
+      type: z.literal('milestone:invoices'),
       tags: z.array(z.string()).default(['account', 'milestone']),
       amount: z.number(),
       future: z.boolean().optional().default(false),
     }),
     z.object({
-      type: z.literal('account-milestone:fastest-paid-invoice'),
+      type: z.literal('milestone:fastest-paid-invoice'),
       tags: z.array(z.string()).default(['account', 'milestone']),
       invoice: z.string(),
       client: z.object({ id: z.string(), name: z.string() }),
       durationInSeconds: z.number(),
     }),
     z.object({
-      type: z.literal('account-milestone:revenue'),
+      type: z.literal('milestone:revenue'),
       tags: z.array(z.string()).default(['account', 'milestone']),
       amount: z.number(),
       milestone: z.number(),
       future: z.boolean().optional().default(false),
     }),
     z.object({
-      type: z.literal('account-milestone:most-expensive-invoice'),
+      type: z.literal('milestone:most-expensive-invoice'),
       tags: z.array(z.string()).default(['account', 'milestone']),
       invoice: z.string(),
       amount: z.number(),
@@ -57,7 +57,7 @@ export let Event = z
       future: z.boolean().optional().default(false),
     }),
     z.object({
-      type: z.literal('account-milestone:clients'),
+      type: z.literal('milestone:clients'),
       tags: z.array(z.string()).default(['account', 'milestone']),
       amount: z.number(),
       future: z.boolean().optional().default(false),

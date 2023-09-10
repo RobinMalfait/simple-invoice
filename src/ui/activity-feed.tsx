@@ -168,10 +168,10 @@ function ActivityIndicator({ item }: { item: Event }) {
         <SparklesIcon className="h-4 w-4 text-gray-600 dark:text-gray-300" aria-hidden="true" />
       )
 
-    case 'account-milestone:fastest-accepted-quote':
+    case 'milestone:fastest-accepted-quote':
       return <ClockIcon className="h-4 w-4 text-gray-600 dark:text-gray-300" aria-hidden="true" />
 
-    case 'account-milestone:most-expensive-invoice':
+    case 'milestone:most-expensive-invoice':
       return (
         <ArrowTrendingUpIcon
           className="h-4 w-4 text-gray-600 dark:text-gray-300"
@@ -179,20 +179,20 @@ function ActivityIndicator({ item }: { item: Event }) {
         />
       )
 
-    case 'account-milestone:clients':
+    case 'milestone:clients':
       return (
         <UserGroupIcon className="h-4 w-4 text-gray-600 dark:text-gray-300" aria-hidden="true" />
       )
 
-    case 'account-milestone:revenue':
+    case 'milestone:revenue':
       return (
         <BanknotesIcon className="h-4 w-4 text-gray-600 dark:text-gray-300" aria-hidden="true" />
       )
 
-    case 'account-milestone:invoices':
+    case 'milestone:invoices':
       return <FlagIcon className="h-4 w-4 text-gray-600 dark:text-gray-300" aria-hidden="true" />
 
-    case 'account-milestone:fastest-paid-invoice':
+    case 'milestone:fastest-paid-invoice':
       return <ClockIcon className="h-4 w-4 text-gray-600 dark:text-gray-300" aria-hidden="true" />
 
     case 'quote-drafted':
@@ -324,7 +324,7 @@ function useActivityText(item: Event) {
       ]
     }
 
-    case 'account-milestone:fastest-accepted-quote':
+    case 'milestone:fastest-accepted-quote':
       return [
         <>
           {`Fastest accepted quote, took `}
@@ -352,7 +352,7 @@ function useActivityText(item: Event) {
         </>,
       ]
 
-    case 'account-milestone:invoices':
+    case 'milestone:invoices':
       return [
         item.amount === 1 ? (
           <>
@@ -369,7 +369,7 @@ function useActivityText(item: Event) {
         ),
       ]
 
-    case 'account-milestone:revenue':
+    case 'milestone:revenue':
       return [
         <>
           {item.future ? 'Will pass ' : 'Passed '}
@@ -381,7 +381,7 @@ function useActivityText(item: Event) {
         </>,
       ]
 
-    case 'account-milestone:most-expensive-invoice':
+    case 'milestone:most-expensive-invoice':
       return [
         <>
           <Link
@@ -409,7 +409,7 @@ function useActivityText(item: Event) {
         </>,
       ]
 
-    case 'account-milestone:clients':
+    case 'milestone:clients':
       return [
         <>
           {item.future ? 'Will attract ' : 'Attracted '}
@@ -418,7 +418,7 @@ function useActivityText(item: Event) {
         </>,
       ]
 
-    case 'account-milestone:fastest-paid-invoice':
+    case 'milestone:fastest-paid-invoice':
       return [
         <>
           {`Fastest paid invoice, took `}
