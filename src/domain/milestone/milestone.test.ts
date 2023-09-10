@@ -15,6 +15,8 @@ import { QuoteBuilder } from '~/domain/quote/quote'
 import { InvoiceBuilder } from '../invoice/invoice'
 import { InvoiceItemBuilder } from '../invoice/invoice-item'
 
+process.env.TZ = 'Europe/Brussels'
+
 configure({
   invoice: {
     numberStrategy: (() => {
