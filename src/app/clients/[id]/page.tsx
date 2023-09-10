@@ -246,7 +246,7 @@ export default async function Page({ params: { id } }: { params: { id: string } 
 
             <Card>
               <CardTitle>Records ({recordsForClient.length})</CardTitle>
-              <CardBody variant="embedded">
+              <CardBody variant="filled">
                 <RecordTabs records={recordsForClient} tabs={tabs} />
               </CardBody>
             </Card>
@@ -392,7 +392,7 @@ function RecordList({ records }: { records: Record[] }) {
   if (records.length <= 0) {
     return (
       <div>
-        <Empty variant="embedded" message="No records found." />
+        <Empty variant="filled" message="No records found." />
       </div>
     )
   }

@@ -22,14 +22,18 @@ export function CardTitle({ children }: React.PropsWithChildren<{}>) {
 export function CardBody({
   children,
   variant = 'default',
-}: React.PropsWithChildren<{ variant?: 'default' | 'embedded' | 'grid' }>) {
+}: React.PropsWithChildren<{
+  variant?: 'default' | 'filled' | 'filled-vertical' | 'filled-horizontal' | 'grid'
+}>) {
   return (
     <div
       className={classNames(
         'overflow-hidden',
         match(variant, {
           default: 'p-4',
-          embedded: '',
+          filled: '',
+          'filled-vertical': 'px-4',
+          'filled-horizontal': 'py-4',
           grid: 'grid grid-cols-2 gap-px rounded-lg bg-gray-100 dark:bg-zinc-800 [&>*]:bg-[--bg] [&>*]:p-4',
         }),
       )}
