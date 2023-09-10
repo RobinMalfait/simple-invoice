@@ -350,15 +350,15 @@ export function mostExpensiveInvoiceMilestones(bus: EventEmitter) {
     let previous = pending.max
     pending.max = e.invoice.total
 
-    e.account.events.push(
-      Event.parse({
-        type: MILESTONE,
-        invoice: e.invoice.number,
-        amount: e.invoice.total,
-        increase: Number(((e.invoice.total / previous - 1) * 100).toFixed(0)),
-        future: true,
-      }),
-    )
+    let event = Event.parse({
+      type: MILESTONE,
+      invoice: e.invoice.number,
+      amount: e.invoice.total,
+      increase: Number(((e.invoice.total / previous - 1) * 100).toFixed(0)),
+      future: true,
+    })
+    e.account.events.push(event)
+    e.client.events.push(event)
   })
 
   bus.on('invoice:paid', (e: InvoiceEvent) => {
@@ -376,15 +376,16 @@ export function mostExpensiveInvoiceMilestones(bus: EventEmitter) {
     let previous = paid.max
     paid.max = e.invoice.total
 
-    e.account.events.push(
-      Event.parse({
-        type: MILESTONE,
-        invoice: e.invoice.number,
-        amount: e.invoice.total,
-        increase: Number(((e.invoice.total / previous - 1) * 100).toFixed(0)),
-        at: e.at,
-      }),
-    )
+    let event = Event.parse({
+      type: MILESTONE,
+      invoice: e.invoice.number,
+      amount: e.invoice.total,
+      increase: Number(((e.invoice.total / previous - 1) * 100).toFixed(0)),
+      at: e.at,
+    })
+
+    e.account.events.push(event)
+    e.client.events.push(event)
   })
 
   // Cleanup future milestones if they are not relevant anymore
@@ -393,6 +394,9 @@ export function mostExpensiveInvoiceMilestones(bus: EventEmitter) {
       let { paid } = stateByAccount.get(e.account.id)!
 
       e.account.events = e.account.events.filter(
+        (e) => !(e.type === MILESTONE && e.future && e.amount <= paid.max!),
+      )
+      e.client.events = e.client.events.filter(
         (e) => !(e.type === MILESTONE && e.future && e.amount <= paid.max!),
       )
     })
