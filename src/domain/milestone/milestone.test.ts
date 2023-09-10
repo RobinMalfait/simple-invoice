@@ -1,4 +1,3 @@
-import { parseISO } from 'date-fns'
 import EventEmitter from 'events'
 import { Account, AccountBuilder } from '~/domain/account/account'
 import { AddressBuilder } from '~/domain/address/address'
@@ -74,7 +73,7 @@ describe('fastestAcceptedQuoteMilestones', () => {
   it('should not mark the first accepted quote as the fastest accepted quote yet', () => {
     setupQuote().send('2020-01-01 10:00').accept('2020-01-01 15:00').build()
 
-    expect(account.events).toEqual([])
+    expect(account.events).toMatchSnapshot()
   })
 
   it('should emit a milestone event for the fastest accepted quote', () => {
@@ -84,43 +83,10 @@ describe('fastestAcceptedQuoteMilestones', () => {
     setupQuote().send('2020-01-01 10:00').accept('2020-01-01 14:00').build() // 4 hours
     setupQuote().send('2020-01-01 10:00').accept('2020-01-01 11:00').build() // 1 hour
 
-    expect(account.events).toEqual([
-      {
-        id: expect.any(String),
-        at: parseISO('2020-01-01 14:00'),
-        client: {
-          id: expect.any(String),
-          name: 'Foo',
-        },
-        durationInSeconds: 14400,
-        quote: '0002',
-        tags: ['account', 'milestone'],
-        type: 'account-milestone:fastest-accepted-quote',
-      },
-      {
-        id: expect.any(String),
-        at: parseISO('2020-01-01 13:00'),
-        client: {
-          id: expect.any(String),
-          name: 'Foo',
-        },
-        durationInSeconds: 10800,
-        quote: '0003',
-        tags: ['account', 'milestone'],
-        type: 'account-milestone:fastest-accepted-quote',
-      },
-      {
-        id: expect.any(String),
-        at: parseISO('2020-01-01 11:00'),
-        client: {
-          id: expect.any(String),
-          name: 'Foo',
-        },
-        durationInSeconds: 3600,
-        quote: '0005',
-        tags: ['account', 'milestone'],
-        type: 'account-milestone:fastest-accepted-quote',
-      },
+    expect(account.events).toMatchSnapshot([
+      { id: expect.any(String), client: { id: expect.any(String) } },
+      { id: expect.any(String), client: { id: expect.any(String) } },
+      { id: expect.any(String), client: { id: expect.any(String) } },
     ])
   })
 })
@@ -150,7 +116,7 @@ describe('fastestPaidInvoiceMilestones', () => {
   it('should not mark the first paid invoice as the fastest paid invoice yet', () => {
     setupInvoice().send('2020-01-01 10:00').pay('2020-01-01 15:00').build()
 
-    expect(account.events).toEqual([])
+    expect(account.events).toMatchSnapshot()
   })
 
   it('should emit a milestone event for the fastest paid invoice', () => {
@@ -160,43 +126,10 @@ describe('fastestPaidInvoiceMilestones', () => {
     setupInvoice().send('2020-01-01 10:00').pay('2020-01-01 14:00').build() // 4 hours
     setupInvoice().send('2020-01-01 10:00').pay('2020-01-01 11:00').build() // 1 hour
 
-    expect(account.events).toEqual([
-      {
-        id: expect.any(String),
-        at: parseISO('2020-01-01 14:00'),
-        client: {
-          id: expect.any(String),
-          name: 'Foo',
-        },
-        durationInSeconds: 14400,
-        invoice: '0002',
-        tags: ['account', 'milestone'],
-        type: 'account-milestone:fastest-paid-invoice',
-      },
-      {
-        id: expect.any(String),
-        at: parseISO('2020-01-01 13:00'),
-        client: {
-          id: expect.any(String),
-          name: 'Foo',
-        },
-        durationInSeconds: 10800,
-        invoice: '0003',
-        tags: ['account', 'milestone'],
-        type: 'account-milestone:fastest-paid-invoice',
-      },
-      {
-        id: expect.any(String),
-        at: parseISO('2020-01-01 11:00'),
-        client: {
-          id: expect.any(String),
-          name: 'Foo',
-        },
-        durationInSeconds: 3600,
-        invoice: '0005',
-        tags: ['account', 'milestone'],
-        type: 'account-milestone:fastest-paid-invoice',
-      },
+    expect(account.events).toMatchSnapshot([
+      { id: expect.any(String), client: { id: expect.any(String) } },
+      { id: expect.any(String), client: { id: expect.any(String) } },
+      { id: expect.any(String), client: { id: expect.any(String) } },
     ])
   })
 
@@ -207,19 +140,8 @@ describe('fastestPaidInvoiceMilestones', () => {
     setupInvoice().send('2020-01-01 10:00').pay('2020-01-01 14:00').build() // 4 hours
     setupInvoice().pay('2020-01-01 11:00').build() // 1 hour
 
-    expect(account.events).toEqual([
-      {
-        id: expect.any(String),
-        at: parseISO('2020-01-01 14:00'),
-        client: {
-          id: expect.any(String),
-          name: 'Foo',
-        },
-        durationInSeconds: 14400,
-        invoice: '0002',
-        tags: ['account', 'milestone'],
-        type: 'account-milestone:fastest-paid-invoice',
-      },
+    expect(account.events).toMatchSnapshot([
+      { id: expect.any(String), client: { id: expect.any(String) } },
     ])
   })
 })
@@ -255,24 +177,7 @@ describe('invoiceCountMilestones', () => {
     setupInvoice().send('2020-01-01 10:00').pay('2020-01-01 15:00').build() // 5 -- Second milestone
     setupInvoice().send('2020-01-01 10:00').pay('2020-01-01 16:00').build() // 6
 
-    expect(account.events).toEqual([
-      {
-        id: expect.any(String),
-        amount: 1,
-        at: parseISO('2020-01-01 11:00'),
-        tags: ['account', 'milestone'],
-        future: false,
-        type: 'account-milestone:invoices',
-      },
-      {
-        id: expect.any(String),
-        amount: 5,
-        at: parseISO('2020-01-01 15:00'),
-        future: false,
-        tags: ['account', 'milestone'],
-        type: 'account-milestone:invoices',
-      },
-    ])
+    expect(account.events).toMatchSnapshot([{ id: expect.any(String) }, { id: expect.any(String) }])
   })
 
   it('should keep track of sent invoices as well', () => {
@@ -284,24 +189,7 @@ describe('invoiceCountMilestones', () => {
     setupInvoice().send('2020-01-01 10:00').build() // 5 -- Second milestone
     setupInvoice().send('2020-01-01 10:00').build() // 6
 
-    expect(account.events).toEqual([
-      {
-        id: expect.any(String),
-        amount: 1,
-        at: null,
-        future: true,
-        tags: ['account', 'milestone'],
-        type: 'account-milestone:invoices',
-      },
-      {
-        id: expect.any(String),
-        amount: 5,
-        at: null,
-        future: true,
-        tags: ['account', 'milestone'],
-        type: 'account-milestone:invoices',
-      },
-    ])
+    expect(account.events).toMatchSnapshot([{ id: expect.any(String) }, { id: expect.any(String) }])
   })
 
   it('should drop future events in favor of real milestone achievements', () => {
@@ -320,24 +208,7 @@ describe('invoiceCountMilestones', () => {
     setupInvoice().pay('2020-01-01 20:00').build() // 5 -- Second milestone
     setupInvoice().pay('2020-01-01 21:00').build() // 6
 
-    expect(account.events).toEqual([
-      {
-        id: expect.any(String),
-        amount: 1,
-        at: parseISO('2020-01-01 16:00'),
-        future: false,
-        tags: ['account', 'milestone'],
-        type: 'account-milestone:invoices',
-      },
-      {
-        id: expect.any(String),
-        amount: 5,
-        at: parseISO('2020-01-01 20:00'),
-        future: false,
-        tags: ['account', 'milestone'],
-        type: 'account-milestone:invoices',
-      },
-    ])
+    expect(account.events).toMatchSnapshot([{ id: expect.any(String) }, { id: expect.any(String) }])
   })
 })
 
@@ -386,34 +257,10 @@ describe('revenueMilestones', () => {
     setupInvoice().send('2020-01-01 10:00').pay('2020-01-01 16:00').build() // 8
     setupInvoice().send('2020-01-01 10:00').pay('2020-01-01 16:00').build() // 9 -- Third milestone
 
-    expect(account.events).toEqual([
-      {
-        id: expect.any(String),
-        amount: 605_00,
-        milestone: 500_00,
-        at: parseISO('2020-01-01 11:00'),
-        future: false,
-        tags: ['account', 'milestone'],
-        type: 'account-milestone:revenue',
-      },
-      {
-        id: expect.any(String),
-        amount: 1210_00,
-        milestone: 1000_00,
-        at: parseISO('2020-01-01 12:00'),
-        future: false,
-        tags: ['account', 'milestone'],
-        type: 'account-milestone:revenue',
-      },
-      {
-        id: expect.any(String),
-        amount: 5445_00,
-        milestone: 5000_00,
-        at: parseISO('2020-01-01 16:00'),
-        future: false,
-        tags: ['account', 'milestone'],
-        type: 'account-milestone:revenue',
-      },
+    expect(account.events).toMatchSnapshot([
+      { id: expect.any(String) },
+      { id: expect.any(String) },
+      { id: expect.any(String) },
     ])
   })
 
@@ -429,34 +276,10 @@ describe('revenueMilestones', () => {
     setupInvoice().send('2020-01-01 10:00').build() // 8
     setupInvoice().send('2020-01-01 10:00').build() // 9 -- Third milestone
 
-    expect(account.events).toEqual([
-      {
-        id: expect.any(String),
-        amount: 605_00,
-        milestone: 500_00,
-        at: null,
-        future: true,
-        tags: ['account', 'milestone'],
-        type: 'account-milestone:revenue',
-      },
-      {
-        id: expect.any(String),
-        amount: 1210_00,
-        milestone: 1000_00,
-        at: null,
-        future: true,
-        tags: ['account', 'milestone'],
-        type: 'account-milestone:revenue',
-      },
-      {
-        id: expect.any(String),
-        amount: 5445_00,
-        milestone: 5000_00,
-        at: null,
-        future: true,
-        tags: ['account', 'milestone'],
-        type: 'account-milestone:revenue',
-      },
+    expect(account.events).toMatchSnapshot([
+      { id: expect.any(String) },
+      { id: expect.any(String) },
+      { id: expect.any(String) },
     ])
   })
 
@@ -482,34 +305,10 @@ describe('revenueMilestones', () => {
     setupInvoice().send('2020-01-02 12:00').pay('2020-01-02 15:00').build() // 8
     setupInvoice().send('2020-01-02 13:00').pay('2020-01-02 16:00').build() // 9 -- Third milestone
 
-    expect(account.events).toEqual([
-      {
-        id: expect.any(String),
-        amount: 605_00,
-        milestone: 500_00,
-        at: parseISO('2020-01-01 20:00'),
-        future: false,
-        tags: ['account', 'milestone'],
-        type: 'account-milestone:revenue',
-      },
-      {
-        id: expect.any(String),
-        amount: 1210_00,
-        milestone: 1000_00,
-        at: parseISO('2020-01-01 22:00'),
-        future: false,
-        tags: ['account', 'milestone'],
-        type: 'account-milestone:revenue',
-      },
-      {
-        id: expect.any(String),
-        amount: 5445_00,
-        milestone: 5000_00,
-        at: parseISO('2020-01-02 16:00'),
-        future: false,
-        tags: ['account', 'milestone'],
-        type: 'account-milestone:revenue',
-      },
+    expect(account.events).toMatchSnapshot([
+      { id: expect.any(String) },
+      { id: expect.any(String) },
+      { id: expect.any(String) },
     ])
   })
 })
@@ -550,24 +349,7 @@ describe('clientCountMilestones', () => {
     setupInvoice().send('2020-01-01 10:00').pay('2020-01-01 15:00').build() // 5 -- Second milestone
     setupInvoice().send('2020-01-01 10:00').pay('2020-01-01 16:00').build() // 6
 
-    expect(account.events).toEqual([
-      {
-        id: expect.any(String),
-        amount: 3,
-        at: parseISO('2020-01-01 13:00'),
-        future: false,
-        tags: ['account', 'milestone'],
-        type: 'account-milestone:clients',
-      },
-      {
-        id: expect.any(String),
-        amount: 5,
-        at: parseISO('2020-01-01 15:00'),
-        future: false,
-        tags: ['account', 'milestone'],
-        type: 'account-milestone:clients',
-      },
-    ])
+    expect(account.events).toMatchSnapshot([{ id: expect.any(String) }, { id: expect.any(String) }])
   })
 
   it('should keep track of sent invoices as well', () => {
@@ -582,24 +364,7 @@ describe('clientCountMilestones', () => {
     setupInvoice().send('2020-01-01 14:00').build() // 5 -- Second milestone
     setupInvoice().send('2020-01-01 15:00').build() // 6
 
-    expect(account.events).toEqual([
-      {
-        id: expect.any(String),
-        amount: 3,
-        at: null,
-        future: true,
-        tags: ['account', 'milestone'],
-        type: 'account-milestone:clients',
-      },
-      {
-        id: expect.any(String),
-        amount: 5,
-        at: null,
-        future: true,
-        tags: ['account', 'milestone'],
-        type: 'account-milestone:clients',
-      },
-    ])
+    expect(account.events).toMatchSnapshot([{ id: expect.any(String) }, { id: expect.any(String) }])
   })
 
   it('should drop future events in favor of real milestone achievements', () => {
@@ -620,31 +385,10 @@ describe('clientCountMilestones', () => {
     setupInvoice().send('2020-01-01 19:00').pay('2020-01-01 19:30').build() // 11 -- Second milestone
     setupInvoice().send('2020-01-01 20:00').pay('2020-01-01 20:30').build() // 12
 
-    expect(account.events).toEqual([
-      {
-        id: expect.any(String),
-        amount: 3,
-        at: parseISO('2020-01-01 17:30'),
-        future: false,
-        type: 'account-milestone:clients',
-        tags: ['account', 'milestone'],
-      },
-      {
-        id: expect.any(String),
-        amount: 10,
-        at: null,
-        future: true,
-        type: 'account-milestone:clients',
-        tags: ['account', 'milestone'],
-      },
-      {
-        id: expect.any(String),
-        amount: 5,
-        at: parseISO('2020-01-01 19:30'),
-        future: false,
-        type: 'account-milestone:clients',
-        tags: ['account', 'milestone'],
-      },
+    expect(account.events).toMatchSnapshot([
+      { id: expect.any(String) },
+      { id: expect.any(String) },
+      { id: expect.any(String) },
     ])
   })
 })
@@ -687,7 +431,7 @@ describe('mostExpensiveInvoiceMilestones', () => {
 
     setupInvoice(6).send('2020-01-01 10:00').pay('2020-01-01 15:00').build() // First paid
 
-    expect(account.events).toEqual([])
+    expect(account.events).toMatchSnapshot()
   })
 
   it('should track paid invoices', () => {
@@ -702,28 +446,7 @@ describe('mostExpensiveInvoiceMilestones', () => {
     setupInvoice(5).send('2020-01-01 10:00').pay('2020-01-01 18:00').build() // 8 -- Second milestone
     setupInvoice(1).send('2020-01-01 10:00').pay('2020-01-01 19:00').build() // 9
 
-    expect(account.events).toEqual([
-      {
-        id: expect.any(String),
-        amount: 30000,
-        at: parseISO('2020-01-01 12:00'),
-        future: false,
-        increase: 50,
-        invoice: '0003',
-        tags: ['account', 'milestone'],
-        type: 'account-milestone:most-expensive-invoice',
-      },
-      {
-        id: expect.any(String),
-        amount: 50000,
-        at: parseISO('2020-01-01 18:00'),
-        future: false,
-        increase: 67,
-        invoice: '0009',
-        tags: ['account', 'milestone'],
-        type: 'account-milestone:most-expensive-invoice',
-      },
-    ])
+    expect(account.events).toMatchSnapshot([{ id: expect.any(String) }, { id: expect.any(String) }])
   })
 
   it('should keep track of sent invoices as well', () => {
@@ -738,28 +461,7 @@ describe('mostExpensiveInvoiceMilestones', () => {
     setupInvoice(5).send('2020-01-01 18:00').build() // 8 -- Second milestone
     setupInvoice(1).send('2020-01-01 19:00').build() // 9
 
-    expect(account.events).toEqual([
-      {
-        id: expect.any(String),
-        amount: 30000,
-        at: null,
-        future: true,
-        increase: 50,
-        invoice: '0003',
-        tags: ['account', 'milestone'],
-        type: 'account-milestone:most-expensive-invoice',
-      },
-      {
-        id: expect.any(String),
-        amount: 50000,
-        at: null,
-        future: true,
-        increase: 67,
-        invoice: '0009',
-        tags: ['account', 'milestone'],
-        type: 'account-milestone:most-expensive-invoice',
-      },
-    ])
+    expect(account.events).toMatchSnapshot([{ id: expect.any(String) }, { id: expect.any(String) }])
   })
 
   it('should drop future events in favor of real milestone achievements', () => {
@@ -785,27 +487,6 @@ describe('mostExpensiveInvoiceMilestones', () => {
     setupInvoice(5).send('2020-01-01 10:00').pay('2020-01-01 18:00').build() // 8 -- Second milestone
     setupInvoice(1).send('2020-01-01 10:00').pay('2020-01-01 19:00').build() // 9
 
-    expect(account.events).toEqual([
-      {
-        id: expect.any(String),
-        amount: 30000,
-        at: parseISO('2020-01-01 12:00'),
-        future: false,
-        increase: 50,
-        invoice: '0013',
-        tags: ['account', 'milestone'],
-        type: 'account-milestone:most-expensive-invoice',
-      },
-      {
-        id: expect.any(String),
-        amount: 50000,
-        at: parseISO('2020-01-01 18:00'),
-        future: false,
-        increase: 67,
-        invoice: '0019',
-        tags: ['account', 'milestone'],
-        type: 'account-milestone:most-expensive-invoice',
-      },
-    ])
+    expect(account.events).toMatchSnapshot([{ id: expect.any(String) }, { id: expect.any(String) }])
   })
 })
