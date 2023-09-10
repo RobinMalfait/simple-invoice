@@ -25,7 +25,7 @@ import {
   isFuture,
 } from 'date-fns'
 import Link from 'next/link'
-import { ContextType, createContext, useState } from 'react'
+import { ContextType, createContext, useContext, useState } from 'react'
 import { Event } from '~/domain/events/event'
 import { Address, formatAddress } from '~/ui/address/address'
 import { useCardStructure } from '~/ui/card'
@@ -342,6 +342,7 @@ function ActivityIndicator({ item }: { item: Event }) {
 }
 
 function useActivityText(item: Event) {
+  let viewContext = useContext(ViewContext)
   let now = useCurrentDate()
 
   switch (item.type) {
@@ -485,30 +486,38 @@ function useActivityText(item: Event) {
     case 'milestone:most-expensive-invoice':
       return [
         <>
-          <Link
-            className="font-medium text-gray-900 dark:text-gray-100"
-            href={`/invoice/${item.invoice}`}
-          >
-            {`#${item.invoice}`}
-          </Link>
+          {viewContext === 'record' ? (
+            'This'
+          ) : (
+            <Link
+              className="font-medium text-gray-900 dark:text-gray-100"
+              href={`/invoice/${item.invoice}`}
+            >
+              {`#${item.invoice}`}
+            </Link>
+          )}
           {item.future
-            ? ' will be your most expensive invoice ('
-            : ' is your most expensive invoice ('}
+            ? ` will be ${viewContext === 'account' ? 'your' : 'the'} most expensive invoice (`
+            : ` ${item.best ? 'is ' : 'was '} ${
+                viewContext === 'account' ? 'your' : 'the'
+              } most expensive invoice ${item.best ? '' : 'at this time '}(`}
           <span className="font-medium text-emerald-500 dark:text-emerald-400/60">
             +{item.increase}%
           </span>
           {`).`}
         </>,
-        <>
-          <span className="text-xs opacity-50">
-            This invoice {item.future ? 'is' : 'was'}{' '}
-            <span className="font-medium text-gray-900 dark:text-gray-100">
-              <Money amount={item.amount} />
+        viewContext !== 'record' && (
+          <>
+            <span className="text-xs opacity-50">
+              This invoice {item.future ? 'is' : 'was'}{' '}
+              <span className="font-medium text-gray-900 dark:text-gray-100">
+                <Money amount={item.amount} />
+              </span>
+              .
             </span>
-            .
-          </span>
-        </>,
-      ]
+          </>
+        ),
+      ].filter(Boolean)
 
     case 'milestone:clients':
       return [
@@ -527,25 +536,27 @@ function useActivityText(item: Event) {
             {formatDistanceToNowStrict(addSeconds(now, item.durationInSeconds))}
           </span>
         </>,
-        <>
-          <span className="text-xs opacity-50">
-            <Link
-              className="font-medium text-gray-900 dark:text-gray-100"
-              href={`/clients/${item.client.id}`}
-            >
-              {item.client.name}
-            </Link>{' '}
-            paid invoice{' '}
-            <Link
-              href={`/invoice/${item.invoice}`}
-              className="font-medium text-gray-900 dark:text-gray-100"
-            >
-              #{item.invoice}
-            </Link>{' '}
-            in {formatDistanceToNowStrict(addSeconds(now, item.durationInSeconds))}.
-          </span>
-        </>,
-      ]
+        viewContext !== 'record' && (
+          <>
+            <span className="text-xs opacity-50">
+              <Link
+                className="font-medium text-gray-900 dark:text-gray-100"
+                href={`/clients/${item.client.id}`}
+              >
+                {item.client.name}
+              </Link>{' '}
+              paid invoice{' '}
+              <Link
+                href={`/invoice/${item.invoice}`}
+                className="font-medium text-gray-900 dark:text-gray-100"
+              >
+                #{item.invoice}
+              </Link>{' '}
+              in {formatDistanceToNowStrict(addSeconds(now, item.durationInSeconds))}.
+            </span>
+          </>
+        ),
+      ].filter(Boolean)
 
     case 'client-rebranded':
       return [
