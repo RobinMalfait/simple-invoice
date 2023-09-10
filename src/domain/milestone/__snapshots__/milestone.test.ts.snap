@@ -302,6 +302,7 @@ exports[`mostExpensiveInvoiceMilestones should drop future events in favor of re
   {
     "amount": 30000,
     "at": 2020-01-01T11:00:00.000Z,
+    "best": false,
     "future": false,
     "id": Any<String>,
     "increase": 50,
@@ -315,6 +316,7 @@ exports[`mostExpensiveInvoiceMilestones should drop future events in favor of re
   {
     "amount": 50000,
     "at": 2020-01-01T17:00:00.000Z,
+    "best": true,
     "future": false,
     "id": Any<String>,
     "increase": 67,
@@ -333,6 +335,7 @@ exports[`mostExpensiveInvoiceMilestones should keep track of sent invoices as we
   {
     "amount": 30000,
     "at": null,
+    "best": true,
     "future": true,
     "id": Any<String>,
     "increase": 50,
@@ -346,6 +349,7 @@ exports[`mostExpensiveInvoiceMilestones should keep track of sent invoices as we
   {
     "amount": 50000,
     "at": null,
+    "best": true,
     "future": true,
     "id": Any<String>,
     "increase": 67,
@@ -366,6 +370,7 @@ exports[`mostExpensiveInvoiceMilestones should track paid invoices 1`] = `
   {
     "amount": 30000,
     "at": 2020-01-01T11:00:00.000Z,
+    "best": false,
     "future": false,
     "id": Any<String>,
     "increase": 50,
@@ -379,6 +384,7 @@ exports[`mostExpensiveInvoiceMilestones should track paid invoices 1`] = `
   {
     "amount": 50000,
     "at": 2020-01-01T17:00:00.000Z,
+    "best": true,
     "future": false,
     "id": Any<String>,
     "increase": 67,

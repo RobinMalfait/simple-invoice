@@ -356,9 +356,11 @@ export function mostExpensiveInvoiceMilestones(bus: EventEmitter) {
       amount: e.invoice.total,
       increase: Number(((e.invoice.total / previous - 1) * 100).toFixed(0)),
       future: true,
+      best: true,
     })
     e.account.events.push(event)
     e.client.events.push(event)
+    e.invoice.events.push(event)
   })
 
   bus.on('invoice:paid', (e: InvoiceEvent) => {
@@ -382,10 +384,19 @@ export function mostExpensiveInvoiceMilestones(bus: EventEmitter) {
       amount: e.invoice.total,
       increase: Number(((e.invoice.total / previous - 1) * 100).toFixed(0)),
       at: e.at,
-    })
+      best: true,
+    }) as Extract<Event, typeof MILESTONE>
+
+    for (let ev of lazy.pipe(
+      lazy.concat(e.account.events, e.client.events, e.invoice.events),
+      lazy.filter((e: Event) => e.type === MILESTONE),
+    )()) {
+      ev.best = false
+    }
 
     e.account.events.push(event)
     e.client.events.push(event)
+    e.invoice.events.push(event)
   })
 
   // Cleanup future milestones if they are not relevant anymore
@@ -397,6 +408,9 @@ export function mostExpensiveInvoiceMilestones(bus: EventEmitter) {
         (e) => !(e.type === MILESTONE && e.future && e.amount <= paid.max!),
       )
       e.client.events = e.client.events.filter(
+        (e) => !(e.type === MILESTONE && e.future && e.amount <= paid.max!),
+      )
+      e.invoice.events = e.invoice.events.filter(
         (e) => !(e.type === MILESTONE && e.future && e.amount <= paid.max!),
       )
     })

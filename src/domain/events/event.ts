@@ -55,6 +55,7 @@ export let Event = z
       amount: z.number(),
       increase: z.number(),
       future: z.boolean().optional().default(false),
+      best: z.boolean().optional().default(false),
     }),
     z.object({
       type: z.literal('milestone:clients'),
