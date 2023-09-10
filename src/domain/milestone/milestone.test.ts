@@ -359,17 +359,24 @@ describe('revenueMilestones', () => {
 
   it('should track paid invoices', () => {
     setupInvoice().build() // Draft
-    setupInvoice().send('2020-01-01 10:00').pay('2020-01-01 11:00').build() // 1
-    setupInvoice().send('2020-01-01 10:00').pay('2020-01-01 12:00').build() // 2 -- First milestone
+    setupInvoice().send('2020-01-01 10:00').pay('2020-01-01 11:00').build() // 1 -- First milestone
+    setupInvoice().send('2020-01-01 10:00').pay('2020-01-01 12:00').build() // 2 -- Second milestone
     setupInvoice().send('2020-01-01 10:00').pay('2020-01-01 13:00').build() // 3
     setupInvoice().send('2020-01-01 10:00').pay('2020-01-01 14:00').build() // 4
     setupInvoice().send('2020-01-01 10:00').pay('2020-01-01 15:00').build() // 5
     setupInvoice().send('2020-01-01 10:00').pay('2020-01-01 16:00').build() // 6
     setupInvoice().send('2020-01-01 10:00').pay('2020-01-01 16:00').build() // 7
     setupInvoice().send('2020-01-01 10:00').pay('2020-01-01 16:00').build() // 8
-    setupInvoice().send('2020-01-01 10:00').pay('2020-01-01 16:00').build() // 9 -- Second milestone
+    setupInvoice().send('2020-01-01 10:00').pay('2020-01-01 16:00').build() // 9 -- Third milestone
 
     expect(account.events).toEqual([
+      {
+        id: expect.any(String),
+        amount: 605_00,
+        milestone: 500_00,
+        at: parseISO('2020-01-01 11:00'),
+        type: 'account-milestone:revenue',
+      },
       {
         id: expect.any(String),
         amount: 1210_00,
@@ -389,17 +396,25 @@ describe('revenueMilestones', () => {
 
   it('should keep track of sent invoices as well', () => {
     setupInvoice().build() // Draft
-    setupInvoice().send('2020-01-01 10:00').build() // 1
-    setupInvoice().send('2020-01-01 10:00').build() // 2 -- First milestone
+    setupInvoice().send('2020-01-01 10:00').build() // 1 -- First milestone
+    setupInvoice().send('2020-01-01 10:00').build() // 2 -- Second milestone
     setupInvoice().send('2020-01-01 10:00').build() // 3
     setupInvoice().send('2020-01-01 10:00').build() // 4
     setupInvoice().send('2020-01-01 10:00').build() // 5
     setupInvoice().send('2020-01-01 10:00').build() // 6
     setupInvoice().send('2020-01-01 10:00').build() // 7
     setupInvoice().send('2020-01-01 10:00').build() // 8
-    setupInvoice().send('2020-01-01 10:00').build() // 9 -- Second milestone
+    setupInvoice().send('2020-01-01 10:00').build() // 9 -- Third milestone
 
     expect(account.events).toEqual([
+      {
+        id: expect.any(String),
+        amount: 605_00,
+        milestone: 500_00,
+        at: null,
+        future: true,
+        type: 'account-milestone:revenue',
+      },
       {
         id: expect.any(String),
         amount: 1210_00,
@@ -431,17 +446,24 @@ describe('revenueMilestones', () => {
     setupInvoice().send('2020-01-01 17:00').build() // 8
     setupInvoice().send('2020-01-01 18:00').build() // 9 -- Second milestone
 
-    setupInvoice().send('2020-01-01 19:00').pay('2020-01-01 20:00').build() // 1
-    setupInvoice().send('2020-01-01 20:00').pay('2020-01-01 22:00').build() // 2 -- First milestone
+    setupInvoice().send('2020-01-01 19:00').pay('2020-01-01 20:00').build() // 1 -- First milestone
+    setupInvoice().send('2020-01-01 20:00').pay('2020-01-01 22:00').build() // 2 -- Second milestone
     setupInvoice().send('2020-01-01 21:00').pay('2020-01-02 10:00').build() // 3
     setupInvoice().send('2020-01-01 22:00').pay('2020-01-02 11:00').build() // 4
     setupInvoice().send('2020-01-01 23:00').pay('2020-01-02 12:00').build() // 5
     setupInvoice().send('2020-01-02 10:00').pay('2020-01-02 13:00').build() // 6
     setupInvoice().send('2020-01-02 11:00').pay('2020-01-02 14:00').build() // 7
     setupInvoice().send('2020-01-02 12:00').pay('2020-01-02 15:00').build() // 8
-    setupInvoice().send('2020-01-02 13:00').pay('2020-01-02 16:00').build() // 9 -- Second milestone
+    setupInvoice().send('2020-01-02 13:00').pay('2020-01-02 16:00').build() // 9 -- Third milestone
 
     expect(account.events).toEqual([
+      {
+        id: expect.any(String),
+        amount: 605_00,
+        milestone: 500_00,
+        at: parseISO('2020-01-01 20:00'),
+        type: 'account-milestone:revenue',
+      },
       {
         id: expect.any(String),
         amount: 1210_00,

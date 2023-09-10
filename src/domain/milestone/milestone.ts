@@ -281,7 +281,7 @@ export function revenueMilestones(bus: EventEmitter) {
   let stateByAccount = initState(() => ({
     milestones: [
       10_000_000_00, 5_000_000_00, 1_500_000_00, 1_000_000_00, 750_000_00, 500_000_00, 250_000_00,
-      100_000_00, 50_000_00, 10_000_00, 5_000_00, 1_000_00,
+      100_000_00, 50_000_00, 10_000_00, 5_000_00, 1_000_00, 500_00, 100_00,
     ],
     totalByInvoice: new Map<string, number>(),
   }))
