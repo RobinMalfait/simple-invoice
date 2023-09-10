@@ -477,10 +477,14 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
                         separateRecords(list)
                           .filter((r) => isQuote(r) && isAccepted(r))
                           .flatMap((r) => {
-                            let sentAt = r.events.find((e) => e.type === 'quote-sent')?.at
+                            let sentAt = r.events
+                              .filter((x) => !x.tombstone)
+                              .find((e) => e.type === 'quote-sent')?.at
                             if (!sentAt) return []
 
-                            let paidAt = r.events.find((e) => e.type === 'quote-accepted')?.at
+                            let paidAt = r.events
+                              .filter((x) => !x.tombstone)
+                              .find((e) => e.type === 'quote-accepted')?.at
                             if (!paidAt) return []
 
                             return [[r, differenceInSeconds(paidAt, sentAt)] as const]
@@ -512,10 +516,14 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
                         separateRecords(list)
                           .filter((r) => isQuote(r) && isAccepted(r))
                           .flatMap((r) => {
-                            let sentAt = r.events.find((e) => e.type === 'quote-sent')?.at
+                            let sentAt = r.events
+                              .filter((x) => !x.tombstone)
+                              .find((e) => e.type === 'quote-sent')?.at
                             if (!sentAt) return []
 
-                            let paidAt = r.events.find((e) => e.type === 'quote-accepted')?.at
+                            let paidAt = r.events
+                              .filter((x) => !x.tombstone)
+                              .find((e) => e.type === 'quote-accepted')?.at
                             if (!paidAt) return []
 
                             return [[r, differenceInSeconds(paidAt, sentAt)] as const]
@@ -550,10 +558,14 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
                       .filter((r) => isPaidRecord(r))
                       .map((r) => (isReceipt(r) ? r.invoice : r))
                       .flatMap((r) => {
-                        let sentAt = r.events.find((e) => e.type === 'invoice-sent')?.at
+                        let sentAt = r.events
+                          .filter((x) => !x.tombstone)
+                          .find((e) => e.type === 'invoice-sent')?.at
                         if (!sentAt) return []
 
-                        let paidAt = r.events.find((e) => e.type === 'invoice-paid')?.at
+                        let paidAt = r.events
+                          .filter((x) => !x.tombstone)
+                          .find((e) => e.type === 'invoice-paid')?.at
                         if (!paidAt) return []
 
                         return [[r, differenceInSeconds(paidAt, sentAt)] as const]
@@ -586,10 +598,14 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
                       .filter((e) => isPaidRecord(e))
                       .map((r) => (isReceipt(r) ? r.invoice : r))
                       .flatMap((e) => {
-                        let sentAt = e.events.find((e) => e.type === 'invoice-sent')?.at
+                        let sentAt = e.events
+                          .filter((x) => !x.tombstone)
+                          .find((e) => e.type === 'invoice-sent')?.at
                         if (!sentAt) return []
 
-                        let paidAt = e.events.find((e) => e.type === 'invoice-paid')?.at
+                        let paidAt = e.events
+                          .filter((x) => !x.tombstone)
+                          .find((e) => e.type === 'invoice-paid')?.at
                         if (!paidAt) return []
 
                         return [[e, differenceInSeconds(paidAt, sentAt)] as const]

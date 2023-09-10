@@ -127,6 +127,7 @@ export let Event = z
     z.object({
       id: z.string().default(() => scopedId.next()),
       at: z.date().nullable().default(null),
+      tombstone: z.boolean().optional().default(false),
     }),
   )
 

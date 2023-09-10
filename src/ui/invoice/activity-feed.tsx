@@ -48,23 +48,25 @@ export function ActivityFeed(props: React.PropsWithChildren<{ records: Record[] 
                   records.length !== 1 && 'mt-6',
                 )}
               >
-                {record.events.map((activityItem, activityItemIdx, all) => {
-                  let isLast = activityItemIdx === record.events.length - 1
-                  let isLastNonMilestone = all
-                    .slice(activityItemIdx + 1)
-                    .every((e) => e.tags.includes('milestone'))
+                {record.events
+                  .filter((e) => !e.tombstone)
+                  .map((activityItem, activityItemIdx, all) => {
+                    let isLast = activityItemIdx === all.length - 1
+                    let isLastNonMilestone = all
+                      .slice(activityItemIdx + 1)
+                      .every((e) => e.tags.includes('milestone'))
 
-                  return (
-                    <ActivityItem
-                      key={activityItem.id}
-                      previous={all[activityItemIdx - 1]}
-                      item={activityItem}
-                      isFirst={activityItemIdx === 0}
-                      isLast={isLast}
-                      withIndicator={isLast || isLastNonMilestone}
-                    />
-                  )
-                })}
+                    return (
+                      <ActivityItem
+                        key={activityItem.id}
+                        previous={all[activityItemIdx - 1]}
+                        item={activityItem}
+                        isFirst={activityItemIdx === 0}
+                        isLast={isLast}
+                        withIndicator={isLast || isLastNonMilestone}
+                      />
+                    )
+                  })}
               </ul>
             </Fragment>
           )

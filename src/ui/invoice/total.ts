@@ -12,7 +12,7 @@ export function total(invoice: Pick<Invoice, 'items' | 'discounts'>) {
 
 export function totalUnpaid(invoice: Pick<Invoice, 'items' | 'events' | 'discounts'>) {
   let partiallyPaidEvent = (invoice.events
-    .slice()
+    .filter((e) => !e.tombstone)
     .reverse()
     .find((e) => e.type === 'invoice-partially-paid') ?? null) as Extract<
     Event,

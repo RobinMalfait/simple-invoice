@@ -11,6 +11,7 @@ exports[`clientCountMilestones should drop future events in favor of real milest
       "account",
       "milestone",
     ],
+    "tombstone": false,
     "type": "milestone:clients",
   },
   {
@@ -22,6 +23,7 @@ exports[`clientCountMilestones should drop future events in favor of real milest
       "account",
       "milestone",
     ],
+    "tombstone": false,
     "type": "milestone:clients",
   },
   {
@@ -33,6 +35,7 @@ exports[`clientCountMilestones should drop future events in favor of real milest
       "account",
       "milestone",
     ],
+    "tombstone": false,
     "type": "milestone:clients",
   },
 ]
@@ -49,6 +52,7 @@ exports[`clientCountMilestones should keep track of sent invoices as well 1`] = 
       "account",
       "milestone",
     ],
+    "tombstone": false,
     "type": "milestone:clients",
   },
   {
@@ -60,6 +64,7 @@ exports[`clientCountMilestones should keep track of sent invoices as well 1`] = 
       "account",
       "milestone",
     ],
+    "tombstone": false,
     "type": "milestone:clients",
   },
 ]
@@ -76,6 +81,7 @@ exports[`clientCountMilestones should track paid invoices 1`] = `
       "account",
       "milestone",
     ],
+    "tombstone": false,
     "type": "milestone:clients",
   },
   {
@@ -87,6 +93,7 @@ exports[`clientCountMilestones should track paid invoices 1`] = `
       "account",
       "milestone",
     ],
+    "tombstone": false,
     "type": "milestone:clients",
   },
 ]
@@ -108,6 +115,7 @@ exports[`fastestAcceptedQuoteMilestones should emit a milestone event for the fa
       "account",
       "milestone",
     ],
+    "tombstone": false,
     "type": "milestone:fastest-accepted-quote",
   },
   {
@@ -124,6 +132,7 @@ exports[`fastestAcceptedQuoteMilestones should emit a milestone event for the fa
       "account",
       "milestone",
     ],
+    "tombstone": false,
     "type": "milestone:fastest-accepted-quote",
   },
   {
@@ -140,6 +149,7 @@ exports[`fastestAcceptedQuoteMilestones should emit a milestone event for the fa
       "account",
       "milestone",
     ],
+    "tombstone": false,
     "type": "milestone:fastest-accepted-quote",
   },
 ]
@@ -163,6 +173,7 @@ exports[`fastestPaidInvoiceMilestones should emit a milestone event for the fast
       "account",
       "milestone",
     ],
+    "tombstone": false,
     "type": "milestone:fastest-paid-invoice",
   },
   {
@@ -179,6 +190,7 @@ exports[`fastestPaidInvoiceMilestones should emit a milestone event for the fast
       "account",
       "milestone",
     ],
+    "tombstone": false,
     "type": "milestone:fastest-paid-invoice",
   },
   {
@@ -195,6 +207,7 @@ exports[`fastestPaidInvoiceMilestones should emit a milestone event for the fast
       "account",
       "milestone",
     ],
+    "tombstone": false,
     "type": "milestone:fastest-paid-invoice",
   },
 ]
@@ -218,6 +231,7 @@ exports[`fastestPaidInvoiceMilestones should skip paid invoices that have not be
       "account",
       "milestone",
     ],
+    "tombstone": false,
     "type": "milestone:fastest-paid-invoice",
   },
 ]
@@ -234,6 +248,7 @@ exports[`invoiceCountMilestones should drop future events in favor of real miles
       "account",
       "milestone",
     ],
+    "tombstone": false,
     "type": "milestone:invoices",
   },
   {
@@ -245,6 +260,7 @@ exports[`invoiceCountMilestones should drop future events in favor of real miles
       "account",
       "milestone",
     ],
+    "tombstone": false,
     "type": "milestone:invoices",
   },
 ]
@@ -261,6 +277,7 @@ exports[`invoiceCountMilestones should keep track of sent invoices as well 1`] =
       "account",
       "milestone",
     ],
+    "tombstone": false,
     "type": "milestone:invoices",
   },
   {
@@ -272,6 +289,7 @@ exports[`invoiceCountMilestones should keep track of sent invoices as well 1`] =
       "account",
       "milestone",
     ],
+    "tombstone": false,
     "type": "milestone:invoices",
   },
 ]
@@ -288,6 +306,7 @@ exports[`invoiceCountMilestones should track paid invoices 1`] = `
       "account",
       "milestone",
     ],
+    "tombstone": false,
     "type": "milestone:invoices",
   },
   {
@@ -299,6 +318,7 @@ exports[`invoiceCountMilestones should track paid invoices 1`] = `
       "account",
       "milestone",
     ],
+    "tombstone": false,
     "type": "milestone:invoices",
   },
 ]
@@ -318,6 +338,7 @@ exports[`mostExpensiveInvoiceMilestones should drop future events in favor of re
       "account",
       "milestone",
     ],
+    "tombstone": false,
     "type": "milestone:most-expensive-invoice",
   },
   {
@@ -332,6 +353,7 @@ exports[`mostExpensiveInvoiceMilestones should drop future events in favor of re
       "account",
       "milestone",
     ],
+    "tombstone": false,
     "type": "milestone:most-expensive-invoice",
   },
 ]
@@ -351,6 +373,7 @@ exports[`mostExpensiveInvoiceMilestones should keep track of sent invoices as we
       "account",
       "milestone",
     ],
+    "tombstone": false,
     "type": "milestone:most-expensive-invoice",
   },
   {
@@ -365,6 +388,7 @@ exports[`mostExpensiveInvoiceMilestones should keep track of sent invoices as we
       "account",
       "milestone",
     ],
+    "tombstone": false,
     "type": "milestone:most-expensive-invoice",
   },
 ]
@@ -386,6 +410,7 @@ exports[`mostExpensiveInvoiceMilestones should track paid invoices 1`] = `
       "account",
       "milestone",
     ],
+    "tombstone": false,
     "type": "milestone:most-expensive-invoice",
   },
   {
@@ -400,6 +425,7 @@ exports[`mostExpensiveInvoiceMilestones should track paid invoices 1`] = `
       "account",
       "milestone",
     ],
+    "tombstone": false,
     "type": "milestone:most-expensive-invoice",
   },
 ]
@@ -417,6 +443,7 @@ exports[`revenueMilestones should drop future events in favor of real milestone 
       "account",
       "milestone",
     ],
+    "tombstone": false,
     "type": "milestone:revenue",
   },
   {
@@ -429,6 +456,7 @@ exports[`revenueMilestones should drop future events in favor of real milestone 
       "account",
       "milestone",
     ],
+    "tombstone": false,
     "type": "milestone:revenue",
   },
   {
@@ -441,6 +469,7 @@ exports[`revenueMilestones should drop future events in favor of real milestone 
       "account",
       "milestone",
     ],
+    "tombstone": false,
     "type": "milestone:revenue",
   },
 ]
@@ -458,6 +487,7 @@ exports[`revenueMilestones should keep track of sent invoices as well 1`] = `
       "account",
       "milestone",
     ],
+    "tombstone": false,
     "type": "milestone:revenue",
   },
   {
@@ -470,6 +500,7 @@ exports[`revenueMilestones should keep track of sent invoices as well 1`] = `
       "account",
       "milestone",
     ],
+    "tombstone": false,
     "type": "milestone:revenue",
   },
   {
@@ -482,6 +513,7 @@ exports[`revenueMilestones should keep track of sent invoices as well 1`] = `
       "account",
       "milestone",
     ],
+    "tombstone": false,
     "type": "milestone:revenue",
   },
 ]
@@ -499,6 +531,7 @@ exports[`revenueMilestones should track paid invoices 1`] = `
       "account",
       "milestone",
     ],
+    "tombstone": false,
     "type": "milestone:revenue",
   },
   {
@@ -511,6 +544,7 @@ exports[`revenueMilestones should track paid invoices 1`] = `
       "account",
       "milestone",
     ],
+    "tombstone": false,
     "type": "milestone:revenue",
   },
   {
@@ -523,6 +557,7 @@ exports[`revenueMilestones should track paid invoices 1`] = `
       "account",
       "milestone",
     ],
+    "tombstone": false,
     "type": "milestone:revenue",
   },
 ]

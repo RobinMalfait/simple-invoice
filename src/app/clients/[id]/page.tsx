@@ -301,12 +301,17 @@ export default async function Page({ params: { id } }: { params: { id: string } 
               </Card>
             )}
 
-            {client.events.length > 0 && (
+            {client.events.filter((x) => !x.tombstone).length > 0 && (
               <Card>
-                <CardTitle>Activity feed ({client.events.length})</CardTitle>
+                <CardTitle>
+                  Activity feed ({client.events.filter((x) => !x.tombstone).length})
+                </CardTitle>
                 <CardBody variant="filled-vertical">
                   <div className="max-h-96 overflow-auto">
-                    <ActivityFeed events={client.events} viewContext="client" />
+                    <ActivityFeed
+                      events={client.events.filter((x) => !x.tombstone)}
+                      viewContext="client"
+                    />
                   </div>
                 </CardBody>
               </Card>
