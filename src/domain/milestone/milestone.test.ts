@@ -94,6 +94,7 @@ describe('fastestAcceptedQuoteMilestones', () => {
         },
         durationInSeconds: 14400,
         quote: '0002',
+        tags: ['account', 'milestone'],
         type: 'account-milestone:fastest-accepted-quote',
       },
       {
@@ -105,6 +106,7 @@ describe('fastestAcceptedQuoteMilestones', () => {
         },
         durationInSeconds: 10800,
         quote: '0003',
+        tags: ['account', 'milestone'],
         type: 'account-milestone:fastest-accepted-quote',
       },
       {
@@ -116,6 +118,7 @@ describe('fastestAcceptedQuoteMilestones', () => {
         },
         durationInSeconds: 3600,
         quote: '0005',
+        tags: ['account', 'milestone'],
         type: 'account-milestone:fastest-accepted-quote',
       },
     ])
@@ -167,6 +170,7 @@ describe('fastestPaidInvoiceMilestones', () => {
         },
         durationInSeconds: 14400,
         invoice: '0002',
+        tags: ['account', 'milestone'],
         type: 'account-milestone:fastest-paid-invoice',
       },
       {
@@ -178,6 +182,7 @@ describe('fastestPaidInvoiceMilestones', () => {
         },
         durationInSeconds: 10800,
         invoice: '0003',
+        tags: ['account', 'milestone'],
         type: 'account-milestone:fastest-paid-invoice',
       },
       {
@@ -189,6 +194,7 @@ describe('fastestPaidInvoiceMilestones', () => {
         },
         durationInSeconds: 3600,
         invoice: '0005',
+        tags: ['account', 'milestone'],
         type: 'account-milestone:fastest-paid-invoice',
       },
     ])
@@ -211,6 +217,7 @@ describe('fastestPaidInvoiceMilestones', () => {
         },
         durationInSeconds: 14400,
         invoice: '0002',
+        tags: ['account', 'milestone'],
         type: 'account-milestone:fastest-paid-invoice',
       },
     ])
@@ -253,12 +260,16 @@ describe('invoiceCountMilestones', () => {
         id: expect.any(String),
         amount: 1,
         at: parseISO('2020-01-01 11:00'),
+        tags: ['account', 'milestone'],
+        future: false,
         type: 'account-milestone:invoices',
       },
       {
         id: expect.any(String),
         amount: 5,
         at: parseISO('2020-01-01 15:00'),
+        future: false,
+        tags: ['account', 'milestone'],
         type: 'account-milestone:invoices',
       },
     ])
@@ -279,6 +290,7 @@ describe('invoiceCountMilestones', () => {
         amount: 1,
         at: null,
         future: true,
+        tags: ['account', 'milestone'],
         type: 'account-milestone:invoices',
       },
       {
@@ -286,6 +298,7 @@ describe('invoiceCountMilestones', () => {
         amount: 5,
         at: null,
         future: true,
+        tags: ['account', 'milestone'],
         type: 'account-milestone:invoices',
       },
     ])
@@ -312,12 +325,16 @@ describe('invoiceCountMilestones', () => {
         id: expect.any(String),
         amount: 1,
         at: parseISO('2020-01-01 16:00'),
+        future: false,
+        tags: ['account', 'milestone'],
         type: 'account-milestone:invoices',
       },
       {
         id: expect.any(String),
         amount: 5,
         at: parseISO('2020-01-01 20:00'),
+        future: false,
+        tags: ['account', 'milestone'],
         type: 'account-milestone:invoices',
       },
     ])
@@ -375,6 +392,8 @@ describe('revenueMilestones', () => {
         amount: 605_00,
         milestone: 500_00,
         at: parseISO('2020-01-01 11:00'),
+        future: false,
+        tags: ['account', 'milestone'],
         type: 'account-milestone:revenue',
       },
       {
@@ -382,6 +401,8 @@ describe('revenueMilestones', () => {
         amount: 1210_00,
         milestone: 1000_00,
         at: parseISO('2020-01-01 12:00'),
+        future: false,
+        tags: ['account', 'milestone'],
         type: 'account-milestone:revenue',
       },
       {
@@ -389,6 +410,8 @@ describe('revenueMilestones', () => {
         amount: 5445_00,
         milestone: 5000_00,
         at: parseISO('2020-01-01 16:00'),
+        future: false,
+        tags: ['account', 'milestone'],
         type: 'account-milestone:revenue',
       },
     ])
@@ -413,6 +436,7 @@ describe('revenueMilestones', () => {
         milestone: 500_00,
         at: null,
         future: true,
+        tags: ['account', 'milestone'],
         type: 'account-milestone:revenue',
       },
       {
@@ -421,6 +445,7 @@ describe('revenueMilestones', () => {
         milestone: 1000_00,
         at: null,
         future: true,
+        tags: ['account', 'milestone'],
         type: 'account-milestone:revenue',
       },
       {
@@ -429,6 +454,7 @@ describe('revenueMilestones', () => {
         milestone: 5000_00,
         at: null,
         future: true,
+        tags: ['account', 'milestone'],
         type: 'account-milestone:revenue',
       },
     ])
@@ -462,6 +488,8 @@ describe('revenueMilestones', () => {
         amount: 605_00,
         milestone: 500_00,
         at: parseISO('2020-01-01 20:00'),
+        future: false,
+        tags: ['account', 'milestone'],
         type: 'account-milestone:revenue',
       },
       {
@@ -469,6 +497,8 @@ describe('revenueMilestones', () => {
         amount: 1210_00,
         milestone: 1000_00,
         at: parseISO('2020-01-01 22:00'),
+        future: false,
+        tags: ['account', 'milestone'],
         type: 'account-milestone:revenue',
       },
       {
@@ -476,6 +506,8 @@ describe('revenueMilestones', () => {
         amount: 5445_00,
         milestone: 5000_00,
         at: parseISO('2020-01-02 16:00'),
+        future: false,
+        tags: ['account', 'milestone'],
         type: 'account-milestone:revenue',
       },
     ])
@@ -523,12 +555,16 @@ describe('clientCountMilestones', () => {
         id: expect.any(String),
         amount: 3,
         at: parseISO('2020-01-01 13:00'),
+        future: false,
+        tags: ['account', 'milestone'],
         type: 'account-milestone:clients',
       },
       {
         id: expect.any(String),
         amount: 5,
         at: parseISO('2020-01-01 15:00'),
+        future: false,
+        tags: ['account', 'milestone'],
         type: 'account-milestone:clients',
       },
     ])
@@ -552,6 +588,7 @@ describe('clientCountMilestones', () => {
         amount: 3,
         at: null,
         future: true,
+        tags: ['account', 'milestone'],
         type: 'account-milestone:clients',
       },
       {
@@ -559,6 +596,7 @@ describe('clientCountMilestones', () => {
         amount: 5,
         at: null,
         future: true,
+        tags: ['account', 'milestone'],
         type: 'account-milestone:clients',
       },
     ])
@@ -587,7 +625,9 @@ describe('clientCountMilestones', () => {
         id: expect.any(String),
         amount: 3,
         at: parseISO('2020-01-01 17:30'),
+        future: false,
         type: 'account-milestone:clients',
+        tags: ['account', 'milestone'],
       },
       {
         id: expect.any(String),
@@ -595,12 +635,15 @@ describe('clientCountMilestones', () => {
         at: null,
         future: true,
         type: 'account-milestone:clients',
+        tags: ['account', 'milestone'],
       },
       {
         id: expect.any(String),
         amount: 5,
         at: parseISO('2020-01-01 19:30'),
+        future: false,
         type: 'account-milestone:clients',
+        tags: ['account', 'milestone'],
       },
     ])
   })
@@ -664,16 +707,20 @@ describe('mostExpensiveInvoiceMilestones', () => {
         id: expect.any(String),
         amount: 30000,
         at: parseISO('2020-01-01 12:00'),
+        future: false,
         increase: 50,
         invoice: '0003',
+        tags: ['account', 'milestone'],
         type: 'account-milestone:most-expensive-invoice',
       },
       {
         id: expect.any(String),
         amount: 50000,
         at: parseISO('2020-01-01 18:00'),
+        future: false,
         increase: 67,
         invoice: '0009',
+        tags: ['account', 'milestone'],
         type: 'account-milestone:most-expensive-invoice',
       },
     ])
@@ -699,6 +746,7 @@ describe('mostExpensiveInvoiceMilestones', () => {
         future: true,
         increase: 50,
         invoice: '0003',
+        tags: ['account', 'milestone'],
         type: 'account-milestone:most-expensive-invoice',
       },
       {
@@ -708,6 +756,7 @@ describe('mostExpensiveInvoiceMilestones', () => {
         future: true,
         increase: 67,
         invoice: '0009',
+        tags: ['account', 'milestone'],
         type: 'account-milestone:most-expensive-invoice',
       },
     ])
@@ -741,16 +790,20 @@ describe('mostExpensiveInvoiceMilestones', () => {
         id: expect.any(String),
         amount: 30000,
         at: parseISO('2020-01-01 12:00'),
+        future: false,
         increase: 50,
         invoice: '0013',
+        tags: ['account', 'milestone'],
         type: 'account-milestone:most-expensive-invoice',
       },
       {
         id: expect.any(String),
         amount: 50000,
         at: parseISO('2020-01-01 18:00'),
+        future: false,
         increase: 67,
         invoice: '0019',
+        tags: ['account', 'milestone'],
         type: 'account-milestone:most-expensive-invoice',
       },
     ])
