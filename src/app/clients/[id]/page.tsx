@@ -304,7 +304,7 @@ export default async function Page({ params: { id } }: { params: { id: string } 
             {client.events.length > 0 && (
               <Card>
                 <CardTitle>Activity feed ({client.events.length})</CardTitle>
-                <CardBody>
+                <CardBody variant="filled-vertical">
                   <div className="max-h-96 overflow-auto">
                     <ActivityFeed events={client.events} />
                   </div>

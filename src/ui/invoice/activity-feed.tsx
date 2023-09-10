@@ -59,6 +59,7 @@ export function ActivityFeed(props: React.PropsWithChildren<{ records: Record[] 
                       key={activityItem.id}
                       previous={all[activityItemIdx - 1]}
                       item={activityItem}
+                      isFirst={activityItemIdx === 0}
                       isLast={isLast}
                       withIndicator={isLast || isLastNonMilestone}
                     />

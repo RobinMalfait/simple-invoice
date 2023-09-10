@@ -33,6 +33,7 @@ import { Money } from '~/ui/money'
 import { assertNever } from '~/utils/assert-never'
 import { match } from '~/utils/match'
 import { Address, formatAddress } from './address/address'
+import { useCardStructure } from './card'
 
 function isFutureEvent(event: Event) {
   return 'future' in event && event.future
@@ -65,6 +66,7 @@ export function ActivityFeed({ events }: { events: Event[] }) {
               <ActivityItem
                 previous={all[activityItemIdx - 1]}
                 item={activityItem}
+                isFirst={activityItemIdx === 0}
                 isLast={activityItemIdx === all.length - 1}
                 withIndicator={true}
               />
@@ -78,11 +80,13 @@ export function ActivityFeed({ events }: { events: Event[] }) {
 export function ActivityItem({
   item,
   previous,
+  isFirst,
   isLast,
   withIndicator = isLast,
 }: {
   item: Event
   previous?: Event
+  isFirst: boolean
   isLast: boolean
   withIndicator?: boolean
 }) {
@@ -98,12 +102,19 @@ export function ActivityItem({
 
   let [text, extra] = useActivityText(item)
   let isPotentialFutureEvent = 'future' in item && item.future
+  let parentCardStructure = useCardStructure()
 
   return (
     <>
       <li
         className={classNames(
           'relative flex gap-x-4',
+          isFirst &&
+            (parentCardStructure === 'filled' || parentCardStructure === 'filled-vertical') &&
+            'mt-4',
+          isLast &&
+            (parentCardStructure === 'filled' || parentCardStructure === 'filled-vertical') &&
+            'mb-4',
           isPotentialFutureEvent &&
             'opacity-50 grayscale transition hover:opacity-100 hover:grayscale-0',
         )}
