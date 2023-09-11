@@ -1,6 +1,13 @@
 import { Account } from '~/domain/account/account'
+import { bus } from '~/domain/event-bus/bus'
+import { Event } from '~/domain/events/event'
+import { trackMilestones } from '~/domain/milestone/milestone'
 import { Record, separateRecords } from '~/domain/record/record'
 import { env } from '~/utils/env'
+
+export let events: Event[] = []
+
+trackMilestones(bus, { events })
 
 let data = require(`./${env.DATA_SOURCE_FILE}.ts`)
 

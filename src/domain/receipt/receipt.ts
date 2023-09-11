@@ -1,7 +1,8 @@
+import EventEmitter from 'node:events'
+
 import { parseISO } from 'date-fns'
 import { z } from 'zod'
 
-import EventEmitter from 'node:events'
 import { Account } from '~/domain/account/account'
 import { Client } from '~/domain/client/client'
 import { Discount } from '~/domain/discount/discount'
@@ -11,7 +12,6 @@ import { Event } from '~/domain/events/event'
 import { Invoice } from '~/domain/invoice/invoice'
 import { InvoiceItem } from '~/domain/invoice/invoice-item'
 import { InvoiceStatus } from '~/domain/invoice/invoice-status'
-import { total } from '~/ui/invoice/total'
 import { ScopedIDGenerator } from '~/utils/id'
 
 let scopedId = new ScopedIDGenerator('receipt')
@@ -28,7 +28,6 @@ export let Receipt = z.object({
   receiptDate: z.date(),
   discounts: z.array(Discount),
   attachments: z.array(Document),
-  events: z.array(Event),
 })
 
 export type Receipt = z.infer<typeof Receipt>
@@ -43,37 +42,17 @@ export class ReceiptBuilder {
   private _receiptDate: Date | null = null
   private _discounts: Discount[] = []
   private _attachments: Document[] = []
-  private events: Receipt['events'] = []
+
+  private _events: Partial<Event>[] = []
 
   public constructor(private bus: EventEmitter = defaultBus) {}
 
-  private emit(eventName: string, data: ReceiptBuilder | Receipt, at: Date | null = null) {
-    this.bus.emit(eventName, {
-      client: data instanceof ReceiptBuilder ? data._client : data.client,
-      account: data instanceof ReceiptBuilder ? data._account : data.account,
-      invoice: {
-        number: data instanceof ReceiptBuilder ? data._invoice?.number : data.invoice.number,
-        total: total({
-          items: data instanceof ReceiptBuilder ? data._invoice!.items : data.invoice.items,
-          discounts:
-            data instanceof ReceiptBuilder ? data._invoice!.discounts : data.invoice.discounts,
-        }),
-        events: data instanceof ReceiptBuilder ? data._invoice!.events : data.invoice.events,
-      },
-      receipt: {
-        number: data instanceof ReceiptBuilder ? data._number : data.number,
-        total: total({
-          items: data instanceof ReceiptBuilder ? data._items : data.items,
-          discounts: data instanceof ReceiptBuilder ? data._discounts : data.discounts,
-        }),
-        events: data instanceof ReceiptBuilder ? data.events : data.events,
-      },
-      at,
-    })
+  private emit(event: Event) {
+    this.bus.emit(event.type, event)
   }
 
   public build(): Receipt {
-    return Receipt.parse({
+    let receipt = Receipt.parse({
       number: this._number ?? `${this._invoice?.number}-01` ?? null,
       invoice: this._invoice,
       account: this._account,
@@ -83,8 +62,24 @@ export class ReceiptBuilder {
       receiptDate: this._receiptDate,
       discounts: this._discounts,
       attachments: this._attachments,
-      events: this.events,
     })
+
+    for (let event of this._events) {
+      this.emit(
+        Event.parse({
+          ...event,
+          context: {
+            ...event.context,
+            accountId: receipt.account.id,
+            clientId: receipt.client.id,
+            invoiceId: receipt.invoice.id,
+            receiptId: receipt.id,
+          },
+        }),
+      )
+    }
+
+    return receipt
   }
 
   public static fromInvoice(invoice: Invoice, { withAttachments = true } = {}): ReceiptBuilder {
@@ -98,14 +93,14 @@ export class ReceiptBuilder {
     builder._client = invoice.client
     builder._items = invoice.items.slice()
     builder._note = invoice.note
-    builder._receiptDate = invoice.events.find((e) => e.type === 'invoice-paid')?.at ?? null
+    builder._receiptDate = invoice.paidAt
     builder._discounts = invoice.discounts.slice()
+
     if (withAttachments) {
       builder._attachments = invoice.attachments.slice()
     }
-    builder.events.push(Event.parse({ type: 'receipt-created' }))
 
-    builder.emit('receipt:created', builder)
+    builder._events.push({ type: 'receipt-created' })
 
     return builder
   }

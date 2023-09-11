@@ -1,47 +1,25 @@
 import { differenceInSeconds } from 'date-fns'
 import * as lazy from 'lazy-collections'
 import EventEmitter from 'node:events'
-import { Account } from '~/domain/account/account'
-import { Client } from '~/domain/client/client'
 import { Event } from '~/domain/events/event'
-import { InvoiceStatus } from '~/domain/invoice/invoice-status'
 import { DefaultMap } from '~/utils/default-map'
-import { QuoteStatus } from '../quote/quote-status'
 
-export function trackMilestones(bus: EventEmitter) {
-  fastestAcceptedQuoteMilestones(bus)
-  invoiceCountMilestones(bus)
-  fastestPaidInvoiceMilestones(bus)
-  revenueMilestones(bus)
-  clientCountMilestones(bus)
-  mostExpensiveInvoiceMilestones(bus)
+type Context = {
+  events: Event[]
+}
+
+export function trackMilestones(bus: EventEmitter, ctx: Context) {
+  bus.on('*', (event) => ctx.events.push(event))
+
+  fastestAcceptedQuoteMilestones(bus, ctx)
+  invoiceCountMilestones(bus, ctx)
+  fastestPaidInvoiceMilestones(bus, ctx)
+  revenueMilestones(bus, ctx)
+  clientCountMilestones(bus, ctx)
+  mostExpensiveInvoiceMilestones(bus, ctx)
 }
 
 // ---
-
-type InvoiceEvent = {
-  client: Client
-  account: Account
-  invoice: {
-    events: Event[]
-    number: string
-    total: number
-  }
-  status: InvoiceStatus
-  at: Date
-}
-
-type QuoteEvent = {
-  client: Client
-  account: Account
-  quote: {
-    events: Event[]
-    number: string
-    total: number
-  }
-  status: QuoteStatus
-  at: Date
-}
 
 function sum(...streams: Iterable<number>[]) {
   let total = 0
@@ -59,15 +37,14 @@ function milestones<T>(arr: T[], condition: (t: T) => boolean): T[] {
   return arr.splice(idx).splice(0, 1)
 }
 
-function initState<T, R>(cb: () => T) {
+function initState<T>(cb: () => T) {
   return new DefaultMap(() => ({
-    events: new Set<Extract<Event, { type: R }>>(),
     pending: cb(),
     paid: cb(),
   }))
 }
 
-export function fastestAcceptedQuoteMilestones(bus: EventEmitter) {
+export function fastestAcceptedQuoteMilestones(bus: EventEmitter, ctx: Context) {
   const MILESTONE = 'milestone:fastest-accepted-quote'
 
   let stateByAccount = new DefaultMap(() => ({
@@ -76,16 +53,16 @@ export function fastestAcceptedQuoteMilestones(bus: EventEmitter) {
     max: null as number | null,
   }))
 
-  bus.on('quote:sent', (e: QuoteEvent) => {
-    let state = stateByAccount.get(e.account.id)!
+  bus.on('quote-sent', (e: Extract<Event, { type: 'quote-sent' }>) => {
+    let state = stateByAccount.get(e.context.accountId)!
 
-    state.sentAt.set(e.quote.number, e.at)
+    state.sentAt.set(e.context.quoteId, e.at!)
   })
 
-  bus.on('quote:accepted', (e: QuoteEvent) => {
-    let state = stateByAccount.get(e.account.id)!
+  bus.on('quote-accepted', (e: Extract<Event, { type: 'quote-accepted' }>) => {
+    let state = stateByAccount.get(e.context.accountId)!
 
-    let duration = differenceInSeconds(e.at, state.sentAt.get(e.quote.number)!)
+    let duration = differenceInSeconds(e.at!, state.sentAt.get(e.context.quoteId)!)
 
     if (state.max === null) {
       state.max = duration
@@ -93,37 +70,37 @@ export function fastestAcceptedQuoteMilestones(bus: EventEmitter) {
     }
 
     if (duration >= state.max) {
-      state.sentAt.delete(e.quote.number)
+      state.sentAt.delete(e.context.quoteId)
       return
     }
 
     state.max = duration
 
-    let event = Event.parse({
-      type: MILESTONE,
-      quote: e.quote.number,
-      client: {
-        id: e.client.id,
-        name: e.client.name,
-      },
-      durationInSeconds: duration,
-      best: true,
-      at: e.at,
-    }) as Extract<Event, { type: typeof MILESTONE }>
-
-    for (let event of state.events) {
-      event.best = false
+    for (let event of ctx.events.filter(
+      (_e) => _e.type === MILESTONE && _e.context.accountId === e.context.accountId,
+    ) as Extract<Event, { type: typeof MILESTONE }>[]) {
+      event.payload.best = false
     }
 
-    state.events.add(event)
-
-    e.account.events.push(event)
-    e.client.events.push(event)
-    e.quote.events.push(event)
+    bus.emit(
+      MILESTONE,
+      Event.parse({
+        type: MILESTONE,
+        context: {
+          accountId: e.context.accountId,
+          clientId: e.context.clientId,
+        },
+        payload: {
+          durationInSeconds: duration,
+          best: true,
+        },
+        at: e.at,
+      }),
+    )
   })
 }
 
-export function invoiceCountMilestones(bus: EventEmitter) {
+export function invoiceCountMilestones(bus: EventEmitter, ctx: Context) {
   const MILESTONE = 'milestone:invoices'
 
   let stateByAccount = initState(() => ({
@@ -131,53 +108,80 @@ export function invoiceCountMilestones(bus: EventEmitter) {
     count: new Set<string>(),
   }))
 
-  bus.on('invoice:sent', (e: InvoiceEvent) => {
-    let { events, pending, paid } = stateByAccount.get(e.account.id)!
+  bus.on('invoice-sent', (e: Extract<Event, { type: 'invoice-sent' }>) => {
+    let { pending, paid } = stateByAccount.get(e.context.accountId)!
 
-    pending.count.add(e.invoice.number)
+    pending.count.add(e.context.invoiceId)
 
     for (let milestone of milestones(
       pending.milestones,
       (m) => m <= paid.count.size + pending.count.size,
     )) {
-      let event = Event.parse({ type: MILESTONE, amount: milestone, future: true })
-      events.add(event)
-      e.account.events.push(event)
+      bus.emit(
+        MILESTONE,
+        Event.parse({
+          type: MILESTONE,
+          context: {
+            accountId: e.context.accountId,
+          },
+          payload: {
+            amount: milestone,
+            future: true,
+          },
+        }),
+      )
     }
   })
 
-  bus.on('invoice:paid', (e: InvoiceEvent) => {
-    let { events, pending, paid } = stateByAccount.get(e.account.id)!
+  bus.on('invoice-paid', (e: Extract<Event, { type: 'invoice-paid' }>) => {
+    let { pending, paid } = stateByAccount.get(e.context.accountId)!
 
-    pending.count.delete(e.invoice.number)
-    paid.count.add(e.invoice.number)
+    pending.count.delete(e.context.invoiceId)
+    paid.count.add(e.context.invoiceId)
 
     for (let milestone of milestones(paid.milestones, (m) => m <= paid.count.size)) {
-      let event = Event.parse({ type: MILESTONE, amount: milestone, at: e.at })
-      e.account.events.push(event)
-      events.add(event)
+      bus.emit(
+        MILESTONE,
+        Event.parse({
+          type: MILESTONE,
+          context: {
+            accountId: e.context.accountId,
+            invoiceId: e.context.invoiceId,
+          },
+          payload: {
+            amount: milestone,
+            at: e.at,
+          },
+        }),
+      )
     }
   })
 
   // Cleanup future milestones if they are not relevant anymore
-  for (let status of ['invoice:paid', 'invoice:closed']) {
-    bus.on(status, (e: InvoiceEvent) => {
-      let { events, pending, paid } = stateByAccount.get(e.account.id)!
-      pending.count.delete(e.invoice.number)
+  for (let status of ['invoice-paid', 'invoice-closed'] as const) {
+    bus.on(status, (e: Extract<Event, { type: typeof status }>) => {
+      let { pending, paid } = stateByAccount.get(e.context.accountId)!
+      pending.count.delete(e.context.invoiceId)
 
       let amount = paid.count.size + pending.count.size
 
-      for (let event of events as Set<Extract<Event, { type: typeof MILESTONE }>>) {
-        if (event.type === MILESTONE && event.future && event.amount <= amount) {
-          event.tombstone = true
-          events.delete(event)
+      for (let i = ctx.events.length - 1; i >= 0; i--) {
+        let event = ctx.events[i]
+
+        if (
+          event.type === MILESTONE &&
+          event.context.accountId === e.context.accountId &&
+          event.payload.future &&
+          event.payload.amount <= amount
+        ) {
+          ctx.events.splice(i, 1)
         }
       }
     })
   }
 }
 
-export function fastestPaidInvoiceMilestones(bus: EventEmitter) {
+export function fastestPaidInvoiceMilestones(bus: EventEmitter, ctx: Context) {
   const MILESTONE = 'milestone:fastest-paid-invoice'
 
   let stateByAccount = new DefaultMap(() => ({
@@ -186,20 +190,20 @@ export function fastestPaidInvoiceMilestones(bus: EventEmitter) {
     max: null as number | null,
   }))
 
-  bus.on('invoice:sent', (e: InvoiceEvent) => {
-    let state = stateByAccount.get(e.account.id)!
+  bus.on('invoice-sent', (e: Extract<Event, { type: 'invoice-sent' }>) => {
+    let state = stateByAccount.get(e.context.accountId)!
 
-    state.sentAt.set(e.invoice.number, e.at)
+    state.sentAt.set(e.context.invoiceId, e.at!)
   })
 
-  bus.on('invoice:paid', (e: InvoiceEvent) => {
-    let state = stateByAccount.get(e.account.id)!
+  bus.on('invoice-paid', (e: Extract<Event, { type: 'invoice-paid' }>) => {
+    let state = stateByAccount.get(e.context.accountId)!
 
-    if (!state.sentAt.has(e.invoice.number)) {
+    if (!state.sentAt.has(e.context.invoiceId)) {
       return
     }
 
-    let duration = differenceInSeconds(e.at, state.sentAt.get(e.invoice.number)!)
+    let duration = differenceInSeconds(e.at!, state.sentAt.get(e.context.invoiceId)!)
 
     if (state.max === null) {
       state.max = duration
@@ -207,37 +211,38 @@ export function fastestPaidInvoiceMilestones(bus: EventEmitter) {
     }
 
     if (duration >= state.max) {
-      state.sentAt.delete(e.invoice.number)
+      state.sentAt.delete(e.context.invoiceId)
       return
     }
 
     state.max = duration
 
-    let event = Event.parse({
-      type: MILESTONE,
-      invoice: e.invoice.number,
-      client: {
-        id: e.client.id,
-        name: e.client.name,
-      },
-      durationInSeconds: duration,
-      at: e.at,
-      best: true,
-    }) as Extract<Event, { type: typeof MILESTONE }>
+    bus.emit(
+      MILESTONE,
+      Event.parse({
+        type: MILESTONE,
+        context: {
+          accountId: e.context.accountId,
+          clientId: e.context.clientId,
+          invoiceId: e.context.invoiceId,
+        },
+        payload: {
+          durationInSeconds: duration,
+          at: e.at,
+          best: true,
+        },
+      }),
+    )
 
-    for (let event of state.events) {
-      event.best = false
+    for (let event of ctx.events.filter(
+      (_e) => _e.type === MILESTONE && _e.context.accountId === e.context.accountId,
+    ) as Extract<Event, { type: typeof MILESTONE }>[]) {
+      event.payload.best = false
     }
-
-    state.events.add(event)
-
-    e.account.events.push(event)
-    e.client.events.push(event)
-    e.invoice.events.push(event)
   })
 }
 
-export function clientCountMilestones(bus: EventEmitter) {
+export function clientCountMilestones(bus: EventEmitter, ctx: Context) {
   const MILESTONE = 'milestone:clients'
 
   let stateByAccount = initState(() => ({
@@ -245,10 +250,10 @@ export function clientCountMilestones(bus: EventEmitter) {
     clientByInvoice: new Map<string, string>(),
   }))
 
-  bus.on('invoice:sent', (e: InvoiceEvent) => {
-    let { events, pending, paid } = stateByAccount.get(e.account.id)!
+  bus.on('invoice-sent', (e: Extract<Event, { type: 'invoice-sent' }>) => {
+    let { pending, paid } = stateByAccount.get(e.context.accountId)!
 
-    pending.clientByInvoice.set(e.invoice.number, e.client.id)
+    pending.clientByInvoice.set(e.context.invoiceId, e.context.clientId)
 
     let total = lazy.pipe(
       lazy.concat(pending.clientByInvoice.values(), paid.clientByInvoice.values()),
@@ -257,17 +262,27 @@ export function clientCountMilestones(bus: EventEmitter) {
     )()
 
     for (let milestone of milestones(pending.milestones, (m) => m <= total)) {
-      let event = Event.parse({ type: MILESTONE, amount: milestone, future: true })
-      events.add(event)
-      e.account.events.push(event)
+      bus.emit(
+        MILESTONE,
+        Event.parse({
+          type: MILESTONE,
+          context: {
+            accountId: e.context.accountId,
+          },
+          payload: {
+            amount: milestone,
+            future: true,
+          },
+        }),
+      )
     }
   })
 
-  bus.on('invoice:paid', (e: InvoiceEvent) => {
-    let { events, pending, paid } = stateByAccount.get(e.account.id)!
+  bus.on('invoice-paid', (e: Extract<Event, { type: 'invoice-paid' }>) => {
+    let { pending, paid } = stateByAccount.get(e.context.accountId)!
 
-    pending.clientByInvoice.delete(e.invoice.number)
-    paid.clientByInvoice.set(e.invoice.number, e.client.id)
+    pending.clientByInvoice.delete(e.context.invoiceId)
+    paid.clientByInvoice.set(e.context.invoiceId, e.context.clientId)
 
     let total = lazy.pipe(
       lazy.concat(paid.clientByInvoice.values()),
@@ -276,18 +291,28 @@ export function clientCountMilestones(bus: EventEmitter) {
     )()
 
     for (let milestone of milestones(paid.milestones, (m) => m <= total)) {
-      let event = Event.parse({ type: MILESTONE, amount: milestone, at: e.at })
-      e.account.events.push(event)
-      events.add(event)
+      bus.emit(
+        MILESTONE,
+        Event.parse({
+          type: MILESTONE,
+          context: {
+            accountId: e.context.accountId,
+          },
+          payload: {
+            amount: milestone,
+            at: e.at,
+          },
+        }),
+      )
     }
   })
 
   // Cleanup future milestones if they are not relevant anymore
-  for (let status of ['invoice:paid', 'invoice:closed']) {
-    bus.on(status, (e: InvoiceEvent) => {
-      let { events, pending, paid } = stateByAccount.get(e.account.id)!
+  for (let status of ['invoice-paid', 'invoice-closed'] as const) {
+    bus.on(status, (e: Extract<Event, { type: typeof status }>) => {
+      let { pending, paid } = stateByAccount.get(e.context.accountId)!
 
-      pending.clientByInvoice.delete(e.invoice.number)
+      pending.clientByInvoice.delete(e.context.invoiceId)
 
       let total = lazy.pipe(
         lazy.concat(paid.clientByInvoice.values()),
@@ -295,17 +320,23 @@ export function clientCountMilestones(bus: EventEmitter) {
         lazy.toLength(),
       )()
 
-      for (let event of events as Set<Extract<Event, { type: typeof MILESTONE }>>) {
-        if (event.type === MILESTONE && event.future && event.amount <= total) {
-          event.tombstone = true
-          events.delete(event)
+      for (let i = ctx.events.length - 1; i >= 0; i--) {
+        let event = ctx.events[i]
+
+        if (
+          event.type === MILESTONE &&
+          event.context.accountId === e.context.accountId &&
+          event.payload.future &&
+          event.payload.amount <= total
+        ) {
+          ctx.events.splice(i, 1)
         }
       }
     })
   }
 }
 
-export function revenueMilestones(bus: EventEmitter) {
+export function revenueMilestones(bus: EventEmitter, ctx: Context) {
   const MILESTONE = 'milestone:revenue'
 
   let stateByAccount = initState(() => ({
@@ -316,135 +347,175 @@ export function revenueMilestones(bus: EventEmitter) {
     totalByInvoice: new Map<string, number>(),
   }))
 
-  bus.on('invoice:sent', (e: InvoiceEvent) => {
-    let { events, pending, paid } = stateByAccount.get(e.account.id)!
+  bus.on('invoice-sent', (e: Extract<Event, { type: 'invoice-sent' }>) => {
+    let { pending, paid } = stateByAccount.get(e.context.accountId)!
 
-    pending.totalByInvoice.set(e.invoice.number, e.invoice.total)
+    // TODO: Set total
+    {
+      let total = 0
+      pending.totalByInvoice.set(e.context.invoiceId, total)
+    }
 
     let total = sum(pending.totalByInvoice.values(), paid.totalByInvoice.values())
 
     for (let milestone of milestones(pending.milestones, (m) => m <= total)) {
-      let event = Event.parse({ type: MILESTONE, amount: total, milestone, future: true })
-      e.account.events.push(event)
-      events.add(event)
+      bus.emit(MILESTONE, Event.parse({ type: MILESTONE, amount: total, milestone, future: true }))
     }
   })
 
-  bus.on('invoice:paid', (e: InvoiceEvent) => {
-    let { events, pending, paid } = stateByAccount.get(e.account.id)!
+  bus.on('invoice-paid', (e: Extract<Event, { type: 'invoice-paid' }>) => {
+    let { pending, paid } = stateByAccount.get(e.context.accountId)!
 
-    pending.totalByInvoice.delete(e.invoice.number)
-    paid.totalByInvoice.set(e.invoice.number, e.invoice.total)
+    pending.totalByInvoice.delete(e.context.invoiceId)
+    // TODO: Set total
+    paid.totalByInvoice.set(e.context.invoiceId, 0)
 
     let total = sum(paid.totalByInvoice.values())
 
     for (let milestone of milestones(paid.milestones, (m) => m <= total)) {
-      let event = Event.parse({ type: MILESTONE, amount: total, milestone, at: e.at })
-      e.account.events.push(event)
-      events.add(event)
+      bus.emit(
+        MILESTONE,
+        Event.parse({
+          type: MILESTONE,
+          context: {
+            accountId: e.context.accountId,
+            invoiceId: e.context.invoiceId,
+          },
+          payload: {
+            amount: total,
+            milestone,
+            at: e.at,
+          },
+        }),
+      )
     }
   })
 
   // Cleanup future milestones if they are not relevant anymore
-  for (let status of ['invoice:paid', 'invoice:closed']) {
-    bus.on(status, (e: InvoiceEvent) => {
-      let { events, pending, paid } = stateByAccount.get(e.account.id)!
-      pending.totalByInvoice.delete(e.invoice.number)
+  for (let status of ['invoice-paid', 'invoice-closed'] as const) {
+    bus.on(status, (e: Extract<Event, { type: typeof status }>) => {
+      let { pending, paid } = stateByAccount.get(e.context.accountId)!
+      pending.totalByInvoice.delete(e.context.invoiceId)
 
       let total = sum(pending.totalByInvoice.values(), paid.totalByInvoice.values())
 
-      for (let event of events as Set<Extract<Event, { type: typeof MILESTONE }>>) {
-        if (event.type === MILESTONE && event.future && event.amount <= total) {
-          event.tombstone = true
-          events.delete(event)
+      for (let i = ctx.events.length - 1; i >= 0; i--) {
+        let event = ctx.events[i]
+
+        if (
+          event.type === MILESTONE &&
+          event.context.accountId === e.context.accountId &&
+          event.payload.future &&
+          event.payload.amount <= total
+        ) {
+          ctx.events.splice(i, 1)
         }
       }
     })
   }
 }
 
-export function mostExpensiveInvoiceMilestones(bus: EventEmitter) {
+export function mostExpensiveInvoiceMilestones(bus: EventEmitter, ctx: Context) {
   const MILESTONE = 'milestone:most-expensive-invoice'
 
   let stateByAccount = initState(() => ({
     max: null as number | null,
   }))
 
-  bus.on('invoice:sent', (e: InvoiceEvent) => {
-    let { events, pending, paid } = stateByAccount.get(e.account.id)!
+  bus.on('invoice-sent', (e: Extract<Event, { type: 'invoice-sent' }>) => {
+    let { pending, paid } = stateByAccount.get(e.context.accountId)!
+
+    // TODO: Set total
+    let total = 0
 
     if (pending.max === null) {
-      pending.max = e.invoice.total
+      pending.max = total
       return
     }
 
-    if (e.invoice.total <= Math.max(pending.max, paid.max ?? 0)) {
+    if (total <= Math.max(pending.max, paid.max ?? 0)) {
       return
     }
 
     let previous = pending.max
-    pending.max = e.invoice.total
+    pending.max = total
 
-    let event = Event.parse({
-      type: MILESTONE,
-      invoice: e.invoice.number,
-      amount: e.invoice.total,
-      increase: Number(((e.invoice.total / previous - 1) * 100).toFixed(0)),
-      future: true,
-      best: true,
-    }) as Extract<Event, typeof MILESTONE>
-
-    events.add(event)
-
-    e.account.events.push(event)
-    e.client.events.push(event)
-    e.invoice.events.push(event)
+    bus.emit(
+      MILESTONE,
+      Event.parse({
+        type: MILESTONE,
+        context: {
+          accountId: e.context.accountId,
+          invoiceId: e.context.invoiceId,
+        },
+        payload: {
+          amount: total,
+          increase: Number(((total / previous - 1) * 100).toFixed(0)),
+          future: true,
+          best: true,
+        },
+      }),
+    )
   })
 
-  bus.on('invoice:paid', (e: InvoiceEvent) => {
-    let { events, paid } = stateByAccount.get(e.account.id)!
+  bus.on('invoice-paid', (e: Extract<Event, { type: 'invoice-paid' }>) => {
+    let { paid } = stateByAccount.get(e.context.accountId)!
+
+    // TODO: Set total
+    let total = 0
 
     if (paid.max === null) {
-      paid.max = e.invoice.total
+      paid.max = total
       return
     }
 
-    if (e.invoice.total <= paid.max) {
+    if (total <= paid.max) {
       return
     }
 
     let previous = paid.max
-    paid.max = e.invoice.total
+    paid.max = total
 
-    let event = Event.parse({
-      type: MILESTONE,
-      invoice: e.invoice.number,
-      amount: e.invoice.total,
-      increase: Number(((e.invoice.total / previous - 1) * 100).toFixed(0)),
-      at: e.at,
-      best: true,
-    }) as Extract<Event, typeof MILESTONE>
+    bus.emit(
+      MILESTONE,
+      Event.parse({
+        type: MILESTONE,
+        context: {
+          accountId: e.context.accountId,
+          clientId: e.context.clientId,
+          invoiceId: e.context.invoiceId,
+        },
+        payload: {
+          amount: total,
+          increase: Number(((total / previous - 1) * 100).toFixed(0)),
+          at: e.at,
+          best: true,
+        },
+      }),
+    )
 
-    for (let event of events as Set<Extract<Event, { type: typeof MILESTONE }>>) {
-      event.best = false
+    for (let event of ctx.events.filter(
+      (_e) => _e.type === MILESTONE && _e.context.accountId === e.context.accountId,
+    ) as Extract<Event, { type: typeof MILESTONE }>[]) {
+      event.payload.best = false
     }
-
-    events.add(event)
-
-    e.account.events.push(event)
-    e.client.events.push(event)
-    e.invoice.events.push(event)
   })
 
   // Cleanup future milestones if they are not relevant anymore
-  for (let status of ['invoice:paid', 'invoice:closed']) {
-    bus.on(status, (e: InvoiceEvent) => {
-      let { events, paid } = stateByAccount.get(e.account.id)!
+  for (let status of ['invoice-paid', 'invoice-closed'] as const) {
+    bus.on(status, (e: Extract<Event, { type: typeof status }>) => {
+      let { paid } = stateByAccount.get(e.context.accountId)!
 
-      for (let event of events as Set<Extract<Event, { type: typeof MILESTONE }>>) {
-        if (event.type === MILESTONE && event.future && event.amount <= paid.max!) {
-          event.tombstone = true
-          events.delete(event)
+      for (let i = ctx.events.length - 1; i >= 0; i--) {
+        let event = ctx.events[i]
+
+        if (
+          event.type === MILESTONE &&
+          event.context.accountId === e.context.accountId &&
+          event.payload.future &&
+          event.payload.amount <= paid.max!
+        ) {
+          ctx.events.splice(i, 1)
         }
       }
     })

@@ -3,7 +3,6 @@ import { BanknotesIcon, CalendarIcon, MapIcon } from '@heroicons/react/24/outlin
 import { headers } from 'next/headers'
 import React from 'react'
 import { me } from '~/data'
-import { ActivityFeed } from '~/ui/activity-feed'
 import { Address, formatAddress } from '~/ui/address/address'
 import { Avatar } from '~/ui/avatar'
 import { Card, CardBody, CardTitle, Field } from '~/ui/card'
@@ -13,6 +12,7 @@ import { PaypalIcon } from '~/ui/icons/payment'
 import * as SocialIcons from '~/ui/icons/social'
 import { TimezoneDifference } from '~/ui/timezone-difference'
 import { match } from '~/utils/match'
+import { AccountActivityFeed } from './activity-feed'
 
 export default async function Page({ params: { id } }: { params: { id: string } }) {
   let base = headers().get('host')
@@ -190,21 +190,7 @@ export default async function Page({ params: { id } }: { params: { id: string } 
               </Card>
             )}
 
-            {account.events.filter((x) => !x.tombstone).length > 0 && (
-              <Card>
-                <CardTitle>
-                  Activity feed ({account.events.filter((x) => !x.tombstone).length})
-                </CardTitle>
-                <CardBody variant="filled-vertical">
-                  <div className="max-h-96 overflow-auto">
-                    <ActivityFeed
-                      events={account.events.filter((x) => !x.tombstone)}
-                      viewContext="account"
-                    />
-                  </div>
-                </CardBody>
-              </Card>
-            )}
+            <AccountActivityFeed account={account} />
           </div>
         </div>
       </div>

@@ -19,7 +19,6 @@ import {
   isSent,
 } from '~/domain/record/filters'
 import { Record, combineRecords, separateRecords } from '~/domain/record/record'
-import { ActivityFeed } from '~/ui/activity-feed'
 import { Address, formatAddress } from '~/ui/address/address'
 import { Avatar } from '~/ui/avatar'
 import { Card, CardBody, CardTitle, Field } from '~/ui/card'
@@ -34,6 +33,7 @@ import { Money } from '~/ui/money'
 import { StatusDisplay as QuoteStatusDisplay } from '~/ui/quote/status'
 import { TinyRecord } from '~/ui/record/tiny-record'
 import { TimezoneDifference } from '~/ui/timezone-difference'
+import { ClientActivityFeed } from './activity-feed'
 
 type RecordTab<T extends Record> = {
   label: string
@@ -301,21 +301,7 @@ export default async function Page({ params: { id } }: { params: { id: string } 
               </Card>
             )}
 
-            {client.events.filter((x) => !x.tombstone).length > 0 && (
-              <Card>
-                <CardTitle>
-                  Activity feed ({client.events.filter((x) => !x.tombstone).length})
-                </CardTitle>
-                <CardBody variant="filled-vertical">
-                  <div className="max-h-96 overflow-auto">
-                    <ActivityFeed
-                      events={client.events.filter((x) => !x.tombstone)}
-                      viewContext="client"
-                    />
-                  </div>
-                </CardBody>
-              </Card>
-            )}
+            <ClientActivityFeed client={client} />
           </div>
         </div>
       </div>

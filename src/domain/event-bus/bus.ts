@@ -1,6 +1,10 @@
 import { EventEmitter } from 'node:events'
-import { trackMilestones } from '~/domain/milestone/milestone'
 
-export let bus = new EventEmitter()
+class SuperEventEmitter extends EventEmitter {
+  emit(eventName: string | symbol, ...args: any[]) {
+    super.emit('*', ...args)
+    return super.emit(eventName, ...args)
+  }
+}
 
-trackMilestones(bus)
+export let bus = new SuperEventEmitter()

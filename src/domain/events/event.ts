@@ -5,129 +5,278 @@ import { ScopedIDGenerator } from '~/utils/id'
 let scopedId = new ScopedIDGenerator('event')
 
 export let Event = z
-  .discriminatedUnion('type', [
-    // Account
-    z.object({
-      type: z.literal('account-rebranded'),
-      tags: z.array(z.string()).default(['account']),
-      from: z.string(),
-      to: z.string(),
-    }),
-    z.object({
-      type: z.literal('account-relocated'),
-      tags: z.array(z.string()).default(['account']),
-      from: Address,
-      to: Address,
-    }),
+  .object({
+    id: z.string().default(() => scopedId.next()),
+  })
+  .and(
+    z.discriminatedUnion('type', [
+      // Account
+      z.object({
+        type: z.literal('account-rebranded'),
+        tags: z.array(z.string()).default(['account']),
+        context: z.object({
+          accountId: z.string(),
+        }),
+        payload: z.object({
+          from: z.string(),
+          to: z.string(),
+        }),
+      }),
+      z.object({
+        type: z.literal('account-relocated'),
+        tags: z.array(z.string()).default(['account']),
+        context: z.object({
+          accountId: z.string(),
+        }),
+        payload: z.object({
+          from: Address,
+          to: Address,
+        }),
+      }),
 
-    // Milestones
-    z.object({
-      type: z.literal('milestone:fastest-accepted-quote'),
-      tags: z.array(z.string()).default(['account', 'milestone']),
-      quote: z.string(),
-      client: z.object({ id: z.string(), name: z.string() }),
-      best: z.boolean().optional().default(false),
-      durationInSeconds: z.number(),
-    }),
-    z.object({
-      type: z.literal('milestone:invoices'),
-      tags: z.array(z.string()).default(['account', 'milestone']),
-      amount: z.number(),
-      future: z.boolean().optional().default(false),
-    }),
-    z.object({
-      type: z.literal('milestone:fastest-paid-invoice'),
-      tags: z.array(z.string()).default(['account', 'milestone']),
-      invoice: z.string(),
-      client: z.object({ id: z.string(), name: z.string() }),
-      best: z.boolean().optional().default(false),
-      durationInSeconds: z.number(),
-    }),
-    z.object({
-      type: z.literal('milestone:revenue'),
-      tags: z.array(z.string()).default(['account', 'milestone']),
-      amount: z.number(),
-      milestone: z.number(),
-      future: z.boolean().optional().default(false),
-    }),
-    z.object({
-      type: z.literal('milestone:most-expensive-invoice'),
-      tags: z.array(z.string()).default(['account', 'milestone']),
-      invoice: z.string(),
-      amount: z.number(),
-      increase: z.number(),
-      future: z.boolean().optional().default(false),
-      best: z.boolean().optional().default(false),
-    }),
-    z.object({
-      type: z.literal('milestone:clients'),
-      tags: z.array(z.string()).default(['account', 'milestone']),
-      amount: z.number(),
-      future: z.boolean().optional().default(false),
-    }),
+      // Milestones
+      z.object({
+        type: z.literal('milestone:fastest-accepted-quote'),
+        tags: z.array(z.string()).default(['milestone']),
+        context: z.object({
+          accountId: z.string(),
+          clientId: z.string(),
+          quoteId: z.string(),
+        }),
+        payload: z.object({
+          best: z.boolean(),
+          durationInSeconds: z.number(),
+        }),
+      }),
+      z.object({
+        type: z.literal('milestone:invoices'),
+        tags: z.array(z.string()).default(['milestone']),
+        context: z.object({
+          accountId: z.string(),
+        }),
+        payload: z.object({
+          amount: z.number(),
+          future: z.boolean().optional().default(false),
+        }),
+      }),
+      z.object({
+        type: z.literal('milestone:fastest-paid-invoice'),
+        tags: z.array(z.string()).default(['milestone']),
+        context: z.object({
+          accountId: z.string(),
+          clientId: z.string(),
+          invoiceId: z.string(),
+        }),
+        payload: z.object({
+          best: z.boolean(),
+          durationInSeconds: z.number(),
+        }),
+      }),
+      z.object({
+        type: z.literal('milestone:revenue'),
+        tags: z.array(z.string()).default(['milestone']),
+        context: z.object({
+          accountId: z.string(),
+        }),
+        payload: z.object({
+          amount: z.number(),
+          milestone: z.number(),
+          future: z.boolean().optional().default(false),
+        }),
+      }),
+      z.object({
+        type: z.literal('milestone:most-expensive-invoice'),
+        tags: z.array(z.string()).default(['milestone']),
+        context: z.object({
+          accountId: z.string(),
+          clientId: z.string(),
+          invoiceId: z.string(),
+        }),
+        payload: z.object({
+          amount: z.number(),
+          increase: z.number(),
+          future: z.boolean().optional().default(false),
+          best: z.boolean(),
+        }),
+      }),
+      z.object({
+        type: z.literal('milestone:clients'),
+        tags: z.array(z.string()).default(['milestone']),
+        context: z.object({
+          accountId: z.string(),
+        }),
+        payload: z.object({
+          amount: z.number(),
+          future: z.boolean().optional().default(false),
+        }),
+      }),
 
-    // Clients
-    z.object({
-      type: z.literal('client-rebranded'),
-      tags: z.array(z.string()).default(['client']),
-      from: z.string(),
-      to: z.string(),
-    }),
-    z.object({
-      type: z.literal('client-relocated'),
-      tags: z.array(z.string()).default(['client']),
-      from: Address,
-      to: Address,
-    }),
+      // Clients
+      z.object({
+        type: z.literal('client-rebranded'),
+        tags: z.array(z.string()).default(['client']),
+        context: z.object({
+          clientId: z.string(),
+        }),
+        payload: z.object({
+          from: z.string(),
+          to: z.string(),
+        }),
+      }),
+      z.object({
+        type: z.literal('client-relocated'),
+        tags: z.array(z.string()).default(['client']),
+        context: z.object({
+          clientId: z.string(),
+        }),
+        payload: z.object({
+          from: Address,
+          to: Address,
+        }),
+      }),
 
-    // Quotes
-    z.object({
-      type: z.literal('quote-drafted'),
-      tags: z.array(z.string()).default(['quote']),
-      from: z.enum(['quote']).optional(),
-    }),
-    z.object({ type: z.literal('quote-sent'), tags: z.array(z.string()).default(['quote']) }),
-    z.object({ type: z.literal('quote-accepted'), tags: z.array(z.string()).default(['quote']) }),
-    z.object({ type: z.literal('quote-rejected'), tags: z.array(z.string()).default(['quote']) }),
-    z.object({ type: z.literal('quote-expired'), tags: z.array(z.string()).default(['quote']) }),
-    z.object({ type: z.literal('quote-closed'), tags: z.array(z.string()).default(['quote']) }),
+      // Quotes
+      z.object({
+        type: z.literal('quote-drafted'),
+        tags: z.array(z.string()).default(['quote']),
+        context: z.object({
+          accountId: z.string(),
+          clientId: z.string(),
+          quoteId: z.string(),
+        }),
+        payload: z.object({
+          from: z.enum(['quote']).optional(),
+        }),
+      }),
+      z.object({
+        type: z.literal('quote-sent'),
+        tags: z.array(z.string()).default(['quote']),
+        context: z.object({
+          accountId: z.string(),
+          clientId: z.string(),
+          quoteId: z.string(),
+        }),
+      }),
+      z.object({
+        type: z.literal('quote-accepted'),
+        tags: z.array(z.string()).default(['quote']),
+        context: z.object({
+          accountId: z.string(),
+          clientId: z.string(),
+          quoteId: z.string(),
+        }),
+      }),
+      z.object({
+        type: z.literal('quote-rejected'),
+        tags: z.array(z.string()).default(['quote']),
+        context: z.object({
+          accountId: z.string(),
+          clientId: z.string(),
+          quoteId: z.string(),
+        }),
+      }),
+      z.object({
+        type: z.literal('quote-expired'),
+        tags: z.array(z.string()).default(['quote']),
+        context: z.object({
+          accountId: z.string(),
+          clientId: z.string(),
+          quoteId: z.string(),
+        }),
+      }),
+      z.object({
+        type: z.literal('quote-closed'),
+        tags: z.array(z.string()).default(['quote']),
+        context: z.object({
+          accountId: z.string(),
+          clientId: z.string(),
+          quoteId: z.string(),
+        }),
+      }),
 
-    // Invoices
-    z.object({
-      type: z.literal('invoice-drafted'),
-      tags: z.array(z.string()).default(['invoice']),
-      from: z.enum(['quote']).optional(),
-    }),
-    z.object({ type: z.literal('invoice-sent'), tags: z.array(z.string()).default(['invoice']) }),
-    z.object({
-      type: z.literal('invoice-partially-paid'),
-      tags: z.array(z.string()).default(['invoice']),
-      amount: z.number(),
-      outstanding: z.number(),
-    }),
-    z.object({
-      type: z.literal('invoice-paid'),
-      tags: z.array(z.string()).default(['invoice']),
-      amount: z.number(),
-      outstanding: z.number(),
-    }),
-    z.object({
-      type: z.literal('invoice-overdue'),
-      tags: z.array(z.string()).default(['invoice']),
-    }),
-    z.object({ type: z.literal('invoice-closed'), tags: z.array(z.string()).default(['invoice']) }),
+      // Invoices
+      z.object({
+        type: z.literal('invoice-drafted'),
+        tags: z.array(z.string()).default(['invoice']),
+        context: z.object({
+          accountId: z.string(),
+          clientId: z.string(),
+          invoiceId: z.string(),
+        }),
+        payload: z.object({
+          from: z.enum(['quote']).optional(),
+        }),
+      }),
+      z.object({
+        type: z.literal('invoice-sent'),
+        tags: z.array(z.string()).default(['invoice']),
+        context: z.object({
+          accountId: z.string(),
+          clientId: z.string(),
+          invoiceId: z.string(),
+        }),
+      }),
+      z.object({
+        type: z.literal('invoice-partially-paid'),
+        tags: z.array(z.string()).default(['invoice']),
+        context: z.object({
+          accountId: z.string(),
+          clientId: z.string(),
+          invoiceId: z.string(),
+        }),
+        payload: z.object({
+          amount: z.number(),
+          outstanding: z.number(),
+        }),
+      }),
+      z.object({
+        type: z.literal('invoice-paid'),
+        tags: z.array(z.string()).default(['invoice']),
+        context: z.object({
+          accountId: z.string(),
+          clientId: z.string(),
+          invoiceId: z.string(),
+        }),
+        payload: z.object({
+          amount: z.number(),
+          outstanding: z.number(),
+        }),
+      }),
+      z.object({
+        type: z.literal('invoice-overdue'),
+        tags: z.array(z.string()).default(['invoice']),
+        context: z.object({
+          accountId: z.string(),
+          clientId: z.string(),
+          invoiceId: z.string(),
+        }),
+      }),
+      z.object({
+        type: z.literal('invoice-closed'),
+        tags: z.array(z.string()).default(['invoice']),
+        context: z.object({
+          accountId: z.string(),
+          clientId: z.string(),
+          invoiceId: z.string(),
+        }),
+      }),
 
-    // Receipts
-    z.object({
-      type: z.literal('receipt-created'),
-      tags: z.array(z.string()).default(['receipt']),
-    }),
-  ])
+      // Receipts
+      z.object({
+        type: z.literal('receipt-created'),
+        tags: z.array(z.string()).default(['receipt']),
+        context: z.object({
+          accountId: z.string(),
+          clientId: z.string(),
+          invoiceId: z.string(),
+          receiptId: z.string(),
+        }),
+      }),
+    ]),
+  )
   .and(
     z.object({
-      id: z.string().default(() => scopedId.next()),
       at: z.date().nullable().default(null),
-      tombstone: z.boolean().optional().default(false),
     }),
   )
 

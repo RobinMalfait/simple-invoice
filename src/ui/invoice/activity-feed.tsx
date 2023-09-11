@@ -4,6 +4,7 @@ import { Fragment } from 'react'
 import type { Record } from '~/domain/record/record'
 import { ActivityItem, ViewContext } from '~/ui/activity-feed'
 import { classNames } from '~/ui/class-names'
+import { useLazyEventsForRecord } from '~/ui/hooks/use-events-by'
 import { useRecord } from '~/ui/hooks/use-record'
 import { useRecordStacks } from '~/ui/hooks/use-record-stacks'
 import { match } from '~/utils/match'
@@ -15,10 +16,13 @@ export function ActivityFeed(props: React.PropsWithChildren<{ records: Record[] 
 
   let activeRecordIdx = stacks[record.id]?.indexOf(record.id) ?? -1
 
+  let getEvents = useLazyEventsForRecord()
+
   return (
     <ViewContext.Provider value="record">
       <ul role="list" className="space-y-6">
         {records.map((record, idx) => {
+          let events = getEvents(record)
           return (
             <Fragment key={record.id}>
               {records.length !== 1 && (
@@ -48,25 +52,23 @@ export function ActivityFeed(props: React.PropsWithChildren<{ records: Record[] 
                   records.length !== 1 && 'mt-6',
                 )}
               >
-                {record.events
-                  .filter((e) => !e.tombstone)
-                  .map((activityItem, activityItemIdx, all) => {
-                    let isLast = activityItemIdx === all.length - 1
-                    let isLastNonMilestone = all
-                      .slice(activityItemIdx + 1)
-                      .every((e) => e.tags.includes('milestone'))
+                {events.map((activityItem, activityItemIdx, all) => {
+                  let isLast = activityItemIdx === all.length - 1
+                  let isLastNonMilestone = all
+                    .slice(activityItemIdx + 1)
+                    .every((e) => e.tags.includes('milestone'))
 
-                    return (
-                      <ActivityItem
-                        key={activityItem.id}
-                        previous={all[activityItemIdx - 1]}
-                        item={activityItem}
-                        isFirst={activityItemIdx === 0}
-                        isLast={isLast}
-                        withIndicator={isLast || isLastNonMilestone}
-                      />
-                    )
-                  })}
+                  return (
+                    <ActivityItem
+                      key={activityItem.id}
+                      previous={all[activityItemIdx - 1]}
+                      item={activityItem}
+                      isFirst={activityItemIdx === 0}
+                      isLast={isLast}
+                      withIndicator={isLast || isLastNonMilestone}
+                    />
+                  )
+                })}
               </ul>
             </Fragment>
           )

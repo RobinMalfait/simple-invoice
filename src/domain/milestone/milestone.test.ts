@@ -12,6 +12,7 @@ import {
   revenueMilestones,
 } from '~/domain/milestone/milestone'
 import { QuoteBuilder } from '~/domain/quote/quote'
+import { Event } from '../events/event'
 import { InvoiceBuilder } from '../invoice/invoice'
 import { InvoiceItemBuilder } from '../invoice/invoice-item'
 
@@ -49,14 +50,17 @@ configure({
 })
 
 describe('fastestAcceptedQuoteMilestones', () => {
+  let events: Event[] = []
   let bus = new EventEmitter()
   let account: Account = null as unknown as Account
   let client: Client = null as unknown as Client
 
   beforeEach(() => {
     bus.removeAllListeners()
+    events.splice(0)
+    bus.on('*', (e) => events.push(e))
 
-    fastestAcceptedQuoteMilestones(bus)
+    fastestAcceptedQuoteMilestones(bus, { events })
 
     account = new AccountBuilder().name('Foo').billing(new AddressBuilder().build()).build()
     client = new ClientBuilder().name('Foo').billing(new AddressBuilder().build()).build()
@@ -73,7 +77,7 @@ describe('fastestAcceptedQuoteMilestones', () => {
   it('should not mark the first accepted quote as the fastest accepted quote yet', () => {
     setupQuote().send('2020-01-01 10:00').accept('2020-01-01 15:00').build()
 
-    expect(account.events.filter((x) => !x.tombstone)).toMatchSnapshot()
+    expect(events).toMatchSnapshot()
   })
 
   it('should emit a milestone event for the fastest accepted quote', () => {
@@ -83,7 +87,7 @@ describe('fastestAcceptedQuoteMilestones', () => {
     setupQuote().send('2020-01-01 10:00').accept('2020-01-01 14:00').build() // 4 hours
     setupQuote().send('2020-01-01 10:00').accept('2020-01-01 11:00').build() // 1 hour
 
-    expect(account.events.filter((x) => !x.tombstone)).toMatchSnapshot([
+    expect(events).toMatchSnapshot([
       { id: expect.any(String), client: { id: expect.any(String) } },
       { id: expect.any(String), client: { id: expect.any(String) } },
       { id: expect.any(String), client: { id: expect.any(String) } },
@@ -92,14 +96,17 @@ describe('fastestAcceptedQuoteMilestones', () => {
 })
 
 describe('fastestPaidInvoiceMilestones', () => {
+  let events: Event[] = []
   let bus = new EventEmitter()
   let account: Account = null as unknown as Account
   let client: Client = null as unknown as Client
 
   beforeEach(() => {
     bus.removeAllListeners()
+    events.splice(0)
+    bus.on('*', (e) => events.push(e))
 
-    fastestPaidInvoiceMilestones(bus)
+    fastestPaidInvoiceMilestones(bus, { events })
 
     account = new AccountBuilder().name('Foo').billing(new AddressBuilder().build()).build()
     client = new ClientBuilder().name('Foo').billing(new AddressBuilder().build()).build()
@@ -116,7 +123,7 @@ describe('fastestPaidInvoiceMilestones', () => {
   it('should not mark the first paid invoice as the fastest paid invoice yet', () => {
     setupInvoice().send('2020-01-01 10:00').pay('2020-01-01 15:00').build()
 
-    expect(account.events.filter((x) => !x.tombstone)).toMatchSnapshot()
+    expect(events).toMatchSnapshot()
   })
 
   it('should emit a milestone event for the fastest paid invoice', () => {
@@ -126,7 +133,7 @@ describe('fastestPaidInvoiceMilestones', () => {
     setupInvoice().send('2020-01-01 10:00').pay('2020-01-01 14:00').build() // 4 hours
     setupInvoice().send('2020-01-01 10:00').pay('2020-01-01 11:00').build() // 1 hour
 
-    expect(account.events.filter((x) => !x.tombstone)).toMatchSnapshot([
+    expect(events).toMatchSnapshot([
       { id: expect.any(String), client: { id: expect.any(String) } },
       { id: expect.any(String), client: { id: expect.any(String) } },
       { id: expect.any(String), client: { id: expect.any(String) } },
@@ -140,21 +147,22 @@ describe('fastestPaidInvoiceMilestones', () => {
     setupInvoice().send('2020-01-01 10:00').pay('2020-01-01 14:00').build() // 4 hours
     setupInvoice().pay('2020-01-01 11:00').build() // 1 hour
 
-    expect(account.events.filter((x) => !x.tombstone)).toMatchSnapshot([
-      { id: expect.any(String), client: { id: expect.any(String) } },
-    ])
+    expect(events).toMatchSnapshot([{ id: expect.any(String), client: { id: expect.any(String) } }])
   })
 })
 
 describe('invoiceCountMilestones', () => {
+  let events: Event[] = []
   let bus = new EventEmitter()
   let account: Account = null as unknown as Account
   let client: Client = null as unknown as Client
 
   beforeEach(() => {
     bus.removeAllListeners()
+    events.splice(0)
+    bus.on('*', (e) => events.push(e))
 
-    invoiceCountMilestones(bus)
+    invoiceCountMilestones(bus, { events })
 
     account = new AccountBuilder().name('Foo').billing(new AddressBuilder().build()).build()
     client = new ClientBuilder().name('Foo').billing(new AddressBuilder().build()).build()
@@ -177,10 +185,7 @@ describe('invoiceCountMilestones', () => {
     setupInvoice().send('2020-01-01 10:00').pay('2020-01-01 15:00').build() // 5 -- Second milestone
     setupInvoice().send('2020-01-01 10:00').pay('2020-01-01 16:00').build() // 6
 
-    expect(account.events.filter((x) => !x.tombstone)).toMatchSnapshot([
-      { id: expect.any(String) },
-      { id: expect.any(String) },
-    ])
+    expect(events).toMatchSnapshot([{ id: expect.any(String) }, { id: expect.any(String) }])
   })
 
   it('should keep track of sent invoices as well', () => {
@@ -192,10 +197,7 @@ describe('invoiceCountMilestones', () => {
     setupInvoice().send('2020-01-01 10:00').build() // 5 -- Second milestone
     setupInvoice().send('2020-01-01 10:00').build() // 6
 
-    expect(account.events.filter((x) => !x.tombstone)).toMatchSnapshot([
-      { id: expect.any(String) },
-      { id: expect.any(String) },
-    ])
+    expect(events).toMatchSnapshot([{ id: expect.any(String) }, { id: expect.any(String) }])
   })
 
   it('should drop future events in favor of real milestone achievements', () => {
@@ -214,22 +216,22 @@ describe('invoiceCountMilestones', () => {
     setupInvoice().pay('2020-01-01 20:00').build() // 5 -- Second milestone
     setupInvoice().pay('2020-01-01 21:00').build() // 6
 
-    expect(account.events.filter((x) => !x.tombstone)).toMatchSnapshot([
-      { id: expect.any(String) },
-      { id: expect.any(String) },
-    ])
+    expect(events).toMatchSnapshot([{ id: expect.any(String) }, { id: expect.any(String) }])
   })
 })
 
 describe('revenueMilestones', () => {
+  let events: Event[] = []
   let bus = new EventEmitter()
   let account: Account = null as unknown as Account
   let client: Client = null as unknown as Client
 
   beforeEach(() => {
     bus.removeAllListeners()
+    events.splice(0)
+    bus.on('*', (e) => events.push(e))
 
-    revenueMilestones(bus)
+    revenueMilestones(bus, { events })
 
     account = new AccountBuilder().name('Foo').billing(new AddressBuilder().build()).build()
     client = new ClientBuilder().name('Foo').billing(new AddressBuilder().build()).build()
@@ -266,7 +268,7 @@ describe('revenueMilestones', () => {
     setupInvoice().send('2020-01-01 10:00').pay('2020-01-01 16:00').build() // 8
     setupInvoice().send('2020-01-01 10:00').pay('2020-01-01 16:00').build() // 9 -- Third milestone
 
-    expect(account.events.filter((x) => !x.tombstone)).toMatchSnapshot([
+    expect(events).toMatchSnapshot([
       { id: expect.any(String) },
       { id: expect.any(String) },
       { id: expect.any(String) },
@@ -285,7 +287,7 @@ describe('revenueMilestones', () => {
     setupInvoice().send('2020-01-01 10:00').build() // 8
     setupInvoice().send('2020-01-01 10:00').build() // 9 -- Third milestone
 
-    expect(account.events.filter((x) => !x.tombstone)).toMatchSnapshot([
+    expect(events).toMatchSnapshot([
       { id: expect.any(String) },
       { id: expect.any(String) },
       { id: expect.any(String) },
@@ -314,7 +316,7 @@ describe('revenueMilestones', () => {
     setupInvoice().send('2020-01-02 12:00').pay('2020-01-02 15:00').build() // 8
     setupInvoice().send('2020-01-02 13:00').pay('2020-01-02 16:00').build() // 9 -- Third milestone
 
-    expect(account.events.filter((x) => !x.tombstone)).toMatchSnapshot([
+    expect(events).toMatchSnapshot([
       { id: expect.any(String) },
       { id: expect.any(String) },
       { id: expect.any(String) },
@@ -323,13 +325,16 @@ describe('revenueMilestones', () => {
 })
 
 describe('clientCountMilestones', () => {
+  let events: Event[] = []
   let bus = new EventEmitter()
   let account: Account = null as unknown as Account
 
   beforeEach(() => {
     bus.removeAllListeners()
+    events.splice(0)
+    bus.on('*', (e) => events.push(e))
 
-    clientCountMilestones(bus)
+    clientCountMilestones(bus, { events })
 
     account = new AccountBuilder().name('Foo').billing(new AddressBuilder().build()).build()
   })
@@ -358,10 +363,7 @@ describe('clientCountMilestones', () => {
     setupInvoice().send('2020-01-01 10:00').pay('2020-01-01 15:00').build() // 5 -- Second milestone
     setupInvoice().send('2020-01-01 10:00').pay('2020-01-01 16:00').build() // 6
 
-    expect(account.events.filter((x) => !x.tombstone)).toMatchSnapshot([
-      { id: expect.any(String) },
-      { id: expect.any(String) },
-    ])
+    expect(events).toMatchSnapshot([{ id: expect.any(String) }, { id: expect.any(String) }])
   })
 
   it('should keep track of sent invoices as well', () => {
@@ -376,10 +378,7 @@ describe('clientCountMilestones', () => {
     setupInvoice().send('2020-01-01 14:00').build() // 5 -- Second milestone
     setupInvoice().send('2020-01-01 15:00').build() // 6
 
-    expect(account.events.filter((x) => !x.tombstone)).toMatchSnapshot([
-      { id: expect.any(String) },
-      { id: expect.any(String) },
-    ])
+    expect(events).toMatchSnapshot([{ id: expect.any(String) }, { id: expect.any(String) }])
   })
 
   it('should drop future events in favor of real milestone achievements', () => {
@@ -400,7 +399,7 @@ describe('clientCountMilestones', () => {
     setupInvoice().send('2020-01-01 19:00').pay('2020-01-01 19:30').build() // 11 -- Second milestone
     setupInvoice().send('2020-01-01 20:00').pay('2020-01-01 20:30').build() // 12
 
-    expect(account.events.filter((x) => !x.tombstone)).toMatchSnapshot([
+    expect(events).toMatchSnapshot([
       { id: expect.any(String) },
       { id: expect.any(String) },
       { id: expect.any(String) },
@@ -409,14 +408,17 @@ describe('clientCountMilestones', () => {
 })
 
 describe('mostExpensiveInvoiceMilestones', () => {
+  let events: Event[] = []
   let bus = new EventEmitter()
   let account: Account = null as unknown as Account
   let client: Client = null as unknown as Client
 
   beforeEach(() => {
     bus.removeAllListeners()
+    events.splice(0)
+    bus.on('*', (e) => events.push(e))
 
-    mostExpensiveInvoiceMilestones(bus)
+    mostExpensiveInvoiceMilestones(bus, { events })
 
     account = new AccountBuilder().name('Foo').billing(new AddressBuilder().build()).build()
     client = new ClientBuilder().name('Foo').billing(new AddressBuilder().build()).build()
@@ -446,7 +448,7 @@ describe('mostExpensiveInvoiceMilestones', () => {
 
     setupInvoice(6).send('2020-01-01 10:00').pay('2020-01-01 15:00').build() // First paid
 
-    expect(account.events.filter((x) => !x.tombstone)).toMatchSnapshot()
+    expect(events).toMatchSnapshot()
   })
 
   it('should track paid invoices', () => {
@@ -461,10 +463,7 @@ describe('mostExpensiveInvoiceMilestones', () => {
     setupInvoice(5).send('2020-01-01 10:00').pay('2020-01-01 18:00').build() // 8 -- Second milestone
     setupInvoice(1).send('2020-01-01 10:00').pay('2020-01-01 19:00').build() // 9
 
-    expect(account.events.filter((x) => !x.tombstone)).toMatchSnapshot([
-      { id: expect.any(String) },
-      { id: expect.any(String) },
-    ])
+    expect(events).toMatchSnapshot([{ id: expect.any(String) }, { id: expect.any(String) }])
   })
 
   it('should keep track of sent invoices as well', () => {
@@ -479,10 +478,7 @@ describe('mostExpensiveInvoiceMilestones', () => {
     setupInvoice(5).send('2020-01-01 18:00').build() // 8 -- Second milestone
     setupInvoice(1).send('2020-01-01 19:00').build() // 9
 
-    expect(account.events.filter((x) => !x.tombstone)).toMatchSnapshot([
-      { id: expect.any(String) },
-      { id: expect.any(String) },
-    ])
+    expect(events).toMatchSnapshot([{ id: expect.any(String) }, { id: expect.any(String) }])
   })
 
   it('should drop future events in favor of real milestone achievements', () => {
@@ -508,9 +504,6 @@ describe('mostExpensiveInvoiceMilestones', () => {
     setupInvoice(5).send('2020-01-01 10:00').pay('2020-01-01 18:00').build() // 8 -- Second milestone
     setupInvoice(1).send('2020-01-01 10:00').pay('2020-01-01 19:00').build() // 9
 
-    expect(account.events.filter((x) => !x.tombstone)).toMatchSnapshot([
-      { id: expect.any(String) },
-      { id: expect.any(String) },
-    ])
+    expect(events).toMatchSnapshot([{ id: expect.any(String) }, { id: expect.any(String) }])
   })
 })

@@ -34,6 +34,7 @@ import { useCurrentDate } from '~/ui/hooks/use-current-date'
 import { Money } from '~/ui/money'
 import { assertNever } from '~/utils/assert-never'
 import { match } from '~/utils/match'
+import { useDatabase } from './hooks/use-db'
 
 function isFutureEvent(event: Event) {
   return 'future' in event && event.future
@@ -57,21 +58,11 @@ export function ActivityFeed({
   viewContext: ContextType<typeof ViewContext>
 }) {
   let grouped = events
-    .filter((e) => !e.tombstone)
     .reverse()
     .sort((a, z) => {
-      if (isFutureEvent(a) && isFutureEvent(z)) {
-        return 0
-      }
-
-      if (isFutureEvent(a)) {
-        return -1
-      }
-
-      if (isFutureEvent(z)) {
-        return 1
-      }
-
+      if (isFutureEvent(a) && isFutureEvent(z)) return 0
+      if (isFutureEvent(a)) return -1
+      if (isFutureEvent(z)) return 1
       return 0
     })
     .map((activityItem, activityItemIdx, all) => {
@@ -191,7 +182,7 @@ export function ActivityItem({
   }
 
   let [text, extra] = useActivityText(item)
-  let isPotentialFutureEvent = 'future' in item && item.future
+  let isPotentialFutureEvent = 'payload' in item && 'future' in item.payload && item.payload.future
   let parentCardStructure = useCardStructure()
 
   return (
@@ -344,23 +335,31 @@ function ActivityIndicator({ item }: { item: Event }) {
 function useActivityText(item: Event) {
   let viewContext = useContext(ViewContext)
   let now = useCurrentDate()
+  let db = useDatabase()
+
+  // @ts-expect-error
+  let client = db.clientById.get(item.context.clientId)!
+  // @ts-expect-error
+  let quote = db.quoteById.get(item.context.quoteId)!
+  // @ts-expect-error
+  let invoice = db.invoiceById.get(item.context.invoiceId)!
 
   switch (item.type) {
     case 'account-rebranded':
       return [
         <>
           {'"'}
-          <span className="font-medium text-gray-900 dark:text-gray-100">{item.from}</span>
+          <span className="font-medium text-gray-900 dark:text-gray-100">{item.payload.from}</span>
           {'" rebranded to "'}
-          <span className="font-medium text-gray-900 dark:text-gray-100">{item.to}</span>
+          <span className="font-medium text-gray-900 dark:text-gray-100">{item.payload.to}</span>
           {'".'}
         </>,
       ]
 
     case 'account-relocated': {
       let encoded = new URLSearchParams({
-        from: formatAddress(item.from).replace(/\n/g, ', '),
-        to: formatAddress(item.to).replace(/\n/g, ', '),
+        from: formatAddress(item.payload.from).replace(/\n/g, ', '),
+        to: formatAddress(item.payload.to).replace(/\n/g, ', '),
       })
 
       return [
@@ -387,7 +386,7 @@ function useActivityText(item: Event) {
               <div className="flex-1">
                 <span className="text-xs font-medium dark:text-zinc-200">From</span>
                 <div className="flex items-center justify-between gap-4 font-mono text-xs font-medium">
-                  <Address address={item.from} />
+                  <Address address={item.payload.from} />
                   <a
                     title="Open in Google Maps"
                     target="_blank"
@@ -405,7 +404,7 @@ function useActivityText(item: Event) {
               <div className="flex-1">
                 <span className="text-xs font-medium dark:text-zinc-200">To</span>
                 <div className="flex items-center justify-between gap-4 font-mono text-xs font-medium">
-                  <Address address={item.to} />
+                  <Address address={item.payload.to} />
                   <a
                     title="Open in Google Maps"
                     target="_blank"
@@ -429,36 +428,36 @@ function useActivityText(item: Event) {
     case 'milestone:fastest-accepted-quote':
       return [
         <>
-          {item.best || viewContext !== 'record'
+          {item.payload.best || viewContext !== 'record'
             ? `Fastest accepted quote, took `
             : `Previously fasted accepted quote, took `}
           <span className="font-medium text-gray-900 dark:text-gray-100">
-            {formatDistanceToNowStrict(addSeconds(now, item.durationInSeconds))}
+            {formatDistanceToNowStrict(addSeconds(now, item.payload.durationInSeconds))}
           </span>
         </>,
         <>
           <span className="text-xs opacity-50">
             <Link
               className="font-medium text-gray-900 dark:text-gray-100"
-              href={`/clients/${item.client.id}`}
+              href={`/clients/${item.context.clientId}`}
             >
-              {item.client.name}
+              {client.name}
             </Link>{' '}
             accepted quote{' '}
             <Link
-              href={`/quote/${item.quote}`}
+              href={`/quote/${quote?.number}`}
               className="font-medium text-gray-900 dark:text-gray-100"
             >
-              #{item.quote}
+              #{quote.number}
             </Link>{' '}
-            in {formatDistanceToNowStrict(addSeconds(now, item.durationInSeconds))}.
+            in {formatDistanceToNowStrict(addSeconds(now, item.payload.durationInSeconds))}.
           </span>
         </>,
       ]
 
     case 'milestone:invoices':
       return [
-        item.amount === 1 ? (
+        item.payload.amount === 1 ? (
           <>
             {'Your '}
             <span className="font-medium text-gray-900 dark:text-gray-100">1st</span>
@@ -466,8 +465,10 @@ function useActivityText(item: Event) {
           </>
         ) : (
           <>
-            {item.future ? 'Will reach ' : 'Reached '}
-            <span className="font-medium text-gray-900 dark:text-gray-100">{item.amount}</span>
+            {item.payload.future ? 'Will reach ' : 'Reached '}
+            <span className="font-medium text-gray-900 dark:text-gray-100">
+              {item.payload.amount}
+            </span>
             {' paid invoices!'}
           </>
         ),
@@ -476,10 +477,10 @@ function useActivityText(item: Event) {
     case 'milestone:revenue':
       return [
         <>
-          {item.future ? 'Will pass ' : 'Passed '}
+          {item.payload.future ? 'Will pass ' : 'Passed '}
           <span className="font-medium text-gray-900 dark:text-gray-100">
-            <Money amount={item.milestone} />
-            {item.amount > item.milestone ? '+' : ''}
+            <Money amount={item.payload.milestone} />
+            {item.payload.amount > item.payload.milestone ? '+' : ''}
           </span>
           {' in total revenue!'}
         </>,
@@ -493,29 +494,29 @@ function useActivityText(item: Event) {
           ) : (
             <Link
               className="font-medium text-gray-900 dark:text-gray-100"
-              href={`/invoice/${item.invoice}`}
+              href={`/invoice/${invoice.number}`}
             >
-              {`#${item.invoice}`}
+              {`#${invoice.number}`}
             </Link>
           )}
-          {item.future
+          {item.payload.future
             ? ` will be ${viewContext === 'account' ? 'your' : 'the'} most expensive invoice (`
-            : ` ${item.best || viewContext !== 'record' ? 'is ' : 'was '} ${
+            : ` ${item.payload.best || viewContext !== 'record' ? 'is ' : 'was '} ${
                 viewContext === 'account' ? 'your' : 'the'
               } most expensive invoice ${
-                item.best || viewContext !== 'record' ? '' : 'at this time '
+                item.payload.best || viewContext !== 'record' ? '' : 'at this time '
               }(`}
           <span className="font-medium text-emerald-500 dark:text-emerald-400/60">
-            +{item.increase}%
+            +{item.payload.increase}%
           </span>
           {`).`}
         </>,
         viewContext !== 'record' && (
           <>
             <span className="text-xs opacity-50">
-              This invoice {item.future ? 'is' : 'was'}{' '}
+              This invoice {item.payload.future ? 'is' : 'was'}{' '}
               <span className="font-medium text-gray-900 dark:text-gray-100">
-                <Money amount={item.amount} />
+                <Money amount={item.payload.amount} />
               </span>
               .
             </span>
@@ -526,8 +527,10 @@ function useActivityText(item: Event) {
     case 'milestone:clients':
       return [
         <>
-          {item.future ? 'Will attract ' : 'Attracted '}
-          <span className="font-medium text-gray-900 dark:text-gray-100">{item.amount}</span>
+          {item.payload.future ? 'Will attract ' : 'Attracted '}
+          <span className="font-medium text-gray-900 dark:text-gray-100">
+            {item.payload.amount}
+          </span>
           {' paying clients!'}
         </>,
       ]
@@ -535,11 +538,11 @@ function useActivityText(item: Event) {
     case 'milestone:fastest-paid-invoice':
       return [
         <>
-          {item.best || viewContext !== 'record'
+          {item.payload.best || viewContext !== 'record'
             ? `Fastest paid invoice, took `
             : `Previously fasted paid invoice, took `}
           <span className="font-medium text-gray-900 dark:text-gray-100">
-            {formatDistanceToNowStrict(addSeconds(now, item.durationInSeconds))}
+            {formatDistanceToNowStrict(addSeconds(now, item.payload.durationInSeconds))}
           </span>
         </>,
         viewContext !== 'record' && (
@@ -547,18 +550,18 @@ function useActivityText(item: Event) {
             <span className="text-xs opacity-50">
               <Link
                 className="font-medium text-gray-900 dark:text-gray-100"
-                href={`/clients/${item.client.id}`}
+                href={`/clients/${item.context.clientId}`}
               >
-                {item.client.name}
+                {client.name}
               </Link>{' '}
               paid invoice{' '}
               <Link
-                href={`/invoice/${item.invoice}`}
+                href={`/invoice/${invoice.number}`}
                 className="font-medium text-gray-900 dark:text-gray-100"
               >
-                #{item.invoice}
+                #{invoice.number}
               </Link>{' '}
-              in {formatDistanceToNowStrict(addSeconds(now, item.durationInSeconds))}.
+              in {formatDistanceToNowStrict(addSeconds(now, item.payload.durationInSeconds))}.
             </span>
           </>
         ),
@@ -568,17 +571,17 @@ function useActivityText(item: Event) {
       return [
         <>
           {'"'}
-          <span className="font-medium text-gray-900 dark:text-gray-100">{item.from}</span>
+          <span className="font-medium text-gray-900 dark:text-gray-100">{item.payload.from}</span>
           {'" rebranded to "'}
-          <span className="font-medium text-gray-900 dark:text-gray-100">{item.to}</span>
+          <span className="font-medium text-gray-900 dark:text-gray-100">{item.payload.to}</span>
           {'".'}
         </>,
       ]
 
     case 'client-relocated': {
       let encoded = new URLSearchParams({
-        from: formatAddress(item.from).replace(/\n/g, ', '),
-        to: formatAddress(item.to).replace(/\n/g, ', '),
+        from: formatAddress(item.payload.from).replace(/\n/g, ', '),
+        to: formatAddress(item.payload.to).replace(/\n/g, ', '),
       })
 
       return [
@@ -605,7 +608,7 @@ function useActivityText(item: Event) {
               <div className="flex-1">
                 <span className="text-xs font-medium dark:text-zinc-200">From</span>
                 <div className="flex items-center justify-between gap-4 font-mono text-xs font-medium">
-                  <Address address={item.from} />
+                  <Address address={item.payload.from} />
                   <a
                     title="Open in Google Maps"
                     target="_blank"
@@ -623,7 +626,7 @@ function useActivityText(item: Event) {
               <div className="flex-1">
                 <span className="text-xs font-medium dark:text-zinc-200">To</span>
                 <div className="flex items-center justify-between gap-4 font-mono text-xs font-medium">
-                  <Address address={item.to} />
+                  <Address address={item.payload.to} />
                   <a
                     title="Open in Google Maps"
                     target="_blank"
@@ -645,12 +648,12 @@ function useActivityText(item: Event) {
     }
 
     case 'quote-drafted': {
-      if (item.from) {
+      if (item.payload.from) {
         return [
           <>
             <span className="font-medium text-gray-900 dark:text-gray-100">Drafted</span> the quote
             from{' '}
-            {match(item.from, {
+            {match(item.payload.from, {
               quote: () => 'another quote',
             })}
             .
@@ -711,12 +714,12 @@ function useActivityText(item: Event) {
       ]
 
     case 'invoice-drafted':
-      if (item.from) {
+      if (item.payload.from) {
         return [
           <>
             <span className="font-medium text-gray-900 dark:text-gray-100">Drafted</span> the
             invoice from a{' '}
-            {match(item.from, {
+            {match(item.payload.from, {
               quote: () => 'quote',
             })}
             .
@@ -748,8 +751,8 @@ function useActivityText(item: Event) {
       return [
         <>
           <span className="font-medium text-gray-900 dark:text-gray-100">Partially paid</span> with{' '}
-          <Money amount={item.amount} />, outstanding amount of <Money amount={item.outstanding} />{' '}
-          left.
+          <Money amount={item.payload.amount} />, outstanding amount of{' '}
+          <Money amount={item.payload.outstanding} /> left.
         </>,
       ]
 
