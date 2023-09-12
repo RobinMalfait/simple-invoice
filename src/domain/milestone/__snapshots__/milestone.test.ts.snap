@@ -258,6 +258,171 @@ exports[`fastestPaidInvoiceMilestones should skip paid invoices that have not be
 ]
 `;
 
+exports[`internationalClientCountMilestones should drop future events in favor of real milestone achievements 1`] = `
+[
+  {
+    "at": 2020-01-01T14:30:00.000Z,
+    "context": {
+      "accountId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "amount": 1,
+      "future": false,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:international-clients",
+  },
+  {
+    "at": 2020-01-01T16:30:00.000Z,
+    "context": {
+      "accountId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "amount": 3,
+      "future": false,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:international-clients",
+  },
+  {
+    "at": null,
+    "context": {
+      "accountId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "amount": 10,
+      "future": true,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:international-clients",
+  },
+  {
+    "at": 2020-01-01T18:30:00.000Z,
+    "context": {
+      "accountId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "amount": 5,
+      "future": false,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:international-clients",
+  },
+]
+`;
+
+exports[`internationalClientCountMilestones should keep track of sent invoices as well 1`] = `
+[
+  {
+    "at": null,
+    "context": {
+      "accountId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "amount": 1,
+      "future": true,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:international-clients",
+  },
+  {
+    "at": null,
+    "context": {
+      "accountId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "amount": 3,
+      "future": true,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:international-clients",
+  },
+  {
+    "at": null,
+    "context": {
+      "accountId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "amount": 5,
+      "future": true,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:international-clients",
+  },
+]
+`;
+
+exports[`internationalClientCountMilestones should track paid invoices 1`] = `
+[
+  {
+    "at": 2020-01-01T10:00:00.000Z,
+    "context": {
+      "accountId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "amount": 1,
+      "future": false,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:international-clients",
+  },
+  {
+    "at": 2020-01-01T12:00:00.000Z,
+    "context": {
+      "accountId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "amount": 3,
+      "future": false,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:international-clients",
+  },
+  {
+    "at": 2020-01-01T14:00:00.000Z,
+    "context": {
+      "accountId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "amount": 5,
+      "future": false,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:international-clients",
+  },
+]
+`;
+
 exports[`invoiceCountMilestones should drop future events in favor of real milestone achievements 1`] = `
 [
   {

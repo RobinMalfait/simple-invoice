@@ -10,6 +10,7 @@ import {
   clientCountMilestones,
   fastestAcceptedQuoteMilestones,
   fastestPaidInvoiceMilestones,
+  internationalClientCountMilestones,
   invoiceCountMilestones,
   mostExpensiveInvoiceMilestones,
   revenueMilestones,
@@ -516,6 +517,107 @@ describe('clientCountMilestones', () => {
     setupInvoice().send('2020-01-01 20:00').pay('2020-01-01 20:30').build() // 12
 
     expect(events).toMatchSnapshot([
+      { id: expect.any(String), context: { accountId: expect.any(String) } },
+      { id: expect.any(String), context: { accountId: expect.any(String) } },
+      { id: expect.any(String), context: { accountId: expect.any(String) } },
+    ])
+  })
+})
+
+describe('internationalClientCountMilestones', () => {
+  let events: Event[] = []
+  let bus = new SuperEventEmitter()
+  let account: Account = null as unknown as Account
+
+  beforeEach(() => {
+    bus.removeAllListeners()
+    events.splice(0)
+    bus.on('*', (e: Extract<Event, { type: `milestone:${string}` }>) => {
+      if (e.tags.includes('milestone')) {
+        events.push(e)
+      }
+    })
+
+    internationalClientCountMilestones(bus, { events })
+
+    account = new AccountBuilder()
+      .name('Foo')
+      .billing(new AddressBuilder().country('Belgium').build())
+      .build()
+  })
+
+  afterEach(() => {
+    bus.removeAllListeners()
+  })
+
+  function setupInvoice() {
+    return new InvoiceBuilder(bus)
+      .account(account)
+      .client(
+        new ClientBuilder().name('Foo').billing(new AddressBuilder().country('US').build()).build(),
+      )
+      .issueDate(new Date())
+      .item(new InvoiceItemBuilder().unitPrice(100_00).description('Expensive lollies').build())
+  }
+
+  it('should track paid invoices', () => {
+    setupInvoice().build() // Draft
+    setupInvoice().build() // Draft
+    setupInvoice().build() // Draft
+
+    setupInvoice().send('2020-01-01 10:00').pay('2020-01-01 11:00').build() // 1 -- First milestone
+    setupInvoice().send('2020-01-01 10:00').pay('2020-01-01 12:00').build() // 2
+    setupInvoice().send('2020-01-01 10:00').pay('2020-01-01 13:00').build() // 3 -- Second milestone
+    setupInvoice().send('2020-01-01 10:00').pay('2020-01-01 14:00').build() // 4
+    setupInvoice().send('2020-01-01 10:00').pay('2020-01-01 15:00').build() // 5 -- Third milestone
+    setupInvoice().send('2020-01-01 10:00').pay('2020-01-01 16:00').build() // 6
+
+    expect(events).toMatchSnapshot([
+      { id: expect.any(String), context: { accountId: expect.any(String) } },
+      { id: expect.any(String), context: { accountId: expect.any(String) } },
+      { id: expect.any(String), context: { accountId: expect.any(String) } },
+    ])
+  })
+
+  it('should keep track of sent invoices as well', () => {
+    setupInvoice().build() // Draft
+    setupInvoice().build() // Draft
+    setupInvoice().build() // Draft
+
+    setupInvoice().send('2020-01-01 10:00').build() // 1 -- First milestone
+    setupInvoice().send('2020-01-01 11:00').build() // 2
+    setupInvoice().send('2020-01-01 12:00').build() // 3 -- Second milestone
+    setupInvoice().send('2020-01-01 13:00').build() // 4
+    setupInvoice().send('2020-01-01 14:00').build() // 5 -- Third milestone
+    setupInvoice().send('2020-01-01 15:00').build() // 6
+
+    expect(events).toMatchSnapshot([
+      { id: expect.any(String), context: { accountId: expect.any(String) } },
+      { id: expect.any(String), context: { accountId: expect.any(String) } },
+      { id: expect.any(String), context: { accountId: expect.any(String) } },
+    ])
+  })
+
+  it('should drop future events in favor of real milestone achievements', () => {
+    setupInvoice().build() // Draft
+    setupInvoice().build() // Draft
+    setupInvoice().build() // Draft
+
+    setupInvoice().send('2020-01-01 10:00').build() // 1
+    setupInvoice().send('2020-01-01 11:00').build() // 2
+    setupInvoice().send('2020-01-01 12:00').build() // 3
+    setupInvoice().send('2020-01-01 13:00').build() // 4
+    setupInvoice().send('2020-01-01 14:00').build() // 5 -- 1.5 milestone?
+
+    setupInvoice().send('2020-01-01 15:00').pay('2020-01-01 15:30').build() // 7  -- First milestone
+    setupInvoice().send('2020-01-01 16:00').pay('2020-01-01 16:30').build() // 8
+    setupInvoice().send('2020-01-01 17:00').pay('2020-01-01 17:30').build() // 9  -- Second milestone
+    setupInvoice().send('2020-01-01 18:00').pay('2020-01-01 18:30').build() // 10
+    setupInvoice().send('2020-01-01 19:00').pay('2020-01-01 19:30').build() // 11 -- Third milestone
+    setupInvoice().send('2020-01-01 20:00').pay('2020-01-01 20:30').build() // 12
+
+    expect(events).toMatchSnapshot([
+      { id: expect.any(String), context: { accountId: expect.any(String) } },
       { id: expect.any(String), context: { accountId: expect.any(String) } },
       { id: expect.any(String), context: { accountId: expect.any(String) } },
       { id: expect.any(String), context: { accountId: expect.any(String) } },

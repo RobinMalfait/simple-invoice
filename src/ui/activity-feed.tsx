@@ -7,6 +7,7 @@ import {
   ClockIcon,
   EllipsisHorizontalCircleIcon,
   FlagIcon,
+  GlobeAmericasIcon,
   LockClosedIcon,
   MapIcon,
   MapPinIcon,
@@ -277,6 +278,14 @@ function ActivityIndicator({ item }: { item: Event }) {
         <UserGroupIcon className="h-4 w-4 text-gray-600 dark:text-gray-300" aria-hidden="true" />
       )
 
+    case 'milestone:international-clients':
+      return (
+        <GlobeAmericasIcon
+          className="h-4 w-4 text-gray-600 dark:text-gray-300"
+          aria-hidden="true"
+        />
+      )
+
     case 'milestone:revenue':
       return (
         <BanknotesIcon className="h-4 w-4 text-gray-600 dark:text-gray-300" aria-hidden="true" />
@@ -535,6 +544,25 @@ function useActivityText(item: Event) {
           {' paying clients!'}
         </>,
       ]
+
+    case 'milestone:international-clients':
+      return item.payload.amount === 1
+        ? [
+            <>
+              {item.payload.future ? 'Will be your ' : 'Your '}
+              <span className="font-medium text-gray-900 dark:text-gray-100">1st</span>
+              {' international client!'}
+            </>,
+          ]
+        : [
+            <>
+              {item.payload.future ? 'Will reach ' : 'Worked with '}
+              <span className="font-medium text-gray-900 dark:text-gray-100">
+                {item.payload.amount}
+              </span>
+              {' international clients!'}
+            </>,
+          ]
 
     case 'milestone:fastest-paid-invoice':
       return [

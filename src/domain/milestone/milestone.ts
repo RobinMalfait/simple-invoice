@@ -17,6 +17,7 @@ export function trackMilestones(bus: EventEmitter, ctx: Context) {
   fastestPaidInvoiceMilestones(bus, ctx)
   revenueMilestones(bus, ctx)
   clientCountMilestones(bus, ctx)
+  internationalClientCountMilestones(bus, ctx)
   mostExpensiveInvoiceMilestones(bus, ctx)
 }
 
@@ -318,6 +319,112 @@ export function clientCountMilestones(bus: EventEmitter, ctx: Context) {
 
       let amount = lazy.pipe(
         lazy.concat(paid.clientByInvoice.values()),
+        lazy.unique(),
+        lazy.toLength(),
+      )()
+
+      for (let i = ctx.events.length - 1; i >= 0; i--) {
+        let event = ctx.events[i]
+
+        if (
+          event.type === MILESTONE &&
+          event.context.accountId === e.context.accountId &&
+          event.payload.future &&
+          event.payload.amount <= amount
+        ) {
+          ctx.events.splice(i, 1)
+        }
+      }
+    })
+  }
+}
+
+export function internationalClientCountMilestones(bus: EventEmitter, ctx: Context) {
+  const MILESTONE = 'milestone:international-clients'
+
+  let stateByAccount = initState(() => ({
+    milestones: [100, 75, 50, 25, 10, 5, 3, 1],
+    countryByInvoice: new Map<string, string | null>(),
+  }))
+
+  bus.on('invoice-sent', (e: Extract<Event, { type: 'invoice-sent' }>) => {
+    if (e.payload.invoice.client.billing.country === e.payload.invoice.account.billing.country) {
+      return
+    }
+
+    let { pending, paid } = stateByAccount.get(e.context.accountId)!
+
+    pending.countryByInvoice.set(e.context.invoiceId, e.context.clientId)
+
+    let amount = lazy.pipe(
+      lazy.concat(pending.countryByInvoice.values(), paid.countryByInvoice.values()),
+      lazy.unique(),
+      lazy.toLength(),
+    )()
+
+    for (let milestone of milestones(pending.milestones, (m) => m <= amount)) {
+      bus.emit(
+        MILESTONE,
+        Event.parse({
+          type: MILESTONE,
+          context: {
+            accountId: e.context.accountId,
+          },
+          payload: {
+            amount: milestone,
+            future: true,
+          },
+        }),
+      )
+    }
+  })
+
+  bus.on('invoice-paid', (e: Extract<Event, { type: 'invoice-paid' }>) => {
+    if (e.payload.invoice.client.billing.country === e.payload.invoice.account.billing.country) {
+      return
+    }
+
+    let { pending, paid } = stateByAccount.get(e.context.accountId)!
+
+    pending.countryByInvoice.delete(e.context.invoiceId)
+    paid.countryByInvoice.set(e.context.invoiceId, e.context.clientId)
+
+    let amount = lazy.pipe(
+      lazy.concat(paid.countryByInvoice.values()),
+      lazy.unique(),
+      lazy.toLength(),
+    )()
+
+    for (let milestone of milestones(paid.milestones, (m) => m <= amount)) {
+      bus.emit(
+        MILESTONE,
+        Event.parse({
+          type: MILESTONE,
+          context: {
+            accountId: e.context.accountId,
+          },
+          payload: {
+            amount: milestone,
+          },
+          at: e.at,
+        }),
+      )
+    }
+  })
+
+  // Cleanup future milestones if they are not relevant anymore
+  for (let status of ['invoice-paid', 'invoice-closed'] as const) {
+    bus.on(status, (e: Extract<Event, { type: typeof status }>) => {
+      if (e.payload.invoice.client.billing.country === e.payload.invoice.account.billing.country) {
+        return
+      }
+
+      let { pending, paid } = stateByAccount.get(e.context.accountId)!
+
+      pending.countryByInvoice.delete(e.context.invoiceId)
+
+      let amount = lazy.pipe(
+        lazy.concat(paid.countryByInvoice.values()),
         lazy.unique(),
         lazy.toLength(),
       )()

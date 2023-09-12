@@ -111,6 +111,17 @@ export let Event = z
           future: z.boolean().optional().default(false),
         }),
       }),
+      z.object({
+        type: z.literal('milestone:international-clients'),
+        tags: z.array(z.string()).default(['milestone']),
+        context: z.object({
+          accountId: z.string(),
+        }),
+        payload: z.object({
+          amount: z.number(),
+          future: z.boolean().optional().default(false),
+        }),
+      }),
 
       // Clients
       z.object({
