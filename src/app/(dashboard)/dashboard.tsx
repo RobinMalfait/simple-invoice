@@ -42,6 +42,7 @@ import {
 } from 'recharts'
 import { Account } from '~/domain/account/account'
 import { Client } from '~/domain/client/client'
+import { Invoice } from '~/domain/invoice/invoice'
 import {
   isAccepted,
   isActiveRecord,
@@ -66,9 +67,10 @@ import { Empty } from '~/ui/empty'
 import { useCurrencyFormatter } from '~/ui/hooks/use-currency-formatter'
 import { useCurrentDate } from '~/ui/hooks/use-current-date'
 import { useEvent } from '~/ui/hooks/use-event'
+import { useLazyEventsForRecord } from '~/ui/hooks/use-events-by'
 import { I18NProvider } from '~/ui/hooks/use-i18n'
 import { useLocalStorageState } from '~/ui/hooks/use-local-storage'
-import { total, totalUnpaid } from '~/ui/invoice/total'
+import { total } from '~/ui/invoice/total'
 import { Money } from '~/ui/money'
 import { RangePicker, options } from '~/ui/range-picker'
 import { TinyRecord } from '~/ui/record/tiny-record'
@@ -136,6 +138,8 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
   let allRecords = separateRecords(records)
   let systemContainsQuotes = allRecords.some((r) => isQuote(r))
   let systemContainsInvoices = allRecords.some((r) => isInvoice(r))
+
+  let eventsBy = useLazyEventsForRecord()
 
   return (
     <CompareConfigContext.Provider
@@ -402,7 +406,7 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
                 value={(list) =>
                   list
                     .filter((e) => isInvoice(e) && (isSent(e) || isPartiallyPaid(e)))
-                    .reduce((acc, r) => acc + totalUnpaid(r), 0)
+                    .reduce((acc, r) => acc + (r as Invoice).outstanding, 0)
                 }
                 display={(value) => <Money amount={value} />}
               />
@@ -477,10 +481,10 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
                         separateRecords(list)
                           .filter((r) => isQuote(r) && isAccepted(r))
                           .flatMap((r) => {
-                            let sentAt = r.events.find((e) => e.type === 'quote-sent')?.at
+                            let sentAt = eventsBy(r).find((e) => e.type === 'quote:sent')?.at
                             if (!sentAt) return []
 
-                            let paidAt = r.events.find((e) => e.type === 'quote-accepted')?.at
+                            let paidAt = eventsBy(r).find((e) => e.type === 'quote:accepted')?.at
                             if (!paidAt) return []
 
                             return [[r, differenceInSeconds(paidAt, sentAt)] as const]
@@ -512,10 +516,10 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
                         separateRecords(list)
                           .filter((r) => isQuote(r) && isAccepted(r))
                           .flatMap((r) => {
-                            let sentAt = r.events.find((e) => e.type === 'quote-sent')?.at
+                            let sentAt = eventsBy(r).find((e) => e.type === 'quote:sent')?.at
                             if (!sentAt) return []
 
-                            let paidAt = r.events.find((e) => e.type === 'quote-accepted')?.at
+                            let paidAt = eventsBy(r).find((e) => e.type === 'quote:accepted')?.at
                             if (!paidAt) return []
 
                             return [[r, differenceInSeconds(paidAt, sentAt)] as const]
@@ -550,10 +554,10 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
                       .filter((r) => isPaidRecord(r))
                       .map((r) => (isReceipt(r) ? r.invoice : r))
                       .flatMap((r) => {
-                        let sentAt = r.events.find((e) => e.type === 'invoice-sent')?.at
+                        let sentAt = eventsBy(r).find((e) => e.type === 'invoice:sent')?.at
                         if (!sentAt) return []
 
-                        let paidAt = r.events.find((e) => e.type === 'invoice-paid')?.at
+                        let paidAt = eventsBy(r).find((e) => e.type === 'invoice:paid')?.at
                         if (!paidAt) return []
 
                         return [[r, differenceInSeconds(paidAt, sentAt)] as const]
@@ -583,16 +587,16 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
                   title={'Slowest paying client'}
                   data={(list) =>
                     separateRecords(list)
-                      .filter((e) => isPaidRecord(e))
+                      .filter((r) => isPaidRecord(r))
                       .map((r) => (isReceipt(r) ? r.invoice : r))
-                      .flatMap((e) => {
-                        let sentAt = e.events.find((e) => e.type === 'invoice-sent')?.at
+                      .flatMap((r) => {
+                        let sentAt = eventsBy(r).find((e) => e.type === 'invoice:sent')?.at
                         if (!sentAt) return []
 
-                        let paidAt = e.events.find((e) => e.type === 'invoice-paid')?.at
+                        let paidAt = eventsBy(r).find((e) => e.type === 'invoice:paid')?.at
                         if (!paidAt) return []
 
-                        return [[e, differenceInSeconds(paidAt, sentAt)] as const]
+                        return [[r, differenceInSeconds(paidAt, sentAt)] as const]
                       })
                       .sort(([, a], [, z]) => a - z)
                       .pop() ?? null

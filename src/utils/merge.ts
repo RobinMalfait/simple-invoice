@@ -4,6 +4,7 @@ export function merge<T>(target: T, ...sources: T[]): T {
       if (Array.isArray(source[key])) {
         target[key] = source[key]
       } else if (typeof source[key] === 'object' && source[key] !== null) {
+        // @ts-expect-error This is fine.
         target[key] = merge(target[key] ?? ({} as T), source[key])
       } else {
         target[key] = source[key]

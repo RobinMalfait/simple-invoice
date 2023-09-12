@@ -1,3 +1,5 @@
+import EventEmitter from 'node:events'
+
 import { parseISO } from 'date-fns'
 import { z } from 'zod'
 
@@ -5,6 +7,7 @@ import { Account } from '~/domain/account/account'
 import { Client } from '~/domain/client/client'
 import { Discount } from '~/domain/discount/discount'
 import { Document } from '~/domain/document/document'
+import { bus as defaultBus } from '~/domain/event-bus/bus'
 import { Event } from '~/domain/events/event'
 import { Invoice } from '~/domain/invoice/invoice'
 import { InvoiceItem } from '~/domain/invoice/invoice-item'
@@ -17,15 +20,14 @@ export let Receipt = z.object({
   type: z.literal('receipt').default('receipt'),
   id: z.string().default(() => scopedId.next()),
   number: z.string(),
-  invoice: Invoice,
-  account: Account,
-  client: Client,
-  items: z.array(InvoiceItem),
+  invoice: z.lazy(() => Invoice),
+  account: z.lazy(() => Account),
+  client: z.lazy(() => Client),
+  items: z.array(z.lazy(() => InvoiceItem)),
   note: z.string().nullable(),
   receiptDate: z.date(),
-  discounts: z.array(Discount),
-  attachments: z.array(Document),
-  events: z.array(Event),
+  discounts: z.array(z.lazy(() => Discount)),
+  attachments: z.array(z.lazy(() => Document)),
 })
 
 export type Receipt = z.infer<typeof Receipt>
@@ -40,10 +42,17 @@ export class ReceiptBuilder {
   private _receiptDate: Date | null = null
   private _discounts: Discount[] = []
   private _attachments: Document[] = []
-  private events: Receipt['events'] = []
+
+  private _events: Partial<Event>[] = []
+
+  public constructor(private bus: EventEmitter = defaultBus) {}
+
+  private emit(event: Event) {
+    this.bus.emit(event.type, event)
+  }
 
   public build(): Receipt {
-    return Receipt.parse({
+    let receipt = Receipt.parse({
       number: this._number ?? `${this._invoice?.number}-01` ?? null,
       invoice: this._invoice,
       account: this._account,
@@ -53,8 +62,24 @@ export class ReceiptBuilder {
       receiptDate: this._receiptDate,
       discounts: this._discounts,
       attachments: this._attachments,
-      events: this.events,
     })
+
+    for (let event of this._events) {
+      this.emit(
+        Event.parse({
+          ...event,
+          context: {
+            ...event.context,
+            accountId: receipt.account.id,
+            clientId: receipt.client.id,
+            invoiceId: receipt.invoice.id,
+            receiptId: receipt.id,
+          },
+        }),
+      )
+    }
+
+    return receipt
   }
 
   public static fromInvoice(invoice: Invoice, { withAttachments = true } = {}): ReceiptBuilder {
@@ -68,12 +93,15 @@ export class ReceiptBuilder {
     builder._client = invoice.client
     builder._items = invoice.items.slice()
     builder._note = invoice.note
-    builder._receiptDate = invoice.events.find((e) => e.type === 'invoice-paid')?.at ?? null
+    builder._receiptDate = invoice.paidAt
     builder._discounts = invoice.discounts.slice()
+
     if (withAttachments) {
       builder._attachments = invoice.attachments.slice()
     }
-    builder.events.push(Event.parse({ type: 'receipt-created' }))
+
+    builder._events.push({ type: 'receipt:created' })
+
     return builder
   }
 

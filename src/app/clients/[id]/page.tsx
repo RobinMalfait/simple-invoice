@@ -33,6 +33,7 @@ import { Money } from '~/ui/money'
 import { StatusDisplay as QuoteStatusDisplay } from '~/ui/quote/status'
 import { TinyRecord } from '~/ui/record/tiny-record'
 import { TimezoneDifference } from '~/ui/timezone-difference'
+import { ClientActivityFeed } from './activity-feed'
 
 type RecordTab<T extends Record> = {
   label: string
@@ -132,7 +133,7 @@ export default async function Page({ params: { id } }: { params: { id: string } 
       value={{
         // Prefer my language/currency when looking at the overview of records.
         language: me.language,
-        currency: me.currency,
+        currency: client.currency,
       }}
     >
       <div className="relative px-4 py-8 text-gray-700 dark:text-zinc-400 sm:px-6 lg:px-8">
@@ -148,7 +149,7 @@ export default async function Page({ params: { id } }: { params: { id: string } 
         </div>
 
         <div className="mt-8 grid grid-cols-1 gap-8 xl:grid-cols-3">
-          <div className="col-span-2 grid grid-cols-1 gap-[inherit]">
+          <div className="grid grid-cols-1 gap-[inherit] xl:col-span-2">
             <Card>
               <CardTitle>
                 <div className="flex items-center justify-between">
@@ -245,13 +246,13 @@ export default async function Page({ params: { id } }: { params: { id: string } 
 
             <Card>
               <CardTitle>Records ({recordsForClient.length})</CardTitle>
-              <CardBody variant="embedded">
+              <CardBody variant="filled">
                 <RecordTabs records={recordsForClient} tabs={tabs} />
               </CardBody>
             </Card>
           </div>
 
-          <div className="col-span-1">
+          <div className="col-span-1 flex w-full flex-col gap-[inherit]">
             {client.contacts.length > 0 && (
               <Card>
                 <CardTitle>Contacts</CardTitle>
@@ -299,6 +300,8 @@ export default async function Page({ params: { id } }: { params: { id: string } 
                 </CardBody>
               </Card>
             )}
+
+            <ClientActivityFeed client={client} />
           </div>
         </div>
       </div>
@@ -380,7 +383,7 @@ function RecordList({ records }: { records: Record[] }) {
   if (records.length <= 0) {
     return (
       <div>
-        <Empty variant="embedded" message="No records found." />
+        <Empty variant="filled" message="No records found." />
       </div>
     )
   }

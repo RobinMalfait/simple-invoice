@@ -1,0 +1,852 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`anniversaryMilestones should result in an anniversary milestone every year 1`] = `
+[
+  {
+    "at": 2021-01-01T09:00:00.000Z,
+    "context": {
+      "accountId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "start": 2020-01-01T09:00:00.000Z,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:anniversary",
+  },
+  {
+    "at": 2022-04-01T08:00:00.000Z,
+    "context": {
+      "accountId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "start": 2020-01-01T09:00:00.000Z,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:anniversary",
+  },
+]
+`;
+
+exports[`clientCountMilestones should drop future events in favor of real milestone achievements 1`] = `
+[
+  {
+    "at": 2020-01-01T16:30:00.000Z,
+    "context": {
+      "accountId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "amount": 3,
+      "future": false,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:clients",
+  },
+  {
+    "at": null,
+    "context": {
+      "accountId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "amount": 10,
+      "future": true,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:clients",
+  },
+  {
+    "at": 2020-01-01T18:30:00.000Z,
+    "context": {
+      "accountId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "amount": 5,
+      "future": false,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:clients",
+  },
+]
+`;
+
+exports[`clientCountMilestones should keep track of sent invoices as well 1`] = `
+[
+  {
+    "at": null,
+    "context": {
+      "accountId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "amount": 3,
+      "future": true,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:clients",
+  },
+  {
+    "at": null,
+    "context": {
+      "accountId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "amount": 5,
+      "future": true,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:clients",
+  },
+]
+`;
+
+exports[`clientCountMilestones should track paid invoices 1`] = `
+[
+  {
+    "at": 2020-01-01T12:00:00.000Z,
+    "context": {
+      "accountId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "amount": 3,
+      "future": false,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:clients",
+  },
+  {
+    "at": 2020-01-01T14:00:00.000Z,
+    "context": {
+      "accountId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "amount": 5,
+      "future": false,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:clients",
+  },
+]
+`;
+
+exports[`fastestAcceptedQuoteMilestones should emit a milestone event for the fastest accepted quote 1`] = `
+[
+  {
+    "at": 2020-01-01T13:00:00.000Z,
+    "context": {
+      "accountId": Any<String>,
+      "clientId": Any<String>,
+      "quoteId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "best": false,
+      "durationInSeconds": 14400,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:fastest-accepted-quote",
+  },
+  {
+    "at": 2020-01-01T12:00:00.000Z,
+    "context": {
+      "accountId": Any<String>,
+      "clientId": Any<String>,
+      "quoteId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "best": false,
+      "durationInSeconds": 10800,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:fastest-accepted-quote",
+  },
+  {
+    "at": 2020-01-01T10:00:00.000Z,
+    "context": {
+      "accountId": Any<String>,
+      "clientId": Any<String>,
+      "quoteId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "best": true,
+      "durationInSeconds": 3600,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:fastest-accepted-quote",
+  },
+]
+`;
+
+exports[`fastestAcceptedQuoteMilestones should not mark the first accepted quote as the fastest accepted quote yet 1`] = `[]`;
+
+exports[`fastestPaidInvoiceMilestones should emit a milestone event for the fastest paid invoice 1`] = `
+[
+  {
+    "at": 2020-01-01T13:00:00.000Z,
+    "context": {
+      "accountId": Any<String>,
+      "clientId": Any<String>,
+      "invoiceId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "best": false,
+      "durationInSeconds": 14400,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:fastest-paid-invoice",
+  },
+  {
+    "at": 2020-01-01T12:00:00.000Z,
+    "context": {
+      "accountId": Any<String>,
+      "clientId": Any<String>,
+      "invoiceId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "best": false,
+      "durationInSeconds": 10800,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:fastest-paid-invoice",
+  },
+  {
+    "at": 2020-01-01T10:00:00.000Z,
+    "context": {
+      "accountId": Any<String>,
+      "clientId": Any<String>,
+      "invoiceId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "best": true,
+      "durationInSeconds": 3600,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:fastest-paid-invoice",
+  },
+]
+`;
+
+exports[`fastestPaidInvoiceMilestones should not mark the first paid invoice as the fastest paid invoice yet 1`] = `[]`;
+
+exports[`fastestPaidInvoiceMilestones should skip paid invoices that have not been sent 1`] = `
+[
+  {
+    "at": 2020-01-01T13:00:00.000Z,
+    "context": {
+      "accountId": Any<String>,
+      "clientId": Any<String>,
+      "invoiceId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "best": true,
+      "durationInSeconds": 14400,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:fastest-paid-invoice",
+  },
+]
+`;
+
+exports[`internationalClientCountMilestones should drop future events in favor of real milestone achievements 1`] = `
+[
+  {
+    "at": 2020-01-01T14:30:00.000Z,
+    "context": {
+      "accountId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "amount": 1,
+      "future": false,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:international-clients",
+  },
+  {
+    "at": 2020-01-01T16:30:00.000Z,
+    "context": {
+      "accountId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "amount": 3,
+      "future": false,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:international-clients",
+  },
+  {
+    "at": null,
+    "context": {
+      "accountId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "amount": 10,
+      "future": true,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:international-clients",
+  },
+  {
+    "at": 2020-01-01T18:30:00.000Z,
+    "context": {
+      "accountId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "amount": 5,
+      "future": false,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:international-clients",
+  },
+]
+`;
+
+exports[`internationalClientCountMilestones should keep track of sent invoices as well 1`] = `
+[
+  {
+    "at": null,
+    "context": {
+      "accountId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "amount": 1,
+      "future": true,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:international-clients",
+  },
+  {
+    "at": null,
+    "context": {
+      "accountId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "amount": 3,
+      "future": true,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:international-clients",
+  },
+  {
+    "at": null,
+    "context": {
+      "accountId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "amount": 5,
+      "future": true,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:international-clients",
+  },
+]
+`;
+
+exports[`internationalClientCountMilestones should track paid invoices 1`] = `
+[
+  {
+    "at": 2020-01-01T10:00:00.000Z,
+    "context": {
+      "accountId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "amount": 1,
+      "future": false,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:international-clients",
+  },
+  {
+    "at": 2020-01-01T12:00:00.000Z,
+    "context": {
+      "accountId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "amount": 3,
+      "future": false,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:international-clients",
+  },
+  {
+    "at": 2020-01-01T14:00:00.000Z,
+    "context": {
+      "accountId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "amount": 5,
+      "future": false,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:international-clients",
+  },
+]
+`;
+
+exports[`invoiceCountMilestones should drop future events in favor of real milestone achievements 1`] = `
+[
+  {
+    "at": 2020-01-01T15:00:00.000Z,
+    "context": {
+      "accountId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "amount": 1,
+      "future": false,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:invoices",
+  },
+  {
+    "at": 2020-01-01T19:00:00.000Z,
+    "context": {
+      "accountId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "amount": 5,
+      "future": false,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:invoices",
+  },
+]
+`;
+
+exports[`invoiceCountMilestones should keep track of sent invoices as well 1`] = `
+[
+  {
+    "at": null,
+    "context": {
+      "accountId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "amount": 1,
+      "future": true,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:invoices",
+  },
+  {
+    "at": null,
+    "context": {
+      "accountId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "amount": 5,
+      "future": true,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:invoices",
+  },
+]
+`;
+
+exports[`invoiceCountMilestones should track paid invoices 1`] = `
+[
+  {
+    "at": 2020-01-01T10:00:00.000Z,
+    "context": {
+      "accountId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "amount": 1,
+      "future": false,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:invoices",
+  },
+  {
+    "at": 2020-01-01T14:00:00.000Z,
+    "context": {
+      "accountId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "amount": 5,
+      "future": false,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:invoices",
+  },
+]
+`;
+
+exports[`mostExpensiveInvoiceMilestones should drop future events in favor of real milestone achievements 1`] = `
+[
+  {
+    "at": 2020-01-01T11:00:00.000Z,
+    "context": {
+      "accountId": Any<String>,
+      "clientId": Any<String>,
+      "invoiceId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "amount": 30000,
+      "best": false,
+      "future": false,
+      "increase": 50,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:most-expensive-invoice",
+  },
+  {
+    "at": 2020-01-01T17:00:00.000Z,
+    "context": {
+      "accountId": Any<String>,
+      "clientId": Any<String>,
+      "invoiceId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "amount": 50000,
+      "best": true,
+      "future": false,
+      "increase": 67,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:most-expensive-invoice",
+  },
+]
+`;
+
+exports[`mostExpensiveInvoiceMilestones should keep track of sent invoices as well 1`] = `
+[
+  {
+    "at": null,
+    "context": {
+      "accountId": Any<String>,
+      "clientId": Any<String>,
+      "invoiceId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "amount": 30000,
+      "best": true,
+      "future": true,
+      "increase": 50,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:most-expensive-invoice",
+  },
+  {
+    "at": null,
+    "context": {
+      "accountId": Any<String>,
+      "clientId": Any<String>,
+      "invoiceId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "amount": 50000,
+      "best": true,
+      "future": true,
+      "increase": 67,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:most-expensive-invoice",
+  },
+]
+`;
+
+exports[`mostExpensiveInvoiceMilestones should not track the first paid invoice 1`] = `[]`;
+
+exports[`mostExpensiveInvoiceMilestones should track paid invoices 1`] = `
+[
+  {
+    "at": 2020-01-01T11:00:00.000Z,
+    "context": {
+      "accountId": Any<String>,
+      "clientId": Any<String>,
+      "invoiceId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "amount": 30000,
+      "best": false,
+      "future": false,
+      "increase": 50,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:most-expensive-invoice",
+  },
+  {
+    "at": 2020-01-01T17:00:00.000Z,
+    "context": {
+      "accountId": Any<String>,
+      "clientId": Any<String>,
+      "invoiceId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "amount": 50000,
+      "best": true,
+      "future": false,
+      "increase": 67,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:most-expensive-invoice",
+  },
+]
+`;
+
+exports[`revenueMilestones should drop future events in favor of real milestone achievements 1`] = `
+[
+  {
+    "at": 2020-01-01T19:00:00.000Z,
+    "context": {
+      "accountId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "amount": 60500,
+      "future": false,
+      "milestone": 50000,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:revenue",
+  },
+  {
+    "at": 2020-01-01T21:00:00.000Z,
+    "context": {
+      "accountId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "amount": 121000,
+      "future": false,
+      "milestone": 100000,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:revenue",
+  },
+  {
+    "at": 2020-01-02T15:00:00.000Z,
+    "context": {
+      "accountId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "amount": 544500,
+      "future": false,
+      "milestone": 500000,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:revenue",
+  },
+]
+`;
+
+exports[`revenueMilestones should keep track of sent invoices as well 1`] = `
+[
+  {
+    "at": null,
+    "context": {
+      "accountId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "amount": 60500,
+      "future": true,
+      "milestone": 50000,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:revenue",
+  },
+  {
+    "at": null,
+    "context": {
+      "accountId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "amount": 121000,
+      "future": true,
+      "milestone": 100000,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:revenue",
+  },
+  {
+    "at": null,
+    "context": {
+      "accountId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "amount": 544500,
+      "future": true,
+      "milestone": 500000,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:revenue",
+  },
+]
+`;
+
+exports[`revenueMilestones should track paid invoices 1`] = `
+[
+  {
+    "at": 2020-01-01T10:00:00.000Z,
+    "context": {
+      "accountId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "amount": 60500,
+      "future": false,
+      "milestone": 50000,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:revenue",
+  },
+  {
+    "at": 2020-01-01T11:00:00.000Z,
+    "context": {
+      "accountId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "amount": 121000,
+      "future": false,
+      "milestone": 100000,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:revenue",
+  },
+  {
+    "at": 2020-01-01T15:00:00.000Z,
+    "context": {
+      "accountId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "amount": 544500,
+      "future": false,
+      "milestone": 500000,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:revenue",
+  },
+]
+`;

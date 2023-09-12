@@ -1,3 +1,5 @@
+import EventEmitter from 'node:events'
+
 import { isPast, parseISO } from 'date-fns'
 import { z } from 'zod'
 
@@ -6,11 +8,13 @@ import { Client } from '~/domain/client/client'
 import { config } from '~/domain/configuration/configuration'
 import { Discount } from '~/domain/discount/discount'
 import { Document } from '~/domain/document/document'
+import { bus as defaultBus } from '~/domain/event-bus/bus'
 import { Event } from '~/domain/events/event'
 import { InvoiceItem } from '~/domain/invoice/invoice-item'
 import { InvoiceStatus } from '~/domain/invoice/invoice-status'
 import { Quote } from '~/domain/quote/quote'
 import { QuoteStatus } from '~/domain/quote/quote-status'
+import { DeepPartial } from '~/types/shared'
 import { total } from '~/ui/invoice/total'
 import { ScopedIDGenerator } from '~/utils/id'
 import { match } from '~/utils/match'
@@ -21,18 +25,19 @@ export let Invoice = z.object({
   type: z.literal('invoice').default('invoice'),
   id: z.string().default(() => scopedId.next()),
   number: z.string(),
-  account: Account,
-  client: Client,
-  items: z.array(InvoiceItem),
+  account: z.lazy(() => Account),
+  client: z.lazy(() => Client),
+  items: z.array(z.lazy(() => InvoiceItem)),
   note: z.string().nullable(),
   issueDate: z.date(),
   dueDate: z.date(),
-  discounts: z.array(Discount),
-  attachments: z.array(Document).default([]),
+  discounts: z.array(z.lazy(() => Discount)),
+  attachments: z.array(z.lazy(() => Document)).default([]),
   status: z.nativeEnum(InvoiceStatus).default(InvoiceStatus.Draft),
-  events: z.array(Event),
-
-  quote: Quote.nullable(),
+  paid: z.number(),
+  outstanding: z.number(),
+  paidAt: z.date().nullable(),
+  quote: z.lazy(() => Quote.nullable()),
 })
 
 export type Invoice = z.infer<typeof Invoice>
@@ -48,10 +53,19 @@ export class InvoiceBuilder {
   private _discounts: Discount[] = []
   private _attachments: Document[] = []
   private _quote: Quote | null = null
+  private _paidAt: Date | null = null
 
   private _status = InvoiceStatus.Draft
   private paid: number = 0
-  private events: Event[] = [Event.parse({ type: 'invoice-drafted' })]
+  private outstanding: number | null = null
+
+  private _events: DeepPartial<Extract<Event, { type: `invoice:${string}` }>>[] = []
+
+  public constructor(private bus: EventEmitter = defaultBus) {}
+
+  private emit(event: Event) {
+    this.bus.emit(event.type, event)
+  }
 
   public build(): Invoice {
     let input = {
@@ -65,15 +79,41 @@ export class InvoiceBuilder {
       discounts: this._discounts,
       attachments: this._attachments,
       status: this.computeStatus,
-      events: this.events,
       quote: this._quote,
+      paidAt: this._paidAt,
+      paid: this.paid,
+      outstanding: this.outstanding ?? 0,
     }
 
-    if (input.status === InvoiceStatus.Overdue) {
-      input.events.push(Event.parse({ type: 'invoice-overdue', at: input.dueDate }))
+    let invoice = Invoice.parse(input)
+
+    if (!this._events.some((e) => e.type === 'invoice:drafted')) {
+      this._events.unshift({ type: 'invoice:drafted' })
     }
 
-    return Invoice.parse(input)
+    if (invoice.status === InvoiceStatus.Overdue) {
+      this._events.push({ type: 'invoice:overdue', at: invoice.dueDate })
+    }
+
+    for (let event of this._events) {
+      this.emit(
+        Event.parse({
+          ...event,
+          context: {
+            ...event.context,
+            accountId: invoice.account.id,
+            clientId: invoice.client.id,
+            invoiceId: invoice.id,
+          },
+          payload: {
+            ...event.payload,
+            invoice,
+          },
+        }),
+      )
+    }
+
+    return invoice
   }
 
   public static fromQuote(quote: Quote, { withAttachments = true } = {}): InvoiceBuilder {
@@ -90,8 +130,15 @@ export class InvoiceBuilder {
     if (withAttachments) {
       builder._attachments = quote.attachments.slice()
     }
-    builder.events = [Event.parse({ type: 'invoice-drafted', from: 'quote' })]
     builder._quote = quote
+
+    builder._events.push({
+      type: 'invoice:drafted',
+      payload: {
+        from: 'quote',
+      },
+    })
+
     return builder
   }
 
@@ -99,7 +146,8 @@ export class InvoiceBuilder {
     if (this._number) return this._number
     if (!this._issueDate) return null // Let the validation handle this
 
-    return config().invoice.numberStrategy(this._issueDate)
+    this._number = config().invoice.numberStrategy(this._issueDate)
+    return this._number
   }
 
   private get computeDueDate() {
@@ -246,8 +294,8 @@ export class InvoiceBuilder {
 
     match(this._status, {
       [InvoiceStatus.Draft]: () => {
-        this.events.push(Event.parse({ type: 'invoice-sent', at: parsedAt }))
         this._status = InvoiceStatus.Sent
+        this._events.push({ type: 'invoice:sent', at: parsedAt })
       },
       [InvoiceStatus.Sent]: () => {
         throw new Error('Cannot send an invoice that is already sent')
@@ -275,26 +323,36 @@ export class InvoiceBuilder {
   ): InvoiceBuilder {
     let parsedAt = typeof at === 'string' ? parseISO(at) : at
 
+    if (this.outstanding === null) {
+      this.outstanding = total({ items: this._items, discounts: this._discounts })
+    }
+
     let handlePayment = () => {
-      let remaining = total({ items: this._items, discounts: this._discounts }) - this.paid - amount
-
       this.paid += amount
+      this.outstanding! -= amount
 
-      if (remaining > 0) {
-        this.events.push(
-          Event.parse({
-            type: 'invoice-partially-paid',
-            at: parsedAt,
-            amount,
-            outstanding: remaining,
-          }),
-        )
+      if (this.outstanding! > 0) {
         this._status = InvoiceStatus.PartiallyPaid
+
+        this._events.push({
+          type: 'invoice:partially-paid',
+          payload: {
+            amount,
+            outstanding: this.outstanding!,
+          },
+          at: parsedAt,
+        })
       } else {
-        this.events.push(
-          Event.parse({ type: 'invoice-paid', at: parsedAt, amount, outstanding: remaining }),
-        )
+        this._paidAt = parsedAt
         this._status = InvoiceStatus.Paid
+        this._events.push({
+          type: 'invoice:paid',
+          payload: {
+            amount,
+            outstanding: this.outstanding!,
+          },
+          at: parsedAt,
+        })
       }
     }
 
@@ -306,26 +364,30 @@ export class InvoiceBuilder {
         throw new Error('Cannot pay an invoice that is already paid')
       },
       [InvoiceStatus.PartiallyPaid]: () => {
-        let remaining =
-          total({ items: this._items, discounts: this._discounts }) - this.paid - amount
-
         this.paid += amount
+        this.outstanding! -= amount
 
-        if (remaining > 0) {
-          this.events.push(
-            Event.parse({
-              type: 'invoice-partially-paid',
-              at: parsedAt,
-              amount,
-              outstanding: remaining,
-            }),
-          )
+        if (this.outstanding! > 0) {
           this._status = InvoiceStatus.PartiallyPaid
+          this._events.push({
+            type: 'invoice:partially-paid',
+            payload: {
+              amount,
+              outstanding: this.outstanding!,
+            },
+            at: parsedAt,
+          })
         } else {
-          this.events.push(
-            Event.parse({ type: 'invoice-paid', at: parsedAt, amount, outstanding: remaining }),
-          )
           this._status = InvoiceStatus.Paid
+          this._paidAt = parsedAt
+          this._events.push({
+            type: 'invoice:paid',
+            payload: {
+              amount,
+              outstanding: this.outstanding!,
+            },
+            at: parsedAt,
+          })
         }
       },
       [InvoiceStatus.Overdue]: () => {
@@ -343,8 +405,11 @@ export class InvoiceBuilder {
     let parsedAt = typeof at === 'string' ? parseISO(at) : at
 
     if (isPast(this.computeDueDate!)) {
-      this.events.push(Event.parse({ type: 'invoice-overdue', at: parsedAt }))
       this._status = InvoiceStatus.Overdue
+      this._events.push({
+        type: 'invoice:overdue',
+        at: parsedAt,
+      })
     }
 
     match(this._status, {
@@ -361,8 +426,11 @@ export class InvoiceBuilder {
         throw new Error('Cannot close an invoice that is already partially paid')
       },
       [InvoiceStatus.Overdue]: () => {
-        this.events.push(Event.parse({ type: 'invoice-closed', at: parsedAt }))
         this._status = InvoiceStatus.Closed
+        this._events.push({
+          type: 'invoice:closed',
+          at: parsedAt,
+        })
       },
       [InvoiceStatus.Closed]: () => {
         throw new Error('Cannot close an invoice that is closed')

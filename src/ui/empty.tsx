@@ -10,7 +10,7 @@ export function Empty({
 }: {
   message: string
   footer?: ReactNode
-  variant?: 'standalone' | 'embedded'
+  variant?: 'standalone' | 'filled'
 }) {
   return (
     <div
@@ -18,7 +18,7 @@ export function Empty({
         'flex flex-1 flex-col overflow-hidden bg-white dark:bg-zinc-900',
         match(variant, {
           standalone: 'rounded-lg shadow',
-          embedded: '',
+          filled: '',
         }),
       )}
     >

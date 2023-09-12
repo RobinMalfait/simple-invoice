@@ -12,6 +12,7 @@ import { PaypalIcon } from '~/ui/icons/payment'
 import * as SocialIcons from '~/ui/icons/social'
 import { TimezoneDifference } from '~/ui/timezone-difference'
 import { match } from '~/utils/match'
+import { AccountActivityFeed } from './activity-feed'
 
 export default async function Page({ params: { id } }: { params: { id: string } }) {
   let base = headers().get('host')
@@ -38,7 +39,7 @@ export default async function Page({ params: { id } }: { params: { id: string } 
         </div>
 
         <div className="mt-8 grid grid-cols-1 gap-8 xl:grid-cols-3">
-          <div className="col-span-2 grid grid-cols-1 gap-[inherit]">
+          <div className="grid grid-cols-1 items-start gap-[inherit] xl:col-span-2">
             <Card>
               <CardTitle>Details</CardTitle>
 
@@ -188,6 +189,8 @@ export default async function Page({ params: { id } }: { params: { id: string } 
                 </CardBody>
               </Card>
             )}
+
+            <AccountActivityFeed account={account} />
           </div>
         </div>
       </div>

@@ -1,7 +1,13 @@
+import EventEmitter from 'node:events'
+
+import { parseISO } from 'date-fns'
 import { z } from 'zod'
+
 import { Address } from '~/domain/address/address'
 import { Contact } from '~/domain/contact/contact'
 import { Currency } from '~/domain/currency/currency'
+import { bus as defaultBus } from '~/domain/event-bus/bus'
+import { Event } from '~/domain/events/event'
 import { Language } from '~/domain/language/language'
 import { Tax } from '~/domain/tax/tax'
 import { ScopedIDGenerator } from '~/utils/id'
@@ -28,6 +34,7 @@ export let Client = z.object({
 export type Client = z.infer<typeof Client>
 
 export class ClientBuilder {
+  private _id: Client['id'] | undefined = undefined
   private _name: Client['name'] | null = null
   private _email: Client['email'] | null = null
   private _phone: Client['phone'] | null = null
@@ -41,8 +48,17 @@ export class ClientBuilder {
   private _legal: Client['legal'] | null = null
   private _contacts: Client['contacts'] = []
 
+  private _events: Partial<Event>[] = []
+
+  public constructor(private bus: EventEmitter = defaultBus) {}
+
+  private emit(event: Event) {
+    this.bus.emit(event.type, event)
+  }
+
   public build(): Client {
-    return Client.parse({
+    let client = Client.parse({
+      id: this._id,
       name: this._name,
       email: this._email,
       phone: this._phone,
@@ -56,6 +72,20 @@ export class ClientBuilder {
       legal: this._legal,
       contacts: this._contacts,
     })
+
+    for (let event of this._events) {
+      this.emit(
+        Event.parse({
+          ...event,
+          context: {
+            ...event.context,
+            clientId: client.id,
+          },
+        }),
+      )
+    }
+
+    return client
   }
 
   public static from(client: Client): ClientBuilder {
@@ -76,33 +106,61 @@ export class ClientBuilder {
   }
 
   private static mutate(client: Client, mutator: (builder: ClientBuilder) => void): Client {
-    return Object.assign(client, tap(ClientBuilder.from(client), mutator).build(), {
-      id: client.id,
-    })
+    return Object.assign(
+      client,
+      tap(ClientBuilder.from(client), (builder) => {
+        builder._id = client.id
+        mutator(builder)
+      }).build(),
+    )
   }
 
   public static rebrand(
     client: Client,
     handle: (builder: ClientBuilder) => void,
-    { mutate = true } = {},
+    { mutate = true, at }: { mutate?: boolean; at?: string | Date } = {},
   ): Client {
-    if (mutate) {
-      return ClientBuilder.mutate(client, handle)
-    } else {
-      return tap(ClientBuilder.from(client), handle).build()
+    let oldName = client.name
+    function handler(builder: ClientBuilder) {
+      handle(builder)
+
+      builder._events.push({
+        type: 'client:rebranded',
+        payload: {
+          from: oldName,
+          to: builder._name!,
+        },
+        at: typeof at === 'string' ? parseISO(at) : at,
+      })
     }
+
+    return mutate
+      ? ClientBuilder.mutate(client, handler)
+      : tap(ClientBuilder.from(client), handler).build()
   }
 
   public static relocate(
     client: Client,
     handle: (builder: ClientBuilder) => void,
-    { mutate = true } = {},
+    { mutate = true, at }: { mutate?: boolean; at?: string | Date } = {},
   ): Client {
-    if (mutate) {
-      return ClientBuilder.mutate(client, handle)
-    } else {
-      return tap(ClientBuilder.from(client), handle).build()
+    let oldAddress = client.billing
+    function handler(builder: ClientBuilder) {
+      handle(builder)
+
+      builder._events.push({
+        type: 'client:relocated',
+        payload: {
+          from: oldAddress,
+          to: builder._billing!,
+        },
+        at: typeof at === 'string' ? parseISO(at) : at,
+      })
     }
+
+    return mutate
+      ? ClientBuilder.mutate(client, handler)
+      : tap(ClientBuilder.from(client), handler).build()
   }
 
   public name(name: Client['name']): ClientBuilder {
