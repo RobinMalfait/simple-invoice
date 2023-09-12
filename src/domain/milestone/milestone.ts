@@ -67,13 +67,13 @@ export function fastestAcceptedQuoteMilestones(bus: EventEmitter, ctx: Context) 
 
     let duration = differenceInSeconds(e.at!, state.sentAt.get(e.context.quoteId)!)
 
-    if (state.max === null) {
-      state.max = duration
+    if (state.max !== null && duration >= state.max) {
+      state.sentAt.delete(e.context.quoteId)
       return
     }
 
-    if (duration >= state.max) {
-      state.sentAt.delete(e.context.quoteId)
+    if (state.max === null) {
+      state.max = duration
       return
     }
 
@@ -209,13 +209,13 @@ export function fastestPaidInvoiceMilestones(bus: EventEmitter, ctx: Context) {
 
     let duration = differenceInSeconds(e.at!, state.sentAt.get(e.context.invoiceId)!)
 
-    if (state.max === null) {
-      state.max = duration
+    if (state.max !== null && duration >= state.max) {
+      state.sentAt.delete(e.context.invoiceId)
       return
     }
 
-    if (duration >= state.max) {
-      state.sentAt.delete(e.context.invoiceId)
+    if (state.max === null) {
+      state.max = duration
       return
     }
 
