@@ -39,8 +39,10 @@ import { assertNever } from '~/utils/assert-never'
 import { match } from '~/utils/match'
 import { useDatabase } from './hooks/use-db'
 
-function isFutureEvent(event: Event) {
-  return 'future' in event && event.future
+function isFutureEvent(event: Event): event is Extract<Event, { payload: { future: true } }> {
+  if (!('payload' in event)) return false
+  if (!('future' in event.payload)) return false
+  return event.payload.future
 }
 
 type MappedEvent = {
