@@ -80,12 +80,12 @@ export class QuoteBuilder {
 
     let quote = Quote.parse(input)
 
-    if (!this._events.some((e) => e.type === 'quote-drafted')) {
-      this._events.unshift({ type: 'quote-drafted', payload: {} })
+    if (!this._events.some((e) => e.type === 'quote:drafted')) {
+      this._events.unshift({ type: 'quote:drafted', payload: {} })
     }
 
     if (quote.status === QuoteStatus.Expired) {
-      this._events.push({ type: 'quote-expired', at: quote.quoteExpirationDate })
+      this._events.push({ type: 'quote:expired', at: quote.quoteExpirationDate })
     }
 
     for (let event of this._events.splice(0)) {
@@ -120,7 +120,7 @@ export class QuoteBuilder {
     if (withAttachments) {
       builder._attachments = quote.attachments.slice()
     }
-    builder._events = [{ type: 'quote-drafted', payload: { from: 'quote' } }]
+    builder._events = [{ type: 'quote:drafted', payload: { from: 'quote' } }]
 
     return builder
   }
@@ -275,7 +275,7 @@ export class QuoteBuilder {
     match(this._status, {
       [QuoteStatus.Draft]: () => {
         this._status = QuoteStatus.Sent
-        this._events.push({ type: 'quote-sent', at: parsedAt })
+        this._events.push({ type: 'quote:sent', at: parsedAt })
       },
       [QuoteStatus.Sent]: () => {
         throw new Error('Cannot send a quote that is already sent')
@@ -306,7 +306,7 @@ export class QuoteBuilder {
       },
       [QuoteStatus.Sent]: () => {
         this._status = QuoteStatus.Accepted
-        this._events.push({ type: 'quote-accepted', at: parsedAt })
+        this._events.push({ type: 'quote:accepted', at: parsedAt })
       },
       [QuoteStatus.Accepted]: () => {
         throw new Error('Cannot accept a quote that is already accepted')
@@ -334,7 +334,7 @@ export class QuoteBuilder {
       },
       [QuoteStatus.Sent]: () => {
         this._status = QuoteStatus.Rejected
-        this._events.push({ type: 'quote-rejected', at: parsedAt })
+        this._events.push({ type: 'quote:rejected', at: parsedAt })
       },
       [QuoteStatus.Accepted]: () => {
         throw new Error('Cannot reject a quote that is already accepted')
@@ -357,7 +357,7 @@ export class QuoteBuilder {
     let parsedAt = typeof at === 'string' ? parseISO(at) : at
 
     if (isPast(this.computeQuoteExpirationDate!)) {
-      this._events.push({ type: 'quote-expired', at: parsedAt })
+      this._events.push({ type: 'quote:expired', at: parsedAt })
       this._status = QuoteStatus.Expired
     }
 
@@ -376,7 +376,7 @@ export class QuoteBuilder {
       },
       [QuoteStatus.Expired]: () => {
         this._status = QuoteStatus.Closed
-        this._events.push({ type: 'quote-closed', at: parsedAt })
+        this._events.push({ type: 'quote:closed', at: parsedAt })
       },
       [QuoteStatus.Closed]: () => {
         throw new Error('Cannot close a quote that is closed')

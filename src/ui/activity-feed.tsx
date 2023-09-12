@@ -252,12 +252,12 @@ export function ActivityItem({
 
 function ActivityIndicator({ item }: { item: Event }) {
   switch (item.type) {
-    case 'account-relocated':
-    case 'client-relocated':
+    case 'account:relocated':
+    case 'client:relocated':
       return <TruckIcon className="h-4 w-4 text-gray-600 dark:text-gray-300" aria-hidden="true" />
 
-    case 'account-rebranded':
-    case 'client-rebranded':
+    case 'account:rebranded':
+    case 'client:rebranded':
       return (
         <SparklesIcon className="h-4 w-4 text-gray-600 dark:text-gray-300" aria-hidden="true" />
       )
@@ -297,19 +297,19 @@ function ActivityIndicator({ item }: { item: Event }) {
     case 'milestone:fastest-paid-invoice':
       return <ClockIcon className="h-4 w-4 text-gray-600 dark:text-gray-300" aria-hidden="true" />
 
-    case 'quote-drafted':
-    case 'invoice-drafted':
+    case 'quote:drafted':
+    case 'invoice:drafted':
       return (
         <PencilSquareIcon className="h-4 w-4 text-gray-600 dark:text-gray-300" aria-hidden="true" />
       )
 
-    case 'quote-sent':
-    case 'invoice-sent':
+    case 'quote:sent':
+    case 'invoice:sent':
       return (
         <ClockIcon className="h-6 w-6 text-orange-600 dark:text-orange-300" aria-hidden="true" />
       )
 
-    case 'invoice-partially-paid':
+    case 'invoice:partially-paid':
       return (
         <EllipsisHorizontalCircleIcon
           className="h-6 w-6 text-orange-600 dark:text-orange-300"
@@ -317,20 +317,20 @@ function ActivityIndicator({ item }: { item: Event }) {
         />
       )
 
-    case 'quote-accepted':
-    case 'invoice-paid':
-    case 'receipt-created':
+    case 'quote:accepted':
+    case 'invoice:paid':
+    case 'receipt:created':
       return (
         <CheckCircleIcon className="h-6 w-6 text-blue-600 dark:text-blue-300" aria-hidden="true" />
       )
 
-    case 'quote-rejected':
-    case 'quote-expired':
-    case 'invoice-overdue':
+    case 'quote:rejected':
+    case 'quote:expired':
+    case 'invoice:overdue':
       return <XCircleIcon className="h-6 w-6 text-red-600 dark:text-red-300" aria-hidden="true" />
 
-    case 'quote-closed':
-    case 'invoice-closed':
+    case 'quote:closed':
+    case 'invoice:closed':
       return (
         <LockClosedIcon className="h-4 w-4 text-gray-600 dark:text-gray-300" aria-hidden="true" />
       )
@@ -355,7 +355,7 @@ function useActivityText(item: Event) {
   let invoice = db.invoiceById.get(item.context.invoiceId)!
 
   switch (item.type) {
-    case 'account-rebranded':
+    case 'account:rebranded':
       return [
         <>
           {'"'}
@@ -366,7 +366,7 @@ function useActivityText(item: Event) {
         </>,
       ]
 
-    case 'account-relocated': {
+    case 'account:relocated': {
       let encoded = new URLSearchParams({
         from: formatAddress(item.payload.from).replace(/\n/g, ', '),
         to: formatAddress(item.payload.to).replace(/\n/g, ', '),
@@ -596,7 +596,7 @@ function useActivityText(item: Event) {
         ),
       ].filter(Boolean)
 
-    case 'client-rebranded':
+    case 'client:rebranded':
       return [
         <>
           {'"'}
@@ -607,7 +607,7 @@ function useActivityText(item: Event) {
         </>,
       ]
 
-    case 'client-relocated': {
+    case 'client:relocated': {
       let encoded = new URLSearchParams({
         from: formatAddress(item.payload.from).replace(/\n/g, ', '),
         to: formatAddress(item.payload.to).replace(/\n/g, ', '),
@@ -676,7 +676,7 @@ function useActivityText(item: Event) {
       ]
     }
 
-    case 'quote-drafted': {
+    case 'quote:drafted': {
       if (item.payload.from) {
         return [
           <>
@@ -697,7 +697,7 @@ function useActivityText(item: Event) {
       ]
     }
 
-    case 'quote-sent':
+    case 'quote:sent':
       return item.at && isFuture(item.at)
         ? [
             <>
@@ -711,7 +711,7 @@ function useActivityText(item: Event) {
             </>,
           ]
 
-    case 'quote-accepted':
+    case 'quote:accepted':
       return [
         <>
           The quote has been{' '}
@@ -719,7 +719,7 @@ function useActivityText(item: Event) {
         </>,
       ]
 
-    case 'quote-rejected':
+    case 'quote:rejected':
       return [
         <>
           The quote has been{' '}
@@ -727,14 +727,14 @@ function useActivityText(item: Event) {
         </>,
       ]
 
-    case 'quote-expired':
+    case 'quote:expired':
       return [
         <>
           The quote <span className="font-medium text-gray-900 dark:text-gray-100">expired</span>.
         </>,
       ]
 
-    case 'quote-closed':
+    case 'quote:closed':
       return [
         <>
           The quote has been{' '}
@@ -742,7 +742,7 @@ function useActivityText(item: Event) {
         </>,
       ]
 
-    case 'invoice-drafted':
+    case 'invoice:drafted':
       if (item.payload.from) {
         return [
           <>
@@ -762,7 +762,7 @@ function useActivityText(item: Event) {
         </>,
       ]
 
-    case 'invoice-sent':
+    case 'invoice:sent':
       return item.at && isFuture(item.at)
         ? [
             <>
@@ -776,7 +776,7 @@ function useActivityText(item: Event) {
             </>,
           ]
 
-    case 'invoice-partially-paid':
+    case 'invoice:partially-paid':
       return [
         <>
           <span className="font-medium text-gray-900 dark:text-gray-100">Partially paid</span> with{' '}
@@ -785,14 +785,14 @@ function useActivityText(item: Event) {
         </>,
       ]
 
-    case 'invoice-paid':
+    case 'invoice:paid':
       return [
         <>
           <span className="font-medium text-gray-900 dark:text-gray-100">Paid</span> the invoice.
         </>,
       ]
 
-    case 'invoice-overdue':
+    case 'invoice:overdue':
       return [
         <>
           The invoice is{' '}
@@ -800,7 +800,7 @@ function useActivityText(item: Event) {
         </>,
       ]
 
-    case 'invoice-closed':
+    case 'invoice:closed':
       return [
         <>
           The invoice has been{' '}
@@ -808,7 +808,7 @@ function useActivityText(item: Event) {
         </>,
       ]
 
-    case 'receipt-created':
+    case 'receipt:created':
       return [
         <>
           The receipt has been{' '}

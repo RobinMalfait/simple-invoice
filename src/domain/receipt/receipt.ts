@@ -100,7 +100,7 @@ export class ReceiptBuilder {
       builder._attachments = invoice.attachments.slice()
     }
 
-    builder._events.push({ type: 'receipt-created' })
+    builder._events.push({ type: 'receipt:created' })
 
     return builder
   }

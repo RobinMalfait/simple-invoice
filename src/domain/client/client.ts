@@ -125,7 +125,7 @@ export class ClientBuilder {
       handle(builder)
 
       builder._events.push({
-        type: 'client-rebranded',
+        type: 'client:rebranded',
         payload: {
           from: oldName,
           to: builder._name!,
@@ -149,7 +149,7 @@ export class ClientBuilder {
       handle(builder)
 
       builder._events.push({
-        type: 'client-relocated',
+        type: 'client:relocated',
         payload: {
           from: oldAddress,
           to: builder._billing!,

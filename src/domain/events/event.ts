@@ -13,7 +13,7 @@ export let Event = z
     z.discriminatedUnion('type', [
       // Account
       z.object({
-        type: z.literal('account-rebranded'),
+        type: z.literal('account:rebranded'),
         tags: z.array(z.string()).default(['account']),
         context: z.object({
           accountId: z.string(),
@@ -24,7 +24,7 @@ export let Event = z
         }),
       }),
       z.object({
-        type: z.literal('account-relocated'),
+        type: z.literal('account:relocated'),
         tags: z.array(z.string()).default(['account']),
         context: z.object({
           accountId: z.string(),
@@ -125,7 +125,7 @@ export let Event = z
 
       // Clients
       z.object({
-        type: z.literal('client-rebranded'),
+        type: z.literal('client:rebranded'),
         tags: z.array(z.string()).default(['client']),
         context: z.object({
           clientId: z.string(),
@@ -136,7 +136,7 @@ export let Event = z
         }),
       }),
       z.object({
-        type: z.literal('client-relocated'),
+        type: z.literal('client:relocated'),
         tags: z.array(z.string()).default(['client']),
         context: z.object({
           clientId: z.string(),
@@ -149,7 +149,7 @@ export let Event = z
 
       // Quotes
       z.object({
-        type: z.literal('quote-drafted'),
+        type: z.literal('quote:drafted'),
         tags: z.array(z.string()).default(['quote']),
         context: z.object({
           accountId: z.string(),
@@ -161,7 +161,7 @@ export let Event = z
         }),
       }),
       z.object({
-        type: z.literal('quote-sent'),
+        type: z.literal('quote:sent'),
         tags: z.array(z.string()).default(['quote']),
         context: z.object({
           accountId: z.string(),
@@ -170,7 +170,7 @@ export let Event = z
         }),
       }),
       z.object({
-        type: z.literal('quote-accepted'),
+        type: z.literal('quote:accepted'),
         tags: z.array(z.string()).default(['quote']),
         context: z.object({
           accountId: z.string(),
@@ -179,7 +179,7 @@ export let Event = z
         }),
       }),
       z.object({
-        type: z.literal('quote-rejected'),
+        type: z.literal('quote:rejected'),
         tags: z.array(z.string()).default(['quote']),
         context: z.object({
           accountId: z.string(),
@@ -188,7 +188,7 @@ export let Event = z
         }),
       }),
       z.object({
-        type: z.literal('quote-expired'),
+        type: z.literal('quote:expired'),
         tags: z.array(z.string()).default(['quote']),
         context: z.object({
           accountId: z.string(),
@@ -197,7 +197,7 @@ export let Event = z
         }),
       }),
       z.object({
-        type: z.literal('quote-closed'),
+        type: z.literal('quote:closed'),
         tags: z.array(z.string()).default(['quote']),
         context: z.object({
           accountId: z.string(),
@@ -208,7 +208,7 @@ export let Event = z
 
       // Invoices
       z.object({
-        type: z.literal('invoice-drafted'),
+        type: z.literal('invoice:drafted'),
         tags: z.array(z.string()).default(['invoice']),
         context: z.object({
           accountId: z.string(),
@@ -221,7 +221,7 @@ export let Event = z
         }),
       }),
       z.object({
-        type: z.literal('invoice-sent'),
+        type: z.literal('invoice:sent'),
         tags: z.array(z.string()).default(['invoice']),
         context: z.object({
           accountId: z.string(),
@@ -233,21 +233,7 @@ export let Event = z
         }),
       }),
       z.object({
-        type: z.literal('invoice-partially-paid'),
-        tags: z.array(z.string()).default(['invoice']),
-        context: z.object({
-          accountId: z.string(),
-          clientId: z.string(),
-          invoiceId: z.string(),
-        }),
-        payload: z.object({
-          amount: z.number(),
-          outstanding: z.number(),
-          invoice: z.lazy(() => Invoice),
-        }),
-      }),
-      z.object({
-        type: z.literal('invoice-paid'),
+        type: z.literal('invoice:partially-paid'),
         tags: z.array(z.string()).default(['invoice']),
         context: z.object({
           accountId: z.string(),
@@ -261,7 +247,21 @@ export let Event = z
         }),
       }),
       z.object({
-        type: z.literal('invoice-overdue'),
+        type: z.literal('invoice:paid'),
+        tags: z.array(z.string()).default(['invoice']),
+        context: z.object({
+          accountId: z.string(),
+          clientId: z.string(),
+          invoiceId: z.string(),
+        }),
+        payload: z.object({
+          amount: z.number(),
+          outstanding: z.number(),
+          invoice: z.lazy(() => Invoice),
+        }),
+      }),
+      z.object({
+        type: z.literal('invoice:overdue'),
         tags: z.array(z.string()).default(['invoice']),
         context: z.object({
           accountId: z.string(),
@@ -273,7 +273,7 @@ export let Event = z
         }),
       }),
       z.object({
-        type: z.literal('invoice-closed'),
+        type: z.literal('invoice:closed'),
         tags: z.array(z.string()).default(['invoice']),
         context: z.object({
           accountId: z.string(),
@@ -287,7 +287,7 @@ export let Event = z
 
       // Receipts
       z.object({
-        type: z.literal('receipt-created'),
+        type: z.literal('receipt:created'),
         tags: z.array(z.string()).default(['receipt']),
         context: z.object({
           accountId: z.string(),

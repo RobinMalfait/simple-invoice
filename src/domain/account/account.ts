@@ -130,7 +130,7 @@ export class AccountBuilder {
       handle(builder)
 
       builder._events.push({
-        type: 'account-rebranded',
+        type: 'account:rebranded',
         payload: {
           from: oldName,
           to: builder._name!,
@@ -154,7 +154,7 @@ export class AccountBuilder {
       handle(builder)
 
       builder._events.push({
-        type: 'account-relocated',
+        type: 'account:relocated',
         payload: {
           from: oldAddress,
           to: builder._billing!,
