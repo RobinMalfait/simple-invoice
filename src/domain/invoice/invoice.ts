@@ -82,7 +82,7 @@ export class InvoiceBuilder {
       quote: this._quote,
       paidAt: this._paidAt,
       paid: this.paid,
-      outstanding: this.outstanding ?? 0,
+      outstanding: this.outstanding ?? total({ items: this._items, discounts: this._discounts }),
     }
 
     let invoice = Invoice.parse(input)
