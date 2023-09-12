@@ -7,6 +7,7 @@ import { Event } from '~/domain/events/event'
 import { InvoiceBuilder } from '~/domain/invoice/invoice'
 import { InvoiceItemBuilder } from '~/domain/invoice/invoice-item'
 import {
+  anniversaryMilestones,
   clientCountMilestones,
   fastestAcceptedQuoteMilestones,
   fastestPaidInvoiceMilestones,
@@ -777,6 +778,57 @@ describe('mostExpensiveInvoiceMilestones', () => {
           invoiceId: expect.any(String),
         },
       },
+    ])
+  })
+})
+
+describe('anniversaryMilestones', () => {
+  let events: Event[] = []
+  let bus = new SuperEventEmitter()
+  let account: Account = null as unknown as Account
+  let client: Client = null as unknown as Client
+
+  beforeEach(() => {
+    bus.removeAllListeners()
+    events.splice(0)
+    bus.on('*', (e: Extract<Event, { type: `milestone:${string}` }>) => {
+      if (e.tags.includes('milestone')) {
+        events.push(e)
+      }
+    })
+
+    anniversaryMilestones(bus, { events })
+
+    account = new AccountBuilder().name('Foo').billing(new AddressBuilder().build()).build()
+    client = new ClientBuilder().name('Foo').billing(new AddressBuilder().build()).build()
+  })
+
+  afterEach(() => {
+    bus.removeAllListeners()
+  })
+
+  function setupInvoice() {
+    return new InvoiceBuilder(bus)
+      .account(account)
+      .client(client)
+      .issueDate(new Date())
+      .item(new InvoiceItemBuilder().unitPrice(100_00).description('Expensive lollies').build())
+  }
+
+  it('should result in an anniversary milestone every year', () => {
+    setupInvoice().build() // Draft
+    setupInvoice().build() // Draft
+
+    setupInvoice().send('2020-01-01 10:00').pay('2020-01-01 15:00').build()
+
+    setupInvoice().send('2021-01-01 10:00').build() // 1 year later
+    setupInvoice().send('2021-02-01 10:00').build() // Same 1 year later
+    setupInvoice().send('2021-03-01 10:00').build() // Same 1 year later
+    setupInvoice().send('2022-04-01 10:00').build() // 2 yers later
+
+    expect(events).toMatchSnapshot([
+      { id: expect.any(String), context: { accountId: expect.any(String) } },
+      { id: expect.any(String), context: { accountId: expect.any(String) } },
     ])
   })
 })

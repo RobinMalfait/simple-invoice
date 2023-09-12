@@ -1,4 +1,4 @@
-import { differenceInSeconds } from 'date-fns'
+import { differenceInSeconds, differenceInYears } from 'date-fns'
 import * as lazy from 'lazy-collections'
 import EventEmitter from 'node:events'
 import { Event } from '~/domain/events/event'
@@ -19,6 +19,7 @@ export function trackMilestones(bus: EventEmitter, ctx: Context) {
   clientCountMilestones(bus, ctx)
   internationalClientCountMilestones(bus, ctx)
   mostExpensiveInvoiceMilestones(bus, ctx)
+  anniversaryMilestones(bus, ctx)
 }
 
 // ---
@@ -637,4 +638,48 @@ export function mostExpensiveInvoiceMilestones(bus: EventEmitter, ctx: Context) 
       }
     })
   }
+}
+
+export function anniversaryMilestones(bus: EventEmitter, ctx: Context) {
+  const MILESTONE = 'milestone:anniversary'
+
+  let stateByAccount = new DefaultMap(() => ({
+    start: null as Date | null,
+  }))
+
+  bus.on('invoice:sent', (e: Extract<Event, { type: 'invoice:sent' }>) => {
+    let state = stateByAccount.get(e.context.accountId)!
+
+    if (state.start === null) {
+      state.start = e.at
+      return
+    }
+
+    let years = differenceInYears(e.at!, state.start)
+    if (years <= 0) {
+      return
+    }
+
+    let count = ctx.events.filter(
+      (e) => e.type === MILESTONE && e.context.accountId === e.context.accountId,
+    ).length
+
+    if (years <= count) {
+      return
+    }
+
+    bus.emit(
+      MILESTONE,
+      Event.parse({
+        type: MILESTONE,
+        context: {
+          accountId: e.context.accountId,
+        },
+        payload: {
+          start: state.start,
+        },
+        at: e.at,
+      }),
+    )
+  })
 }

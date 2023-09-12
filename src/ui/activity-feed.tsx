@@ -3,6 +3,7 @@
 import {
   ArrowTrendingUpIcon,
   BanknotesIcon,
+  CakeIcon,
   CheckCircleIcon,
   ClockIcon,
   EllipsisHorizontalCircleIcon,
@@ -19,6 +20,7 @@ import {
 } from '@heroicons/react/24/outline'
 import {
   addSeconds,
+  differenceInYears,
   format,
   formatDistance,
   formatDistanceStrict,
@@ -296,6 +298,9 @@ function ActivityIndicator({ item }: { item: Event }) {
 
     case 'milestone:fastest-paid-invoice':
       return <ClockIcon className="h-4 w-4 text-gray-600 dark:text-gray-300" aria-hidden="true" />
+
+    case 'milestone:anniversary':
+      return <CakeIcon className="h-4 w-4 text-gray-600 dark:text-gray-300" aria-hidden="true" />
 
     case 'quote:drafted':
     case 'invoice:drafted':
@@ -595,6 +600,17 @@ function useActivityText(item: Event) {
           </>
         ),
       ].filter(Boolean)
+
+    case 'milestone:anniversary':
+      return [
+        <>
+          {'Congratulations with your '}
+          <span className="font-medium text-gray-900 dark:text-gray-100">
+            {differenceInYears(item.at!, item.payload.start)}
+          </span>{' '}
+          year anniversary!
+        </>,
+      ]
 
     case 'client:rebranded':
       return [

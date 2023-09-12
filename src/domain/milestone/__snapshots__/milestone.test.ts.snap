@@ -1,5 +1,38 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`anniversaryMilestones should result in an anniversary milestone every year 1`] = `
+[
+  {
+    "at": 2021-01-01T09:00:00.000Z,
+    "context": {
+      "accountId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "start": 2020-01-01T09:00:00.000Z,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:anniversary",
+  },
+  {
+    "at": 2022-04-01T08:00:00.000Z,
+    "context": {
+      "accountId": Any<String>,
+    },
+    "id": Any<String>,
+    "payload": {
+      "start": 2020-01-01T09:00:00.000Z,
+    },
+    "tags": [
+      "milestone",
+    ],
+    "type": "milestone:anniversary",
+  },
+]
+`;
+
 exports[`clientCountMilestones should drop future events in favor of real milestone achievements 1`] = `
 [
   {
