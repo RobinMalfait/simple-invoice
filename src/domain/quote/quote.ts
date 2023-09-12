@@ -21,16 +21,15 @@ let BaseQuote = z.object({
   type: z.literal('quote').default('quote'),
   id: z.string().default(() => scopedId.next()),
   number: z.string(),
-  account: Account,
-  client: Client,
-  items: z.array(InvoiceItem).default([]),
+  account: z.lazy(() => Account),
+  client: z.lazy(() => Client),
+  items: z.array(z.lazy(() => InvoiceItem)).default([]),
   note: z.string().nullable(),
   quoteDate: z.date(),
   quoteExpirationDate: z.date(),
-  discounts: z.array(Discount).default([]),
-  attachments: z.array(Document).default([]),
+  discounts: z.array(z.lazy(() => Discount)).default([]),
+  attachments: z.array(z.lazy(() => Document)).default([]),
   status: z.nativeEnum(QuoteStatus).default(QuoteStatus.Draft),
-  events: z.array(Event),
 })
 
 export type Quote = z.infer<typeof BaseQuote> & {
@@ -51,7 +50,6 @@ export class QuoteBuilder {
   private _quoteExpirationDate: Date | null = null
   private _discounts: Discount[] = []
   private _attachments: Document[] = []
-  private events: Quote['events'] = []
   private _quote: Quote | null = null
 
   private _status = QuoteStatus.Draft
@@ -76,7 +74,6 @@ export class QuoteBuilder {
       discounts: this._discounts,
       attachments: this._attachments,
       status: this.computeStatus,
-      events: this.events,
 
       quote: this._quote,
     }
@@ -360,7 +357,7 @@ export class QuoteBuilder {
     let parsedAt = typeof at === 'string' ? parseISO(at) : at
 
     if (isPast(this.computeQuoteExpirationDate!)) {
-      this.events.push(Event.parse({ type: 'quote-expired', at: parsedAt }))
+      this._events.push({ type: 'quote-expired', at: parsedAt })
       this._status = QuoteStatus.Expired
     }
 

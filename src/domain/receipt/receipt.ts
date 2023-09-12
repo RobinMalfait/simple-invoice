@@ -20,14 +20,14 @@ export let Receipt = z.object({
   type: z.literal('receipt').default('receipt'),
   id: z.string().default(() => scopedId.next()),
   number: z.string(),
-  invoice: Invoice,
-  account: Account,
-  client: Client,
-  items: z.array(InvoiceItem),
+  invoice: z.lazy(() => Invoice),
+  account: z.lazy(() => Account),
+  client: z.lazy(() => Client),
+  items: z.array(z.lazy(() => InvoiceItem)),
   note: z.string().nullable(),
   receiptDate: z.date(),
-  discounts: z.array(Discount),
-  attachments: z.array(Document),
+  discounts: z.array(z.lazy(() => Discount)),
+  attachments: z.array(z.lazy(() => Document)),
 })
 
 export type Receipt = z.infer<typeof Receipt>

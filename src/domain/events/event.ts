@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { Address } from '~/domain/address/address'
 import { ScopedIDGenerator } from '~/utils/id'
+import { Invoice } from '../invoice/invoice'
 
 let scopedId = new ScopedIDGenerator('event')
 
@@ -205,6 +206,7 @@ export let Event = z
         }),
         payload: z.object({
           from: z.enum(['quote']).optional(),
+          invoice: z.lazy(() => Invoice),
         }),
       }),
       z.object({
@@ -214,6 +216,9 @@ export let Event = z
           accountId: z.string(),
           clientId: z.string(),
           invoiceId: z.string(),
+        }),
+        payload: z.object({
+          invoice: z.lazy(() => Invoice),
         }),
       }),
       z.object({
@@ -227,6 +232,7 @@ export let Event = z
         payload: z.object({
           amount: z.number(),
           outstanding: z.number(),
+          invoice: z.lazy(() => Invoice),
         }),
       }),
       z.object({
@@ -240,6 +246,7 @@ export let Event = z
         payload: z.object({
           amount: z.number(),
           outstanding: z.number(),
+          invoice: z.lazy(() => Invoice),
         }),
       }),
       z.object({
@@ -250,6 +257,9 @@ export let Event = z
           clientId: z.string(),
           invoiceId: z.string(),
         }),
+        payload: z.object({
+          invoice: z.lazy(() => Invoice),
+        }),
       }),
       z.object({
         type: z.literal('invoice-closed'),
@@ -258,6 +268,9 @@ export let Event = z
           accountId: z.string(),
           clientId: z.string(),
           invoiceId: z.string(),
+        }),
+        payload: z.object({
+          invoice: z.lazy(() => Invoice),
         }),
       }),
 

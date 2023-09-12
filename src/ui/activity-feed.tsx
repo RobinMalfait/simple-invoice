@@ -58,6 +58,7 @@ export function ActivityFeed({
   viewContext: ContextType<typeof ViewContext>
 }) {
   let grouped = events
+    .slice()
     .reverse()
     .sort((a, z) => {
       if (isFutureEvent(a) && isFutureEvent(z)) return 0

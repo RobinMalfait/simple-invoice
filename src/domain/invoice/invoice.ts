@@ -14,6 +14,7 @@ import { InvoiceItem } from '~/domain/invoice/invoice-item'
 import { InvoiceStatus } from '~/domain/invoice/invoice-status'
 import { Quote } from '~/domain/quote/quote'
 import { QuoteStatus } from '~/domain/quote/quote-status'
+import { DeepPartial } from '~/types/shared'
 import { total } from '~/ui/invoice/total'
 import { ScopedIDGenerator } from '~/utils/id'
 import { match } from '~/utils/match'
@@ -24,19 +25,19 @@ export let Invoice = z.object({
   type: z.literal('invoice').default('invoice'),
   id: z.string().default(() => scopedId.next()),
   number: z.string(),
-  account: Account,
-  client: Client,
-  items: z.array(InvoiceItem),
+  account: z.lazy(() => Account),
+  client: z.lazy(() => Client),
+  items: z.array(z.lazy(() => InvoiceItem)),
   note: z.string().nullable(),
   issueDate: z.date(),
   dueDate: z.date(),
-  discounts: z.array(Discount),
-  attachments: z.array(Document).default([]),
+  discounts: z.array(z.lazy(() => Discount)),
+  attachments: z.array(z.lazy(() => Document)).default([]),
   status: z.nativeEnum(InvoiceStatus).default(InvoiceStatus.Draft),
   paid: z.number(),
   outstanding: z.number(),
   paidAt: z.date().nullable(),
-  quote: Quote.nullable(),
+  quote: z.lazy(() => Quote.nullable()),
 })
 
 export type Invoice = z.infer<typeof Invoice>
@@ -58,7 +59,7 @@ export class InvoiceBuilder {
   private paid: number = 0
   private outstanding: number | null = null
 
-  private _events: Partial<Event>[] = []
+  private _events: DeepPartial<Extract<Event, { type: `invoice-${string}` }>>[] = []
 
   public constructor(private bus: EventEmitter = defaultBus) {}
 
@@ -87,7 +88,7 @@ export class InvoiceBuilder {
     let invoice = Invoice.parse(input)
 
     if (!this._events.some((e) => e.type === 'invoice-drafted')) {
-      this._events.unshift({ type: 'invoice-drafted', payload: {} })
+      this._events.unshift({ type: 'invoice-drafted' })
     }
 
     if (invoice.status === InvoiceStatus.Overdue) {
@@ -103,6 +104,10 @@ export class InvoiceBuilder {
             accountId: invoice.account.id,
             clientId: invoice.client.id,
             invoiceId: invoice.id,
+          },
+          payload: {
+            ...event.payload,
+            invoice,
           },
         }),
       )
