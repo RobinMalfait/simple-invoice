@@ -790,7 +790,8 @@ function useActivityText(item: Event) {
           ]
         : [
             <>
-              <span className="font-medium text-gray-900 dark:text-gray-100">Sent</span> the quote.
+              <span className="font-medium text-gray-900 dark:text-gray-100">Sent</span> the
+              invoice.
             </>,
           ]
 
