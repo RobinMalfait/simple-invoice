@@ -40,7 +40,7 @@ export function render<T>(template: string, input: T, config: Configuration = {}
   })
 
   return template.replace(/{{\s*(.+?)\s*}}/g, (_, value) => {
-    let transformations: string[] = value.split('|')
+    let transformations: string[] = value.split(/\s*\|\s*/g)
     let [path, arg] = transformations.shift()?.split(':') ?? []
 
     let next = dot(path, input)
