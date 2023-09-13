@@ -1,11 +1,13 @@
 import { z } from 'zod'
 import { ScopedIDGenerator } from '~/utils/id'
+import { match } from '~/utils/match'
 
 let scopedId = new ScopedIDGenerator('payment-method')
 
 export let PaymentMethod = z.object({
   id: z.string().default(() => scopedId.next()),
   type: z.enum(['iban', 'paypal']),
+  display: z.string(),
   value: z.string(),
 })
 
@@ -19,6 +21,10 @@ export class PaymentMethodBuilder {
     return PaymentMethod.parse({
       type: this._type,
       value: this._value,
+      display: match(this._type!, {
+        iban: () => `IBAN ${this._value}`,
+        paypal: () => `${this._value}`,
+      }),
     })
   }
 

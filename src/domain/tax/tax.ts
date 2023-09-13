@@ -16,6 +16,7 @@ export enum TaxID {
 export let Tax = z.object({
   id: z.nativeEnum(TaxID),
   value: z.string(),
+  display: z.string(),
 })
 
 export type Tax = z.infer<typeof Tax>
@@ -28,6 +29,7 @@ export class TaxBuilder {
     return Tax.parse({
       id: this._id,
       value: this._value,
+      display: `${this._id!.toUpperCase()} ${this._value}`,
     })
   }
 
