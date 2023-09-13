@@ -108,8 +108,14 @@ export async function loadTemplate(record: Record, id: string, configuration: Co
     return null
   }
 
-  let subject = dedent(renderTemplate(template.subject, record, { classified }))
-  let body = dedent(renderTemplate(template.body ?? '', record, { classified }))
+  let adjustedRecord = Object.assign({}, record, {
+    account: Object.assign({}, record.account, {
+      legal: record.account.legal && render(record.account.legal, { account: record.account }),
+    }),
+  })
+
+  let subject = dedent(renderTemplate(template.subject, adjustedRecord, { classified }))
+  let body = dedent(renderTemplate(template.body ?? '', adjustedRecord, { classified }))
 
   return {
     id: template.id,
