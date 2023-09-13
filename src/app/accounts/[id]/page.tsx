@@ -12,6 +12,7 @@ import { PaypalIcon } from '~/ui/icons/payment'
 import * as SocialIcons from '~/ui/icons/social'
 import { TimezoneDifference } from '~/ui/timezone-difference'
 import { match } from '~/utils/match'
+import { render } from '~/utils/tl'
 import { AccountActivityFeed } from './activity-feed'
 
 export default async function Page({ params: { id } }: { params: { id: string } }) {
@@ -91,7 +92,7 @@ export default async function Page({ params: { id } }: { params: { id: string } 
                 )}
                 {account.legal && (
                   <Field classified title="Legal" variant="block">
-                    {account.legal}
+                    {render(account.legal, { account })}
                   </Field>
                 )}
 
