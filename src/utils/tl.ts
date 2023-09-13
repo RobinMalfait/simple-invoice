@@ -62,6 +62,7 @@ export function render<T>(template: string, input: T, config: Configuration = {}
           pick: () => next.map((x: any) => dot(arg, x)),
           and: () => and.format(next),
           or: () => or.format(next),
+          join: () => next.join(arg),
 
           // Transform the transformations itself to pass in the `next` value.
           ...Object.fromEntries(
