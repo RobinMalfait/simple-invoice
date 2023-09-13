@@ -39,7 +39,7 @@ export function render<T>(template: string, input: T, config: Configuration = {}
     type: 'conjunction',
   })
 
-  return template.replace(/{{(.+?)}}/g, (_, value) => {
+  return template.replace(/{{\s*(.+?)\s*}}/g, (_, value) => {
     let transformations: string[] = value.split('|')
     let [path, arg] = transformations.shift()?.split(':') ?? []
 

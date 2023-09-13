@@ -9,6 +9,10 @@ it('should replace a variable', () => {
   expect(render('Hello {{name}}!', { name: 'world' })).toBe('Hello world!')
 })
 
+it('should replace a variable with spaces around it', () => {
+  expect(render('Hello {{ name }}!', { name: 'world' })).toBe('Hello world!')
+})
+
 it('should replace a nested variable', () => {
   expect(render('Hello {{user.name}}!', { user: { name: 'world' } })).toBe('Hello world!')
 })
