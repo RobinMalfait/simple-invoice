@@ -105,7 +105,7 @@ export class ClientBuilder {
     return builder
   }
 
-  private static mutate(client: Client, mutator: (builder: ClientBuilder) => void): Client {
+  public static mutate(client: Client, mutator: (builder: ClientBuilder) => void): Client {
     return Object.assign(
       client,
       tap(ClientBuilder.from(client), (builder) => {

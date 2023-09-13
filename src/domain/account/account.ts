@@ -110,7 +110,7 @@ export class AccountBuilder {
     return builder
   }
 
-  private static mutate(account: Account, mutator: (builder: AccountBuilder) => void): Account {
+  public static mutate(account: Account, mutator: (builder: AccountBuilder) => void): Account {
     return Object.assign(
       account,
       tap(AccountBuilder.from(account), (builder) => {
