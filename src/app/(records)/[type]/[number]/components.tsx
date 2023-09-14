@@ -2,7 +2,6 @@
 
 import { EyeIcon } from '@heroicons/react/24/outline'
 import { format, formatISO9075, parseISO } from 'date-fns'
-// @ts-expect-error
 import estreePlugin from 'prettier/plugins/estree'
 import tsPlugin from 'prettier/plugins/typescript'
 import * as prettier from 'prettier/standalone'

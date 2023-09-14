@@ -47,6 +47,11 @@ configure({
        *  - For dates, you can use a format string, for example `{{quoteDate:dd-MM-yyyy}}`
        */
       filename: 'quote-{{number}}.pdf',
+
+      /**
+       * When creating a backup, the PDFs will be stored in this folder.
+       */
+      folder: 'quotes/{{status}}/{{quoteDate:yyyy-QQ}}',
     },
 
     mail: {
@@ -95,6 +100,11 @@ configure({
        *  - For dates, you can use a format string, for example `{{issueDate:dd-MM-yyyy}}`
        */
       filename: 'invoice-{{number}}.pdf',
+
+      /**
+       * When creating a backup, the PDFs will be stored in this folder.
+       */
+      folder: 'invoices/{{status}}/{{issueDate:yyyy-QQ}}',
     },
 
     mail: {
@@ -137,6 +147,11 @@ configure({
        *  - For dates, you can use a format string, for example `{{receiptDate:dd-MM-yyyy}}`
        */
       filename: 'receipt-{{number}}.pdf',
+
+      /**
+       * When creating a backup, the PDFs will be stored in this folder.
+       */
+      folder: 'receipts/{{status}}/{{invoice.issueDate:yyyy-QQ}}',
     },
 
     mail: {

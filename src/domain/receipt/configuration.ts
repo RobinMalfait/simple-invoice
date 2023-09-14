@@ -13,6 +13,11 @@ export type Configuration = {
      *  - For dates, you can use a format string, for example `{{receiptDate:dd-MM-yyyy}}`
      */
     filename: string
+
+    /**
+     * When creating a backup, the PDFs will be stored in this folder.
+     */
+    folder: string
   }
 
   /**
@@ -26,6 +31,7 @@ export type Configuration = {
 export let defaultConfiguration: Configuration = {
   pdf: {
     filename: 'receipt-{{invoice.number}}.pdf',
+    folder: 'quotes/{{invoice.issueDate:yyyy-QQ}}',
   },
   mail: {
     templates: [],
