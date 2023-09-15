@@ -45,6 +45,8 @@ export async function GET(request: Request, { params }: { params: { id: string }
     return redirect(`/`)
   }
 
+  console.log('Generating PDFs...')
+  console.time('Generated PDFs')
   let baseURL = `http://${request.headers.get('host')}/{type}/{number}/raw`
 
   let zip = Archiver('zip')
@@ -78,38 +80,40 @@ export async function GET(request: Request, { params }: { params: { id: string }
     'Content-disposition',
     `attachment; filename=backup-${format(new Date(), 'yyyy-MM-dd')}.zip`,
   )
+  console.timeEnd('Generated PDFs')
 
   return response
 }
 
 async function generatePDFs(urls: [filename: string, url: string][]) {
   let browser = await puppeteer.launch({ headless: 'new' })
+  try {
+    let buffers = await Promise.all(
+      urls.map(async ([filename, url]) => {
+        let page = await browser.newPage()
 
-  let buffers = await Promise.all(
-    urls.map(async ([filename, url]) => {
-      let page = await browser.newPage()
+        page.setDefaultNavigationTimeout(0)
 
-      page.setDefaultNavigationTimeout(0)
+        await page.goto(url)
 
-      await page.goto(url)
+        // Give the page time to load
+        await page.waitForSelector('[data-pdf-state="ready"]', {
+          timeout: 2 * 60 * 1000, // 2 minutes
+        })
 
-      // Give the page time to load
-      await page.waitForSelector('[data-pdf-state="ready"]', {
-        timeout: 2 * 60 * 1000, // 2 minutes
-      })
+        return [
+          filename,
+          await page.pdf({
+            printBackground: true,
+            format: 'A4',
+            preferCSSPageSize: true,
+          }),
+        ] as const
+      }),
+    )
 
-      return [
-        filename,
-        await page.pdf({
-          printBackground: true,
-          format: 'A4',
-          preferCSSPageSize: true,
-        }),
-      ] as const
-    }),
-  )
-
-  await browser.close()
-
-  return buffers
+    return buffers
+  } finally {
+    await browser.close()
+  }
 }
