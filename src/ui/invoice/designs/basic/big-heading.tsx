@@ -17,13 +17,13 @@ export function BigHeading() {
 
   return (
     <>
-      <div className="bg-gray-50 px-12 py-8 dark:bg-zinc-900">
-        <CubeIcon className="h-12 text-gray-400 dark:text-zinc-200" />
+      <div className="bg-gray-50 px-12 py-8">
+        <CubeIcon className="h-12 text-gray-400" />
 
         <div className="mt-4 flex items-end justify-between">
           <span className="space-x-3 text-2xl">
             <span>
-              <span className="font-medium text-gray-500 dark:text-zinc-100">
+              <span className="font-medium text-gray-500">
                 {t((x) =>
                   match(record.type, {
                     quote: () => x.quote.title,
@@ -32,16 +32,14 @@ export function BigHeading() {
                   }),
                 )}
               </span>
-              <span className="text-gray-300 dark:text-zinc-50">.</span>
+              <span className="text-gray-300">.</span>
             </span>
-            <span className="text-lg text-gray-300 dark:text-zinc-400">/</span>
-            <span className="text-lg tabular-nums text-gray-500 dark:text-zinc-300">
-              {record.number}
-            </span>
+            <span className="text-lg text-gray-300">/</span>
+            <span className="text-lg tabular-nums text-gray-500">{record.number}</span>
           </span>
           <div className="text-right">
             <div className="space-x-3">
-              <span className="text-gray-500 dark:text-zinc-400">
+              <span className="text-gray-500">
                 {t((x) =>
                   match(record.type, {
                     quote: () => x.dates.quoteDate,
@@ -50,7 +48,7 @@ export function BigHeading() {
                   }),
                 )}
               </span>
-              <span className="font-medium tabular-nums text-gray-700 dark:text-zinc-300">
+              <span className="font-medium tabular-nums text-gray-700">
                 {match(
                   record.type,
                   {
@@ -63,7 +61,7 @@ export function BigHeading() {
               </span>
             </div>
             <div className="space-x-3">
-              <span className="text-gray-500 dark:text-zinc-400">
+              <span className="text-gray-500">
                 {t((x) =>
                   match(record.type, {
                     quote: () => x.dates.quoteExpirationDate,
@@ -72,7 +70,7 @@ export function BigHeading() {
                   }),
                 )}
               </span>
-              <span className="font-medium tabular-nums text-gray-700 dark:text-zinc-300">
+              <span className="font-medium tabular-nums text-gray-700">
                 {match(
                   record.type,
                   {
@@ -88,11 +86,9 @@ export function BigHeading() {
         </div>
       </div>
 
-      <div className="flex justify-between px-12 py-8 text-gray-500 dark:text-gray-300">
+      <div className="flex justify-between px-12 py-8 text-gray-500">
         <div className="flex flex-col">
-          <h3 className="text-sm font-medium text-gray-900 dark:text-zinc-50">
-            {t((x) => x.account.title)}
-          </h3>
+          <h3 className="text-sm font-medium text-gray-900">{t((x) => x.account.title)}</h3>
           <div className="flex flex-1 flex-col whitespace-pre-wrap text-sm font-normal">
             <div className="flex-1">
               <span>{record.account.name}</span>
@@ -100,9 +96,7 @@ export function BigHeading() {
             </div>
             {record.account.tax && (
               <div className="mt-4">
-                <div className="text-sm font-medium text-gray-900 dark:text-zinc-50">
-                  {t((x) => x.account.vat)}
-                </div>
+                <div className="text-sm font-medium text-gray-900">{t((x) => x.account.vat)}</div>
                 <div>
                   <Classified>{record.account.tax.value}</Classified>
                 </div>
@@ -112,9 +106,7 @@ export function BigHeading() {
         </div>
 
         <div className="flex flex-col">
-          <h3 className="text-sm font-medium text-gray-900 dark:text-zinc-50">
-            {t((x) => x.client.title)}
-          </h3>
+          <h3 className="text-sm font-medium text-gray-900">{t((x) => x.client.title)}</h3>
           <div className="flex flex-1 flex-col whitespace-pre-wrap text-sm font-normal">
             <div className="flex-1">
               <span>{record.client.name}</span>
@@ -122,9 +114,7 @@ export function BigHeading() {
             </div>
             {record.client.tax && (
               <div className="mt-4">
-                <div className="text-sm font-medium text-gray-900 dark:text-zinc-50">
-                  {t((x) => x.client.vat)}
-                </div>
+                <div className="text-sm font-medium text-gray-900">{t((x) => x.client.vat)}</div>
                 <div>
                   <Classified>{record.client.tax.value}</Classified>
                 </div>

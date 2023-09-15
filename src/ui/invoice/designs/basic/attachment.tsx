@@ -34,11 +34,11 @@ export function Attachment({ document }: { document: Document }) {
           <PageProvider key={pageIdx} info={{ total: pages.length, current: pageIdx }}>
             <div
               id={pageIdx === 0 ? `attachment-${document.id}` : undefined}
-              className="paper relative mx-auto flex flex-col overflow-hidden bg-white dark:bg-zinc-950/70 print:m-0"
+              className="paper relative mx-auto flex flex-col overflow-hidden bg-white print:m-0"
             >
               {!completed && (
                 <div className="absolute inset-0 z-20 bg-black/10 backdrop-blur">
-                  <div className="p-4 text-xl dark:text-white">
+                  <div className="p-4 text-xl">
                     Computing <strong className="font-bold">{document.name}</strong>, please hold on
                     tight&hellip;
                   </div>
@@ -50,7 +50,7 @@ export function Attachment({ document }: { document: Document }) {
                 <FitContent>
                   <div
                     dangerouslySetInnerHTML={{ __html: html }}
-                    className="prose prose-sm flex max-w-[calc(297mm-calc(48px*2))] flex-1 flex-col dark:prose-invert"
+                    className="prose prose-sm flex max-w-[calc(297mm-calc(48px*2))] flex-1 flex-col"
                   />
                 </FitContent>
               </div>
@@ -69,7 +69,7 @@ export function SmallHeading({ name }: { name: string }) {
   let t = useTranslation()
 
   return (
-    <div className="flex items-center justify-between bg-gray-50 px-12 py-3 text-sm text-gray-600 dark:bg-zinc-900 dark:text-zinc-300">
+    <div className="flex items-center justify-between bg-gray-50 px-12 py-3 text-sm text-gray-600">
       <span>{name}</span>
       <span>
         {t((x) => x.pagination.summary, {

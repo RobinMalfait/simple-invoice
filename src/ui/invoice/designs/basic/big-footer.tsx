@@ -16,11 +16,11 @@ export function BigFooter() {
 
   return (
     <div>
-      <div className="relative space-y-12 bg-gray-50 px-12 py-8 text-gray-900 dark:bg-zinc-900 dark:text-gray-300">
+      <div className="relative space-y-12 bg-gray-50 px-12 py-8 text-gray-900">
         <div className="space-y-4">
           <div className="flex items-center justify-between text-xl font-medium">
             <span>{t((x) => x.summary.total)}</span>
-            <div className="-mx-4 -my-2 rounded-full bg-black px-4 py-2 text-white dark:bg-zinc-50 dark:text-zinc-800">
+            <div className="-mx-4 -my-2 rounded-full bg-black px-4 py-2 text-white">
               <Money
                 amount={match(record.type, {
                   quote: () => total(record),
@@ -36,10 +36,7 @@ export function BigFooter() {
               <table className="text-sm">
                 <thead>
                   <tr>
-                    <td
-                      colSpan={2}
-                      className="text-sm font-medium text-gray-900 dark:text-zinc-300"
-                    >
+                    <td colSpan={2} className="text-sm font-medium text-gray-900">
                       {t((x) => x.summary.contactDetails)}
                     </td>
                   </tr>
@@ -64,7 +61,7 @@ export function BigFooter() {
                     return (
                       <tr key={field.id}>
                         <td className="text-center">
-                          <Icon className="h-4 w-4 text-gray-500 grayscale dark:text-gray-400" />
+                          <Icon className="h-4 w-4 text-gray-500 grayscale" />
                         </td>
                         <td className="px-3">
                           <Classified>{field.value}</Classified>
@@ -80,10 +77,7 @@ export function BigFooter() {
               <table className="text-sm">
                 <thead>
                   <tr>
-                    <td
-                      colSpan={2}
-                      className="text-sm font-medium text-gray-900 dark:text-zinc-300"
-                    >
+                    <td colSpan={2} className="text-sm font-medium text-gray-900">
                       {t((x) => x.summary.paymentDetails)}
                     </td>
                   </tr>
@@ -94,12 +88,8 @@ export function BigFooter() {
                       <tr key={paymentMethod.id}>
                         <td className="text-center">
                           {match(paymentMethod.type, {
-                            iban: () => (
-                              <BanknotesIcon className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-                            ),
-                            paypal: () => (
-                              <PaypalIcon className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-                            ),
+                            iban: () => <BanknotesIcon className="h-4 w-4 text-gray-500" />,
+                            paypal: () => <PaypalIcon className="h-4 w-4 text-gray-500" />,
                           })}
                         </td>
                         <td className="px-3">
