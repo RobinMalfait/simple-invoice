@@ -1,19 +1,43 @@
 import Archiver from 'archiver'
 import { format } from 'date-fns'
-import fs from 'fs'
 import { redirect } from 'next/navigation'
-import { tmpdir } from 'os'
+import { Writable } from 'node:stream'
 import puppeteer from 'puppeteer'
 import { records } from '~/data'
 import { config } from '~/domain/configuration/configuration'
 import { languageToLocale } from '~/utils/language-to-locale'
 import { render } from '~/utils/tl'
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
-  // TODO: Don't do this, stream directly
-  let tmpFileName = `${tmpdir()}/simple-invoice-backup.zip`
-  let stream = fs.createWriteStream(tmpFileName)
+class BufferStream extends Writable {
+  private chunks: Uint8Array[] = []
+  private ready = false
+  private readyListeners: ((buffer: Buffer) => void)[] = []
 
+  _write(chunk: Uint8Array, encoding: BufferEncoding, callback: (error?: Error | null) => void) {
+    this.chunks.push(chunk)
+    callback()
+  }
+
+  _final(callback: (error?: Error | null) => void) {
+    this.ready = true
+    for (let listener of this.readyListeners.splice(0)) {
+      listener(Buffer.concat(this.chunks))
+    }
+    callback()
+  }
+
+  buffer() {
+    if (this.ready) {
+      return Promise.resolve(Buffer.concat(this.chunks))
+    }
+
+    return new Promise<Buffer>((resolve) => {
+      this.readyListeners.push(resolve)
+    })
+  }
+}
+
+export async function GET(request: Request, { params }: { params: { id: string } }) {
   // TODO: Filter records by account
   let myRecords = records
 
@@ -26,7 +50,8 @@ export async function GET(request: Request, { params }: { params: { id: string }
   let zip = Archiver('zip')
 
   // Send the file to the page output.
-  zip.pipe(stream)
+  let bufferStream = new BufferStream()
+  zip.pipe(bufferStream)
 
   for (let [file, buffer] of await generatePDFs(
     myRecords.map((record) => {
@@ -46,15 +71,13 @@ export async function GET(request: Request, { params }: { params: { id: string }
   }
 
   await zip.finalize()
-  await new Promise((r) => setTimeout(r, 100))
 
-  let response = new Response(fs.readFileSync(tmpFileName), { status: 200 })
+  let response = new Response(await bufferStream.buffer(), { status: 200 })
   response.headers.set('Content-Type', 'application/zip')
   response.headers.set(
     'Content-disposition',
     `attachment; filename=backup-${format(new Date(), 'yyyy-MM-dd')}.zip`,
   )
-  fs.unlinkSync(tmpFileName)
 
   return response
 }
