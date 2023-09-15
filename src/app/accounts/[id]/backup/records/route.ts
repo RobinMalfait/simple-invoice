@@ -89,6 +89,8 @@ async function generatePDFs(urls: [filename: string, url: string][]) {
     urls.map(async ([filename, url]) => {
       let page = await browser.newPage()
 
+      page.setDefaultNavigationTimeout(0)
+
       await page.goto(url)
 
       // Give the page time to load
