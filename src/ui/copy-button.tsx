@@ -17,17 +17,22 @@ export function CopyButton({
   return (
     <button
       onClick={async () => {
-        let data = [
-          new ClipboardItem(
-            Object.fromEntries(
-              [
-                text != null ? ['text/plain', new Blob([text], { type: 'text/plain' })] : null,
-                html != null ? ['text/html', new Blob([html], { type: 'text/html' })] : null,
-              ].filter(Boolean) as [string, Blob][],
+        if (typeof ClipboardItem !== 'undefined') {
+          let data = [
+            new ClipboardItem(
+              Object.fromEntries(
+                [
+                  text != null ? ['text/plain', new Blob([text], { type: 'text/plain' })] : null,
+                  html != null ? ['text/html', new Blob([html], { type: 'text/html' })] : null,
+                ].filter(Boolean) as [string, Blob][],
+              ),
             ),
-          ),
-        ]
-        await navigator.clipboard.write(data)
+          ]
+          await navigator.clipboard.write(data)
+        } else {
+          // Fallback to text
+          await navigator.clipboard.writeText(text ?? '')
+        }
         setCopyStatus('copied')
         setTimeout(() => setCopyStatus('idle'), 3000)
       }}
