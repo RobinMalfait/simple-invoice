@@ -7,6 +7,7 @@ import { Address, formatAddress } from '~/ui/address/address'
 import { Avatar } from '~/ui/avatar'
 import { Card, CardBody, CardTitle, Field } from '~/ui/card'
 import { Classified } from '~/ui/classified'
+import { DownloadLink } from '~/ui/download-link'
 import { I18NProvider } from '~/ui/hooks/use-i18n'
 import { PaypalIcon } from '~/ui/icons/payment'
 import * as SocialIcons from '~/ui/icons/social'
@@ -105,14 +106,23 @@ export default async function Page({ params: { id } }: { params: { id: string } 
                   </span>
                 </div>
 
-                <Field title="iCal" variant="block">
-                  <a
-                    className="inline-flex items-center rounded-md border border-transparent bg-blue-600 px-3 py-2 text-sm font-medium leading-4 text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                    href={`webcal://${base}/accounts/${account.id}/ics`}
-                  >
-                    <CalendarIcon className="-ml-0.5 mr-2 h-4 w-4" aria-hidden="true" />
-                    Add to calendar
-                  </a>
+                <Field title="Actions" variant="block">
+                  <div className="flex gap-2">
+                    <a
+                      className="inline-flex items-center rounded-md border border-transparent bg-blue-600 px-3 py-2 font-sans text-sm font-medium leading-4 text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                      href={`webcal://${base}/accounts/${account.id}/ics`}
+                    >
+                      <CalendarIcon className="-ml-0.5 mr-2 h-4 w-4" aria-hidden="true" />
+                      Add to calendar
+                    </a>
+
+                    <DownloadLink
+                      className="inline-flex items-center rounded-md border border-transparent bg-blue-600 px-3 py-2 font-sans text-sm font-medium leading-4 text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                      href={`/accounts/${account.id}/backup/records`}
+                    >
+                      Download invoices
+                    </DownloadLink>
+                  </div>
                 </Field>
               </CardBody>
             </Card>

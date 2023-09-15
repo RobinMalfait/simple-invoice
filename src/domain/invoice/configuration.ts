@@ -28,6 +28,11 @@ export type Configuration = {
      *  - For dates, you can use a format string, for example `{{issueDate:dd-MM-yyyy}}`
      */
     filename: string
+
+    /**
+     * When creating a backup, the PDFs will be stored in this folder.
+     */
+    folder: string
   }
 
   /**
@@ -43,6 +48,7 @@ export let defaultConfiguration: Configuration = {
   numberStrategy: new IncrementStrategy().next,
   pdf: {
     filename: 'invoice-{{number}}.pdf',
+    folder: 'invoices/{{status}}/{{issueDate:yyyy-QQ}}',
   },
   mail: {
     templates: [],

@@ -30,7 +30,19 @@ export function DownloadLink({
   }, [d, downloading])
 
   return (
-    <a onClick={() => setDownloading(true)} download {...props}>
+    <a
+      onClick={(e) => {
+        if (downloading) {
+          e.preventDefault()
+          return
+        }
+
+        setDownloading(true)
+      }}
+      aria-disabled={downloading}
+      download
+      {...props}
+    >
       {downloading ? (
         <ArrowPathIcon className="mr-2 h-4 w-4 animate-spin" />
       ) : (
