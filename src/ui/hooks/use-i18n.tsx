@@ -14,6 +14,14 @@ export function I18NProvider(props: {
   return <Context.Provider value={props.value}>{props.children}</Context.Provider>
 }
 
+export function I18NPartialProvider(props: {
+  value: Partial<{ language: Language; currency: Currency }> | null
+  children: React.ReactNode
+}) {
+  let existing = useI18N()
+  return <I18NProvider value={{ ...existing, ...props.value }}>{props.children}</I18NProvider>
+}
+
 export function useI18N() {
   let i18n = useContext(Context)
   if (i18n === null) {

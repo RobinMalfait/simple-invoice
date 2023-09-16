@@ -2,19 +2,16 @@ import { compareDesc, format, isFuture } from 'date-fns'
 import Link from 'next/link'
 
 import { me, records } from '~/data'
-import { Currency } from '~/domain/currency/currency'
 import { Invoice } from '~/domain/invoice/invoice'
 import { Quote } from '~/domain/quote/quote'
 import { Receipt } from '~/domain/receipt/receipt'
-import { isAccepted, isPaidRecord, isQuote } from '~/domain/record/filters'
 import { Record, combineRecords, resolveRelevantRecordDate } from '~/domain/record/record'
 import { classNames } from '~/ui/class-names'
 import { Empty } from '~/ui/empty'
 import { Disclosure, DisclosureButton, DisclosurePanel } from '~/ui/headlessui'
 import { I18NProvider } from '~/ui/hooks/use-i18n'
-import { total } from '~/ui/invoice/total'
-import { Money } from '~/ui/money'
 import { TinyRecord } from '~/ui/record/tiny-record'
+import { TotalsByStatus } from '~/ui/record/totals-by-status'
 import { match } from '~/utils/match'
 
 function titleForQuarter(date: Date) {
@@ -45,17 +42,6 @@ function groupByQuarter(records: Record[]) {
         acc.get(key)!.push(record)
         return acc
       }, new Map<string, Record[]>()),
-  )
-}
-
-function groupByCurrency(records: Record[]) {
-  return Array.from(
-    records.reduce((acc, record) => {
-      let key = record.client.currency
-      if (!acc.has(key)) acc.set(key, [])
-      acc.get(key)!.push(record)
-      return acc
-    }, new Map<Currency, Record[]>()),
   )
 }
 
@@ -105,47 +91,7 @@ export default async function Home({ params: { type } }: { params: { type: strin
 
                     <div className="relative z-20 -mx-1.5 flex justify-between rounded-md bg-white/95 px-[18px] py-3 text-gray-500 ring-1 ring-black/5 backdrop-blur dark:bg-zinc-900/95 dark:text-gray-400">
                       <span>{title}</span>
-                      <span className="flex items-center gap-2">
-                        <span>
-                          {match(type, {
-                            quote: () => 'Expected',
-                            invoice: () => 'Paid',
-                            receipt: () => 'Paid',
-                          })}
-                        </span>
-                        {groupByCurrency(records).map(([currency, records], idx) => (
-                          <I18NProvider
-                            key={currency}
-                            value={{
-                              // Prefer my language when looking at the overview of records.
-                              language: me.language,
-
-                              // Prefer the currency of the client when looking at the overview of
-                              // records.
-                              currency,
-                            }}
-                          >
-                            {idx !== 0 && <span className="text-gray-300">•</span>}
-                            <Money
-                              amount={match(type, {
-                                quote: () =>
-                                  records
-                                    .filter((r) => isQuote(r) && isAccepted(r))
-                                    .reduce((acc, record) => acc + total(record), 0),
-
-                                invoice: () =>
-                                  records
-                                    .filter((r) => isPaidRecord(r))
-                                    .reduce((acc, record) => acc + total(record), 0),
-                                receipt: () =>
-                                  records
-                                    .filter((r) => isPaidRecord(r))
-                                    .reduce((acc, record) => acc + total(record), 0),
-                              })}
-                            />
-                          </I18NProvider>
-                        ))}
-                      </span>
+                      <TotalsByStatus records={records} />
                     </div>
                   </DisclosureButton>
 
