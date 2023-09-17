@@ -245,6 +245,7 @@ export let me: Account = new AccountBuilder()
 
 let Client1 = new ClientBuilder()
   .name('Client Inc #1')
+  .nickname('Client #1')
   .email('bob@client.com')
   .billing(
     new AddressBuilder()
