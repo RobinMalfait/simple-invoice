@@ -458,7 +458,7 @@ function useActivityText(item: Event) {
               className="font-medium text-gray-900 dark:text-gray-100"
               href={`/clients/${item.context.clientId}`}
             >
-              {client.name}
+              {client.nickname}
             </Link>{' '}
             accepted quote{' '}
             <Link
@@ -588,7 +588,7 @@ function useActivityText(item: Event) {
                 className="font-medium text-gray-900 dark:text-gray-100"
                 href={`/clients/${item.context.clientId}`}
               >
-                {client.name}
+                {client.nickname}
               </Link>{' '}
               paid invoice{' '}
               <Link

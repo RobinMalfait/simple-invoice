@@ -68,7 +68,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
         )}`,
         '',
         `${title(record.type)}: #${record.number}`,
-        `Client: ${record.client.name}`,
+        `Client: ${record.client.nickname}`,
         '',
         ...match(
           record.type,
@@ -107,7 +107,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
       ],
       categories: [record.type],
       url: `${req.nextUrl.origin}/${record.type}/${record.number}`,
-      location: record.client.name,
+      location: record.client.nickname,
       productId: 'invoice.simple/ics',
       uid: `invoice.simple.ics.record.${record.account.id}.${record.type}.${record.number}`,
     }

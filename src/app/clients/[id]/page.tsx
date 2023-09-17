@@ -96,10 +96,10 @@ export default async function Page({ params: { id } }: { params: { id: string } 
     >
       <div className="relative px-4 py-8 text-gray-700 dark:text-zinc-400 sm:px-6 lg:px-8">
         <div className="flex items-center gap-4">
-          <Avatar url={client.imageUrl} name={client.name} />
+          <Avatar url={client.imageUrl} name={client.nickname} />
 
           <div>
-            <h3 className="text-2xl">{client.name}</h3>
+            <h3 className="text-2xl">{client.nickname}</h3>
             <div className="text-sm">
               <Classified>{client.email}</Classified>
             </div>

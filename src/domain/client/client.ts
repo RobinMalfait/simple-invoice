@@ -125,8 +125,13 @@ export class ClientBuilder {
     { mutate = true, at }: { mutate?: boolean; at?: string | Date } = {},
   ): Client {
     let oldName = client.name
+    let shouldMigrateNickname = client.nickname === client.name
     function handler(builder: ClientBuilder) {
       handle(builder)
+
+      if (shouldMigrateNickname) {
+        builder._nickname = builder._name
+      }
 
       builder._events.push({
         type: 'client:rebranded',
