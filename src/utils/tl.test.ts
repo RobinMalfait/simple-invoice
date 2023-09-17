@@ -17,6 +17,30 @@ it('should replace a nested variable', () => {
   expect(render('Hello {{user.name}}!', { user: { name: 'world' } })).toBe('Hello world!')
 })
 
+it('should pick a field from an array', () => {
+  expect(
+    render('Hello {{users|pick:name|and}}!', {
+      users: [{ name: 'Alice' }, { name: 'Bob' }, { name: 'Charlie' }],
+    }),
+  ).toBe('Hello Alice, Bob, and Charlie!')
+})
+
+it('should take the first item from an array', () => {
+  expect(
+    render('Hello {{users|pick:name|first}}!', {
+      users: [{ name: 'Alice' }, { name: 'Bob' }, { name: 'Charlie' }],
+    }),
+  ).toBe('Hello Alice!')
+})
+
+it('should take the first item from an array', () => {
+  expect(
+    render('Hello {{users|pick:name|last}}!', {
+      users: [{ name: 'Alice' }, { name: 'Bob' }, { name: 'Charlie' }],
+    }),
+  ).toBe('Hello Charlie!')
+})
+
 describe('arguments', () => {
   describe('dates', () => {
     it('should be possible to pass a format to a date', () => {
