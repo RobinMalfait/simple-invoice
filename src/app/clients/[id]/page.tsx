@@ -96,10 +96,10 @@ export default async function Page({ params: { id } }: { params: { id: string } 
     >
       <div className="relative px-4 py-8 text-gray-700 dark:text-zinc-400 sm:px-6 lg:px-8">
         <div className="flex items-center gap-4">
-          <Avatar url={client.imageUrl} name={client.name} />
+          <Avatar url={client.imageUrl} name={client.nickname} />
 
           <div>
-            <h3 className="text-2xl">{client.name}</h3>
+            <h3 className="text-2xl">{client.nickname}</h3>
             <div className="text-sm">
               <Classified>{client.email}</Classified>
             </div>
@@ -117,6 +117,16 @@ export default async function Page({ params: { id } }: { params: { id: string } 
               </CardTitle>
 
               <CardBody variant="grid">
+                {client.name && (
+                  <Field classified title="Name">
+                    {client.name}
+                  </Field>
+                )}
+                {client.nickname !== client.name && (
+                  <Field classified title="Nickname">
+                    {client.nickname}
+                  </Field>
+                )}
                 {client.email && (
                   <Field classified title="Email">
                     {client.email}
@@ -193,23 +203,23 @@ export default async function Page({ params: { id } }: { params: { id: string } 
                 <CardTitle>Contacts</CardTitle>
                 <CardBody>
                   <ul className="flex flex-col divide-y divide-gray-100 dark:divide-zinc-800">
-                    {client.contacts.map((client) => {
+                    {client.contacts.map((contact) => {
                       let fields = [
-                        client.nickname !== client.name ? client.nickname : null,
-                        client.phone,
-                        client.email,
+                        contact.nickname !== contact.name ? contact.nickname : null,
+                        contact.phone,
+                        contact.email,
                       ].filter(Boolean)
 
                       return (
-                        <li key={client.id} className="py-2 first:pt-0 last:pb-0">
+                        <li key={contact.id} className="py-2 first:pt-0 last:pb-0">
                           <div className="flex items-center gap-4">
-                            <Avatar size="sm" url={client.imageUrl} name={client.name} />
+                            <Avatar size="sm" url={contact.imageUrl} name={contact.name} />
                             <div className="flex w-full flex-col justify-center">
                               <div className="flex w-full items-center justify-between gap-2">
-                                <span className="flex flex-col">{client.name}</span>
-                                {client.role && (
+                                <span className="flex flex-col">{contact.name}</span>
+                                {contact.role && (
                                   <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10 dark:bg-blue-400/10 dark:text-blue-400 dark:ring-blue-400/30 ">
-                                    {client.role}
+                                    {contact.role}
                                   </span>
                                 )}
                               </div>

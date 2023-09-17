@@ -84,15 +84,15 @@ export default async function Page({
             <span className="text-sm dark:text-zinc-400">Recipients</span>
             <form action={addRecipient}>
               <ul className="flex gap-2">
-                {record.client.contacts.map((client) => {
+                {record.client.contacts.map((contact) => {
                   return (
-                    <li key={client.id}>
+                    <li key={contact.id}>
                       <label className="inline-flex items-center gap-2 rounded-md bg-blue-50 px-2 py-1 pl-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10 dark:bg-blue-400/10 dark:text-blue-400 dark:ring-blue-400/30 ">
                         <RecipientCheckbox
-                          name={`contacts[${client.id}]`}
-                          checked={recipients.split(',').includes(client.id)}
+                          name={`contacts[${contact.id}]`}
+                          checked={recipients.split(',').includes(contact.id)}
                         />
-                        {client.name}
+                        {contact.name}
                       </label>
                     </li>
                   )

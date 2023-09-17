@@ -392,7 +392,7 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
                     <div className="text-xs text-gray-500 dark:text-zinc-400">
                       <Link href={`/clients/${data[0].id}`}>
                         <span className="absolute inset-0"></span>
-                        <Classified>{data[0].name}</Classified>
+                        <Classified>{data[0].nickname}</Classified>
                       </Link>
                     </div>
                   )
@@ -501,7 +501,7 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
                           <div className="text-xs text-gray-500 dark:text-zinc-400">
                             <Link href={`/${data[0].type}/${data[0].number}`}>
                               <span className="absolute inset-0"></span>
-                              <Classified>{data[0].client.name}</Classified>{' '}
+                              <Classified>{data[0].client.nickname}</Classified>{' '}
                               <small className="tabular-nums">— {data[0].number}</small>
                             </Link>
                           </div>
@@ -536,7 +536,7 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
                           <div className="text-xs text-gray-500 dark:text-zinc-400">
                             <Link href={`/${data[0].type}/${data[0].number}`}>
                               <span className="absolute inset-0"></span>
-                              <Classified>{data[0].client.name}</Classified>{' '}
+                              <Classified>{data[0].client.nickname}</Classified>{' '}
                               <small className="tabular-nums">— {data[0].number}</small>
                             </Link>
                           </div>
@@ -574,7 +574,7 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
                       <div className="text-xs text-gray-500 dark:text-zinc-400">
                         <Link href={`/${data[0].type}/${data[0].number}`}>
                           <span className="absolute inset-0"></span>
-                          <Classified>{data[0].client.name}</Classified>{' '}
+                          <Classified>{data[0].client.nickname}</Classified>{' '}
                           <small className="tabular-nums">— {data[0].number}</small>
                         </Link>
                       </div>
@@ -610,7 +610,7 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
                       <div className="text-xs text-gray-500 dark:text-zinc-400">
                         <Link href={`/${data[0].type}/${data[0].number}`}>
                           <span className="absolute inset-0"></span>
-                          <Classified>{data[0].client.name}</Classified>{' '}
+                          <Classified>{data[0].client.nickname}</Classified>{' '}
                           <small className="tabular-nums">— {data[0].number}</small>
                         </Link>
                       </div>
@@ -671,7 +671,7 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
                                 </span>
                                 <div className="flex flex-1 items-center justify-between space-x-2 truncate dark:text-zinc-300">
                                   <span className="truncate">
-                                    <Classified>{client.name}</Classified>
+                                    <Classified>{client.nickname}</Classified>
                                   </span>
                                   <span className="text-xs">
                                     <Money amount={total} />

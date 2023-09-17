@@ -32,9 +32,9 @@ export default async function Page() {
           >
             <Link href={`/clients/${client.id}`} className="absolute inset-0 z-10" />
             <div className="flex items-center gap-4 text-gray-600 dark:text-zinc-400">
-              <Avatar url={client.imageUrl} name={client.name} />
+              <Avatar url={client.imageUrl} name={client.nickname} />
               <div className="flex flex-1 flex-col">
-                <span className="truncate">{client.name}</span>
+                <span className="truncate">{client.nickname}</span>
                 <span className="text-xs">
                   <Classified>{client.email}</Classified>
                 </span>

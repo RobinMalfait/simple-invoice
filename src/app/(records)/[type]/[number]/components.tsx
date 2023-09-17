@@ -143,7 +143,7 @@ function PromoteToInvoicePanel() {
         .format(
           ts`
             records.push(InvoiceBuilder.fromQuote(
-              // ${record.client.name} — (#${record.number}, ${formatter.format(
+              // ${record.client.nickname} — (#${record.number}, ${formatter.format(
                 total(record) / 100,
               )})
               records.find(record => record.type === 'quote' && record.number === "${
@@ -258,7 +258,7 @@ function TryNewQuotePanel() {
         .format(
           ts`
             records.push(QuoteBuilder.fromQuote(
-              // ${record.client.name} — (#${record.number}, ${formatter.format(
+              // ${record.client.nickname} — (#${record.number}, ${formatter.format(
                 total(record) / 100,
               )})
               records.find(record => record.type === 'quote' && record.number === "${

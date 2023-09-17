@@ -57,7 +57,7 @@ export default async function Home() {
       }}
     >
       <div className="fixed inset-x-0 top-0 z-10 h-8 bg-gray-100/75 backdrop-blur dark:bg-zinc-800/75 lg:top-4"></div>
-      <div className="relative px-4 py-8 space-y-8 sm:px-6 lg:px-8">
+      <div className="relative space-y-8 px-4 py-8 sm:px-6 lg:px-8">
         {combinedRecords.length > 0 ? (
           <>
             {groupByQuarter(combinedRecords).map(([title, records], idx) => {
@@ -77,9 +77,9 @@ export default async function Home() {
                     <div className="w-px bg-gray-300 dark:bg-zinc-500"></div>
                   </div>
 
-                  <div className="relative flex flex-col w-full ml-10 gap-4">
-                    <DisclosureButton className="sticky z-20 top-8 isolate">
-                      <div className="absolute left-0 flex items-center justify-center flex-none w-6 h-6 bg-gray-100 inset-y-3 -translate-x-12 dark:bg-zinc-800">
+                  <div className="relative ml-10 flex w-full flex-col gap-4">
+                    <DisclosureButton className="sticky top-8 isolate z-20">
+                      <div className="absolute inset-y-3 left-0 flex h-6 w-6 flex-none -translate-x-12 items-center justify-center bg-gray-100 dark:bg-zinc-800">
                         <div
                           className={classNames(
                             'h-1.5 w-1.5 rounded-full ',
@@ -122,11 +122,11 @@ export default async function Home() {
             })}
 
             <div className="relative flex -translate-x-2 gap-x-4">
-              <div className="absolute top-0 left-0 flex justify-center w-6 bottom-8">
+              <div className="absolute bottom-8 left-0 top-0 flex w-6 justify-center">
                 <div className="w-px bg-gray-300 dark:bg-zinc-500"></div>
               </div>
 
-              <div className="relative flex items-center justify-center flex-none w-6 h-6 mt-3 bg-gray-100 dark:bg-zinc-800">
+              <div className="relative mt-3 flex h-6 w-6 flex-none items-center justify-center bg-gray-100 dark:bg-zinc-800">
                 <div className="h-1.5 w-1.5 rounded-full bg-gray-300 ring-1 ring-gray-300 dark:bg-zinc-500 dark:ring-zinc-500" />
               </div>
 

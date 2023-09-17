@@ -18,6 +18,7 @@ let scopedId = new ScopedIDGenerator('client')
 export let Client = z.object({
   id: z.string().default(() => scopedId.next()),
   name: z.string(),
+  nickname: z.string(),
   email: z.string().email().nullable(),
   phone: z.string().nullable(),
   imageUrl: z.string().nullable(),
@@ -36,6 +37,7 @@ export type Client = z.infer<typeof Client>
 export class ClientBuilder {
   private _id: Client['id'] | undefined = undefined
   private _name: Client['name'] | null = null
+  private _nickname: Contact['nickname'] | null = null
   private _email: Client['email'] | null = null
   private _phone: Client['phone'] | null = null
   private _imageUrl: Client['imageUrl'] | null = null
@@ -60,6 +62,7 @@ export class ClientBuilder {
     let client = Client.parse({
       id: this._id,
       name: this._name,
+      nickname: this._nickname ?? this._name,
       email: this._email,
       phone: this._phone,
       imageUrl: this._imageUrl,
@@ -91,6 +94,7 @@ export class ClientBuilder {
   public static from(client: Client): ClientBuilder {
     let builder = new ClientBuilder()
     builder._name = client.name
+    builder._nickname = client.nickname
     builder._email = client.email
     builder._phone = client.phone
     builder._imageUrl = client.imageUrl
@@ -121,8 +125,13 @@ export class ClientBuilder {
     { mutate = true, at }: { mutate?: boolean; at?: string | Date } = {},
   ): Client {
     let oldName = client.name
+    let shouldMigrateNickname = client.nickname === client.name
     function handler(builder: ClientBuilder) {
       handle(builder)
+
+      if (shouldMigrateNickname) {
+        builder._nickname = builder._name
+      }
 
       builder._events.push({
         type: 'client:rebranded',
@@ -165,6 +174,11 @@ export class ClientBuilder {
 
   public name(name: Client['name']): ClientBuilder {
     this._name = name
+    return this
+  }
+
+  public nickname(nickname: Client['nickname']): ClientBuilder {
+    this._nickname = nickname
     return this
   }
 

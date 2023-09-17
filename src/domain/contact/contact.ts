@@ -6,7 +6,7 @@ let scopedId = new ScopedIDGenerator('contact')
 export let Contact = z.object({
   id: z.string().default(() => scopedId.next()),
   name: z.string(),
-  nickname: z.string().nullable(),
+  nickname: z.string(),
   email: z.string().email().nullable(),
   phone: z.string().nullable(),
   role: z.string().nullable(),

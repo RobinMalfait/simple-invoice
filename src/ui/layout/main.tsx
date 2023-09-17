@@ -328,7 +328,7 @@ export default function Layout({
                           invoke={() => router.push(`/clients/${record!.client.id}`)}
                           search={'go to client'}
                         >
-                          Go to client — {record.client.name}
+                          Go to client — {record.client.nickname}
                         </Action>
                       </Group>
                     )
