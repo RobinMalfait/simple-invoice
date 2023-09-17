@@ -117,6 +117,16 @@ export default async function Page({ params: { id } }: { params: { id: string } 
               </CardTitle>
 
               <CardBody variant="grid">
+                {client.name && (
+                  <Field classified title="Name">
+                    {client.name}
+                  </Field>
+                )}
+                {client.nickname !== client.name && (
+                  <Field classified title="Nickname">
+                    {client.nickname}
+                  </Field>
+                )}
                 {client.email && (
                   <Field classified title="Email">
                     {client.email}
