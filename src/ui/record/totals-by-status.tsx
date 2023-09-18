@@ -16,6 +16,7 @@ import { StatusDisplay as InvoiceStatusDisplay } from '~/ui/invoice/status'
 import { total } from '~/ui/invoice/total'
 import { Money } from '~/ui/money'
 import { StatusDisplay as QuoteStatusDisplay } from '~/ui/quote/status'
+import { match } from '~/utils/match'
 import { I18NPartialProvider } from '../hooks/use-i18n'
 
 function groupByCurrency(records: Record[]) {
@@ -102,6 +103,14 @@ export function TotalsByStatus({ records }: { records: Record[] }) {
           <Fragment key={`${type}-${currency}-${status}`}>
             <I18NPartialProvider value={{ currency }}>
               {isDifferentType && <span className="text-black/10 dark:text-white/10">|</span>}
+              {(idx === 0 || isDifferentType) && (
+                <span className="text-sm">
+                  {match(type, {
+                    quote: 'Quotes:',
+                    invoice: 'Invoices:',
+                  })}
+                </span>
+              )}
               {/* @ts-expect-error TypeScript doesn't like this polymorphism shenanigans. */}
               <Component status={status}>
                 <Money amount={total} />
