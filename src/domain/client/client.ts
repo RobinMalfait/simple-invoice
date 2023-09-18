@@ -125,11 +125,11 @@ export class ClientBuilder {
     { mutate = true, at }: { mutate?: boolean; at?: string | Date } = {},
   ): Client {
     let oldName = client.name
-    let shouldMigrateNickname = client.nickname === client.name
+    let oldNickname = client.nickname
     function handler(builder: ClientBuilder) {
       handle(builder)
 
-      if (shouldMigrateNickname) {
+      if (oldName === oldNickname && builder._nickname === oldNickname) {
         builder._nickname = builder._name
       }
 
