@@ -12,7 +12,7 @@ let classified: TokenizerAndRendererExtension = {
     return src.match(/\|\|([\s\S]*?)\|\|/)?.index
   },
   tokenizer(src: string) {
-    let rule = /^\|\|([\s\S]*?)\|\|$/
+    let rule = /^\|\|([\s\S]*?)\|\|/
     let match = rule.exec(src)
     if (!match) return undefined
 
