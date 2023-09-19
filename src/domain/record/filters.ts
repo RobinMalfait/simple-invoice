@@ -49,6 +49,10 @@ export function isAccepted(quote: Quote) {
   return quote.status === QuoteStatus.Accepted
 }
 
+export function isCancelled(quote: Quote) {
+  return quote.status === QuoteStatus.Cancelled
+}
+
 export function isRejected(quote: Quote) {
   return quote.status === QuoteStatus.Rejected
 }

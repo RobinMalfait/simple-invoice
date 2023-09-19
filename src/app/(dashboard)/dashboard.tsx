@@ -46,6 +46,7 @@ import { Invoice } from '~/domain/invoice/invoice'
 import {
   isAccepted,
   isActiveRecord,
+  isCancelled,
   isClosed,
   isDraft,
   isExpired,
@@ -243,7 +244,7 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
             className="grid grid-cols-2 gap-[--gap] 2xl:grid-cols-[--cols]"
           >
             {systemContainsQuotes && (
-              <CompareGroup>
+              <CompareGroup horizontalCount={5}>
                 <CompareBlock
                   title="Quotes"
                   value={(list) => separateRecords(list).filter((r) => isQuote(r)).length}
@@ -271,6 +272,13 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
                 />
                 <CompareBlock
                   variant="tiny"
+                  title="Cancelled"
+                  value={(list) =>
+                    separateRecords(list).filter((r) => isQuote(r) && isCancelled(r)).length
+                  }
+                />
+                <CompareBlock
+                  variant="tiny"
                   title="Rejected"
                   value={(list) =>
                     separateRecords(list).filter((r) => isQuote(r) && isRejected(r)).length
@@ -294,7 +302,7 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
             )}
 
             {systemContainsInvoices && (
-              <CompareGroup>
+              <CompareGroup horizontalCount={4}>
                 <CompareBlock
                   title="Invoices"
                   value={(list) => separateRecords(list).filter((r) => isInvoice(r)).length}
@@ -983,12 +991,20 @@ let CompareConfigContext = createContext<{
   current: Record[]
 }>({ withDiff: true, previous: [], current: [] })
 
-function CompareGroup(props: React.PropsWithChildren<{}>) {
+function CompareGroup({
+  horizontalCount,
+  ...rest
+}: React.PropsWithChildren<{ horizontalCount: number }>) {
   return (
     <div
       data-grouped={true}
-      className="group grid grid-cols-4 gap-[calc(var(--gap)/2)] rounded-xl bg-white p-2 shadow ring-1 ring-black/5 dark:bg-zinc-900 first:[&>*]:col-span-3 first:[&>*]:row-span-2"
-      {...props}
+      style={
+        {
+          '--horizontal-count': horizontalCount,
+        } as React.CSSProperties
+      }
+      className="group grid grid-cols-[repeat(var(--horizontal-count),minmax(0,1fr))] gap-[calc(var(--gap)/2)] rounded-xl bg-white p-2 shadow ring-1 ring-black/5 dark:bg-zinc-900 first:[&>*]:col-[span_calc(var(--horizontal-count)-1)/_span_calc(var(--horizontal-count)-1)] first:[&>*]:row-span-2"
+      {...rest}
     />
   )
 }
