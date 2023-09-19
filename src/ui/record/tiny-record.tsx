@@ -4,11 +4,9 @@ import { CalendarIcon, PaperClipIcon, RectangleStackIcon } from '@heroicons/reac
 import { format } from 'date-fns'
 import { Invoice } from '~/domain/invoice/invoice'
 import { Quote } from '~/domain/quote/quote'
-import { QuoteStatus } from '~/domain/quote/quote-status'
 import { Receipt } from '~/domain/receipt/receipt'
-import { isQuote, recordHasAttachments, recordHasWarning } from '~/domain/record/filters'
+import { recordHasAttachments, recordHasWarning } from '~/domain/record/filters'
 import type { Record } from '~/domain/record/record'
-import { classNames } from '~/ui/class-names'
 import { useRecordStacks } from '~/ui/hooks/use-record-stacks'
 import { StatusDisplay as InvoiceStatusDisplay } from '~/ui/invoice/status'
 import { total } from '~/ui/invoice/total'
@@ -23,12 +21,7 @@ export function TinyRecord({ record }: { record: Record }) {
   let warning = recordHasWarning(record)
 
   return (
-    <div
-      className={classNames(
-        'group relative rounded-md bg-white text-gray-700 shadow transition-[transform,opacity] duration-300 will-change-transform hover:-translate-y-1 dark:bg-zinc-950',
-        isQuote(record) && record.status === QuoteStatus.Rejected && 'opacity-70 hover:opacity-100',
-      )}
-    >
+    <div className="group relative rounded-md bg-white text-gray-700 shadow transition-[transform,opacity] duration-300 will-change-transform hover:-translate-y-1 dark:bg-zinc-950">
       {isLayered && (
         <>
           <div className="absolute inset-0 -z-10 h-full w-full rotate-2 rounded-md bg-gray-100 ring-1 ring-black/5 drop-shadow transition-[transform,opacity] duration-200 will-change-[transform,opacity] group-hover:rotate-0 group-hover:opacity-0 dark:bg-zinc-700"></div>
