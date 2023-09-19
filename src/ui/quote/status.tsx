@@ -3,6 +3,7 @@ import {
   ClockIcon,
   EnvelopeIcon,
   LockClosedIcon,
+  NoSymbolIcon,
   PencilIcon,
   XCircleIcon,
 } from '@heroicons/react/24/outline'
@@ -22,6 +23,7 @@ let statusIconMap: Record<
   [QuoteStatus.Draft]: PencilIcon,
   [QuoteStatus.Sent]: EnvelopeIcon,
   [QuoteStatus.Accepted]: CheckCircleIcon,
+  [QuoteStatus.Cancelled]: NoSymbolIcon,
   [QuoteStatus.Rejected]: XCircleIcon,
   [QuoteStatus.Expired]: ClockIcon,
   [QuoteStatus.Closed]: LockClosedIcon,
@@ -34,6 +36,8 @@ let statusClassMap: Record<QuoteStatus, string> = {
     'bg-yellow-50 text-yellow-800 ring-yellow-600/20 dark:bg-yellow-400/10 dark:text-yellow-500 dark:ring-yellow-400/20',
   [QuoteStatus.Accepted]:
     'bg-blue-50 text-blue-700 ring-blue-700/10 dark:bg-blue-400/10 dark:text-blue-400 dark:ring-blue-400/30',
+  [QuoteStatus.Cancelled]:
+    'bg-red-50 text-red-700 ring-red-700/10 dark:bg-red-400/10 dark:text-red-400 dark:ring-red-400/30',
   [QuoteStatus.Rejected]:
     'bg-red-50 text-red-700 ring-red-600/10 dark:bg-red-400/10 dark:text-red-400 dark:ring-red-400/20',
   [QuoteStatus.Expired]:

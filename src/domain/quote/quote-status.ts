@@ -3,6 +3,7 @@ export enum QuoteStatus {
   Sent = 'sent',
   Accepted = 'accepted',
   Rejected = 'rejected',
+  Cancelled = 'cancelled',
   Expired = 'expired',
   Closed = 'closed',
 }

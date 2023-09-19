@@ -610,6 +610,20 @@ export let records: Record[] = [
     .accept(nextDay())
     .build(),
 
+  // Quote that is accepted, but then cancelled
+  new QuoteBuilder()
+    .account(me)
+    .client(Client1)
+    .quoteDate(inThePast(2))
+    .item(new InvoiceItemBuilder().description('Item #1').unitPrice(123).build())
+    .send(nextDay())
+    .accept(nextDay())
+    .cancel(nextDay(), {
+      by: 'client',
+      reason: 'The weather is really bad today.',
+    })
+    .build(),
+
   // Quote that is rejected
   new QuoteBuilder()
     .account(me)

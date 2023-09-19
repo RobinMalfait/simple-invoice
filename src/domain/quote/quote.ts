@@ -106,7 +106,9 @@ export class QuoteBuilder {
   }
 
   public static fromQuote(quote: Quote, { withAttachments = true } = {}): QuoteBuilder {
-    if (![QuoteStatus.Expired, QuoteStatus.Rejected].includes(quote.status)) {
+    if (
+      ![QuoteStatus.Cancelled, QuoteStatus.Expired, QuoteStatus.Rejected].includes(quote.status)
+    ) {
       throw new Error(`Cannot create a quote from another quote that is currently ${quote.status}`)
     }
 
@@ -141,7 +143,12 @@ export class QuoteBuilder {
 
   private get computeStatus() {
     if (
-      ![QuoteStatus.Accepted, QuoteStatus.Closed, QuoteStatus.Rejected].includes(this._status) &&
+      ![
+        QuoteStatus.Accepted,
+        QuoteStatus.Cancelled,
+        QuoteStatus.Closed,
+        QuoteStatus.Rejected,
+      ].includes(this._status) &&
       isPast(this.computeQuoteExpirationDate!)
     ) {
       return QuoteStatus.Expired
@@ -286,6 +293,9 @@ export class QuoteBuilder {
       [QuoteStatus.Rejected]: () => {
         throw new Error('Cannot send a quote that is already rejected')
       },
+      [QuoteStatus.Cancelled]: () => {
+        throw new Error('Cannot send a quote that is already cancelled')
+      },
       [QuoteStatus.Expired]: () => {
         throw new Error('Cannot send a quote that is already expired')
       },
@@ -311,6 +321,9 @@ export class QuoteBuilder {
       [QuoteStatus.Accepted]: () => {
         throw new Error('Cannot accept a quote that is already accepted')
       },
+      [QuoteStatus.Cancelled]: () => {
+        throw new Error('Cannot accept a quote that is already cancelled')
+      },
       [QuoteStatus.Rejected]: () => {
         throw new Error('Cannot accept a quote that is already rejected')
       },
@@ -319,6 +332,47 @@ export class QuoteBuilder {
       },
       [QuoteStatus.Closed]: () => {
         throw new Error('Cannot accept a quote that is already closed')
+      },
+    })
+
+    return this
+  }
+
+  public cancel(
+    at: string | Date,
+    payload: { by: 'account' | 'client'; reason: string },
+  ): QuoteBuilder {
+    let parsedAt = typeof at === 'string' ? parseISO(at) : at
+
+    match(this._status, {
+      [QuoteStatus.Draft]: () => {
+        throw new Error('Cannot cancel a quote that is not sent')
+      },
+      [QuoteStatus.Sent]: () => {
+        throw new Error('Cannot cancel a quote that is sent')
+      },
+      [QuoteStatus.Accepted]: () => {
+        this._status = QuoteStatus.Cancelled
+        this._events.push({
+          type: 'quote:cancelled',
+          payload: {
+            cancelledBy: payload.by,
+            reason: payload.reason,
+          },
+          at: parsedAt,
+        })
+      },
+      [QuoteStatus.Cancelled]: () => {
+        throw new Error('Cannot cancel a quote that is already cancelled')
+      },
+      [QuoteStatus.Rejected]: () => {
+        throw new Error('Cannot cancel a quote that is already rejected')
+      },
+      [QuoteStatus.Expired]: () => {
+        throw new Error('Cannot cancel a quote that is already expired')
+      },
+      [QuoteStatus.Closed]: () => {
+        throw new Error('Cannot cancel a quote that is already closed')
       },
     })
 
@@ -338,6 +392,9 @@ export class QuoteBuilder {
       },
       [QuoteStatus.Accepted]: () => {
         throw new Error('Cannot reject a quote that is already accepted')
+      },
+      [QuoteStatus.Cancelled]: () => {
+        throw new Error('Cannot reject a quote that is already cancelled')
       },
       [QuoteStatus.Rejected]: () => {
         throw new Error('Cannot reject a quote that is already rejected')
@@ -370,6 +427,9 @@ export class QuoteBuilder {
       },
       [QuoteStatus.Accepted]: () => {
         throw new Error('Cannot close a quote that is accepted')
+      },
+      [QuoteStatus.Cancelled]: () => {
+        throw new Error('Cannot close a quote that is cancelled')
       },
       [QuoteStatus.Rejected]: () => {
         throw new Error('Cannot close a quote that is rejected')

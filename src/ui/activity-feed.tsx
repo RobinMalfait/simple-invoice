@@ -12,6 +12,7 @@ import {
   LockClosedIcon,
   MapIcon,
   MapPinIcon,
+  NoSymbolIcon,
   PencilSquareIcon,
   SparklesIcon,
   TruckIcon,
@@ -330,6 +331,9 @@ function ActivityIndicator({ item }: { item: Event }) {
       return (
         <CheckCircleIcon className="h-6 w-6 text-blue-600 dark:text-blue-300" aria-hidden="true" />
       )
+
+    case 'quote:cancelled':
+      return <NoSymbolIcon className="h-6 w-6 text-red-600 dark:text-red-300" aria-hidden="true" />
 
     case 'quote:rejected':
     case 'quote:expired':
@@ -736,6 +740,28 @@ function useActivityText(item: Event) {
           <span className="font-medium text-gray-900 dark:text-gray-100">accepted</span>.
         </>,
       ]
+
+    case 'quote:cancelled':
+      return [
+        <>
+          The quote has been{' '}
+          <span className="font-medium text-gray-900 dark:text-gray-100">cancelled</span> by{' '}
+          <span className="font-medium text-gray-900 dark:text-gray-100">
+            {match(item.payload.cancelledBy, {
+              client: () => 'the client',
+              account: () => 'you',
+            })}
+          </span>
+          .
+        </>,
+        item.payload.reason && (
+          <>
+            <span className="text-xs leading-5 text-gray-500 dark:text-gray-300">
+              {item.payload.reason}
+            </span>
+          </>
+        ),
+      ].filter(Boolean)
 
     case 'quote:rejected':
       return [

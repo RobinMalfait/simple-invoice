@@ -189,6 +189,19 @@ export let Event = z
         }),
       }),
       z.object({
+        type: z.literal('quote:cancelled'),
+        tags: z.array(z.string()).default(['quote']),
+        context: z.object({
+          accountId: z.string(),
+          clientId: z.string(),
+          quoteId: z.string(),
+        }),
+        payload: z.object({
+          cancelledBy: z.enum(['client', 'account']),
+          reason: z.string(),
+        }),
+      }),
+      z.object({
         type: z.literal('quote:rejected'),
         tags: z.array(z.string()).default(['quote']),
         context: z.object({
