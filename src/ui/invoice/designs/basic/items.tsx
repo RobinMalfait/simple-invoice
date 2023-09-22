@@ -5,7 +5,7 @@ import { Money } from '~/ui/money'
 import { match } from '~/utils/match'
 
 export function Items({ items, children }: { items: Invoice['items']; children: React.ReactNode }) {
-  let containsVat = items.some((item) => item.taxRate > 0)
+  let containsVat = items.some((item) => item.taxRate !== null)
   let t = useTranslation()
 
   return (
@@ -87,7 +87,7 @@ export function Items({ items, children }: { items: Invoice['items']; children: 
             </td>
             {containsVat && (
               <td className="whitespace-nowrap p-4 text-right align-top text-sm tabular-nums text-gray-500">
-                {`${(item.taxRate * 100).toFixed(0)}%`}
+                {`${((item.taxRate ?? 0) * 100).toFixed(0)}%`}
               </td>
             )}
             <td className="whitespace-nowrap py-4 pl-4 pr-12 text-right align-top text-sm font-semibold text-gray-900">

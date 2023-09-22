@@ -9,7 +9,7 @@ export let InvoiceItem = z.object({
   description: z.string(),
   quantity: z.number(),
   unitPrice: z.number(),
-  taxRate: z.number(),
+  taxRate: z.number().nullable(),
   discounts: z.array(Discount),
 })
 
@@ -19,7 +19,7 @@ export class InvoiceItemBuilder {
   private _description: string | null = null
   private _quantity: number | null = 1
   private _unitPrice: number | null = null
-  private _taxRate: number | null = 0
+  private _taxRate: number | null = null
   private _discounts: Discount[] = []
 
   public build(): InvoiceItem {

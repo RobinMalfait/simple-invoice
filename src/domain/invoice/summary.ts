@@ -17,7 +17,7 @@ export function summary({
   let result: Summary[] = []
 
   let hasDiscounts = discounts.length > 0
-  let hasVAT = items.some((item) => item.taxRate !== 0)
+  let hasVAT = items.some((item) => item.taxRate !== null)
 
   // Calculate net subtotal
   let subtotalResult = items.reduce((sum, item) => {
@@ -61,14 +61,15 @@ export function summary({
   }
 
   // Calculate VATs
-  let vatTypes = new Set(items.map((item) => item.taxRate)).size
+  let vatTypes = new Set(items.filter((item) => item.taxRate !== null).map((item) => item.taxRate))
+    .size
 
   let vats = new Map<number, number>()
   let vatResult = 0
 
   // Only dealing with a single VAT rate
-  if (vatTypes === 1 && items[0].taxRate !== 0) {
-    let taxRate = items[0].taxRate
+  if (vatTypes === 1 && items[0].taxRate !== null) {
+    let taxRate = items[0].taxRate ?? 0
     let value = subtotalResult * taxRate
 
     vats.set(taxRate, value)
@@ -78,7 +79,7 @@ export function summary({
   // Dealing with multiple VAT rates (this is currently not supported in combination with discounts)
   else {
     for (let item of items) {
-      if (item.taxRate === 0) continue
+      if (item.taxRate === null) continue
       if (!vats.has(item.taxRate)) vats.set(item.taxRate, 0)
 
       let value = item.unitPrice * item.quantity * item.taxRate
