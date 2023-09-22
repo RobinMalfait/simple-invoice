@@ -11,6 +11,7 @@ import { DownloadLink } from '~/ui/download-link'
 import { I18NProvider } from '~/ui/hooks/use-i18n'
 import { PaypalIcon } from '~/ui/icons/payment'
 import * as SocialIcons from '~/ui/icons/social'
+import { Markdown } from '~/ui/markdown'
 import { TimezoneDifference } from '~/ui/timezone-difference'
 import { match } from '~/utils/match'
 import { render } from '~/utils/tl'
@@ -88,12 +89,12 @@ export default async function Page({ params: { id } }: { params: { id: string } 
                 )}
                 {account.note && (
                   <Field variant="block" title="Note">
-                    {account.note}
+                    <Markdown>{account.note}</Markdown>
                   </Field>
                 )}
                 {account.legal && (
                   <Field classified title="Legal" variant="block">
-                    {render(account.legal, { account })}
+                    <Markdown>{render(account.legal, { account })}</Markdown>
                   </Field>
                 )}
 
