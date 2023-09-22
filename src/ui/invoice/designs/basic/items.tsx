@@ -1,5 +1,6 @@
 import { Discount } from '~/domain/discount/discount'
 import { Invoice } from '~/domain/invoice/invoice'
+import { parseMarkdown } from '~/ui/document/document'
 import { useTranslation } from '~/ui/hooks/use-translation'
 import { Money } from '~/ui/money'
 import { match } from '~/utils/match'
@@ -35,7 +36,7 @@ export function Items({ items, children }: { items: Invoice['items']; children: 
         {items.map((item) => (
           <tr key={item.id}>
             <td className="whitespace-pre-wrap py-4 pl-12 pr-4 text-left align-top text-sm font-medium text-gray-900">
-              {item.description}
+              <div dangerouslySetInnerHTML={{ __html: parseMarkdown(item.description) }} />
               <ul className="empty:hidden">
                 {item.discounts.map((discount, idx) => (
                   <li
