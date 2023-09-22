@@ -1,5 +1,6 @@
 import { classNames } from '~/ui/class-names'
 import { Classified } from '~/ui/classified'
+import { parseMarkdown } from '~/ui/document/document'
 import { useRecord } from '~/ui/hooks/use-record'
 import { render } from '~/utils/tl'
 
@@ -12,11 +13,9 @@ export function Legal({ className }: { className?: string }) {
 
   return (
     <div className={classNames('whitespace-pre-wrap empty:hidden', className)}>
-      {legal.map((line) => (
-        <p key={line}>
-          <Classified>{line}</Classified>
-        </p>
-      ))}
+      <Classified>
+        <div dangerouslySetInnerHTML={{ __html: parseMarkdown(legal.join('\n')) }} />
+      </Classified>
     </div>
   )
 }
