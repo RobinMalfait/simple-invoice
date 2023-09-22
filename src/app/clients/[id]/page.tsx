@@ -18,6 +18,7 @@ import { Classified } from '~/ui/classified'
 import { Empty } from '~/ui/empty'
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '~/ui/headlessui'
 import { I18NProvider } from '~/ui/hooks/use-i18n'
+import { Markdown } from '~/ui/markdown'
 import { TinyRecord } from '~/ui/record/tiny-record'
 import { TotalsByStatus } from '~/ui/record/totals-by-status'
 import { TimezoneDifference } from '~/ui/timezone-difference'
@@ -169,12 +170,12 @@ export default async function Page({ params: { id } }: { params: { id: string } 
                 )}
                 {client.note && (
                   <Field variant="block" title="Note">
-                    {client.note}
+                    <Markdown>{client.note}</Markdown>
                   </Field>
                 )}
                 {client.legal && (
                   <Field classified title="Legal" variant="block">
-                    {client.legal}
+                    <Markdown>{client.legal}</Markdown>
                   </Field>
                 )}
 
