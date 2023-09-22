@@ -2,6 +2,7 @@
 
 import { InformationCircleIcon } from '@heroicons/react/24/outline'
 import { Receipt } from '~/domain/receipt/receipt'
+import { parseMarkdown } from '~/ui/document/document'
 import { useFittedPagination } from '~/ui/hooks/use-fitted-pagination'
 import { PageProvider } from '~/ui/hooks/use-pagination-info'
 import { RecordProvider, useRecord } from '~/ui/hooks/use-record'
@@ -60,9 +61,7 @@ export function Invoice() {
                     <div className="absolute -right-3 -top-3 rounded-full bg-gray-50 p-1">
                       <InformationCircleIcon className="h-6 w-6 text-gray-400" />
                     </div>
-                    {notes.map((line, idx) => (
-                      <p key={idx}>{line}</p>
-                    ))}
+                    <div dangerouslySetInnerHTML={{ __html: parseMarkdown(notes.join('\n')) }} />
                   </div>
                 </div>
               )}
