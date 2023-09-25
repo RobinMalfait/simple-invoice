@@ -15,6 +15,7 @@ import {
   NoSymbolIcon,
   PencilSquareIcon,
   SparklesIcon,
+  TrophyIcon,
   TruckIcon,
   UserGroupIcon,
   XCircleIcon,
@@ -35,10 +36,11 @@ import { Address, formatAddress } from '~/ui/address/address'
 import { useCardStructure } from '~/ui/card'
 import { classNames } from '~/ui/class-names'
 import { useCurrentDate } from '~/ui/hooks/use-current-date'
+import { useDatabase } from '~/ui/hooks/use-db'
+import { Markdown } from '~/ui/markdown'
 import { Money } from '~/ui/money'
 import { assertNever } from '~/utils/assert-never'
 import { match } from '~/utils/match'
-import { useDatabase } from './hooks/use-db'
 
 function isFutureEvent(event: Event): event is Extract<Event, { payload: { future: true } }> {
   if (!('payload' in event)) return false
@@ -267,6 +269,9 @@ function ActivityIndicator({ item }: { item: Event }) {
         <SparklesIcon className="h-4 w-4 text-gray-600 dark:text-gray-300" aria-hidden="true" />
       )
 
+    case 'milestone:custom':
+      return <TrophyIcon className="h-4 w-4 text-gray-600 dark:text-gray-300" aria-hidden="true" />
+
     case 'milestone:fastest-accepted-quote':
       return <ClockIcon className="h-4 w-4 text-gray-600 dark:text-gray-300" aria-hidden="true" />
 
@@ -445,6 +450,20 @@ function useActivityText(item: Event) {
         </>,
       ]
     }
+
+    case 'milestone:custom':
+      return [
+        <>
+          <Markdown>{item.payload.title}</Markdown>
+        </>,
+        item.payload.description && (
+          <>
+            <span className="text-xs opacity-50">
+              <Markdown>{item.payload.description}</Markdown>
+            </span>
+          </>
+        ),
+      ].filter(Boolean)
 
     case 'milestone:fastest-accepted-quote':
       return [

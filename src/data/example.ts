@@ -12,6 +12,7 @@ import { Invoice, InvoiceBuilder } from '~/domain/invoice/invoice'
 import { InvoiceItemBuilder } from '~/domain/invoice/invoice-item'
 import { Language } from '~/domain/language/language'
 import { MailTemplateBuilder } from '~/domain/mail-template/mail-template'
+import { MilestoneBuilder } from '~/domain/milestone/milestone'
 import { IncrementStrategy } from '~/domain/number-strategies'
 import { PaymentMethodBuilder } from '~/domain/payment-method/payment-method'
 import { Quote, QuoteBuilder } from '~/domain/quote/quote'
@@ -890,3 +891,10 @@ export let records: Record[] = [
     .item(new InvoiceItemBuilder().description('Item line #1').unitPrice(100_00).build())
     .build(),
 ]
+
+new MilestoneBuilder()
+  .account(me)
+  .title('Custom **milestones**, are `here`!')
+  .description('Thank ~~me~~, **_you_**!')
+  .achievedAt(inTheFuture())
+  .build()

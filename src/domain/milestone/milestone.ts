@@ -1,9 +1,13 @@
-import { differenceInSeconds, differenceInYears } from 'date-fns'
+import { differenceInSeconds, differenceInYears, parseISO } from 'date-fns'
 import * as lazy from 'lazy-collections'
 import EventEmitter from 'node:events'
+import { z } from 'zod'
+import { Account } from '~/domain/account/account'
+import { bus as defaultBus } from '~/domain/event-bus/bus'
 import { Event } from '~/domain/events/event'
 import { total } from '~/ui/invoice/total'
 import { DefaultMap } from '~/utils/default-map'
+import { ScopedIDGenerator } from '~/utils/id'
 
 type Context = {
   events: Event[]
@@ -682,4 +686,79 @@ export function anniversaryMilestones(bus: EventEmitter, ctx: Context) {
       }),
     )
   })
+}
+
+// ---
+
+let scopedId = new ScopedIDGenerator('milestone')
+
+export let Milestone = z.object({
+  id: z.string().default(() => scopedId.next()),
+  account: z.lazy(() => Account),
+  title: z.string(),
+  description: z.string().nullable(),
+  achievedAt: z.date().nullable(),
+})
+
+export type Milestone = z.infer<typeof Milestone>
+
+export class MilestoneBuilder {
+  private _account: Account | null = null
+  private _title: string | null = null
+  private _description: string | null = null
+  private _achievedAt: Date | null = null
+
+  public constructor(private bus: EventEmitter = defaultBus) {}
+
+  private emit(event: Event) {
+    this.bus.emit(event.type, event)
+  }
+
+  public build(): Milestone {
+    let input = {
+      account: this._account,
+      title: this._title,
+      description: this._description,
+      achievedAt: this._achievedAt,
+    }
+
+    let milestone = Milestone.parse(input)
+
+    this.emit(
+      Event.parse({
+        type: 'milestone:custom',
+        context: {
+          accountId: milestone.account.id,
+        },
+        payload: {
+          title: this._title,
+          description: this._description,
+        },
+        at: this._achievedAt,
+      }),
+    )
+
+    return milestone
+  }
+
+  public account(account: Account): MilestoneBuilder {
+    this._account = account
+    return this
+  }
+
+  public title(title: string): MilestoneBuilder {
+    this._title = title
+    return this
+  }
+
+  public description(description: string): MilestoneBuilder {
+    this._description = description
+    return this
+  }
+
+  public achievedAt(achievedAt: string | Date): MilestoneBuilder {
+    let parsedAchievedAt = typeof achievedAt === 'string' ? parseISO(achievedAt) : achievedAt
+    this._achievedAt = parsedAchievedAt
+    return this
+  }
 }

@@ -37,6 +37,17 @@ export let Event = z
 
       // Milestones
       z.object({
+        type: z.literal('milestone:custom'),
+        tags: z.array(z.string()).default(['milestone']),
+        context: z.object({
+          accountId: z.string(),
+        }),
+        payload: z.object({
+          title: z.string(),
+          description: z.string().nullable(),
+        }),
+      }),
+      z.object({
         type: z.literal('milestone:fastest-accepted-quote'),
         tags: z.array(z.string()).default(['milestone']),
         context: z.object({
