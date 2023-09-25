@@ -293,8 +293,10 @@ let Client2 = new ClientBuilder()
   .currency(Currency.USD)
   .build()
 
-export let records: Record[] = [
-  // Single item invoice, fully paid, via partial payments
+export let records: Record[] = []
+
+// Single item invoice, fully paid, via partial payments
+records.push(
   new InvoiceBuilder()
     .account(me)
     .client(Client1)
@@ -305,8 +307,10 @@ export let records: Record[] = [
     .pay(nextDay(), 50_00) // Partial Payment
     .pay(nextDay(), 25_00) // Partial Payment
     .build(),
+)
 
-  // Single item invoice, overdue
+// Single item invoice, overdue
+records.push(
   new InvoiceBuilder()
     .account(me)
     .client(Client1)
@@ -314,8 +318,10 @@ export let records: Record[] = [
     .item(new InvoiceItemBuilder().description('Item line #1').unitPrice(100_00).build())
     .send(nextDay())
     .build(),
+)
 
-  // Single item invoice, closed
+// Single item invoice, closed
+records.push(
   new InvoiceBuilder()
     .account(me)
     .client(Client1)
@@ -324,8 +330,10 @@ export let records: Record[] = [
     .send(sameDay())
     .close(afterDays(60))
     .build(),
+)
 
-  // Single item invoice, with multiple quantities
+// Single item invoice, with multiple quantities
+records.push(
   new InvoiceBuilder()
     .account(me)
     .client(Client1)
@@ -336,8 +344,10 @@ export let records: Record[] = [
     .send(nextDay())
     .pay(nextDay())
     .build(),
+)
 
-  // Single item invoice, with tax
+// Single item invoice, with tax
+records.push(
   new InvoiceBuilder()
     .account(me)
     .client(Client1)
@@ -348,8 +358,10 @@ export let records: Record[] = [
     .send(nextDay())
     .pay(nextDay())
     .build(),
+)
 
-  // Single item invoice, with multiple quantities and tax
+// Single item invoice, with multiple quantities and tax
+records.push(
   new InvoiceBuilder()
     .account(me)
     .client(Client1)
@@ -365,8 +377,10 @@ export let records: Record[] = [
     .send(nextDay())
     .pay(nextDay())
     .build(),
+)
 
-  // Multiple items invoice
+// Multiple items invoice
+records.push(
   new InvoiceBuilder()
     .account(me)
     .client(Client1)
@@ -376,8 +390,10 @@ export let records: Record[] = [
     .send(nextDay())
     .pay(nextDay())
     .build(),
+)
 
-  // Multiple items invoice, with multiple quantities
+// Multiple items invoice, with multiple quantities
+records.push(
   new InvoiceBuilder()
     .account(me)
     .client(Client1)
@@ -394,8 +410,10 @@ export let records: Record[] = [
     .send(nextDay())
     .pay(nextDay())
     .build(),
+)
 
-  // Multiple items invoice, with tax
+// Multiple items invoice, with tax
+records.push(
   new InvoiceBuilder()
     .account(me)
     .client(Client1)
@@ -412,8 +430,10 @@ export let records: Record[] = [
     .send(nextDay())
     .pay(nextDay())
     .build(),
+)
 
-  // Multiple items invoice, with multiple quantities and tax
+// Multiple items invoice, with multiple quantities and tax
+records.push(
   new InvoiceBuilder()
     .account(me)
     .client(Client1)
@@ -437,8 +457,10 @@ export let records: Record[] = [
     .send(nextDay())
     .pay(nextDay())
     .build(),
+)
 
-  // Multiple items invoice, with multiple quantities and multiple tax rates
+// Multiple items invoice, with multiple quantities and multiple tax rates
+records.push(
   new InvoiceBuilder()
     .account(me)
     .client(Client1)
@@ -462,8 +484,10 @@ export let records: Record[] = [
     .send(nextDay())
     .pay(nextDay())
     .build(),
+)
 
-  // Multiple items invoice, spreading over multiple pages
+// Multiple items invoice, spreading over multiple pages
+records.push(
   new InvoiceBuilder()
     .account(me)
     .client(Client1)
@@ -508,8 +532,10 @@ export let records: Record[] = [
     .send(nextDay())
     .pay(nextDay())
     .build(),
+)
 
-  // Single item invoice with notes
+// Single item invoice with notes
+records.push(
   new InvoiceBuilder()
     .account(me)
     .client(Client2)
@@ -519,8 +545,10 @@ export let records: Record[] = [
     .send(nextDay())
     .pay(nextDay())
     .build(),
+)
 
-  // Single item invoice, in the future
+// Single item invoice, in the future
+records.push(
   new InvoiceBuilder()
     .account(me)
     .client(Client1)
@@ -529,8 +557,10 @@ export let records: Record[] = [
     .send(nextDay())
     .pay(nextDay())
     .build(),
+)
 
-  // Single item invoice, with a fixed discount
+// Single item invoice, with a fixed discount
+records.push(
   new InvoiceBuilder()
     .account(me)
     .client(Client1)
@@ -540,8 +570,10 @@ export let records: Record[] = [
     .send(nextDay())
     .pay(nextDay())
     .build(),
+)
 
-  // Single item invoice, with a percentage discount
+// Single item invoice, with a percentage discount
+records.push(
   new InvoiceBuilder()
     .account(me)
     .client(Client1)
@@ -551,8 +583,10 @@ export let records: Record[] = [
     .send(nextDay())
     .pay(nextDay())
     .build(),
+)
 
-  // Single item invoice, with a combination of discounts
+// Single item invoice, with a combination of discounts
+records.push(
   new InvoiceBuilder()
     .account(me)
     .client(Client1)
@@ -565,8 +599,10 @@ export let records: Record[] = [
     .send(nextDay())
     .pay(nextDay())
     .build(),
+)
 
-  // Single item invoice, with a discount for an item
+// Single item invoice, with a discount for an item
+records.push(
   new InvoiceBuilder()
     .account(me)
     .client(Client1)
@@ -583,16 +619,20 @@ export let records: Record[] = [
     .send(nextDay())
     .pay(nextDay())
     .build(),
+)
 
-  // Quote
+// Quote
+records.push(
   new QuoteBuilder()
     .account(me)
     .client(Client1)
     .quoteDate(inThePast(2))
     .item(new InvoiceItemBuilder().description('Item #1').unitPrice(123).build())
     .build(),
+)
 
-  // Quote that is sent
+// Quote that is sent
+records.push(
   new QuoteBuilder()
     .account(me)
     .client(Client1)
@@ -600,8 +640,10 @@ export let records: Record[] = [
     .item(new InvoiceItemBuilder().description('Item #1').unitPrice(123).build())
     .send(nextDay())
     .build(),
+)
 
-  // Quote that is accepted
+// Quote that is accepted
+records.push(
   new QuoteBuilder()
     .account(me)
     .client(Client1)
@@ -610,8 +652,10 @@ export let records: Record[] = [
     .send(nextDay())
     .accept(nextDay())
     .build(),
+)
 
-  // Quote that is accepted, but then cancelled
+// Quote that is accepted, but then cancelled
+records.push(
   new QuoteBuilder()
     .account(me)
     .client(Client1)
@@ -624,8 +668,10 @@ export let records: Record[] = [
       reason: 'The weather is really bad today.',
     })
     .build(),
+)
 
-  // Quote that is rejected
+// Quote that is rejected
+records.push(
   new QuoteBuilder()
     .account(me)
     .client(Client1)
@@ -634,8 +680,10 @@ export let records: Record[] = [
     .send(nextDay())
     .reject(nextDay())
     .build(),
+)
 
-  // Quote that is expired
+// Quote that is expired
+records.push(
   new QuoteBuilder()
     .account(me)
     .client(Client1)
@@ -643,8 +691,10 @@ export let records: Record[] = [
     .item(new InvoiceItemBuilder().description('Item #1').unitPrice(123).build())
     .send(nextDay())
     .build(),
+)
 
-  // Quote that is closed
+// Quote that is closed
+records.push(
   new QuoteBuilder()
     .account(me)
     .client(Client1)
@@ -653,8 +703,10 @@ export let records: Record[] = [
     .send(nextDay())
     .close(nextDay())
     .build(),
+)
 
-  // Quote with an attachment
+// Quote with an attachment
+records.push(
   new QuoteBuilder()
     .account(me)
     .client(Client1)
@@ -729,8 +781,10 @@ export let records: Record[] = [
         .build(),
     )
     .build(),
+)
 
-  // Quote from another quote
+// Quote from another quote
+records.push(
   QuoteBuilder.fromQuote(
     new QuoteBuilder()
       .account(me)
@@ -745,8 +799,10 @@ export let records: Record[] = [
     .send(nextDay())
     .accept(nextDay())
     .build(),
+)
 
-  // Invoice from Quote
+// Invoice from Quote
+records.push(
   InvoiceBuilder.fromQuote(
     new QuoteBuilder()
       .account(me)
@@ -763,8 +819,10 @@ export let records: Record[] = [
     .pay(nextDay(), 20_00)
     .pay(nextDay(), 30_00)
     .build(),
+)
 
-  // Invoice from quote with attachment(s)
+// Invoice from quote with attachment(s)
+records.push(
   InvoiceBuilder.fromQuote(
     new QuoteBuilder()
       .account(me)
@@ -793,8 +851,10 @@ export let records: Record[] = [
     .send(nextDay())
     .pay(nextDay())
     .build(),
+)
 
-  // Invoice from quote without inheritting the attachment(s)
+// Invoice from quote without inheritting the attachment(s)
+records.push(
   InvoiceBuilder.fromQuote(
     new QuoteBuilder()
       .account(me)
@@ -824,8 +884,10 @@ export let records: Record[] = [
     .send(nextDay())
     .pay(nextDay())
     .build(),
+)
 
-  // Receipt from Invoice from Quote
+// Receipt from Invoice from Quote
+records.push(
   ReceiptBuilder.fromInvoice(
     InvoiceBuilder.fromQuote(
       new QuoteBuilder()
@@ -844,8 +906,10 @@ export let records: Record[] = [
       .pay(nextDay(), 30_00)
       .build(),
   ).build(),
+)
 
-  // Single item invoice, paid
+// Single item invoice, paid
+records.push(
   new InvoiceBuilder()
     .account(me)
     .client(Client1)
@@ -854,8 +918,10 @@ export let records: Record[] = [
     .send(nextDay())
     .pay(nextDay())
     .build(),
+)
 
-  // Single item invoice, sent
+// Single item invoice, sent
+records.push(
   new InvoiceBuilder()
     .account(me)
     .client(Client1)
@@ -863,8 +929,10 @@ export let records: Record[] = [
     .item(new InvoiceItemBuilder().description('Item line #1').unitPrice(100_00).build())
     .send(sameDay())
     .build(),
+)
 
-  // Single item invoice, partially paid
+// Single item invoice, partially paid
+records.push(
   new InvoiceBuilder()
     .account(me)
     .client(Client1)
@@ -874,23 +942,27 @@ export let records: Record[] = [
     .pay(nextDay(), 25_00) // Partial Payment
     .pay(nextDay(), 50_00) // Partial Payment
     .build(),
+)
 
-  // Single item invoice, drafted (issue date today!)
+// Single item invoice, drafted (issue date today!)
+records.push(
   new InvoiceBuilder()
     .account(me)
     .client(Client1)
     .issueDate(today())
     .item(new InvoiceItemBuilder().description('Item line #1').unitPrice(100_00).build())
     .build(),
+)
 
-  // Single item invoice, drafted (issue date in the future)
+// Single item invoice, drafted (issue date in the future)
+records.push(
   new InvoiceBuilder()
     .account(me)
     .client(Client1)
     .issueDate(inTheFuture())
     .item(new InvoiceItemBuilder().description('Item line #1').unitPrice(100_00).build())
     .build(),
-]
+)
 
 new MilestoneBuilder()
   .account(me)
