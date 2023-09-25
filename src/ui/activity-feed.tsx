@@ -22,6 +22,7 @@ import {
 } from '@heroicons/react/24/outline'
 import {
   addSeconds,
+  compareDesc,
   differenceInYears,
   format,
   formatDistance,
@@ -68,6 +69,10 @@ export function ActivityFeed({
   let grouped = events
     .slice()
     .reverse()
+    .sort((a, z) => {
+      if (a.at === null || z.at === null) return 0
+      return compareDesc(a.at, z.at)
+    })
     .sort((a, z) => {
       if (isFutureEvent(a) && isFutureEvent(z)) return 0
       if (isFutureEvent(a)) return -1
