@@ -38,7 +38,7 @@ export function Items({ items, children }: { items: Invoice['items']; children: 
             key={item.id}
             data-first={idx === 0 ? true : undefined}
             data-last={idx === all.length - 1 ? true : undefined}
-            className="[--bottom:--py] [--indent:theme(spacing.8)] [--left:--px] [--px:theme(spacing.4)] [--py:theme(spacing.4)] [--right:--px] [--top:--py] data-[first]:[--top:theme(spacing.4)] data-[last]:[--bottom:theme(spacing.4)]"
+            className="[--bottom:--py] [--indent:theme(spacing.8)] [--left:--px] [--px:theme(spacing.4)] [--py:theme(spacing[1.5])] [--right:--px] [--top:--py] data-[first]:[--top:theme(spacing.4)] data-[last]:[--bottom:theme(spacing.4)]"
           >
             <td className="whitespace-pre-wrap pb-[--bottom] pl-[calc(var(--indent)+var(--left))] pr-[--right] pt-[--top] text-left align-top text-sm font-medium text-gray-900">
               <Markdown>{item.description}</Markdown>
