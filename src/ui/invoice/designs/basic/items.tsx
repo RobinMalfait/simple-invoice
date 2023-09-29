@@ -33,9 +33,14 @@ export function Items({ items, children }: { items: Invoice['items']; children: 
         </tr>
       </thead>
       <tbody>
-        {items.map((item) => (
-          <tr key={item.id}>
-            <td className="whitespace-pre-wrap py-4 pl-12 pr-4 text-left align-top text-sm font-medium text-gray-900">
+        {items.map((item, idx, all) => (
+          <tr
+            key={item.id}
+            data-first={idx === 0 ? true : undefined}
+            data-last={idx === all.length - 1 ? true : undefined}
+            className="[--bottom:--py] [--indent:theme(spacing.8)] [--left:--px] [--px:theme(spacing.4)] [--py:theme(spacing.4)] [--right:--px] [--top:--py] data-[first]:[--top:theme(spacing.4)] data-[last]:[--bottom:theme(spacing.4)]"
+          >
+            <td className="whitespace-pre-wrap pb-[--bottom] pl-[calc(var(--indent)+var(--left))] pr-[--right] pt-[--top] text-left align-top text-sm font-medium text-gray-900">
               <Markdown>{item.description}</Markdown>
               <ul className="empty:hidden">
                 {item.discounts.map((discount, idx) => (
@@ -80,18 +85,18 @@ export function Items({ items, children }: { items: Invoice['items']; children: 
                 ))}
               </ul>
             </td>
-            <td className="whitespace-nowrap p-4 text-left align-top text-sm tabular-nums text-gray-500">
+            <td className="whitespace-nowrap pb-[--bottom] pl-[--left] pr-[--right] pt-[--top] text-left align-top text-sm tabular-nums text-gray-500">
               {item.quantity}
             </td>
-            <td className="whitespace-nowrap p-4 text-right align-top text-sm text-gray-500">
+            <td className="whitespace-nowrap pb-[--bottom] pl-[--left] pr-[--right] pt-[--top] text-right align-top text-sm text-gray-500">
               <Money amount={item.unitPrice} />
             </td>
             {containsVat && (
-              <td className="whitespace-nowrap p-4 text-right align-top text-sm tabular-nums text-gray-500">
+              <td className="whitespace-nowrap pb-[--bottom] pl-[--left] pr-[--right] pt-[--top] text-right align-top text-sm tabular-nums text-gray-500">
                 {`${((item.taxRate ?? 0) * 100).toFixed(0)}%`}
               </td>
             )}
-            <td className="whitespace-nowrap py-4 pl-4 pr-12 text-right align-top text-sm font-semibold text-gray-900">
+            <td className="whitespace-nowrap pb-[--bottom] pl-[--left] pr-[calc(var(--indent)+var(--right))] pt-[--top] text-right align-top text-sm font-semibold text-gray-900">
               <Money amount={itemPrice(item)} />
             </td>
           </tr>
