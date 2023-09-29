@@ -33,8 +33,8 @@ marked.use({
 })
 
 export function parseMarkdown(value: string): string {
-  let html = marked.parse(dedent(value), { breaks: true }).trim()
-  return html
+  let html = marked.parse(dedent(value.replace(/\t/g, '{{TAB}}')), { breaks: true }).trim()
+  return html.replace(/\{\{TAB\}\}/g, '\t')
 }
 
 type JSXNode = { tag: string; props: Record<string | symbol, any>; children: JSX[] }
