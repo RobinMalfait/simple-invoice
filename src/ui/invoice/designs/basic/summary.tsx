@@ -110,7 +110,7 @@ export function Summary({
       <tr>
         <td></td>
         <td colSpan={4} className="pb-3 pl-4 pr-12">
-          <div className="h-1 w-full rounded-full bg-gray-50"></div>
+          <div className="h-1 w-full rounded-full bg-gray-50 group-first-of-type:hidden"></div>
         </td>
       </tr>
       {summaryInfo
