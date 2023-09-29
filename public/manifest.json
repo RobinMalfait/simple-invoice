@@ -1,0 +1,17 @@
+{
+  "id": "com.robinmalfait.simple-invoice",
+  "version": "1.0.0",
+  "manifest_version": 2,
+  "name": "Simple Invoice",
+  "description": "Simple Invoice, manage your business in a simple way.",
+  "background_color": "#fafafa",
+  "theme_color": "#0f172a",
+  "display": "standalone",
+  "start_url": "/",
+  "orientation": "landscape",
+  "scope": "/",
+  "icons": [
+    { "src": "/192.png", "type": "image/png", "sizes": "192x192" },
+    { "src": "/512.png", "type": "image/png", "sizes": "512x512" }
+  ]
+}

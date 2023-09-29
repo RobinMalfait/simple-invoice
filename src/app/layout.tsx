@@ -16,6 +16,18 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'sw
 export const metadata: Metadata = {
   title: 'Simple Invoice',
   description: 'Generate simple invoices with ease.',
+  manifest: '/manifest.json',
+  themeColor: [
+    { color: '#fff', media: '(prefers-color-scheme: light)' },
+    { color: '#000', media: '(prefers-color-scheme: dark)' },
+  ],
+  viewport: {
+    width: 'device-width',
+    initialScale: 1.0,
+    maximumScale: 1.0,
+    userScalable: false,
+    viewportFit: 'cover',
+  },
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
