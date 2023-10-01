@@ -18,6 +18,7 @@ export default async function Page() {
   let clients = combined
     .map((x) => x.client)
     .filter((c, idx, all) => all.findIndex((other) => other.id === c.id) === idx)
+    .sort((a, z) => a.nickname.localeCompare(z.nickname))
 
   return (
     <div className="relative px-4 py-8 text-white sm:px-6 lg:px-8">
