@@ -28,6 +28,10 @@ export const metadata: Metadata = {
     userScalable: false,
     viewportFit: 'cover',
   },
+  icons: [
+    { url: '/favicon.ico', sizes: 'any' },
+    { url: '/apple-touch-icon.png', rel: 'apple-touch-icon' },
+  ],
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
