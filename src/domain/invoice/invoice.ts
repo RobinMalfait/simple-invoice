@@ -17,7 +17,6 @@ import { QuoteStatus } from '~/domain/quote/quote-status'
 import { DeepPartial } from '~/types/shared'
 import { total } from '~/ui/invoice/total'
 import { ScopedIDGenerator } from '~/utils/id'
-import { match } from '~/utils/match'
 
 let scopedId = new ScopedIDGenerator('invoice')
 
@@ -292,29 +291,13 @@ export class InvoiceBuilder {
   public send(at: string | Date): InvoiceBuilder {
     let parsedAt = typeof at === 'string' ? parseISO(at) : at
 
-    match(this._status, {
-      [InvoiceStatus.Draft]: () => {
-        this._status = InvoiceStatus.Sent
-        this._events.push({ type: 'invoice:sent', at: parsedAt })
-      },
-      [InvoiceStatus.Sent]: () => {
-        throw new Error('Cannot send an invoice that is already sent')
-      },
-      [InvoiceStatus.Paid]: () => {
-        throw new Error('Cannot send an invoice that is already paid')
-      },
-      [InvoiceStatus.PartiallyPaid]: () => {
-        throw new Error('Cannot send an invoice that is already partially paid')
-      },
-      [InvoiceStatus.Overdue]: () => {
-        throw new Error('Cannot send an invoice that is overdue')
-      },
-      [InvoiceStatus.Closed]: () => {
-        throw new Error('Cannot send an invoice that is closed')
-      },
-    })
+    if (this._status === InvoiceStatus.Draft) {
+      this._status = InvoiceStatus.Sent
+      this._events.push({ type: 'invoice:sent', at: parsedAt })
+      return this
+    }
 
-    return this
+    throw new Error(`Cannot send an invoice that is in the ${this._status} state.`)
   }
 
   public pay(
@@ -327,7 +310,13 @@ export class InvoiceBuilder {
       this.outstanding = total({ items: this._items, discounts: this._discounts })
     }
 
-    let handlePayment = () => {
+    if (
+      [
+        InvoiceStatus.Draft, // When money comes in _before_ an invoice is sent
+        InvoiceStatus.Sent,
+        InvoiceStatus.PartiallyPaid,
+      ].includes(this._status)
+    ) {
       this.paid += amount
       this.outstanding! -= amount
 
@@ -354,51 +343,10 @@ export class InvoiceBuilder {
           at: parsedAt,
         })
       }
+      return this
     }
 
-    match(this._status, {
-      // When money comes in _before_ an invoice is sent
-      [InvoiceStatus.Draft]: handlePayment,
-      [InvoiceStatus.Sent]: handlePayment,
-      [InvoiceStatus.Paid]: () => {
-        throw new Error('Cannot pay an invoice that is already paid')
-      },
-      [InvoiceStatus.PartiallyPaid]: () => {
-        this.paid += amount
-        this.outstanding! -= amount
-
-        if (this.outstanding! > 0) {
-          this._status = InvoiceStatus.PartiallyPaid
-          this._events.push({
-            type: 'invoice:partially-paid',
-            payload: {
-              amount,
-              outstanding: this.outstanding!,
-            },
-            at: parsedAt,
-          })
-        } else {
-          this._status = InvoiceStatus.Paid
-          this._paidAt = parsedAt
-          this._events.push({
-            type: 'invoice:paid',
-            payload: {
-              amount,
-              outstanding: this.outstanding!,
-            },
-            at: parsedAt,
-          })
-        }
-      },
-      [InvoiceStatus.Overdue]: () => {
-        throw new Error('Cannot pay an invoice that is overdue')
-      },
-      [InvoiceStatus.Closed]: () => {
-        throw new Error('Cannot pay an invoice that is closed')
-      },
-    })
-
-    return this
+    throw new Error(`Cannot pay an invoice that is in the ${this._status} state.`)
   }
 
   public close(at: string | Date): InvoiceBuilder {
@@ -412,31 +360,16 @@ export class InvoiceBuilder {
       })
     }
 
-    match(this._status, {
-      [InvoiceStatus.Draft]: () => {
-        throw new Error('Cannot close an invoice that is in draft')
-      },
-      [InvoiceStatus.Sent]: () => {
-        throw new Error('Cannot close an invoice that is sent')
-      },
-      [InvoiceStatus.Paid]: () => {
-        throw new Error('Cannot close an invoice that is already paid')
-      },
-      [InvoiceStatus.PartiallyPaid]: () => {
-        throw new Error('Cannot close an invoice that is already partially paid')
-      },
-      [InvoiceStatus.Overdue]: () => {
-        this._status = InvoiceStatus.Closed
-        this._events.push({
-          type: 'invoice:closed',
-          at: parsedAt,
-        })
-      },
-      [InvoiceStatus.Closed]: () => {
-        throw new Error('Cannot close an invoice that is closed')
-      },
-    })
+    if (this._status === InvoiceStatus.Overdue) {
+      this._status = InvoiceStatus.Closed
+      this._events.push({
+        type: 'invoice:closed',
+        at: parsedAt,
+      })
 
-    return this
+      return this
+    }
+
+    throw new Error(`Cannot close an invoice that is in the ${this._status} state.`)
   }
 }
