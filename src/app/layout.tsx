@@ -18,8 +18,8 @@ export const metadata: Metadata = {
   description: 'Generate simple invoices with ease.',
   manifest: '/manifest.json',
   themeColor: [
-    { color: '#fff', media: '(prefers-color-scheme: light)' },
-    { color: '#000', media: '(prefers-color-scheme: dark)' },
+    { color: '#18181b', media: '(prefers-color-scheme: light)' },
+    { color: '#18181b', media: '(prefers-color-scheme: dark)' },
   ],
   viewport: {
     width: 'device-width',
