@@ -4,6 +4,7 @@ import { InformationCircleIcon } from '@heroicons/react/24/outline'
 import { Receipt } from '~/domain/receipt/receipt'
 import { parseMarkdown } from '~/ui/document/document'
 import { useFittedPagination } from '~/ui/hooks/use-fitted-pagination'
+import { useIbanQrCodeData } from '~/ui/hooks/use-iban-qr-code-data'
 import { PageProvider } from '~/ui/hooks/use-pagination-info'
 import { RecordProvider, useRecord } from '~/ui/hooks/use-record'
 import { QRCode } from '~/ui/qr-code'
@@ -20,6 +21,7 @@ export function Invoice() {
   let record = useRecord()
   let [pages, FitContent] = useFittedPagination(record.items)
   let notes = [record.note, record.client.note, record.account.note].filter(Boolean)
+  let qrCodeData = useIbanQrCodeData(record)
 
   return (
     <RecordProvider record={record}>
@@ -58,17 +60,22 @@ export function Invoice() {
 
               {pageIdx === pages.length - 1 && (
                 <div className="flex w-full items-end justify-between px-8 py-4">
-                  {notes.length > 0 && (
+                  {notes.length > 0 ? (
                     <div className="relative w-full max-w-sm space-y-1 rounded-md bg-gray-50 p-4 text-xs">
                       <div className="absolute -right-3 -top-3 rounded-full bg-gray-50 p-1">
                         <InformationCircleIcon className="h-6 w-6 text-gray-400" />
                       </div>
                       <div dangerouslySetInnerHTML={{ __html: parseMarkdown(notes.join('\n')) }} />
                     </div>
+                  ) : (
+                    <div />
                   )}
-                  <div className="relative rounded border border-black p-2">
-                    <QRCode data="https://www.google.com" />
-                  </div>
+
+                  {qrCodeData !== null && (
+                    <div className="relative rounded-lg border border-gray-400 p-3">
+                      <QRCode>{qrCodeData}</QRCode>
+                    </div>
+                  )}
                 </div>
               )}
 
