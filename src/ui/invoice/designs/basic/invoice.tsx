@@ -6,6 +6,7 @@ import { parseMarkdown } from '~/ui/document/document'
 import { useFittedPagination } from '~/ui/hooks/use-fitted-pagination'
 import { PageProvider } from '~/ui/hooks/use-pagination-info'
 import { RecordProvider, useRecord } from '~/ui/hooks/use-record'
+import { QRCode } from '~/ui/qr-code'
 import { match } from '~/utils/match'
 import { Attachment } from './attachment'
 import { BigFooter } from './big-footer'
@@ -55,13 +56,18 @@ export function Invoice() {
                 </FitContent>
               </div>
 
-              {pageIdx === pages.length - 1 && notes.length > 0 && (
-                <div className="px-8 py-4">
-                  <div className="relative max-w-sm space-y-1 rounded-md bg-gray-50 p-4 text-xs">
-                    <div className="absolute -right-3 -top-3 rounded-full bg-gray-50 p-1">
-                      <InformationCircleIcon className="h-6 w-6 text-gray-400" />
+              {pageIdx === pages.length - 1 && (
+                <div className="flex w-full items-end justify-between px-8 py-4">
+                  {notes.length > 0 && (
+                    <div className="relative w-full max-w-sm space-y-1 rounded-md bg-gray-50 p-4 text-xs">
+                      <div className="absolute -right-3 -top-3 rounded-full bg-gray-50 p-1">
+                        <InformationCircleIcon className="h-6 w-6 text-gray-400" />
+                      </div>
+                      <div dangerouslySetInnerHTML={{ __html: parseMarkdown(notes.join('\n')) }} />
                     </div>
-                    <div dangerouslySetInnerHTML={{ __html: parseMarkdown(notes.join('\n')) }} />
+                  )}
+                  <div className="relative rounded border border-black p-2">
+                    <QRCode data="https://www.google.com" />
                   </div>
                 </div>
               )}
