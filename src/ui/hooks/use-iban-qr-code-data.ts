@@ -46,7 +46,7 @@ let data = z.object({
   amount: z
     .number()
     .min(10) // In cents
-    .max(99999999999) // In cents
+    .max(999_999_999_99) // In cents
     .transform((value) => `EUR${(value / 100).toFixed(2)}`),
   purpose: z.string().max(4).optional(),
   remittanceReference: z.string().max(35).optional(), // Structured reference
