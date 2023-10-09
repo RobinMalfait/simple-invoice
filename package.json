@@ -52,7 +52,7 @@
     "ics": "^3.5.0",
     "lazy-collections": "^0.11.2",
     "marked": "^9.0.3",
-    "next": "^13.4.19",
+    "next": "^13.5.4",
     "puppeteer": "^21.3.1",
     "qrcode": "^1.5.3",
     "react": "18.2.0",
