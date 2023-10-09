@@ -111,6 +111,7 @@ export class ClientBuilder {
     builder._note = client.note
     builder._legal = client.legal
     builder._contacts = client.contacts.slice()
+    builder._qr = client.qr
     return builder
   }
 
