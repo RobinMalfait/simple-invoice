@@ -2,6 +2,7 @@
 
 import { InformationCircleIcon } from '@heroicons/react/24/outline'
 import { Receipt } from '~/domain/receipt/receipt'
+import { Classified } from '~/ui/classified'
 import { parseMarkdown } from '~/ui/document/document'
 import { useFittedPagination } from '~/ui/hooks/use-fitted-pagination'
 import { useIbanQrCodeData } from '~/ui/hooks/use-iban-qr-code-data'
@@ -59,7 +60,7 @@ export function Invoice() {
               </div>
 
               {pageIdx === pages.length - 1 && (
-                <div className="flex w-full items-end justify-between px-8 py-4">
+                <div className="flex w-full items-end justify-between px-8 pb-4 pt-1">
                   {notes.length > 0 ? (
                     <div className="relative w-full max-w-sm space-y-1 rounded-md bg-gray-50 p-4 text-xs">
                       <div className="absolute -right-3 -top-3 rounded-full bg-gray-50 p-1">
@@ -72,8 +73,13 @@ export function Invoice() {
                   )}
 
                   {qrCodeData !== null && (
-                    <div className="relative rounded-lg border border-gray-400 p-3">
-                      <QRCode>{qrCodeData}</QRCode>
+                    <div className="relative rounded-lg border border-gray-400 p-3 pt-4">
+                      <span className="absolute left-2 top-0 -translate-y-1/2 bg-white px-1 text-xs">
+                        QR Betaalcode
+                      </span>
+                      <Classified>
+                        <QRCode scale={3}>{qrCodeData}</QRCode>
+                      </Classified>
                     </div>
                   )}
                 </div>
