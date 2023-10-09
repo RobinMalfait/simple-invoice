@@ -30,6 +30,9 @@ export let Client = z.object({
   note: z.string().nullable(),
   legal: z.string().nullable(),
   contacts: z.array(Contact).default([]),
+
+  // Visual representation
+  qr: z.boolean().nullable().default(null),
 })
 
 export type Client = z.infer<typeof Client>
@@ -49,6 +52,7 @@ export class ClientBuilder {
   private _note: Client['note'] | null = null
   private _legal: Client['legal'] | null = null
   private _contacts: Client['contacts'] = []
+  private _qr: Client['qr'] | null = null
 
   private _events: Partial<Event>[] = []
 
@@ -74,6 +78,7 @@ export class ClientBuilder {
       note: this._note,
       legal: this._legal,
       contacts: this._contacts,
+      qr: this._qr,
     })
 
     for (let event of this._events) {
@@ -239,6 +244,11 @@ export class ClientBuilder {
 
   public contact(contact: Client['contacts'][number]): ClientBuilder {
     this._contacts.push(contact)
+    return this
+  }
+
+  public qr(qr: Client['qr']): ClientBuilder {
+    this._qr = qr
     return this
   }
 }

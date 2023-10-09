@@ -37,6 +37,9 @@ export let Invoice = z.object({
   outstanding: z.number(),
   paidAt: z.date().nullable(),
   quote: z.lazy(() => Quote.nullable()),
+
+  // Visual representation
+  qr: z.boolean().nullable().default(null),
 })
 
 export type Invoice = z.infer<typeof Invoice>
@@ -53,6 +56,7 @@ export class InvoiceBuilder {
   private _attachments: Document[] = []
   private _quote: Quote | null = null
   private _paidAt: Date | null = null
+  private _qr: Invoice['qr'] | null = null
 
   private _status = InvoiceStatus.Draft
   private paid: number = 0
@@ -82,6 +86,7 @@ export class InvoiceBuilder {
       paidAt: this._paidAt,
       paid: this.paid,
       outstanding: this.outstanding ?? total({ items: this._items, discounts: this._discounts }),
+      qr: this._qr,
     }
 
     let invoice = Invoice.parse(input)
@@ -284,6 +289,16 @@ export class InvoiceBuilder {
         'You already had discounts configured, but this is not supported for mixed tax rates right now',
       )
     }
+
+    return this
+  }
+
+  public qr(qr: Invoice['qr']): InvoiceBuilder {
+    if (this._status !== InvoiceStatus.Draft) {
+      throw new Error('Cannot edit an invoice that is not in draft status')
+    }
+
+    this._qr = qr
 
     return this
   }

@@ -31,6 +31,9 @@ export let Account = z.object({
   contactFields: z.array(z.lazy(() => ContactField)),
   note: z.string().nullable(),
   legal: z.string().nullable(),
+
+  // Visual representation
+  qr: z.boolean().nullable().default(true),
 })
 
 export type Account = z.infer<typeof Account>
@@ -50,6 +53,7 @@ export class AccountBuilder {
   private _contactFields: Account['contactFields'] = []
   private _note: Account['note'] | null = null
   private _legal: Account['legal'] | null = null
+  private _qr: Account['qr'] | null = true
 
   private _events: Partial<Event>[] = []
 
@@ -75,6 +79,7 @@ export class AccountBuilder {
       contactFields: this._contactFields,
       note: this._note,
       legal: this._legal,
+      qr: this._qr,
     })
 
     for (let event of this._events) {
@@ -258,6 +263,11 @@ export class AccountBuilder {
 
   public contactField(contactField: ContactField): AccountBuilder {
     this._contactFields.push(contactField)
+    return this
+  }
+
+  public qr(qr: Account['qr']): AccountBuilder {
+    this._qr = qr
     return this
   }
 }

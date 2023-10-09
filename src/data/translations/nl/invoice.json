@@ -47,6 +47,9 @@
     "paid": "Betaald",
     "vat": "BTW (:rate)"
   },
+  "qr": {
+    "title": "Scan met bank app"
+  },
   "pagination": {
     "summary": ":current van :total"
   }
