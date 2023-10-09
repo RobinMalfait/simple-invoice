@@ -8,6 +8,7 @@ import { useFittedPagination } from '~/ui/hooks/use-fitted-pagination'
 import { useIbanQrCodeData } from '~/ui/hooks/use-iban-qr-code-data'
 import { PageProvider } from '~/ui/hooks/use-pagination-info'
 import { RecordProvider, useRecord } from '~/ui/hooks/use-record'
+import { useTranslation } from '~/ui/hooks/use-translation'
 import { QRCode } from '~/ui/qr-code'
 import { match } from '~/utils/match'
 import { Attachment } from './attachment'
@@ -23,6 +24,7 @@ export function Invoice() {
   let [pages, FitContent] = useFittedPagination(record.items)
   let notes = [record.note, record.client.note, record.account.note].filter(Boolean)
   let qrCodeData = useIbanQrCodeData(record)
+  let t = useTranslation()
 
   return (
     <RecordProvider record={record}>
@@ -75,7 +77,7 @@ export function Invoice() {
                   {qrCodeData !== null && (
                     <div className="relative rounded-lg border border-gray-400 p-3 pt-4">
                       <span className="absolute left-2 top-0 -translate-y-1/2 bg-white px-1 text-xs">
-                        QR Betaalcode
+                        {t((x) => x.qr.title)}
                       </span>
                       <Classified>
                         <QRCode scale={3}>{qrCodeData}</QRCode>
