@@ -2,6 +2,7 @@
 
 import { InformationCircleIcon } from '@heroicons/react/24/outline'
 import { Receipt } from '~/domain/receipt/receipt'
+import { isInvoice } from '~/domain/record/filters'
 import { Classified } from '~/ui/classified'
 import { parseMarkdown } from '~/ui/document/document'
 import { useFittedPagination } from '~/ui/hooks/use-fitted-pagination'
@@ -25,6 +26,9 @@ export function Invoice() {
   let notes = [record.note, record.client.note, record.account.note].filter(Boolean)
   let qrCodeData = useIbanQrCodeData(record)
   let t = useTranslation()
+
+  let isQRCodeEnabled =
+    isInvoice(record) && (record.qr ?? record.client.qr ?? record.account.qr ?? false)
 
   return (
     <RecordProvider record={record}>
@@ -74,7 +78,7 @@ export function Invoice() {
                     <div />
                   )}
 
-                  {qrCodeData !== null && (
+                  {isQRCodeEnabled && qrCodeData !== null && (
                     <div className="relative rounded-lg border border-gray-400 p-3 pt-4">
                       <span className="absolute left-2 top-0 -translate-y-1/2 bg-white px-1 text-xs">
                         {t((x) => x.qr.title)}
