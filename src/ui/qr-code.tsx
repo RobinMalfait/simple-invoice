@@ -27,5 +27,5 @@ export function QRCode({
   }, [children, margin, scale])
 
   // eslint-disable-next-line @next/next/no-img-element
-  return qrCode === null ? null : <img alt="" src={qrCode} />
+  return qrCode === null ? <div className="aspect-square h-28 w-28" /> : <img alt="" src={qrCode} />
 }
