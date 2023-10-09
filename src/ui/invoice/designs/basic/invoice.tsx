@@ -80,8 +80,10 @@ export function Invoice() {
 
                   {isQRCodeEnabled && qrCodeData !== null && (
                     <div className="relative rounded-lg border border-gray-400 p-3 pt-4">
-                      <span className="absolute left-2 top-0 -translate-y-1/2 bg-white px-1 text-xs text-gray-600">
-                        {t((x) => x.qr.title)}
+                      <span className="absolute inset-x-0 top-0 flex -translate-y-2 items-center justify-center">
+                        <span className="bg-white px-1 text-xs text-gray-600">
+                          {t((x) => x.qr.title)}
+                        </span>
                       </span>
                       <Classified>
                         <QRCode scale={3}>{qrCodeData}</QRCode>

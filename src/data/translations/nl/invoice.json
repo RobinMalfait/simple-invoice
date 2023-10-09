@@ -48,7 +48,7 @@
     "vat": "BTW (:rate)"
   },
   "qr": {
-    "title": "Scan met bank app"
+    "title": "Betaal met bank app"
   },
   "pagination": {
     "summary": ":current van :total"
