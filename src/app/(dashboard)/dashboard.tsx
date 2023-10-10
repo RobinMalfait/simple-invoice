@@ -1046,7 +1046,7 @@ function ComparisonChart({
                 />
                 <Line
                   dot={false}
-                  type="natural"
+                  type="basis"
                   name="Previous"
                   dataKey="previous"
                   stroke="var(--previous)"
@@ -1055,7 +1055,7 @@ function ComparisonChart({
                 />
                 <Line
                   dot={false}
-                  type="natural"
+                  type="basis"
                   name="Current"
                   dataKey="current"
                   stroke="var(--current)"
