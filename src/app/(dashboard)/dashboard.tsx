@@ -1382,7 +1382,7 @@ function createGoals(records: Record[], milestones: Milestones): Goal[] {
     }
   }
 
-  // Internatiol client count
+  // International client count
   {
     let current = new Set(
       paidRecords
