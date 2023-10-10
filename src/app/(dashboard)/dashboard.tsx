@@ -61,6 +61,7 @@ import {
   isSent,
 } from '~/domain/record/filters'
 import { Record, resolveRelevantRecordDate, separateRecords } from '~/domain/record/record'
+import { Card, CardBody, CardTitle } from '~/ui/card'
 import { classNames } from '~/ui/class-names'
 import { Classified, useIsClassified } from '~/ui/classified'
 import { FormatRange } from '~/ui/date-range'
@@ -77,7 +78,22 @@ import { RangePicker, options } from '~/ui/range-picker'
 import { TinyRecord } from '~/ui/record/tiny-record'
 import { match } from '~/utils/match'
 
-export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
+type Milestones = {
+  clientCountMilestonesData: number[]
+  internationalClientCountMilestonesData: number[]
+  invoiceCountMilestonesData: number[]
+  revenueMilestonesData: number[]
+}
+
+export function Dashboard({
+  me,
+  records,
+  milestones,
+}: {
+  me: Account
+  records: Record[]
+  milestones: Milestones
+}) {
   let [presetName, setPresetName] = useLocalStorageState('dashboard.preset-name', 'This quarter')
   let [, range, previous, next] = options.find((e) => e[0] === presetName)!
 
@@ -141,6 +157,8 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
   let systemContainsInvoices = allRecords.some((r) => isInvoice(r))
 
   let eventsBy = useLazyEventsForRecord()
+
+  let goals = createGoals(currentRecords, milestones)
 
   return (
     <CompareConfigContext.Provider
@@ -237,7 +255,7 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
             style={
               {
                 '--cols': `repeat(${
-                  4 - (systemContainsQuotes ? 0 : 1) - (systemContainsInvoices ? 0 : 1)
+                  5 - (systemContainsQuotes ? 0 : 1) - (systemContainsInvoices ? 0 : 1)
                 }, minmax(0, 1fr))`,
               } as React.CSSProperties
             }
@@ -351,6 +369,8 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
                 />
               </CompareGroup>
             )}
+
+            {goals.length > 0 && <Goals goals={goals} />}
 
             <div className="col-span-2 grid grid-cols-4 items-stretch gap-[--gap]">
               <CompareBlock
@@ -721,6 +741,75 @@ export function Dashboard({ me, records }: { me: Account; records: Record[] }) {
         </main>
       </I18NProvider>
     </CompareConfigContext.Provider>
+  )
+}
+
+function Goals({ goals }: { goals: Goal[] }) {
+  let [index, setIndex] = useState(0)
+  let goal = goals[index]
+
+  return (
+    <Card>
+      <CardTitle>
+        <span className="flex items-center justify-between">
+          <span>Goals</span>
+          <div className="flex items-center gap-2">
+            <button
+              className="relative -m-2 p-2"
+              onClick={() => setIndex((v) => (v + goals.length - 1) % goals.length)}
+            >
+              <ArrowSmallLeftIcon className="h-4 w-4" />
+            </button>
+            <span className="font-mono tabular-nums">
+              {index + 1}/{goals.length}
+            </span>
+            <button
+              className="relative -m-2 p-2"
+              onClick={() => setIndex((v) => (v + goals.length + 1) % goals.length)}
+            >
+              <ArrowSmallRightIcon className="h-4 w-4" />
+            </button>
+          </div>
+        </span>
+      </CardTitle>
+      <CardBody>
+        <div className="flex h-full flex-1 flex-col [--current:theme(colors.blue.500)] [--next:theme(colors.blue.800)] dark:[--current:theme(colors.blue.600)] dark:[--next:theme(colors.blue.800)]">
+          <div className="flex items-center justify-between">
+            <span>{goal.label}</span>
+            <span className="text-sm">{((goal.current / goal.next) * 100).toFixed(2) + '%'}</span>
+          </div>
+          <div className="mt-2 h-4 w-full overflow-hidden rounded-full bg-[--next] p-0.5">
+            <div
+              style={{ width: Math.floor((goal.current / goal.next) * 100).toFixed(2) + '%' }}
+              className="h-full rounded-full bg-[--current]"
+            ></div>
+          </div>
+          <div className="flex flex-1 items-center justify-between">
+            <div className="flex items-center justify-center gap-2 px-1">
+              <div className="h-2 w-2 rounded-full bg-[--current]"></div>
+              {match(goal.type, {
+                number: () => <>{goal.current}</>,
+                money: () => <Money amount={goal.current} />,
+              })}
+            </div>
+            <div className="flex items-center justify-center gap-2 px-1">
+              <div className="h-2 w-2 rounded-full bg-[--next]"></div>
+              {match(goal.type, {
+                number: () => <>{goal.next}</>,
+                money: () => <Money amount={goal.next} />,
+              })}
+            </div>
+          </div>
+          <div className="mt-4 text-xs">
+            Remaining:{' '}
+            {match(goal.type, {
+              number: () => <>{goal.next - goal.current}</>,
+              money: () => <Money amount={goal.next - goal.current} />,
+            })}
+          </div>
+        </div>
+      </CardBody>
+    </Card>
   )
 }
 
@@ -1259,4 +1348,62 @@ function AccumulativePaidInvoicesChart({
       )}
     </div>
   )
+}
+
+// ---
+
+type Goal = {
+  current: number
+  next: number
+  label: string
+  type: 'number' | 'money'
+}
+
+function createGoals(records: Record[], milestones: Milestones): Goal[] {
+  let goals: Goal[] = []
+
+  // Paid invoices count
+  {
+    let current = records.filter(isPaidRecord).length
+    let next = milestones.invoiceCountMilestonesData.findLast((m) => m > current)
+    if (next) {
+      goals.push({ current, next, label: 'Paid invoices', type: 'number' })
+    }
+  }
+
+  // Client count
+  {
+    let current = new Set(records.map((r) => r.client.id)).size
+    let next = milestones.clientCountMilestonesData.findLast((m) => m > current)
+    if (next) {
+      goals.push({ current, next, label: 'Total clients', type: 'number' })
+    }
+  }
+
+  // Internation client count
+  {
+    let current = new Set(
+      records
+        .filter((r) => r.client.billing.country !== r.account.billing.country)
+        .map((r) => r.client.id),
+    ).size
+    let next = milestones.internationalClientCountMilestonesData.findLast((m) => m > current)
+    if (next) {
+      goals.push({ current, next, label: 'Total international clients', type: 'number' })
+    }
+  }
+
+  // Total revenue
+  {
+    let current = records.filter(isPaidRecord).reduce((sum, r) => sum + total(r), 0)
+    let next = milestones.revenueMilestonesData.findLast((m) => m > current)
+    if (next) {
+      goals.push({ current, next, label: 'Total revenue', type: 'money' })
+    }
+  }
+
+  // Sort goals by progress
+  return goals.sort((a, z) => {
+    return z.current / z.next - a.current / a.next
+  })
 }
