@@ -2,6 +2,12 @@ import { Dashboard } from './dashboard'
 
 import { compareDesc } from 'date-fns'
 import { me, records as rawRecords } from '~/data'
+import {
+  clientCountMilestonesData,
+  internationalClientCountMilestonesData,
+  invoiceCountMilestonesData,
+  revenueMilestonesData,
+} from '~/domain/milestone/milestone'
 import { combineRecords, resolveRelevantRecordDate } from '~/domain/record/record'
 
 export default function Page() {
@@ -11,5 +17,16 @@ export default function Page() {
       z.number.localeCompare(a.number),
   )
 
-  return <Dashboard me={me} records={records} />
+  return (
+    <Dashboard
+      me={me}
+      records={records}
+      milestones={{
+        clientCountMilestonesData,
+        internationalClientCountMilestonesData,
+        invoiceCountMilestonesData,
+        revenueMilestonesData,
+      }}
+    />
+  )
 }

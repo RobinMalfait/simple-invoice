@@ -7,7 +7,7 @@ import { match } from '~/utils/match'
 
 export function Card({ children }: React.PropsWithChildren<{}>) {
   return (
-    <div className="rounded-lg bg-[--bg] shadow ring-1 ring-black/5 [--bg:white] dark:text-gray-300 dark:[--bg:theme(colors.zinc.900)]">
+    <div className="flex flex-1 flex-col rounded-lg bg-[--bg] shadow ring-1 ring-black/5 [--bg:white] dark:text-gray-300 dark:[--bg:theme(colors.zinc.900)]">
       {children}
     </div>
   )
@@ -46,7 +46,7 @@ export function CardBody({
   return (
     <div
       className={classNames(
-        'overflow-hidden',
+        'flex-1 overflow-hidden',
         match(variant, {
           default: 'p-4',
           filled: '',

@@ -108,11 +108,12 @@ export function fastestAcceptedQuoteMilestones(bus: EventEmitter, ctx: Context) 
   })
 }
 
+export let invoiceCountMilestonesData = [1000, 750, 500, 300, 200, 150, 100, 50, 25, 10, 5, 1]
 export function invoiceCountMilestones(bus: EventEmitter, ctx: Context) {
   const MILESTONE = 'milestone:invoices'
 
   let stateByAccount = initState(() => ({
-    milestones: [1000, 750, 500, 300, 200, 150, 100, 50, 25, 10, 5, 1],
+    milestones: invoiceCountMilestonesData.slice(),
     count: new Set<string>(),
   }))
 
@@ -250,11 +251,12 @@ export function fastestPaidInvoiceMilestones(bus: EventEmitter, ctx: Context) {
   })
 }
 
+export let clientCountMilestonesData = [100, 75, 50, 25, 10, 5, 3]
 export function clientCountMilestones(bus: EventEmitter, ctx: Context) {
   const MILESTONE = 'milestone:clients'
 
   let stateByAccount = initState(() => ({
-    milestones: [100, 75, 50, 25, 10, 5, 3],
+    milestones: clientCountMilestonesData.slice(),
     clientByInvoice: new Map<string, string>(),
   }))
 
@@ -344,11 +346,12 @@ export function clientCountMilestones(bus: EventEmitter, ctx: Context) {
   }
 }
 
+export let internationalClientCountMilestonesData = [100, 75, 50, 25, 10, 5, 3, 1]
 export function internationalClientCountMilestones(bus: EventEmitter, ctx: Context) {
   const MILESTONE = 'milestone:international-clients'
 
   let stateByAccount = initState(() => ({
-    milestones: [100, 75, 50, 25, 10, 5, 3, 1],
+    milestones: internationalClientCountMilestonesData.slice(),
     countryByInvoice: new Map<string, string | null>(),
   }))
 
@@ -450,14 +453,15 @@ export function internationalClientCountMilestones(bus: EventEmitter, ctx: Conte
   }
 }
 
+export let revenueMilestonesData = [
+  10_000_000_00, 5_000_000_00, 1_500_000_00, 1_000_000_00, 750_000_00, 500_000_00, 250_000_00,
+  100_000_00, 50_000_00, 10_000_00, 5_000_00, 1_000_00, 500_00, 100_00,
+]
 export function revenueMilestones(bus: EventEmitter, ctx: Context) {
   const MILESTONE = 'milestone:revenue'
 
   let stateByAccount = initState(() => ({
-    milestones: [
-      10_000_000_00, 5_000_000_00, 1_500_000_00, 1_000_000_00, 750_000_00, 500_000_00, 250_000_00,
-      100_000_00, 50_000_00, 10_000_00, 5_000_00, 1_000_00, 500_00, 100_00,
-    ],
+    milestones: revenueMilestonesData.slice(),
     totalByInvoice: new Map<string, number>(),
   }))
 
