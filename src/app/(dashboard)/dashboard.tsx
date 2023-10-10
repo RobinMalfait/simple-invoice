@@ -1404,8 +1404,14 @@ function createGoals(records: Record[], milestones: Milestones): Goal[] {
     }
   }
 
-  // Sort goals by progress
-  return goals.sort((a, z) => {
-    return z.current / z.next - a.current / a.next
-  })
+  return (
+    goals
+      // Filter out goals with 0%
+      .filter((g) => g.current / g.next !== 0)
+
+      // Sort goals by progress
+      .sort((a, z) => {
+        return z.current / z.next - a.current / a.next
+      })
+  )
 }
