@@ -1362,9 +1362,11 @@ type Goal = {
 function createGoals(records: Record[], milestones: Milestones): Goal[] {
   let goals: Goal[] = []
 
+  let paidRecords = records.filter(isPaidRecord)
+
   // Paid invoices count
   {
-    let current = records.filter(isPaidRecord).length
+    let current = paidRecords.length
     let next = milestones.invoiceCountMilestonesData.findLast((m) => m > current)
     if (next) {
       goals.push({ current, next, label: 'Paid invoices', type: 'number' })
@@ -1373,17 +1375,17 @@ function createGoals(records: Record[], milestones: Milestones): Goal[] {
 
   // Client count
   {
-    let current = new Set(records.map((r) => r.client.id)).size
+    let current = new Set(paidRecords.map((r) => r.client.id)).size
     let next = milestones.clientCountMilestonesData.findLast((m) => m > current)
     if (next) {
       goals.push({ current, next, label: 'Total clients', type: 'number' })
     }
   }
 
-  // Internation client count
+  // Internatiol client count
   {
     let current = new Set(
-      records
+      paidRecords
         .filter((r) => r.client.billing.country !== r.account.billing.country)
         .map((r) => r.client.id),
     ).size
@@ -1395,7 +1397,7 @@ function createGoals(records: Record[], milestones: Milestones): Goal[] {
 
   // Total revenue
   {
-    let current = records.filter(isPaidRecord).reduce((sum, r) => sum + total(r), 0)
+    let current = paidRecords.reduce((sum, r) => sum + total(r), 0)
     let next = milestones.revenueMilestonesData.findLast((m) => m > current)
     if (next) {
       goals.push({ current, next, label: 'Total revenue', type: 'money' })
