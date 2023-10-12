@@ -173,8 +173,9 @@ export function Dashboard({
           currency: me.currency,
         }}
       >
-        <main className="space-y-[--gap] px-4 py-8 [--gap:theme(spacing.4)] sm:px-6 lg:px-8">
+        <main className="grid grid-cols-10 gap-[--gap] px-4 py-8 [--gap:theme(spacing.4)] sm:px-6 lg:px-8">
           <ActionsBar
+            className="col-span-full"
             setRange={setRange}
             previous={previous}
             next={next}
@@ -189,65 +190,34 @@ export function Dashboard({
             setStrategy={setStrategy}
             previousRange={previousRange}
           />
-
-          <div
-            style={
-              {
-                '--cols': `repeat(${
-                  5 - (systemContainsQuotes ? 0 : 1) - (systemContainsInvoices ? 0 : 1)
-                }, minmax(0, 1fr))`,
-              } as React.CSSProperties
-            }
-            className="grid grid-cols-2 gap-[--gap] 2xl:grid-cols-[--cols]"
-          >
-            {systemContainsQuotes && <QuotesCell />}
-            {systemContainsInvoices && <InvoicesCell />}
-            {goals.length > 0 && <Goals goals={goals} />}
-
-            <div className="col-span-2 grid grid-cols-4 items-stretch gap-[--gap]">
-              <ReceiptsCell />
-              <UniqueClientsCell />
-              <BestPayingClientCell />
-              <OutstandingCell />
-              <PaidCell />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 gap-[--gap] 2xl:grid-cols-2">
-            <ActiveRecordsCell />
-            <AccumulativePaidInvoicesChart
-              currentRange={currentRange}
-              currentRecords={currentRecords}
-            />
-          </div>
-
-          <div className="grid grid-cols-5 gap-[--gap]">
-            <div className="col-span-2 flex flex-1 flex-col gap-[--gap]">
-              <div className="grid grid-cols-1 gap-[--gap] xl:grid-cols-2">
-                {systemContainsQuotes && (
-                  <>
-                    <FastestAcceptedQuoteCell />
-                    <SlowestAcceptedQuoteCell />
-                  </>
-                )}
-                <FastestPayingClientCell />
-                <SlowestPayingClientCell />
-              </div>
-
-              <TopPayingClientsCell />
-            </div>
-
-            <div className="col-span-3">
-              <PaidInvoicesChartCell
-                currentRange={currentRange}
-                strategy={strategy}
-                previous={previous}
-                next={next}
-                earliestDate={earliestDate}
-                latestDate={latestDate}
-              />
-            </div>
-          </div>
+          {systemContainsQuotes && <QuotesCell className="col-span-2 row-span-2" />}
+          {systemContainsInvoices && <InvoicesCell className="col-span-2 row-span-2" />}
+          {goals.length > 0 && <Goals className="col-span-2 row-span-2" goals={goals} />}
+          <ReceiptsCell className="col-span-1 row-span-1" />
+          <UniqueClientsCell className="col-span-1 row-span-1" />
+          <BestPayingClientCell className="col-span-2 row-span-1" />
+          <OutstandingCell className="col-span-2 row-span-1" />
+          <PaidCell className="col-span-2 row-span-1" />
+          <ActiveRecordsCell className="col-span-5" />
+          <AccumulativePaidInvoicesChart
+            className="col-span-5"
+            currentRange={currentRange}
+            currentRecords={currentRecords}
+          />
+          {systemContainsQuotes && <FastestAcceptedQuoteCell className="col-span-2" />}
+          {systemContainsQuotes && <SlowestAcceptedQuoteCell className="col-span-2" />}
+          <FastestPayingClientCell className="col-span-2" />
+          <SlowestPayingClientCell className="col-span-2" />
+          <TopPayingClientsCell className="col-span-4" />
+          <PaidInvoicesChartCell
+            className="col-span-6"
+            currentRange={currentRange}
+            strategy={strategy}
+            previous={previous}
+            next={next}
+            earliestDate={earliestDate}
+            latestDate={latestDate}
+          />
         </main>
       </I18NProvider>
     </CompareConfigContext.Provider>
@@ -257,6 +227,7 @@ export function Dashboard({
 // ---
 
 function ActionsBar({
+  className,
   setRange,
   previous,
   next,
@@ -271,6 +242,7 @@ function ActionsBar({
   strategy,
   setStrategy,
 }: {
+  className?: string
   setRange: React.Dispatch<React.SetStateAction<[Date, Date]>>
   previous: (value: Date, range: [start: Date, end: Date]) => Date
   next: (value: Date, range: [start: Date, end: Date]) => Date
@@ -288,7 +260,12 @@ function ActionsBar({
   let now = useCurrentDate()
 
   return (
-    <div className="sticky top-0 z-10 -mx-8 -mb-[calc(var(--gap)-1px)] -mt-[--gap] flex items-center justify-between bg-gray-100/20 px-8 py-[--gap] backdrop-blur dark:bg-zinc-800/20">
+    <div
+      className={classNames(
+        'sticky top-0 z-10 -mx-8 -mb-[calc(var(--gap)-1px)] -mt-[--gap] flex items-center justify-between bg-gray-100/20 px-8 py-[--gap] backdrop-blur dark:bg-zinc-800/20',
+        className,
+      )}
+    >
       <div className="flex flex-1 flex-wrap justify-between gap-2">
         <div className="flex items-center gap-2">
           <button
@@ -366,9 +343,9 @@ function ActionsBar({
 
 // ---
 
-function QuotesCell() {
+function QuotesCell({ className }: { className?: string }) {
   return (
-    <CompareGroup horizontalCount={5}>
+    <CompareGroup horizontalCount={5} className={className}>
       <CompareBlock
         title="Quotes"
         value={(list) => separateRecords(list).filter((r) => isQuote(r)).length}
@@ -412,9 +389,9 @@ function QuotesCell() {
   )
 }
 
-function InvoicesCell() {
+function InvoicesCell({ className }: { className?: string }) {
   return (
-    <CompareGroup horizontalCount={4}>
+    <CompareGroup horizontalCount={4} className={className}>
       <CompareBlock
         title="Invoices"
         value={(list) => separateRecords(list).filter((r) => isInvoice(r)).length}
@@ -455,28 +432,30 @@ function InvoicesCell() {
   )
 }
 
-function ReceiptsCell() {
+function ReceiptsCell({ className }: { className?: string }) {
   return (
     <CompareBlock
+      className={className}
       title="Receipts"
       value={(list) => separateRecords(list).filter((r) => isReceipt(r)).length}
     />
   )
 }
 
-function UniqueClientsCell() {
+function UniqueClientsCell({ className }: { className?: string }) {
   return (
     <CompareBlock
+      className={className}
       title="Unique clients"
       value={(list) => new Set(separateRecords(list).map((r) => r.client.id)).size}
     />
   )
 }
 
-function BestPayingClientCell() {
+function BestPayingClientCell({ className }: { className?: string }) {
   return (
     <CompareBlock<readonly [Client | null, number | null]>
-      className="col-span-2 row-start-2"
+      className={className}
       title="Best paying client"
       data={(list) => {
         let interestingRecords = separateRecords(list).filter(
@@ -518,10 +497,10 @@ function BestPayingClientCell() {
   )
 }
 
-function OutstandingCell() {
+function OutstandingCell({ className }: { className?: string }) {
   return (
     <CompareBlock
-      className="col-span-2"
+      className={className}
       inverse
       title="Outstanding"
       value={(list) =>
@@ -534,10 +513,10 @@ function OutstandingCell() {
   )
 }
 
-function PaidCell() {
+function PaidCell({ className }: { className?: string }) {
   return (
     <CompareBlock
-      className="col-span-2"
+      className={className}
       title="Paid"
       value={(list) => list.filter((e) => isPaidRecord(e)).reduce((acc, e) => acc + total(e), 0)}
       display={(value) => <Money amount={value} />}
@@ -545,7 +524,7 @@ function PaidCell() {
   )
 }
 
-function ActiveRecordsCell() {
+function ActiveRecordsCell({ className }: { className?: string }) {
   let { current } = useContext(CompareConfigContext)
   let data = current.filter((e) => isActiveRecord(e)).reverse()
 
@@ -554,6 +533,7 @@ function ActiveRecordsCell() {
       className={classNames(
         'flex flex-1 flex-col overflow-auto rounded-md bg-white shadow ring-1 ring-black/5 dark:bg-zinc-900',
         data.length === 0 && 'opacity-50 transition-opacity duration-300 hover:opacity-100',
+        className,
       )}
     >
       <div className="border-b p-4 dark:border-zinc-700/75 dark:text-zinc-400">
@@ -585,12 +565,13 @@ function ActiveRecordsCell() {
   )
 }
 
-function FastestAcceptedQuoteCell() {
+function FastestAcceptedQuoteCell({ className }: { className?: string }) {
   let now = useCurrentDate()
   let eventsBy = useLazyEventsForRecord()
 
   return (
     <CompareBlock<readonly [Record, number] | null>
+      className={className}
       inverse
       title={'Fastest accepted quote'}
       data={(list) =>
@@ -625,12 +606,13 @@ function FastestAcceptedQuoteCell() {
   )
 }
 
-function SlowestAcceptedQuoteCell() {
+function SlowestAcceptedQuoteCell({ className }: { className?: string }) {
   let now = useCurrentDate()
   let eventsBy = useLazyEventsForRecord()
 
   return (
     <CompareBlock<readonly [Record, number] | null>
+      className={className}
       inverse
       title={'Slowest accepted quote'}
       data={(list) =>
@@ -665,13 +647,14 @@ function SlowestAcceptedQuoteCell() {
   )
 }
 
-function FastestPayingClientCell() {
+function FastestPayingClientCell({ className }: { className?: string }) {
   let now = useCurrentDate()
   let eventsBy = useLazyEventsForRecord()
 
   return (
     <CompareBlock<readonly [Record, number] | null>
       inverse
+      className={className}
       title={'Fastest paying client'}
       data={(list) =>
         separateRecords(list)
@@ -706,13 +689,14 @@ function FastestPayingClientCell() {
   )
 }
 
-function SlowestPayingClientCell() {
+function SlowestPayingClientCell({ className }: { className?: string }) {
   let now = useCurrentDate()
   let eventsBy = useLazyEventsForRecord()
 
   return (
     <CompareBlock<readonly [Record, number] | null>
       inverse
+      className={className}
       title={'Slowest paying client'}
       data={(list) =>
         separateRecords(list)
@@ -747,7 +731,7 @@ function SlowestPayingClientCell() {
   )
 }
 
-function TopPayingClientsCell() {
+function TopPayingClientsCell({ className }: { className?: string }) {
   let { current } = useContext(CompareConfigContext)
   let totalInvoiceSales = current
     .filter((e) => isPaidRecord(e))
@@ -774,6 +758,7 @@ function TopPayingClientsCell() {
       className={classNames(
         'flex-1 overflow-auto rounded-md bg-white shadow ring-1 ring-black/5 dark:bg-zinc-900',
         data.length === 0 && 'opacity-50 transition-opacity duration-300 hover:opacity-100',
+        className,
       )}
     >
       <div className="border-b p-4 dark:border-zinc-700/75 dark:text-zinc-400">
@@ -821,6 +806,7 @@ function TopPayingClientsCell() {
 }
 
 function PaidInvoicesChartCell({
+  className,
   currentRange,
   strategy,
   previous,
@@ -828,6 +814,7 @@ function PaidInvoicesChartCell({
   earliestDate,
   latestDate,
 }: {
+  className?: string
   currentRange: { start: Date; end: Date }
   strategy: 'previous-period' | 'last-year'
   previous: (value: Date, range: [start: Date, end: Date]) => Date
@@ -839,6 +826,7 @@ function PaidInvoicesChartCell({
 
   return (
     <ComparisonChart
+      className={className}
       currentRange={currentRange}
       previousRecords={config.previous}
       currentRecords={config.current}
@@ -856,12 +844,12 @@ function PaidInvoicesChartCell({
 
 // ---
 
-function Goals({ goals }: { goals: Goal[] }) {
+function Goals({ className, goals }: { className?: string; goals: Goal[] }) {
   let [index, setIndex] = useState(0)
   let goal = goals[index]
 
   return (
-    <Card>
+    <Card className={className}>
       <CardTitle>
         <span className="flex items-center justify-between">
           <span>Goals</span>
@@ -926,12 +914,14 @@ function Goals({ goals }: { goals: Goal[] }) {
 }
 
 function ComparisonChart({
+  className,
   currentRange,
   previousRecords,
   currentRecords,
   previous,
   next,
 }: {
+  className?: string
   currentRange: { start: Date; end: Date }
   previousRecords: Record[]
   currentRecords: Record[]
@@ -1063,6 +1053,7 @@ function ComparisonChart({
       className={classNames(
         'flex h-full flex-1 flex-col overflow-auto rounded-md bg-white shadow ring-1 ring-black/5 dark:bg-zinc-900',
         !hasData && 'opacity-50 transition-opacity duration-300 hover:opacity-100',
+        className,
       )}
     >
       <div className="border-b p-4 dark:border-zinc-700/75 dark:text-zinc-400">
@@ -1193,9 +1184,10 @@ let CompareConfigContext = createContext<{
 }>({ withDiff: true, previous: [], current: [] })
 
 function CompareGroup({
+  className,
   horizontalCount,
   ...rest
-}: React.PropsWithChildren<{ horizontalCount: number }>) {
+}: React.PropsWithChildren<{ className?: string; horizontalCount: number }>) {
   return (
     <div
       data-grouped={true}
@@ -1204,7 +1196,10 @@ function CompareGroup({
           '--horizontal-count': horizontalCount,
         } as React.CSSProperties
       }
-      className="group grid grid-cols-[repeat(var(--horizontal-count),minmax(0,1fr))] gap-[calc(var(--gap)/2)] rounded-xl bg-white p-2 shadow ring-1 ring-black/5 dark:bg-zinc-900 first:[&>*]:col-[span_calc(var(--horizontal-count)-1)/_span_calc(var(--horizontal-count)-1)] first:[&>*]:row-span-2"
+      className={classNames(
+        'group grid grid-cols-[repeat(var(--horizontal-count),minmax(0,1fr))] gap-[calc(var(--gap)/2)] rounded-xl bg-white p-2 shadow ring-1 ring-black/5 dark:bg-zinc-900 first:[&>*]:col-[span_calc(var(--horizontal-count)-1)/_span_calc(var(--horizontal-count)-1)] first:[&>*]:row-span-2',
+        className,
+      )}
       {...rest}
     />
   )
@@ -1336,9 +1331,11 @@ function CompareBlock<T = Record[]>({
 }
 
 function AccumulativePaidInvoicesChart({
+  className,
   currentRange,
   currentRecords,
 }: {
+  className?: string
   currentRange: { start: Date; end: Date }
   currentRecords: Record[]
 }) {
@@ -1375,6 +1372,7 @@ function AccumulativePaidInvoicesChart({
       className={classNames(
         'flex h-full flex-1 flex-col overflow-auto rounded-md bg-white shadow ring-1 ring-black/5 dark:bg-zinc-900',
         !hasData && 'opacity-50 transition-opacity duration-300 hover:opacity-100',
+        className,
       )}
     >
       <div className="border-b p-4 dark:border-zinc-700/75 dark:text-zinc-400">

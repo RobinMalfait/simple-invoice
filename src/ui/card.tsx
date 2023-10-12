@@ -5,9 +5,14 @@ import { classNames } from '~/ui/class-names'
 import { Classified } from '~/ui/classified'
 import { match } from '~/utils/match'
 
-export function Card({ children }: React.PropsWithChildren<{}>) {
+export function Card({ className, children }: React.PropsWithChildren<{ className?: string }>) {
   return (
-    <div className="flex flex-1 flex-col rounded-lg bg-[--bg] shadow ring-1 ring-black/5 [--bg:white] dark:text-gray-300 dark:[--bg:theme(colors.zinc.900)]">
+    <div
+      className={classNames(
+        'flex flex-1 flex-col rounded-lg bg-[--bg] shadow ring-1 ring-black/5 [--bg:white] dark:text-gray-300 dark:[--bg:theme(colors.zinc.900)]',
+        className,
+      )}
+    >
       {children}
     </div>
   )
