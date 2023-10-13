@@ -173,7 +173,11 @@ export function Dashboard({
           currency: me.currency,
         }}
       >
-        <main className="grid grid-cols-10 gap-[--gap] px-4 py-8 [--gap:theme(spacing.4)] sm:px-6 lg:px-8">
+        <div
+          data-no-quotes={systemContainsQuotes ? null : true}
+          data-no-invoices={systemContainsInvoices ? null : true}
+          className="group grid gap-[--gap] px-4 py-8 [--gap:theme(spacing.4)] sm:px-6 lg:grid-cols-10 lg:px-8"
+        >
           <ActionsBar
             className="col-span-full"
             setRange={setRange}
@@ -190,9 +194,18 @@ export function Dashboard({
             setStrategy={setStrategy}
             previousRange={previousRange}
           />
-          {systemContainsQuotes && <QuotesCell className="col-span-2 row-span-2" />}
-          {systemContainsInvoices && <InvoicesCell className="col-span-2 row-span-2" />}
-          {goals.length > 0 && <Goals className="col-span-2 row-span-2" goals={goals} />}
+          {systemContainsQuotes && (
+            <QuotesCell className="col-span-2 row-span-2 group-data-[no-invoices]:col-span-3" />
+          )}
+          {systemContainsInvoices && (
+            <InvoicesCell className="col-span-2 row-span-2 group-data-[no-quotes]:col-span-3" />
+          )}
+          {goals.length > 0 && (
+            <Goals
+              className="col-span-2 row-span-2 group-data-[no-quotes]:col-span-3"
+              goals={goals}
+            />
+          )}
           <ReceiptsCell className="col-span-1 row-span-1" />
           <UniqueClientsCell className="col-span-1 row-span-1" />
           <BestPayingClientCell className="col-span-2 row-span-1" />
@@ -210,7 +223,7 @@ export function Dashboard({
           <SlowestPayingClientCell className="col-span-2" />
           <TopPayingClientsCell className="col-span-4" />
           <PaidInvoicesChartCell
-            className="col-span-6"
+            className="col-span-6 col-start-5 row-span-3 row-start-5 group-data-[no-quotes]:row-span-2 group-data-[no-quotes]:row-start-5"
             currentRange={currentRange}
             strategy={strategy}
             previous={previous}
@@ -218,7 +231,7 @@ export function Dashboard({
             earliestDate={earliestDate}
             latestDate={latestDate}
           />
-        </main>
+        </div>
       </I18NProvider>
     </CompareConfigContext.Provider>
   )
