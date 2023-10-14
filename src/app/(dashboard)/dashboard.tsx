@@ -176,7 +176,7 @@ export function Dashboard({
         <div
           data-no-quotes={systemContainsQuotes ? null : true}
           data-no-invoices={systemContainsInvoices ? null : true}
-          className="group grid gap-[--gap] px-4 py-8 [--gap:theme(spacing.4)] sm:px-6 lg:grid-cols-10 lg:px-8"
+          className="group grid grid-flow-row-dense grid-cols-2 gap-[--gap] px-4 py-8 [--gap:theme(spacing.4)] sm:px-6 lg:grid-cols-10 lg:px-8"
         >
           <ActionsBar
             className="col-span-full"
@@ -194,36 +194,37 @@ export function Dashboard({
             setStrategy={setStrategy}
             previousRange={previousRange}
           />
+
           {systemContainsQuotes && (
-            <QuotesCell className="col-span-2 row-span-2 group-data-[no-invoices]:col-span-3" />
+            <QuotesCell className="lg:col-span-2 lg:row-span-2 lg:group-data-[no-invoices]:col-span-3" />
           )}
           {systemContainsInvoices && (
-            <InvoicesCell className="col-span-2 row-span-2 group-data-[no-quotes]:col-span-3" />
+            <InvoicesCell className="lg:col-span-2 lg:row-span-2 lg:group-data-[no-quotes]:col-span-3" />
           )}
           {goals.length > 0 && (
             <Goals
-              className="col-span-2 row-span-2 group-data-[no-quotes]:col-span-3"
+              className="lg:col-span-2 lg:row-span-2 lg:group-data-[no-quotes]:col-span-3"
               goals={goals}
             />
           )}
           <ReceiptsCell className="col-span-1 row-span-1" />
           <UniqueClientsCell className="col-span-1 row-span-1" />
-          <BestPayingClientCell className="col-span-2 row-span-1" />
-          <OutstandingCell className="col-span-2 row-span-1" />
-          <PaidCell className="col-span-2 row-span-1" />
-          <ActiveRecordsCell className="col-span-5" />
+          <BestPayingClientCell className="row-span-1 lg:col-span-2" />
+          <OutstandingCell className="row-span-1 lg:col-span-2" />
+          <PaidCell className="row-span-1 lg:col-span-2" />
+          <ActiveRecordsCell className="col-span-2 lg:col-span-5 lg:row-start-4" />
           <AccumulativePaidInvoicesChart
-            className="col-span-5"
+            className="col-span-2 lg:col-span-5 lg:row-start-4"
             currentRange={currentRange}
             currentRecords={currentRecords}
           />
-          {systemContainsQuotes && <FastestAcceptedQuoteCell className="col-span-2" />}
-          {systemContainsQuotes && <SlowestAcceptedQuoteCell className="col-span-2" />}
-          <FastestPayingClientCell className="col-span-2" />
-          <SlowestPayingClientCell className="col-span-2" />
-          <TopPayingClientsCell className="col-span-4" />
+          {systemContainsQuotes && <FastestAcceptedQuoteCell className="lg:col-span-2" />}
+          {systemContainsQuotes && <SlowestAcceptedQuoteCell className="lg:col-span-2" />}
+          <FastestPayingClientCell className="lg:col-span-2" />
+          <SlowestPayingClientCell className="lg:col-span-2" />
+          <TopPayingClientsCell className="lg:col-span-4" />
           <PaidInvoicesChartCell
-            className="col-span-6 col-start-5 row-span-3 row-start-5 group-data-[no-quotes]:row-span-2 group-data-[no-quotes]:row-start-5"
+            className="col-span-2 lg:col-span-6 lg:col-start-5 lg:row-span-3 lg:row-start-5 lg:group-data-[no-quotes]:row-span-2 lg:group-data-[no-quotes]:row-start-5"
             currentRange={currentRange}
             strategy={strategy}
             previous={previous}
