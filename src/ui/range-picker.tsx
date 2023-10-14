@@ -12,87 +12,55 @@ import {
   endOfMonth,
   endOfQuarter,
   endOfYear,
-  min,
   startOfDay,
   startOfMonth,
   startOfQuarter,
   startOfYear,
   subDays,
-  subMonths,
-  subQuarters,
-  subYears,
 } from 'date-fns'
 import { FormatRange } from '~/ui/date-range'
 import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from '~/ui/headlessui'
 
 type Preset = [
   string,
-  (now: Date) => [Date | undefined, Date | undefined],
-  (value: Date, range: [start: Date, end: Date]) => Date,
-  (value: Date, range: [start: Date, end: Date]) => Date,
+  (now: Date, offsetMultiplier: number) => [Date | undefined, Date | undefined],
 ]
 
 export let options: Preset[] = [
-  [
-    'Today',
-    (now) => [startOfDay(now), endOfDay(now)],
-    (value) => subDays(value, 1),
-    (value) => addDays(value, 1),
-  ],
+  ['Today', (now, n = 1) => [startOfDay(addDays(now, 1 * n)), endOfDay(addDays(now, 1 * n))]],
   [
     'Yesterday',
-    (now) => [subDays(startOfDay(now), 1), subDays(endOfDay(now), 1)],
-    (value) => subDays(value, 1),
-    (value) => addDays(value, 1),
+    (now, n) => [
+      subDays(startOfDay(addDays(now, 1 * n)), 1),
+      subDays(endOfDay(addDays(now, 1 * n)), 1),
+    ],
   ],
   [
     'Last 7 days',
-    (now) => [subDays(startOfDay(now), 7), endOfDay(now)],
-    (value) => subDays(value, 7),
-    (value) => addDays(value, 7),
+    (now, n) => [subDays(startOfDay(addDays(now, 7 * n)), 7), endOfDay(addDays(now, 7 * n))],
   ],
   [
     'Last 30 days',
-    (now) => [subDays(startOfDay(now), 30), endOfDay(now)],
-    (value) => subDays(value, 30),
-    (value) => addDays(value, 30),
+    (now, n) => [subDays(startOfDay(addDays(now, 30 * n)), 30), endOfDay(addDays(now, 30 * n))],
   ],
   [
     'This month',
-    (now) => [startOfMonth(startOfDay(now)), endOfMonth(endOfDay(now))],
-    (x) => subMonths(x, 1),
-    (x) => addMonths(x, 1),
+    (now, n) => [
+      startOfMonth(startOfDay(addMonths(now, 1 * n))),
+      endOfMonth(endOfDay(addMonths(now, 1 * n))),
+    ],
   ],
   [
     'Quarter to date',
-    (now) => [startOfQuarter(now), now],
-    (value) => subQuarters(value, 1),
-    (value) => addQuarters(value, 1),
+    (now, n) => [startOfQuarter(addQuarters(now, 1 * n)), addQuarters(now, 1 * n)],
   ],
   [
     'This quarter',
-    (now) => [startOfQuarter(now), endOfQuarter(now)],
-    (value) => subQuarters(value, 1),
-    (value) => addQuarters(value, 1),
+    (now, n) => [startOfQuarter(addQuarters(now, 1 * n)), endOfQuarter(addQuarters(now, 1 * n))],
   ],
-  [
-    'Year to date',
-    (now) => [startOfYear(now), now],
-    (value) => subYears(value, 1),
-    (value) => addYears(value, 1),
-  ],
-  [
-    'This year',
-    (now) => [startOfYear(now), endOfYear(now)],
-    (value) => subYears(value, 1),
-    (value) => addYears(value, 1),
-  ],
-  [
-    'All',
-    (_now) => [undefined, undefined],
-    (_value, range) => subDays(min(range), 1),
-    (_value, range) => addDays(min(range), 1),
-  ],
+  ['Year to date', (now, n) => [startOfYear(addYears(now, 1 * n)), addYears(now, 1 * n)]],
+  ['This year', (now, n) => [startOfYear(addYears(now, 1 * n)), endOfYear(addYears(now, 1 * n))]],
+  ['All', (_now) => [undefined, undefined]],
 ]
 
 export function RangePicker({

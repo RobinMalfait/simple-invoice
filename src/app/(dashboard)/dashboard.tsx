@@ -3,10 +3,12 @@
 import { ArrowDownIcon, ArrowUpIcon } from '@heroicons/react/20/solid'
 import { ArrowSmallLeftIcon, ArrowSmallRightIcon } from '@heroicons/react/24/outline'
 import {
+  addHours,
   addSeconds,
   addYears,
   compareAsc,
   differenceInDays,
+  differenceInHours,
   differenceInSeconds,
   eachDayOfInterval,
   eachHourOfInterval,
@@ -26,10 +28,20 @@ import {
   isSameMonth,
   isSameWeek,
   isWithinInterval,
+  subHours,
   subYears,
 } from 'date-fns'
 import Link from 'next/link'
-import { Fragment, createContext, useContext, useEffect, useMemo, useState } from 'react'
+import {
+  ContextType,
+  Fragment,
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useReducer,
+  useState,
+} from 'react'
 import {
   CartesianGrid,
   Legend,
@@ -68,10 +80,8 @@ import { FormatRange } from '~/ui/date-range'
 import { Empty } from '~/ui/empty'
 import { useCurrencyFormatter } from '~/ui/hooks/use-currency-formatter'
 import { useCurrentDate } from '~/ui/hooks/use-current-date'
-import { useEvent } from '~/ui/hooks/use-event'
 import { useLazyEventsForRecord } from '~/ui/hooks/use-events-by'
 import { I18NProvider } from '~/ui/hooks/use-i18n'
-import { useLocalStorageState } from '~/ui/hooks/use-local-storage'
 import { total } from '~/ui/invoice/total'
 import { Money } from '~/ui/money'
 import { RangePicker, options } from '~/ui/range-picker'
@@ -94,16 +104,67 @@ export function Dashboard({
   records: Record[]
   milestones: Milestones
 }) {
-  let [presetName, setPresetName] = useLocalStorageState('dashboard.preset-name', 'This quarter')
-  let [, range, previous, next] = options.find((e) => e[0] === presetName)!
+  let allRecords = separateRecords(records)
+  let systemContainsQuotes = allRecords.some((r) => isQuote(r))
+  let systemContainsInvoices = allRecords.some((r) => isInvoice(r))
 
-  let [strategy, setStrategy] = useLocalStorageState<'previous-period' | 'last-year'>(
-    'dashboard.strategy',
-    'previous-period',
+  return (
+    <DashboardProvider data={{ account: me, records, milestones }}>
+      <div
+        data-no-quotes={systemContainsQuotes ? null : true}
+        data-no-invoices={systemContainsInvoices ? null : true}
+        className="group grid grid-flow-row-dense grid-cols-2 gap-[--gap] px-4 py-8 [--gap:theme(spacing.4)] sm:px-6 lg:grid-cols-10 lg:px-8"
+      >
+        <ActionsBar className="col-span-full" />
+        {systemContainsQuotes && (
+          <QuotesCell className="lg:col-span-2 lg:row-span-2 lg:group-data-[no-invoices]:col-span-3" />
+        )}
+        {systemContainsInvoices && (
+          <InvoicesCell className="lg:col-span-2 lg:row-span-2 lg:group-data-[no-quotes]:col-span-3" />
+        )}
+        <GoalsCell className="lg:col-span-2 lg:row-span-2 lg:group-data-[no-quotes]:col-span-3" />
+        <ReceiptsCell className="col-span-1 row-span-1" />
+        <UniqueClientsCell className="col-span-1 row-span-1" />
+        <BestPayingClientCell className="row-span-1 lg:col-span-2" />
+        <OutstandingCell className="row-span-1 lg:col-span-2" />
+        <PaidCell className="row-span-1 lg:col-span-2" />
+        <ActiveRecordsCell className="col-span-2 lg:col-span-5 lg:row-start-4" />
+        <AccumulativePaidInvoicesChartCell className="col-span-2 lg:col-span-5 lg:row-start-4" />
+        {systemContainsQuotes && <FastestAcceptedQuoteCell className="lg:col-span-2" />}
+        {systemContainsQuotes && <SlowestAcceptedQuoteCell className="lg:col-span-2" />}
+        <FastestPayingClientCell className="lg:col-span-2" />
+        <SlowestPayingClientCell className="lg:col-span-2" />
+        <TopPayingClientsCell className="lg:col-span-4" />
+        <PaidInvoicesChartCell className="col-span-2 lg:col-span-6 lg:col-start-5 lg:row-span-3 lg:row-start-5 lg:group-data-[no-quotes]:row-span-2 lg:group-data-[no-quotes]:row-start-5" />
+      </div>
+    </DashboardProvider>
   )
+}
 
+// ---
+
+function DashboardProvider({
+  children,
+  data: { account, records, milestones },
+}: {
+  children: React.ReactNode
+  data: {
+    account: Account
+    records: Record[]
+    milestones: Milestones
+  }
+}) {
   let now = useCurrentDate()
+  let [state, dispatch] = useReducer(dashboardReducer, {
+    preset: 'This quarter',
+    strategy: 'previous-period',
+    offset: 0,
+  })
 
+  // Preset
+  let range = useMemo(() => options.find((e) => e[0] === state.preset)![1], [state.preset])
+
+  // Compute maximum allowed range
   let [earliestDate = now, latestDate = now] = useMemo(() => {
     if (records.length <= 0) return [undefined, undefined]
 
@@ -117,161 +178,168 @@ export function Dashboard({
     return [resolveRelevantRecordDate(earliest), resolveRelevantRecordDate(latest)]
   }, [records])
 
-  let [[start = earliestDate, end = latestDate], setRange] = useState<[Date, Date]>(
-    () => range(now) as [Date, Date],
-  )
+  let currentRange = useMemo(() => {
+    let [start = earliestDate, end = latestDate] = range(now, state.offset)
+    return { start, end }
+  }, [earliestDate, latestDate, range, now, state.offset])
 
-  // Reset when preset changes
-  let reset = useEvent(() => {
-    let [start = earliestDate, end = latestDate] = range(now)
-    setRange([start, end])
-  })
-  useEffect(() => reset(), [presetName, reset])
+  let previousRange = useMemo(() => {
+    return match(state.strategy, {
+      'previous-period': () => {
+        let [start = earliestDate, end = latestDate] = range(now, state.offset - 1)
+        return { start, end }
+      },
+      'last-year': () => {
+        return {
+          start: subYears(currentRange.start, 1),
+          end: subYears(currentRange.end, 1),
+        }
+      },
+    })
+  }, [currentRange.end, currentRange.start, earliestDate, latestDate, now, range, state])
 
-  let previousRange = match(strategy, {
-    'previous-period': () => {
-      return {
-        start: previous(start, [start, end]),
-        end: previous(end, [start, end]),
-      }
-    },
-    'last-year': () => {
-      return {
-        start: subYears(start, 1),
-        end: subYears(end, 1),
-      }
-    },
-  })
+  let previousRecords = useMemo(() => {
+    return records.filter((r) => isWithinInterval(resolveRelevantRecordDate(r), previousRange))
+  }, [records, previousRange])
 
-  let currentRange = { start, end }
+  let currentRecords = useMemo(() => {
+    return records.filter((r) => isWithinInterval(resolveRelevantRecordDate(r), currentRange))
+  }, [records, currentRange])
 
-  let previousRecords = records.filter((r) =>
-    isWithinInterval(resolveRelevantRecordDate(r), previousRange),
-  )
-  let currentRecords = records.filter((r) =>
-    isWithinInterval(resolveRelevantRecordDate(r), currentRange),
-  )
+  let data: ContextType<typeof DashboardDataContext> = {
+    preset: state.preset,
+    strategy: state.strategy,
+    previous: previousRecords,
+    current: currentRecords,
+    previousRange,
+    currentRange,
+    milestones,
+  }
 
-  let allRecords = separateRecords(records)
-  let systemContainsQuotes = allRecords.some((r) => isQuote(r))
-  let systemContainsInvoices = allRecords.some((r) => isInvoice(r))
-
-  let goals = createGoals(currentRecords, milestones)
+  let actions = useMemo<ContextType<typeof DashboardActionsContext>>(() => {
+    return {
+      choosePreset: (preset) => dispatch({ type: ActionTypes.ChoosePreset, preset }),
+      chooseStrategy: (strategy) => dispatch({ type: ActionTypes.ChooseStrategy, strategy }),
+      previous: () => dispatch({ type: ActionTypes.Previous }),
+      today: () => dispatch({ type: ActionTypes.Today }),
+      next: () => dispatch({ type: ActionTypes.Next }),
+    }
+  }, [dispatch])
 
   return (
-    <CompareConfigContext.Provider
-      value={{
-        previous: previousRecords,
-        current: currentRecords,
-        withDiff: isAfter(previousRange.end, earliestDate),
-      }}
-    >
-      <I18NProvider
-        value={{
-          // Prefer my language/currency when looking at the overview of records.
-          language: me.language,
-          currency: me.currency,
-        }}
-      >
-        <div
-          data-no-quotes={systemContainsQuotes ? null : true}
-          data-no-invoices={systemContainsInvoices ? null : true}
-          className="group grid grid-flow-row-dense grid-cols-2 gap-[--gap] px-4 py-8 [--gap:theme(spacing.4)] sm:px-6 lg:grid-cols-10 lg:px-8"
+    <DashboardActionsContext.Provider value={actions}>
+      <I18NProvider value={{ language: account.language, currency: account.currency }}>
+        <CompareConfigContext.Provider
+          value={{
+            previous: previousRecords,
+            current: currentRecords,
+            withDiff: isAfter(previousRange.end, earliestDate),
+          }}
         >
-          <ActionsBar
-            className="col-span-full"
-            setRange={setRange}
-            previous={previous}
-            next={next}
-            earliestDate={earliestDate}
-            latestDate={latestDate}
-            range={range}
-            presetName={presetName}
-            setPresetName={setPresetName}
-            start={start}
-            end={end}
-            strategy={strategy}
-            setStrategy={setStrategy}
-            previousRange={previousRange}
-          />
-
-          {systemContainsQuotes && (
-            <QuotesCell className="lg:col-span-2 lg:row-span-2 lg:group-data-[no-invoices]:col-span-3" />
-          )}
-          {systemContainsInvoices && (
-            <InvoicesCell className="lg:col-span-2 lg:row-span-2 lg:group-data-[no-quotes]:col-span-3" />
-          )}
-          {goals.length > 0 && (
-            <Goals
-              className="lg:col-span-2 lg:row-span-2 lg:group-data-[no-quotes]:col-span-3"
-              goals={goals}
-            />
-          )}
-          <ReceiptsCell className="col-span-1 row-span-1" />
-          <UniqueClientsCell className="col-span-1 row-span-1" />
-          <BestPayingClientCell className="row-span-1 lg:col-span-2" />
-          <OutstandingCell className="row-span-1 lg:col-span-2" />
-          <PaidCell className="row-span-1 lg:col-span-2" />
-          <ActiveRecordsCell className="col-span-2 lg:col-span-5 lg:row-start-4" />
-          <AccumulativePaidInvoicesChart
-            className="col-span-2 lg:col-span-5 lg:row-start-4"
-            currentRange={currentRange}
-            currentRecords={currentRecords}
-          />
-          {systemContainsQuotes && <FastestAcceptedQuoteCell className="lg:col-span-2" />}
-          {systemContainsQuotes && <SlowestAcceptedQuoteCell className="lg:col-span-2" />}
-          <FastestPayingClientCell className="lg:col-span-2" />
-          <SlowestPayingClientCell className="lg:col-span-2" />
-          <TopPayingClientsCell className="lg:col-span-4" />
-          <PaidInvoicesChartCell
-            className="col-span-2 lg:col-span-6 lg:col-start-5 lg:row-span-3 lg:row-start-5 lg:group-data-[no-quotes]:row-span-2 lg:group-data-[no-quotes]:row-start-5"
-            currentRange={currentRange}
-            strategy={strategy}
-            previous={previous}
-            next={next}
-            earliestDate={earliestDate}
-            latestDate={latestDate}
-          />
-        </div>
+          <DashboardDataContext.Provider value={data}>{children}</DashboardDataContext.Provider>
+        </CompareConfigContext.Provider>
       </I18NProvider>
-    </CompareConfigContext.Provider>
+    </DashboardActionsContext.Provider>
   )
 }
 
 // ---
 
-function ActionsBar({
-  className,
-  setRange,
-  previous,
-  next,
-  earliestDate,
-  latestDate,
-  range,
-  presetName,
-  setPresetName,
-  start,
-  end,
-  previousRange,
-  strategy,
-  setStrategy,
-}: {
-  className?: string
-  setRange: React.Dispatch<React.SetStateAction<[Date, Date]>>
-  previous: (value: Date, range: [start: Date, end: Date]) => Date
-  next: (value: Date, range: [start: Date, end: Date]) => Date
-  earliestDate: Date
-  latestDate: Date
-  range: (now: Date) => [Date | undefined, Date | undefined]
-  presetName: string
-  setPresetName: React.Dispatch<React.SetStateAction<string>>
-  start: Date
-  end: Date
+let DashboardDataContext = createContext<{
+  preset: DashboardState['preset']
+  strategy: DashboardState['strategy']
+  milestones: Milestones
+  current: Record[]
+  previous: Record[]
+  currentRange: {
+    start: Date
+    end: Date
+  }
+  previousRange: {
+    start: Date
+    end: Date
+  }
+} | null>(null)
+function useDashboardData() {
+  let context = useContext(DashboardDataContext)
+  if (context === null) {
+    throw new Error('useDashboardData() is used without a parent <DashboardProvider />')
+  }
+  return context
+}
+
+let DashboardActionsContext = createContext<{
+  choosePreset(preset: DashboardState['preset']): void
+  chooseStrategy(strategy: DashboardState['strategy']): void
+
+  previous(): void
+  today(): void
+  next(): void
+} | null>(null)
+function useDashboardActions() {
+  let context = useContext(DashboardActionsContext)
+  if (context === null) {
+    throw new Error('useDashboardActions() is used without a parent <DashboardProvider />')
+  }
+  return context
+}
+
+// ---
+
+type DashboardState = {
+  preset: string
   strategy: 'previous-period' | 'last-year'
-  setStrategy: React.Dispatch<React.SetStateAction<'previous-period' | 'last-year'>>
-  previousRange: { start: Date; end: Date }
-}) {
-  let now = useCurrentDate()
+  offset: number
+}
+
+enum ActionTypes {
+  // Configuration
+  ChoosePreset,
+  ChooseStrategy,
+
+  // Actions
+  Previous,
+  Today,
+  Next,
+}
+
+type Actions =
+  | { type: ActionTypes.ChoosePreset; preset: DashboardState['preset'] }
+  | { type: ActionTypes.ChooseStrategy; strategy: DashboardState['strategy'] }
+  | { type: ActionTypes.Previous }
+  | { type: ActionTypes.Today }
+  | { type: ActionTypes.Next }
+
+let reducers: {
+  [P in ActionTypes]: (
+    state: DashboardState,
+    action: Extract<Actions, { type: P }>,
+  ) => DashboardState
+} = {
+  [ActionTypes.ChoosePreset](state, action) {
+    return { ...state, preset: action.preset, offset: 0 }
+  },
+  [ActionTypes.ChooseStrategy](state, action) {
+    return { ...state, strategy: action.strategy }
+  },
+  [ActionTypes.Previous](state) {
+    return { ...state, offset: state.offset - 1 }
+  },
+  [ActionTypes.Today](state) {
+    return { ...state, offset: 0 }
+  },
+  [ActionTypes.Next](state) {
+    return { ...state, offset: state.offset + 1 }
+  },
+}
+
+function dashboardReducer(state: DashboardState, action: Actions) {
+  return match(action.type, reducers, state, action)
+}
+
+function ActionsBar({ className }: { className?: string }) {
+  let data = useDashboardData()
+  let actions = useDashboardActions()
 
   return (
     <div
@@ -285,12 +353,7 @@ function ActionsBar({
           <button
             title="Previous period"
             className="aspect-square rounded-md bg-white px-2 py-1.5 text-sm shadow ring-1 ring-black/10 dark:bg-zinc-900/75 dark:text-zinc-300"
-            onClick={() =>
-              setRange(([start, end]) => [
-                previous(start, [start, end]),
-                previous(end, [start, end]),
-              ])
-            }
+            onClick={() => actions.previous()}
           >
             <ArrowSmallLeftIcon className="h-4 w-4" />
           </button>
@@ -299,8 +362,7 @@ function ActionsBar({
             title="Current period"
             className="aspect-square rounded-md bg-white px-2 py-1.5 text-sm shadow ring-1 ring-black/10 dark:bg-zinc-900/75 dark:text-zinc-300"
             onClick={() => {
-              let [start = earliestDate, end = latestDate] = range(now)
-              setRange([start, end])
+              actions.today()
             }}
           >
             <div className="flex h-4 w-4 items-center justify-center">
@@ -311,19 +373,22 @@ function ActionsBar({
           <button
             title="Next period"
             className="aspect-square rounded-md bg-white px-2 py-1.5 text-sm shadow ring-1 ring-black/10 dark:bg-zinc-900/75 dark:text-zinc-300"
-            onClick={() =>
-              setRange(([start, end]) => [next(start, [start, end]), next(end, [start, end])])
-            }
+            onClick={() => actions.next()}
           >
             <ArrowSmallRightIcon className="h-4 w-4" />
           </button>
 
-          <RangePicker value={presetName} start={start} end={end} onChange={setPresetName} />
+          <RangePicker
+            value={data.preset}
+            start={data.currentRange.start}
+            end={data.currentRange.end}
+            onChange={(preset) => actions.choosePreset(preset)}
+          />
 
           <div className="flex items-center gap-2 text-xs dark:text-zinc-400">
             <span>vs</span>
             <span className="text-sm dark:text-zinc-300">
-              <FormatRange start={previousRange.start} end={previousRange.end} />
+              <FormatRange start={data.previousRange.start} end={data.previousRange.end} />
             </span>
           </div>
         </div>
@@ -335,14 +400,15 @@ function ActionsBar({
               [
                 ['previous-period', 'Previous period'],
                 ['last-year', 'Same period last year'],
-              ] as [typeof strategy, string][]
+              ] as [typeof data.strategy, string][]
             ).map(([key, label]) => (
               <button
                 key={key}
-                onClick={() => setStrategy(key)}
+                onClick={() => actions.chooseStrategy(key)}
                 className={classNames(
                   'flex items-center gap-1 rounded-md px-2 py-1.5 text-sm dark:text-zinc-300',
-                  strategy === key && 'bg-white shadow ring-1 ring-black/10 dark:bg-zinc-900/75',
+                  data.strategy === key &&
+                    'bg-white shadow ring-1 ring-black/10 dark:bg-zinc-900/75',
                 )}
               >
                 {label}
@@ -819,44 +885,56 @@ function TopPayingClientsCell({ className }: { className?: string }) {
   )
 }
 
-function PaidInvoicesChartCell({
-  className,
-  currentRange,
-  strategy,
-  previous,
-  next,
-  earliestDate,
-  latestDate,
-}: {
-  className?: string
-  currentRange: { start: Date; end: Date }
-  strategy: 'previous-period' | 'last-year'
-  previous: (value: Date, range: [start: Date, end: Date]) => Date
-  next: (value: Date, range: [start: Date, end: Date]) => Date
-  earliestDate: Date
-  latestDate: Date
-}) {
+function PaidInvoicesChartCell({ className }: { className?: string }) {
+  let data = useDashboardData()
   let config = useContext(CompareConfigContext)
+
+  let rangeDifferenceInHours = useMemo(() => {
+    return Math.max(
+      differenceInHours(data.currentRange.start, data.previousRange.start),
+      differenceInHours(data.currentRange.end, data.previousRange.end),
+    )
+  }, [data.previousRange, data.currentRange])
+  let previous = useCallback(
+    (value: Date) => {
+      return match(data.strategy, {
+        'previous-period': () => subHours(value, rangeDifferenceInHours),
+        'last-year': () => subYears(value, 1),
+      })
+    },
+    [data.strategy, rangeDifferenceInHours],
+  )
+  let next = useCallback(
+    (value: Date) => {
+      return match(data.strategy, {
+        'previous-period': () => addHours(value, rangeDifferenceInHours),
+        'last-year': () => addYears(value, 1),
+      })
+    },
+    [data.strategy, rangeDifferenceInHours],
+  )
 
   return (
     <ComparisonChart
       className={className}
-      currentRange={currentRange}
+      currentRange={data.currentRange}
       previousRecords={config.previous}
       currentRecords={config.current}
-      previous={match(strategy, {
-        'previous-period': () => (value: Date) => previous(value, [earliestDate, latestDate]),
-        'last-year': () => (value: Date) => subYears(value, 1),
-      })}
-      next={match(strategy, {
-        'previous-period': () => (value: Date) => next(value, [earliestDate, latestDate]),
-        'last-year': () => (value: Date) => addYears(value, 1),
-      })}
+      previous={previous}
+      next={next}
     />
   )
 }
 
 // ---
+
+function GoalsCell({ className }: { className?: string }) {
+  let data = useDashboardData()
+  let goals = createGoals(data.current, data.milestones)
+  if (goals.length <= 0) return null
+
+  return <Goals className={className} goals={goals} />
+}
 
 function Goals({ className, goals }: { className?: string; goals: Goal[] }) {
   let [index, setIndex] = useState(0)
@@ -1344,6 +1422,18 @@ function CompareBlock<T = Record[]>({
   )
 }
 
+function AccumulativePaidInvoicesChartCell({ className }: { className?: string }) {
+  let data = useDashboardData()
+
+  return (
+    <AccumulativePaidInvoicesChart
+      className={className}
+      currentRange={data.currentRange}
+      currentRecords={data.current}
+    />
+  )
+}
+
 function AccumulativePaidInvoicesChart({
   className,
   currentRange,
@@ -1534,8 +1624,6 @@ function createGoals(records: Record[], milestones: Milestones): Goal[] {
       .filter((g) => g.current / g.next !== 0)
 
       // Sort goals by progress
-      .sort((a, z) => {
-        return z.current / z.next - a.current / a.next
-      })
+      .sort((a, z) => z.current / z.next - a.current / a.next)
   )
 }
