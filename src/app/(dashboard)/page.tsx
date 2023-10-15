@@ -1,6 +1,7 @@
 import { Dashboard } from './dashboard'
 
 import { compareDesc } from 'date-fns'
+import { load } from '~/app/(db)/actions'
 import { me, records as rawRecords } from '~/data'
 import {
   clientCountMilestonesData,
@@ -10,7 +11,8 @@ import {
 } from '~/domain/milestone/milestone'
 import { combineRecords, resolveRelevantRecordDate } from '~/domain/record/record'
 
-export default function Page() {
+export default async function Page() {
+  let config = await load()
   let records = combineRecords(rawRecords).sort(
     (a, z) =>
       compareDesc(resolveRelevantRecordDate(a), resolveRelevantRecordDate(z)) ||
@@ -27,6 +29,7 @@ export default function Page() {
         invoiceCountMilestonesData,
         revenueMilestonesData,
       }}
+      dashboardConfig={config.ui.dashboard}
     />
   )
 }

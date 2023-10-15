@@ -16,6 +16,11 @@ export type DB = {
   ui: {
     sidebar: 'small' | 'large'
     classified: boolean
+    dashboard: {
+      preset: string
+      strategy: 'previous-period' | 'last-year'
+      offset: number
+    }
   }
 }
 
@@ -23,6 +28,11 @@ let defaults: DB = {
   ui: {
     sidebar: 'large',
     classified: env.CLASSIFIED_MODE,
+    dashboard: {
+      preset: 'This quarter',
+      strategy: 'previous-period',
+      offset: 0,
+    },
   },
 }
 
@@ -33,6 +43,10 @@ function mergeWithDefaults(data: DB, defaults: DB) {
     ui: {
       ...defaults.ui,
       ...data.ui,
+      dashboard: {
+        ...defaults.ui.dashboard,
+        ...data.ui.dashboard,
+      },
     },
   }
 }
@@ -65,5 +79,11 @@ export async function toggleSidebar() {
 export async function toggleClassified() {
   return mutate((config) => {
     config.ui.classified = !config.ui.classified
+  })
+}
+
+export async function setDashboardConfig(dashboard: DB['ui']['dashboard']) {
+  return mutate((config) => {
+    config.ui.dashboard = dashboard
   })
 }

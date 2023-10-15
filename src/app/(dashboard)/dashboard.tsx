@@ -38,6 +38,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useReducer,
   useState,
@@ -87,6 +88,7 @@ import { Money } from '~/ui/money'
 import { RangePicker, options } from '~/ui/range-picker'
 import { TinyRecord } from '~/ui/record/tiny-record'
 import { match } from '~/utils/match'
+import { setDashboardConfig } from '../(db)/actions'
 
 type Milestones = {
   clientCountMilestonesData: number[]
@@ -95,21 +97,29 @@ type Milestones = {
   revenueMilestonesData: number[]
 }
 
+type DashboardConfig = {
+  preset: string
+  strategy: 'previous-period' | 'last-year'
+  offset: number
+}
+
 export function Dashboard({
   me,
   records,
   milestones,
+  dashboardConfig,
 }: {
   me: Account
   records: Record[]
   milestones: Milestones
+  dashboardConfig: DashboardConfig
 }) {
   let allRecords = separateRecords(records)
   let systemContainsQuotes = allRecords.some((r) => isQuote(r))
   let systemContainsInvoices = allRecords.some((r) => isInvoice(r))
 
   return (
-    <DashboardProvider data={{ account: me, records, milestones }}>
+    <DashboardProvider data={{ account: me, records, milestones, config: dashboardConfig }}>
       <div
         data-no-quotes={systemContainsQuotes ? null : true}
         data-no-invoices={systemContainsInvoices ? null : true}
@@ -145,21 +155,26 @@ export function Dashboard({
 
 function DashboardProvider({
   children,
-  data: { account, records, milestones },
+  data: { account, records, milestones, config },
 }: {
   children: React.ReactNode
   data: {
     account: Account
     records: Record[]
     milestones: Milestones
+    config: DashboardConfig
   }
 }) {
   let now = useCurrentDate()
   let [state, dispatch] = useReducer(dashboardReducer, {
-    preset: 'This quarter',
-    strategy: 'previous-period',
-    offset: 0,
+    preset: config.preset,
+    strategy: config.strategy,
+    offset: config.offset,
   })
+
+  useEffect(() => {
+    setDashboardConfig(state)
+  }, [state])
 
   // Preset
   let range = useMemo(() => options.find((e) => e[0] === state.preset)![1], [state.preset])
