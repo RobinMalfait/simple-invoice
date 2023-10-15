@@ -60,7 +60,7 @@ export let options: Preset[] = [
   ],
   ['Year to date', (now, n) => [startOfYear(addYears(now, 1 * n)), addYears(now, 1 * n)]],
   ['This year', (now, n) => [startOfYear(addYears(now, 1 * n)), endOfYear(addYears(now, 1 * n))]],
-  ['All', (_now) => [undefined, undefined]],
+  ['All', () => [undefined, undefined]],
 ]
 
 export function RangePicker({

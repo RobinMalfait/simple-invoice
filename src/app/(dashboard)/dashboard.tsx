@@ -246,9 +246,9 @@ function DashboardProvider({
       <I18NProvider value={{ language: account.language, currency: account.currency }}>
         <CompareConfigContext.Provider
           value={{
-            previous: previousRecords,
+            previous: data.preset === 'All' ? [] : previousRecords,
             current: currentRecords,
-            withDiff: isAfter(previousRange.end, earliestDate),
+            withDiff: data.preset === 'All' ? false : isAfter(previousRange.end, earliestDate),
           }}
         >
           <DashboardDataContext.Provider value={data}>{children}</DashboardDataContext.Provider>
@@ -400,15 +400,20 @@ function ActionsBar({ className }: { className?: string }) {
             onChange={(preset) => actions.choosePreset(preset)}
           />
 
-          <div className="flex items-center gap-2 text-xs dark:text-zinc-400">
-            <span>vs</span>
-            <span className="text-sm dark:text-zinc-300">
-              <FormatRange start={data.previousRange.start} end={data.previousRange.end} />
-            </span>
-          </div>
+          {data.preset !== 'All' && (
+            <div className="flex items-center gap-2 text-xs dark:text-zinc-400">
+              <span>vs</span>
+              <span className="text-sm dark:text-zinc-300">
+                <FormatRange start={data.previousRange.start} end={data.previousRange.end} />
+              </span>
+            </div>
+          )}
         </div>
 
-        <div className="flex items-center gap-2 self-end">
+        <div
+          data-all={data.preset === 'All' ? true : undefined}
+          className="flex items-center gap-2 self-end data-[all]:opacity-50"
+        >
           <span className="dark:text-zinc-300">Compare to:</span>
           <div className="flex gap-2 rounded-lg bg-gray-200 p-1 shadow-inner dark:bg-zinc-700/50">
             {(
