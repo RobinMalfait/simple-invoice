@@ -13,6 +13,7 @@ import {
   UserGroupIcon,
   UserIcon,
 } from '@heroicons/react/24/outline'
+import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { useParams, usePathname, useRouter } from 'next/navigation'
 import { Fragment, useMemo } from 'react'
@@ -156,9 +157,13 @@ export default function Layout({
                             {navigation.map((item) => (
                               <li key={item.name} className="relative">
                                 {isActive(item) && (
-                                  <div className="absolute -left-4 top-1 flex items-center">
+                                  <motion.div
+                                    layout
+                                    layoutId="active-indicator"
+                                    className="absolute -left-4 top-1 flex items-center"
+                                  >
                                     <div className="h-8 w-1.5 rounded-r-md bg-white/20" />
-                                  </div>
+                                  </motion.div>
                                 )}
 
                                 <Link
@@ -203,9 +208,18 @@ export default function Layout({
                                         return (
                                           <li key={item.name} className="relative">
                                             {isActive(item) && (
-                                              <div className="absolute -left-12 top-1 flex items-center">
+                                              <motion.div
+                                                layout
+                                                layoutId="active-indicator"
+                                                className={classNames(
+                                                  'absolute top-1 flex items-center',
+                                                  config.ui.sidebar === 'small'
+                                                    ? '-left-4'
+                                                    : '-left-12',
+                                                )}
+                                              >
                                                 <div className="h-8 w-1.5 rounded-r-md bg-white/20" />
-                                              </div>
+                                              </motion.div>
                                             )}
 
                                             <Link
