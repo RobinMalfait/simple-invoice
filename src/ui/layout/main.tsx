@@ -154,7 +154,13 @@ export default function Layout({
                         <li>
                           <ul role="list" className="-mx-2 space-y-1">
                             {navigation.map((item) => (
-                              <li key={item.name}>
+                              <li key={item.name} className="relative">
+                                {isActive(item) && (
+                                  <div className="absolute -left-4 top-1 flex items-center">
+                                    <div className="h-8 w-1.5 rounded-r-md bg-white/20" />
+                                  </div>
+                                )}
+
                                 <Link
                                   href={item.href}
                                   className={classNames(
@@ -195,7 +201,13 @@ export default function Layout({
                                           : 0
 
                                         return (
-                                          <li key={item.name}>
+                                          <li key={item.name} className="relative">
+                                            {isActive(item) && (
+                                              <div className="absolute -left-12 top-1 flex items-center">
+                                                <div className="h-8 w-1.5 rounded-r-md bg-white/20" />
+                                              </div>
+                                            )}
+
                                             <Link
                                               href={item.href}
                                               className={classNames(
