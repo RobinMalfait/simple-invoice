@@ -48,6 +48,7 @@
     "case": "^1.6.3",
     "date-fns": "^2.30.0",
     "date-fns-tz": "^2.0.0",
+    "framer-motion": "^10.16.4",
     "htmlparser2": "^9.0.0",
     "ics": "^3.5.0",
     "lazy-collections": "^0.11.2",
