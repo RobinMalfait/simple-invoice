@@ -22,21 +22,43 @@ let scopedId = new ScopedIDGenerator('invoice')
 
 export let Invoice = z.object({
   type: z.literal('invoice').default('invoice'),
-  id: z.string().default(() => scopedId.next()),
+  id: z.string().default(() => {
+    return scopedId.next()
+  }),
   number: z.string(),
-  account: z.lazy(() => Account),
-  client: z.lazy(() => Client),
-  items: z.array(z.lazy(() => InvoiceItem)),
+  account: z.lazy(() => {
+    return Account
+  }),
+  client: z.lazy(() => {
+    return Client
+  }),
+  items: z.array(
+    z.lazy(() => {
+      return InvoiceItem
+    }),
+  ),
   note: z.string().nullable(),
   issueDate: z.date(),
   dueDate: z.date(),
-  discounts: z.array(z.lazy(() => Discount)),
-  attachments: z.array(z.lazy(() => Document)).default([]),
+  discounts: z.array(
+    z.lazy(() => {
+      return Discount
+    }),
+  ),
+  attachments: z
+    .array(
+      z.lazy(() => {
+        return Document
+      }),
+    )
+    .default([]),
   status: z.nativeEnum(InvoiceStatus).default(InvoiceStatus.Draft),
   paid: z.number(),
   outstanding: z.number(),
   paidAt: z.date().nullable(),
-  quote: z.lazy(() => Quote.nullable()),
+  quote: z.lazy(() => {
+    return Quote.nullable()
+  }),
 
   // Visual representation
   qr: z.boolean().nullable().default(null),
@@ -91,7 +113,11 @@ export class InvoiceBuilder {
 
     let invoice = Invoice.parse(input)
 
-    if (!this._events.some((e) => e.type === 'invoice:drafted')) {
+    if (
+      !this._events.some((e) => {
+        return e.type === 'invoice:drafted'
+      })
+    ) {
       this._events.unshift({ type: 'invoice:drafted' })
     }
 
@@ -230,7 +256,17 @@ export class InvoiceBuilder {
       throw new Error('Cannot edit an invoice that is not in draft status')
     }
 
-    if (new Set(this._items.map((item) => item.taxRate).filter((rate) => rate !== 0)).size > 1) {
+    if (
+      new Set(
+        this._items
+          .map((item) => {
+            return item.taxRate
+          })
+          .filter((rate) => {
+            return rate !== 0
+          }),
+      ).size > 1
+    ) {
       throw new Error('Discount with mixed tax rates is not supported')
     }
 
@@ -265,7 +301,15 @@ export class InvoiceBuilder {
 
     if (
       this._discounts.length > 0 &&
-      new Set(this._items.map((item) => item.taxRate).filter((rate) => rate !== 0)).size > 1
+      new Set(
+        this._items
+          .map((item) => {
+            return item.taxRate
+          })
+          .filter((rate) => {
+            return rate !== 0
+          }),
+      ).size > 1
     ) {
       throw new Error(
         'You already had discounts configured, but this is not supported for mixed tax rates right now',
@@ -283,7 +327,15 @@ export class InvoiceBuilder {
 
     if (
       this._discounts.length > 0 &&
-      new Set(this._items.map((item) => item.taxRate).filter((rate) => rate !== 0)).size > 1
+      new Set(
+        this._items
+          .map((item) => {
+            return item.taxRate
+          })
+          .filter((rate) => {
+            return rate !== 0
+          }),
+      ).size > 1
     ) {
       throw new Error(
         'You already had discounts configured, but this is not supported for mixed tax rates right now',

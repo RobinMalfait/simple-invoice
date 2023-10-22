@@ -7,7 +7,9 @@ import { ScopedIDGenerator } from '~/utils/id'
 let scopedId = new ScopedIDGenerator('mail-template')
 
 export let MailTemplate = z.object({
-  id: z.string().default(() => scopedId.next()),
+  id: z.string().default(() => {
+    return scopedId.next()
+  }),
   name: z.string(),
   subject: z.string(),
   body: z.string().nullable(),

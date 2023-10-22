@@ -12,7 +12,11 @@ import { match } from '~/utils/match'
 export function ActivityFeed(props: React.PropsWithChildren<{ records: Record[] }>) {
   let stacks = useRecordStacks()
   let record = useRecord()
-  let records = (stacks[record.id] ?? []).map((id) => props.records.find((e) => e.id === id)!)
+  let records = (stacks[record.id] ?? []).map((id) => {
+    return props.records.find((e) => {
+      return e.id === id
+    })!
+  })
 
   let activeRecordIdx = stacks[record.id]?.indexOf(record.id) ?? -1
 
@@ -34,9 +38,15 @@ export function ActivityFeed(props: React.PropsWithChildren<{ records: Record[] 
                 >
                   <span className="whitespace-nowrap pr-3">
                     {match(record.type, {
-                      quote: () => 'Quote',
-                      invoice: () => 'Invoice',
-                      receipt: () => 'Receipt',
+                      quote: () => {
+                        return 'Quote'
+                      },
+                      invoice: () => {
+                        return 'Invoice'
+                      },
+                      receipt: () => {
+                        return 'Receipt'
+                      },
                     })}{' '}
                     (#{record.number})
                   </span>
@@ -54,9 +64,9 @@ export function ActivityFeed(props: React.PropsWithChildren<{ records: Record[] 
               >
                 {events.map((activityItem, activityItemIdx, all) => {
                   let isLast = activityItemIdx === all.length - 1
-                  let isLastNonMilestone = all
-                    .slice(activityItemIdx + 1)
-                    .every((e) => e.tags.includes('milestone'))
+                  let isLastNonMilestone = all.slice(activityItemIdx + 1).every((e) => {
+                    return e.tags.includes('milestone')
+                  })
 
                   return (
                     <ActivityItem

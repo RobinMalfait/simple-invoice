@@ -18,16 +18,36 @@ let scopedId = new ScopedIDGenerator('receipt')
 
 export let Receipt = z.object({
   type: z.literal('receipt').default('receipt'),
-  id: z.string().default(() => scopedId.next()),
+  id: z.string().default(() => {
+    return scopedId.next()
+  }),
   number: z.string(),
-  invoice: z.lazy(() => Invoice),
-  account: z.lazy(() => Account),
-  client: z.lazy(() => Client),
-  items: z.array(z.lazy(() => InvoiceItem)),
+  invoice: z.lazy(() => {
+    return Invoice
+  }),
+  account: z.lazy(() => {
+    return Account
+  }),
+  client: z.lazy(() => {
+    return Client
+  }),
+  items: z.array(
+    z.lazy(() => {
+      return InvoiceItem
+    }),
+  ),
   note: z.string().nullable(),
   receiptDate: z.date(),
-  discounts: z.array(z.lazy(() => Discount)),
-  attachments: z.array(z.lazy(() => Document)),
+  discounts: z.array(
+    z.lazy(() => {
+      return Discount
+    }),
+  ),
+  attachments: z.array(
+    z.lazy(() => {
+      return Document
+    }),
+  ),
 })
 
 export type Receipt = z.infer<typeof Receipt>

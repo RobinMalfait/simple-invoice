@@ -9,9 +9,13 @@ global.DOMParser = window.DOMParser
   let x = 0
   // @ts-expect-error TypeScripts expects this to be a function that returns a string that _looks_
   // like a UUID. We don't care about that here.
-  global.window.crypto.randomUUID = () => (x++).toString()
+  global.window.crypto.randomUUID = () => {
+    return (x++).toString()
+  }
 }
-global.structuredClone = (x: any) => JSON.parse(JSON.stringify(x))
+global.structuredClone = (x: any) => {
+  return JSON.parse(JSON.stringify(x))
+}
 
 let html = String.raw
 let md = String.raw
@@ -19,8 +23,12 @@ let md = String.raw
 function split(html: string, pages: number[]): string[] {
   let expanded = expand(html)
   let paginated = paginate(expanded, pages)
-  let collapsed = paginated.map((page) => collapse(page))
-  let stringified = collapsed.map((page) => stringify(page))
+  let collapsed = paginated.map((page) => {
+    return collapse(page)
+  })
+  let stringified = collapsed.map((page) => {
+    return stringify(page)
+  })
   return stringified
 }
 

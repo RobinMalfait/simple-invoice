@@ -24,13 +24,19 @@ export function BigHeading() {
           <span className="space-x-3 text-2xl">
             <span>
               <span className="font-medium text-gray-500">
-                {t((x) =>
-                  match(record.type, {
-                    quote: () => x.quote.title,
-                    invoice: () => x.invoice.title,
-                    receipt: () => x.receipt.title,
-                  }),
-                )}
+                {t((x) => {
+                  return match(record.type, {
+                    quote: () => {
+                      return x.quote.title
+                    },
+                    invoice: () => {
+                      return x.invoice.title
+                    },
+                    receipt: () => {
+                      return x.receipt.title
+                    },
+                  })
+                })}
               </span>
               <span className="text-gray-300">.</span>
             </span>
@@ -40,21 +46,33 @@ export function BigHeading() {
           <div className="text-right">
             <div className="space-x-3">
               <span className="text-gray-500">
-                {t((x) =>
-                  match(record.type, {
-                    quote: () => x.dates.quoteDate,
-                    invoice: () => x.dates.issueDate,
-                    receipt: () => x.receipt.fields.invoice,
-                  }),
-                )}
+                {t((x) => {
+                  return match(record.type, {
+                    quote: () => {
+                      return x.dates.quoteDate
+                    },
+                    invoice: () => {
+                      return x.dates.issueDate
+                    },
+                    receipt: () => {
+                      return x.receipt.fields.invoice
+                    },
+                  })
+                })}
               </span>
               <span className="font-medium tabular-nums text-gray-700">
                 {match(
                   record.type,
                   {
-                    quote: (r: Quote) => format(r.quoteDate, 'PPP', { locale }),
-                    invoice: (r: Invoice) => format(r.issueDate, 'PPP', { locale }),
-                    receipt: (r: Receipt) => r.invoice.number,
+                    quote: (r: Quote) => {
+                      return format(r.quoteDate, 'PPP', { locale })
+                    },
+                    invoice: (r: Invoice) => {
+                      return format(r.issueDate, 'PPP', { locale })
+                    },
+                    receipt: (r: Receipt) => {
+                      return r.invoice.number
+                    },
                   },
                   record,
                 )}
@@ -62,21 +80,33 @@ export function BigHeading() {
             </div>
             <div className="space-x-3">
               <span className="text-gray-500">
-                {t((x) =>
-                  match(record.type, {
-                    quote: () => x.dates.quoteExpirationDate,
-                    invoice: () => x.dates.dueDate,
-                    receipt: () => x.dates.receiptDate,
-                  }),
-                )}
+                {t((x) => {
+                  return match(record.type, {
+                    quote: () => {
+                      return x.dates.quoteExpirationDate
+                    },
+                    invoice: () => {
+                      return x.dates.dueDate
+                    },
+                    receipt: () => {
+                      return x.dates.receiptDate
+                    },
+                  })
+                })}
               </span>
               <span className="font-medium tabular-nums text-gray-700">
                 {match(
                   record.type,
                   {
-                    quote: (r: Quote) => format(r.quoteExpirationDate, 'PPP', { locale }),
-                    invoice: (r: Invoice) => format(r.dueDate, 'PPP', { locale }),
-                    receipt: (r: Receipt) => format(r.receiptDate, 'PPP', { locale }),
+                    quote: (r: Quote) => {
+                      return format(r.quoteExpirationDate, 'PPP', { locale })
+                    },
+                    invoice: (r: Invoice) => {
+                      return format(r.dueDate, 'PPP', { locale })
+                    },
+                    receipt: (r: Receipt) => {
+                      return format(r.receiptDate, 'PPP', { locale })
+                    },
                   },
                   record,
                 )}
@@ -88,7 +118,11 @@ export function BigHeading() {
 
       <div className="flex justify-between px-12 py-8 text-gray-500">
         <div className="flex flex-col">
-          <h3 className="text-sm font-medium text-gray-900">{t((x) => x.account.title)}</h3>
+          <h3 className="text-sm font-medium text-gray-900">
+            {t((x) => {
+              return x.account.title
+            })}
+          </h3>
           <div className="flex flex-1 flex-col whitespace-pre-wrap text-sm font-normal">
             <div className="flex-1">
               <span>{record.account.name}</span>
@@ -96,7 +130,11 @@ export function BigHeading() {
             </div>
             {record.account.tax && (
               <div className="mt-4">
-                <div className="text-sm font-medium text-gray-900">{t((x) => x.account.vat)}</div>
+                <div className="text-sm font-medium text-gray-900">
+                  {t((x) => {
+                    return x.account.vat
+                  })}
+                </div>
                 <div>
                   <Classified>{record.account.tax.value}</Classified>
                 </div>
@@ -106,7 +144,11 @@ export function BigHeading() {
         </div>
 
         <div className="flex flex-col">
-          <h3 className="text-sm font-medium text-gray-900">{t((x) => x.client.title)}</h3>
+          <h3 className="text-sm font-medium text-gray-900">
+            {t((x) => {
+              return x.client.title
+            })}
+          </h3>
           <div className="flex flex-1 flex-col whitespace-pre-wrap text-sm font-normal">
             <div className="flex-1">
               <span>{record.client.name}</span>
@@ -114,7 +156,11 @@ export function BigHeading() {
             </div>
             {record.client.tax && (
               <div className="mt-4">
-                <div className="text-sm font-medium text-gray-900">{t((x) => x.client.vat)}</div>
+                <div className="text-sm font-medium text-gray-900">
+                  {t((x) => {
+                    return x.client.vat
+                  })}
+                </div>
                 <div>
                   <Classified>{record.client.tax.value}</Classified>
                 </div>

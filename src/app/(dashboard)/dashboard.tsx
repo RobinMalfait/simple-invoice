@@ -115,8 +115,12 @@ export function Dashboard({
   dashboardConfig: DashboardConfig
 }) {
   let allRecords = separateRecords(records)
-  let systemContainsQuotes = allRecords.some((r) => isQuote(r))
-  let systemContainsInvoices = allRecords.some((r) => isInvoice(r))
+  let systemContainsQuotes = allRecords.some((r) => {
+    return isQuote(r)
+  })
+  let systemContainsInvoices = allRecords.some((r) => {
+    return isInvoice(r)
+  })
 
   return (
     <DashboardProvider data={{ account: me, records, milestones, config: dashboardConfig }}>
@@ -177,15 +181,19 @@ function DashboardProvider({
   }, [state])
 
   // Preset
-  let range = useMemo(() => options.find((e) => e[0] === state.preset)![1], [state.preset])
+  let range = useMemo(() => {
+    return options.find((e) => {
+      return e[0] === state.preset
+    })![1]
+  }, [state.preset])
 
   // Compute maximum allowed range
   let [earliestDate = now, latestDate = now] = useMemo(() => {
     if (records.length <= 0) return [undefined, undefined]
 
-    let sortedRecords = records
-      .slice()
-      .sort((a, z) => compareAsc(resolveRelevantRecordDate(a), resolveRelevantRecordDate(z)))
+    let sortedRecords = records.slice().sort((a, z) => {
+      return compareAsc(resolveRelevantRecordDate(a), resolveRelevantRecordDate(z))
+    })
 
     let earliest = sortedRecords[0]
     let latest = sortedRecords[sortedRecords.length - 1]
@@ -214,11 +222,15 @@ function DashboardProvider({
   }, [currentRange.end, currentRange.start, earliestDate, latestDate, now, range, state])
 
   let previousRecords = useMemo(() => {
-    return records.filter((r) => isWithinInterval(resolveRelevantRecordDate(r), previousRange))
+    return records.filter((r) => {
+      return isWithinInterval(resolveRelevantRecordDate(r), previousRange)
+    })
   }, [records, previousRange])
 
   let currentRecords = useMemo(() => {
-    return records.filter((r) => isWithinInterval(resolveRelevantRecordDate(r), currentRange))
+    return records.filter((r) => {
+      return isWithinInterval(resolveRelevantRecordDate(r), currentRange)
+    })
   }, [records, currentRange])
 
   let data: ContextType<typeof DashboardDataContext> = {
@@ -233,11 +245,21 @@ function DashboardProvider({
 
   let actions = useMemo<ContextType<typeof DashboardActionsContext>>(() => {
     return {
-      choosePreset: (preset) => dispatch({ type: ActionTypes.ChoosePreset, preset }),
-      chooseStrategy: (strategy) => dispatch({ type: ActionTypes.ChooseStrategy, strategy }),
-      previous: () => dispatch({ type: ActionTypes.Previous }),
-      today: () => dispatch({ type: ActionTypes.Today }),
-      next: () => dispatch({ type: ActionTypes.Next }),
+      choosePreset: (preset) => {
+        return dispatch({ type: ActionTypes.ChoosePreset, preset })
+      },
+      chooseStrategy: (strategy) => {
+        return dispatch({ type: ActionTypes.ChooseStrategy, strategy })
+      },
+      previous: () => {
+        return dispatch({ type: ActionTypes.Previous })
+      },
+      today: () => {
+        return dispatch({ type: ActionTypes.Today })
+      },
+      next: () => {
+        return dispatch({ type: ActionTypes.Next })
+      },
     }
   }, [dispatch])
 
@@ -368,7 +390,9 @@ function ActionsBar({ className }: { className?: string }) {
           <button
             title="Previous period"
             className="aspect-square rounded-md bg-white px-2 py-1.5 text-sm shadow ring-1 ring-black/10 dark:bg-zinc-900/75 dark:text-zinc-300"
-            onClick={() => actions.previous()}
+            onClick={() => {
+              return actions.previous()
+            }}
           >
             <ArrowSmallLeftIcon className="h-4 w-4" />
           </button>
@@ -388,7 +412,9 @@ function ActionsBar({ className }: { className?: string }) {
           <button
             title="Next period"
             className="aspect-square rounded-md bg-white px-2 py-1.5 text-sm shadow ring-1 ring-black/10 dark:bg-zinc-900/75 dark:text-zinc-300"
-            onClick={() => actions.next()}
+            onClick={() => {
+              return actions.next()
+            }}
           >
             <ArrowSmallRightIcon className="h-4 w-4" />
           </button>
@@ -397,7 +423,9 @@ function ActionsBar({ className }: { className?: string }) {
             value={data.preset}
             start={data.currentRange.start}
             end={data.currentRange.end}
-            onChange={(preset) => actions.choosePreset(preset)}
+            onChange={(preset) => {
+              return actions.choosePreset(preset)
+            }}
           />
 
           {data.preset !== 'All' && (
@@ -421,19 +449,23 @@ function ActionsBar({ className }: { className?: string }) {
                 ['previous-period', 'Previous period'],
                 ['last-year', 'Same period last year'],
               ] as [typeof data.strategy, string][]
-            ).map(([key, label]) => (
-              <button
-                key={key}
-                onClick={() => actions.chooseStrategy(key)}
-                className={classNames(
-                  'flex items-center gap-1 rounded-md px-2 py-1.5 text-sm dark:text-zinc-300',
-                  data.strategy === key &&
-                    'bg-white shadow ring-1 ring-black/10 dark:bg-zinc-900/75',
-                )}
-              >
-                {label}
-              </button>
-            ))}
+            ).map(([key, label]) => {
+              return (
+                <button
+                  key={key}
+                  onClick={() => {
+                    return actions.chooseStrategy(key)
+                  }}
+                  className={classNames(
+                    'flex items-center gap-1 rounded-md px-2 py-1.5 text-sm dark:text-zinc-300',
+                    data.strategy === key &&
+                      'bg-white shadow ring-1 ring-black/10 dark:bg-zinc-900/75',
+                  )}
+                >
+                  {label}
+                </button>
+              )
+            })}
           </div>
         </div>
       </div>
@@ -448,42 +480,74 @@ function QuotesCell({ className }: { className?: string }) {
     <CompareGroup horizontalCount={5} className={className}>
       <CompareBlock
         title="Quotes"
-        value={(list) => separateRecords(list).filter((r) => isQuote(r)).length}
+        value={(list) => {
+          return separateRecords(list).filter((r) => {
+            return isQuote(r)
+          }).length
+        }}
       />
       <CompareBlock
         variant="tiny"
         title="Draft"
-        value={(list) => separateRecords(list).filter((r) => isQuote(r) && isDraft(r)).length}
+        value={(list) => {
+          return separateRecords(list).filter((r) => {
+            return isQuote(r) && isDraft(r)
+          }).length
+        }}
       />
       <CompareBlock
         variant="tiny"
         title="Sent"
-        value={(list) => separateRecords(list).filter((r) => isQuote(r) && isSent(r)).length}
+        value={(list) => {
+          return separateRecords(list).filter((r) => {
+            return isQuote(r) && isSent(r)
+          }).length
+        }}
       />
       <CompareBlock
         variant="tiny"
         title="Accepted"
-        value={(list) => separateRecords(list).filter((r) => isQuote(r) && isAccepted(r)).length}
+        value={(list) => {
+          return separateRecords(list).filter((r) => {
+            return isQuote(r) && isAccepted(r)
+          }).length
+        }}
       />
       <CompareBlock
         variant="tiny"
         title="Cancelled"
-        value={(list) => separateRecords(list).filter((r) => isQuote(r) && isCancelled(r)).length}
+        value={(list) => {
+          return separateRecords(list).filter((r) => {
+            return isQuote(r) && isCancelled(r)
+          }).length
+        }}
       />
       <CompareBlock
         variant="tiny"
         title="Rejected"
-        value={(list) => separateRecords(list).filter((r) => isQuote(r) && isRejected(r)).length}
+        value={(list) => {
+          return separateRecords(list).filter((r) => {
+            return isQuote(r) && isRejected(r)
+          }).length
+        }}
       />
       <CompareBlock
         variant="tiny"
         title="Expired"
-        value={(list) => separateRecords(list).filter((r) => isQuote(r) && isExpired(r)).length}
+        value={(list) => {
+          return separateRecords(list).filter((r) => {
+            return isQuote(r) && isExpired(r)
+          }).length
+        }}
       />
       <CompareBlock
         variant="tiny"
         title="Closed"
-        value={(list) => separateRecords(list).filter((r) => isQuote(r) && isClosed(r)).length}
+        value={(list) => {
+          return separateRecords(list).filter((r) => {
+            return isQuote(r) && isClosed(r)
+          }).length
+        }}
       />
     </CompareGroup>
   )
@@ -494,39 +558,65 @@ function InvoicesCell({ className }: { className?: string }) {
     <CompareGroup horizontalCount={4} className={className}>
       <CompareBlock
         title="Invoices"
-        value={(list) => separateRecords(list).filter((r) => isInvoice(r)).length}
+        value={(list) => {
+          return separateRecords(list).filter((r) => {
+            return isInvoice(r)
+          }).length
+        }}
       />
       <CompareBlock
         variant="tiny"
         title="Draft"
-        value={(list) => separateRecords(list).filter((r) => isInvoice(r) && isDraft(r)).length}
+        value={(list) => {
+          return separateRecords(list).filter((r) => {
+            return isInvoice(r) && isDraft(r)
+          }).length
+        }}
       />
       <CompareBlock
         variant="tiny"
         title="Sent"
-        value={(list) => separateRecords(list).filter((r) => isInvoice(r) && isSent(r)).length}
+        value={(list) => {
+          return separateRecords(list).filter((r) => {
+            return isInvoice(r) && isSent(r)
+          }).length
+        }}
       />
       <CompareBlock
         variant="tiny"
         title="Paid"
-        value={(list) => separateRecords(list).filter((r) => isInvoice(r) && isPaid(r)).length}
+        value={(list) => {
+          return separateRecords(list).filter((r) => {
+            return isInvoice(r) && isPaid(r)
+          }).length
+        }}
       />
       <CompareBlock
         variant="tiny"
         title="Partially paid"
-        value={(list) =>
-          separateRecords(list).filter((r) => isInvoice(r) && isPartiallyPaid(r)).length
-        }
+        value={(list) => {
+          return separateRecords(list).filter((r) => {
+            return isInvoice(r) && isPartiallyPaid(r)
+          }).length
+        }}
       />
       <CompareBlock
         variant="tiny"
         title="Overdue"
-        value={(list) => separateRecords(list).filter((r) => isInvoice(r) && isOverdue(r)).length}
+        value={(list) => {
+          return separateRecords(list).filter((r) => {
+            return isInvoice(r) && isOverdue(r)
+          }).length
+        }}
       />
       <CompareBlock
         variant="tiny"
         title="Closed"
-        value={(list) => separateRecords(list).filter((r) => isInvoice(r) && isClosed(r)).length}
+        value={(list) => {
+          return separateRecords(list).filter((r) => {
+            return isInvoice(r) && isClosed(r)
+          }).length
+        }}
       />
     </CompareGroup>
   )
@@ -537,7 +627,11 @@ function ReceiptsCell({ className }: { className?: string }) {
     <CompareBlock
       className={className}
       title="Receipts"
-      value={(list) => separateRecords(list).filter((r) => isReceipt(r)).length}
+      value={(list) => {
+        return separateRecords(list).filter((r) => {
+          return isReceipt(r)
+        }).length
+      }}
     />
   )
 }
@@ -547,7 +641,13 @@ function UniqueClientsCell({ className }: { className?: string }) {
     <CompareBlock
       className={className}
       title="Unique clients"
-      value={(list) => new Set(separateRecords(list).map((r) => r.client.id)).size}
+      value={(list) => {
+        return new Set(
+          separateRecords(list).map((r) => {
+            return r.client.id
+          }),
+        ).size
+      }}
     />
   )
 }
@@ -558,9 +658,9 @@ function BestPayingClientCell({ className }: { className?: string }) {
       className={className}
       title="Best paying client"
       data={(list) => {
-        let interestingRecords = separateRecords(list).filter(
-          (r) => isInvoice(r) && (isPaid(r) || isPartiallyPaid(r)),
-        )
+        let interestingRecords = separateRecords(list).filter((r) => {
+          return isInvoice(r) && (isPaid(r) || isPartiallyPaid(r))
+        })
         let winner: string | null = null
         let clients = []
         let byClient = new Map()
@@ -575,24 +675,39 @@ function BestPayingClientCell({ className }: { className?: string }) {
             winner = record.client.id
           }
         }
-        clients = clients.filter(
-          (c, idx, all) => all.findIndex((other) => other.id === c.id) === idx,
-        )
+        clients = clients.filter((c, idx, all) => {
+          return (
+            all.findIndex((other) => {
+              return other.id === c.id
+            }) === idx
+          )
+        })
 
-        return [clients.find((c) => c.id === winner) ?? null, byClient.get(winner) ?? null] as const
+        return [
+          clients.find((c) => {
+            return c.id === winner
+          }) ?? null,
+          byClient.get(winner) ?? null,
+        ] as const
       }}
-      value={(data) => data?.[1] ?? null}
-      display={(value) => <Money amount={value} />}
-      footer={(data) =>
-        data?.[0] && (
-          <div className="text-xs text-gray-500 dark:text-zinc-400">
-            <Link href={`/clients/${data[0].id}`}>
-              <span className="absolute inset-0"></span>
-              <Classified>{data[0].nickname}</Classified>
-            </Link>
-          </div>
+      value={(data) => {
+        return data?.[1] ?? null
+      }}
+      display={(value) => {
+        return <Money amount={value} />
+      }}
+      footer={(data) => {
+        return (
+          data?.[0] && (
+            <div className="text-xs text-gray-500 dark:text-zinc-400">
+              <Link href={`/clients/${data[0].id}`}>
+                <span className="absolute inset-0"></span>
+                <Classified>{data[0].nickname}</Classified>
+              </Link>
+            </div>
+          )
         )
-      }
+      }}
     />
   )
 }
@@ -603,12 +718,18 @@ function OutstandingCell({ className }: { className?: string }) {
       className={className}
       inverse
       title="Outstanding"
-      value={(list) =>
-        list
-          .filter((e) => isInvoice(e) && (isSent(e) || isPartiallyPaid(e)))
-          .reduce((acc, r) => acc + (r as Invoice).outstanding, 0)
-      }
-      display={(value) => <Money amount={value} />}
+      value={(list) => {
+        return list
+          .filter((e) => {
+            return isInvoice(e) && (isSent(e) || isPartiallyPaid(e))
+          })
+          .reduce((acc, r) => {
+            return acc + (r as Invoice).outstanding
+          }, 0)
+      }}
+      display={(value) => {
+        return <Money amount={value} />
+      }}
     />
   )
 }
@@ -618,15 +739,29 @@ function PaidCell({ className }: { className?: string }) {
     <CompareBlock
       className={className}
       title="Paid"
-      value={(list) => list.filter((e) => isPaidRecord(e)).reduce((acc, e) => acc + total(e), 0)}
-      display={(value) => <Money amount={value} />}
+      value={(list) => {
+        return list
+          .filter((e) => {
+            return isPaidRecord(e)
+          })
+          .reduce((acc, e) => {
+            return acc + total(e)
+          }, 0)
+      }}
+      display={(value) => {
+        return <Money amount={value} />
+      }}
     />
   )
 }
 
 function ActiveRecordsCell({ className }: { className?: string }) {
   let { current } = useContext(CompareConfigContext)
-  let data = current.filter((e) => isActiveRecord(e)).reverse()
+  let data = current
+    .filter((e) => {
+      return isActiveRecord(e)
+    })
+    .reverse()
 
   return (
     <div
@@ -641,22 +776,24 @@ function ActiveRecordsCell({ className }: { className?: string }) {
       </div>
       {data.length > 0 ? (
         <div className="grid auto-cols-[280px] grid-flow-col grid-cols-[repeat(auto-fill,280px)] grid-rows-1 gap-4 overflow-x-auto p-4 [scrollbar-width:auto]">
-          {data.map((record) => (
-            <I18NProvider
-              key={record.id}
-              value={{
-                // Prefer the language of the account when looking at the overview of invoices.
-                language: record.account.language,
+          {data.map((record) => {
+            return (
+              <I18NProvider
+                key={record.id}
+                value={{
+                  // Prefer the language of the account when looking at the overview of invoices.
+                  language: record.account.language,
 
-                // Prefer the currency of the client when looking at the overview of invoices.
-                currency: record.client.currency,
-              }}
-            >
-              <Link href={`/${record.type}/${record.number}`}>
-                <TinyRecord record={record} />
-              </Link>
-            </I18NProvider>
-          ))}
+                  // Prefer the currency of the client when looking at the overview of invoices.
+                  currency: record.client.currency,
+                }}
+              >
+                <Link href={`/${record.type}/${record.number}`}>
+                  <TinyRecord record={record} />
+                </Link>
+              </I18NProvider>
+            )
+          })}
         </div>
       ) : (
         <Empty message="No active quotes / invoices available" />
@@ -674,34 +811,50 @@ function FastestAcceptedQuoteCell({ className }: { className?: string }) {
       className={className}
       inverse
       title={'Fastest accepted quote'}
-      data={(list) =>
-        separateRecords(list)
-          .filter((r) => isQuote(r) && isAccepted(r))
-          .flatMap((r) => {
-            let sentAt = eventsBy(r).find((e) => e.type === 'quote:sent')?.at
-            if (!sentAt) return []
+      data={(list) => {
+        return (
+          separateRecords(list)
+            .filter((r) => {
+              return isQuote(r) && isAccepted(r)
+            })
+            .flatMap((r) => {
+              let sentAt = eventsBy(r).find((e) => {
+                return e.type === 'quote:sent'
+              })?.at
+              if (!sentAt) return []
 
-            let paidAt = eventsBy(r).find((e) => e.type === 'quote:accepted')?.at
-            if (!paidAt) return []
+              let paidAt = eventsBy(r).find((e) => {
+                return e.type === 'quote:accepted'
+              })?.at
+              if (!paidAt) return []
 
-            return [[r, differenceInSeconds(paidAt, sentAt)] as const]
-          })
-          .sort(([, a], [, z]) => z - a)
-          .pop() ?? null
-      }
-      value={(data) => data?.[1] ?? null}
-      display={(value) => <span>{formatDistanceStrict(now, addSeconds(now, value))}</span>}
-      footer={(data) =>
-        data && (
-          <div className="text-xs text-gray-500 dark:text-zinc-400">
-            <Link href={`/${data[0].type}/${data[0].number}`}>
-              <span className="absolute inset-0"></span>
-              <Classified>{data[0].client.nickname}</Classified>{' '}
-              <small className="tabular-nums">— {data[0].number}</small>
-            </Link>
-          </div>
+              return [[r, differenceInSeconds(paidAt, sentAt)] as const]
+            })
+            .sort(([, a], [, z]) => {
+              return z - a
+            })
+            .pop() ?? null
         )
-      }
+      }}
+      value={(data) => {
+        return data?.[1] ?? null
+      }}
+      display={(value) => {
+        return <span>{formatDistanceStrict(now, addSeconds(now, value))}</span>
+      }}
+      footer={(data) => {
+        return (
+          data && (
+            <div className="text-xs text-gray-500 dark:text-zinc-400">
+              <Link href={`/${data[0].type}/${data[0].number}`}>
+                <span className="absolute inset-0"></span>
+                <Classified>{data[0].client.nickname}</Classified>{' '}
+                <small className="tabular-nums">— {data[0].number}</small>
+              </Link>
+            </div>
+          )
+        )
+      }}
     />
   )
 }
@@ -715,34 +868,50 @@ function SlowestAcceptedQuoteCell({ className }: { className?: string }) {
       className={className}
       inverse
       title={'Slowest accepted quote'}
-      data={(list) =>
-        separateRecords(list)
-          .filter((r) => isQuote(r) && isAccepted(r))
-          .flatMap((r) => {
-            let sentAt = eventsBy(r).find((e) => e.type === 'quote:sent')?.at
-            if (!sentAt) return []
+      data={(list) => {
+        return (
+          separateRecords(list)
+            .filter((r) => {
+              return isQuote(r) && isAccepted(r)
+            })
+            .flatMap((r) => {
+              let sentAt = eventsBy(r).find((e) => {
+                return e.type === 'quote:sent'
+              })?.at
+              if (!sentAt) return []
 
-            let paidAt = eventsBy(r).find((e) => e.type === 'quote:accepted')?.at
-            if (!paidAt) return []
+              let paidAt = eventsBy(r).find((e) => {
+                return e.type === 'quote:accepted'
+              })?.at
+              if (!paidAt) return []
 
-            return [[r, differenceInSeconds(paidAt, sentAt)] as const]
-          })
-          .sort(([, a], [, z]) => a - z)
-          .pop() ?? null
-      }
-      value={(data) => data?.[1] ?? null}
-      display={(value) => <span>{formatDistanceStrict(now, addSeconds(now, value))}</span>}
-      footer={(data) =>
-        data && (
-          <div className="text-xs text-gray-500 dark:text-zinc-400">
-            <Link href={`/${data[0].type}/${data[0].number}`}>
-              <span className="absolute inset-0"></span>
-              <Classified>{data[0].client.nickname}</Classified>{' '}
-              <small className="tabular-nums">— {data[0].number}</small>
-            </Link>
-          </div>
+              return [[r, differenceInSeconds(paidAt, sentAt)] as const]
+            })
+            .sort(([, a], [, z]) => {
+              return a - z
+            })
+            .pop() ?? null
         )
-      }
+      }}
+      value={(data) => {
+        return data?.[1] ?? null
+      }}
+      display={(value) => {
+        return <span>{formatDistanceStrict(now, addSeconds(now, value))}</span>
+      }}
+      footer={(data) => {
+        return (
+          data && (
+            <div className="text-xs text-gray-500 dark:text-zinc-400">
+              <Link href={`/${data[0].type}/${data[0].number}`}>
+                <span className="absolute inset-0"></span>
+                <Classified>{data[0].client.nickname}</Classified>{' '}
+                <small className="tabular-nums">— {data[0].number}</small>
+              </Link>
+            </div>
+          )
+        )
+      }}
     />
   )
 }
@@ -756,35 +925,53 @@ function FastestPayingClientCell({ className }: { className?: string }) {
       inverse
       className={className}
       title={'Fastest paying client'}
-      data={(list) =>
-        separateRecords(list)
-          .filter((r) => isPaidRecord(r))
-          .map((r) => (isReceipt(r) ? r.invoice : r))
-          .flatMap((r) => {
-            let sentAt = eventsBy(r).find((e) => e.type === 'invoice:sent')?.at
-            if (!sentAt) return []
+      data={(list) => {
+        return (
+          separateRecords(list)
+            .filter((r) => {
+              return isPaidRecord(r)
+            })
+            .map((r) => {
+              return isReceipt(r) ? r.invoice : r
+            })
+            .flatMap((r) => {
+              let sentAt = eventsBy(r).find((e) => {
+                return e.type === 'invoice:sent'
+              })?.at
+              if (!sentAt) return []
 
-            let paidAt = eventsBy(r).find((e) => e.type === 'invoice:paid')?.at
-            if (!paidAt) return []
+              let paidAt = eventsBy(r).find((e) => {
+                return e.type === 'invoice:paid'
+              })?.at
+              if (!paidAt) return []
 
-            return [[r, differenceInSeconds(paidAt, sentAt)] as const]
-          })
-          .sort(([, a], [, z]) => z - a)
-          .pop() ?? null
-      }
-      value={(data) => data?.[1] ?? null}
-      display={(value) => <span>{formatDistanceStrict(now, addSeconds(now, value))}</span>}
-      footer={(data) =>
-        data && (
-          <div className="text-xs text-gray-500 dark:text-zinc-400">
-            <Link href={`/${data[0].type}/${data[0].number}`}>
-              <span className="absolute inset-0"></span>
-              <Classified>{data[0].client.nickname}</Classified>{' '}
-              <small className="tabular-nums">— {data[0].number}</small>
-            </Link>
-          </div>
+              return [[r, differenceInSeconds(paidAt, sentAt)] as const]
+            })
+            .sort(([, a], [, z]) => {
+              return z - a
+            })
+            .pop() ?? null
         )
-      }
+      }}
+      value={(data) => {
+        return data?.[1] ?? null
+      }}
+      display={(value) => {
+        return <span>{formatDistanceStrict(now, addSeconds(now, value))}</span>
+      }}
+      footer={(data) => {
+        return (
+          data && (
+            <div className="text-xs text-gray-500 dark:text-zinc-400">
+              <Link href={`/${data[0].type}/${data[0].number}`}>
+                <span className="absolute inset-0"></span>
+                <Classified>{data[0].client.nickname}</Classified>{' '}
+                <small className="tabular-nums">— {data[0].number}</small>
+              </Link>
+            </div>
+          )
+        )
+      }}
     />
   )
 }
@@ -798,35 +985,53 @@ function SlowestPayingClientCell({ className }: { className?: string }) {
       inverse
       className={className}
       title={'Slowest paying client'}
-      data={(list) =>
-        separateRecords(list)
-          .filter((r) => isPaidRecord(r))
-          .map((r) => (isReceipt(r) ? r.invoice : r))
-          .flatMap((r) => {
-            let sentAt = eventsBy(r).find((e) => e.type === 'invoice:sent')?.at
-            if (!sentAt) return []
+      data={(list) => {
+        return (
+          separateRecords(list)
+            .filter((r) => {
+              return isPaidRecord(r)
+            })
+            .map((r) => {
+              return isReceipt(r) ? r.invoice : r
+            })
+            .flatMap((r) => {
+              let sentAt = eventsBy(r).find((e) => {
+                return e.type === 'invoice:sent'
+              })?.at
+              if (!sentAt) return []
 
-            let paidAt = eventsBy(r).find((e) => e.type === 'invoice:paid')?.at
-            if (!paidAt) return []
+              let paidAt = eventsBy(r).find((e) => {
+                return e.type === 'invoice:paid'
+              })?.at
+              if (!paidAt) return []
 
-            return [[r, differenceInSeconds(paidAt, sentAt)] as const]
-          })
-          .sort(([, a], [, z]) => a - z)
-          .pop() ?? null
-      }
-      value={(data) => data?.[1] ?? null}
-      display={(value) => <span>{formatDistanceStrict(now, addSeconds(now, value))}</span>}
-      footer={(data) =>
-        data && (
-          <div className="text-xs text-gray-500 dark:text-zinc-400">
-            <Link href={`/${data[0].type}/${data[0].number}`}>
-              <span className="absolute inset-0"></span>
-              <Classified>{data[0].client.nickname}</Classified>{' '}
-              <small className="tabular-nums">— {data[0].number}</small>
-            </Link>
-          </div>
+              return [[r, differenceInSeconds(paidAt, sentAt)] as const]
+            })
+            .sort(([, a], [, z]) => {
+              return a - z
+            })
+            .pop() ?? null
         )
-      }
+      }}
+      value={(data) => {
+        return data?.[1] ?? null
+      }}
+      display={(value) => {
+        return <span>{formatDistanceStrict(now, addSeconds(now, value))}</span>
+      }}
+      footer={(data) => {
+        return (
+          data && (
+            <div className="text-xs text-gray-500 dark:text-zinc-400">
+              <Link href={`/${data[0].type}/${data[0].number}`}>
+                <span className="absolute inset-0"></span>
+                <Classified>{data[0].client.nickname}</Classified>{' '}
+                <small className="tabular-nums">— {data[0].number}</small>
+              </Link>
+            </div>
+          )
+        )
+      }}
     />
   )
 }
@@ -834,8 +1039,12 @@ function SlowestPayingClientCell({ className }: { className?: string }) {
 function TopPayingClientsCell({ className }: { className?: string }) {
   let { current } = useContext(CompareConfigContext)
   let totalInvoiceSales = current
-    .filter((e) => isPaidRecord(e))
-    .reduce((acc, e) => acc + total(e), 0)
+    .filter((e) => {
+      return isPaidRecord(e)
+    })
+    .reduce((acc, e) => {
+      return acc + total(e)
+    }, 0)
 
   let data = Array.from(
     current
@@ -850,7 +1059,9 @@ function TopPayingClientsCell({ className }: { className?: string }) {
       }, new Map<Client['id'], { client: Client; total: number }>())
       .entries(),
   )
-    .sort(([, a], [, z]) => z.total - a.total) // Sort by best paying client first.
+    .sort(([, a], [, z]) => {
+      return z.total - a.total
+    }) // Sort by best paying client first.
     .slice(0, 5) // Only show the top 5.
 
   return (
@@ -866,37 +1077,39 @@ function TopPayingClientsCell({ className }: { className?: string }) {
       </div>
       {data.length > 0 ? (
         <div className="flex-1 divide-y divide-gray-100 dark:divide-zinc-900">
-          {data.map(([id, { client, total }], idx) => (
-            <I18NProvider key={id} value={client}>
-              <Link
-                href={`/clients/${client.id}`}
-                className="group relative flex items-center p-3 first:border-t-[1px] first:border-t-transparent focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 dark:border-zinc-700"
-              >
-                <div className="absolute inset-2 z-0 flex">
-                  <div
-                    className="rounded-md bg-blue-200/30 dark:bg-blue-400/25"
-                    style={{ width: `${(total / totalInvoiceSales) * 100}%` }}
-                  />
-                </div>
-                <div className="z-10 flex w-full items-center space-x-2">
-                  <span className="w-[2ch] text-right text-sm font-medium tabular-nums text-gray-400 dark:text-zinc-400">
-                    {idx + 1}.
-                  </span>
-                  <div className="flex flex-1 items-center justify-between space-x-2 truncate dark:text-zinc-300">
-                    <span className="truncate">
-                      <Classified>{client.nickname}</Classified>
-                    </span>
-                    <span className="text-xs">
-                      <Money amount={total} />
-                      <small className="mx-1 inline-block w-[4ch] flex-shrink-0 text-right">
-                        {((total / totalInvoiceSales) * 100).toFixed(0)}%
-                      </small>
-                    </span>
+          {data.map(([id, { client, total }], idx) => {
+            return (
+              <I18NProvider key={id} value={client}>
+                <Link
+                  href={`/clients/${client.id}`}
+                  className="group relative flex items-center p-3 first:border-t-[1px] first:border-t-transparent focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 dark:border-zinc-700"
+                >
+                  <div className="absolute inset-2 z-0 flex">
+                    <div
+                      className="rounded-md bg-blue-200/30 dark:bg-blue-400/25"
+                      style={{ width: `${(total / totalInvoiceSales) * 100}%` }}
+                    />
                   </div>
-                </div>
-              </Link>
-            </I18NProvider>
-          ))}
+                  <div className="z-10 flex w-full items-center space-x-2">
+                    <span className="w-[2ch] text-right text-sm font-medium tabular-nums text-gray-400 dark:text-zinc-400">
+                      {idx + 1}.
+                    </span>
+                    <div className="flex flex-1 items-center justify-between space-x-2 truncate dark:text-zinc-300">
+                      <span className="truncate">
+                        <Classified>{client.nickname}</Classified>
+                      </span>
+                      <span className="text-xs">
+                        <Money amount={total} />
+                        <small className="mx-1 inline-block w-[4ch] flex-shrink-0 text-right">
+                          {((total / totalInvoiceSales) * 100).toFixed(0)}%
+                        </small>
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              </I18NProvider>
+            )
+          })}
         </div>
       ) : (
         <Empty message="No clients available" />
@@ -918,8 +1131,12 @@ function PaidInvoicesChartCell({ className }: { className?: string }) {
   let previous = useCallback(
     (value: Date) => {
       return match(data.strategy, {
-        'previous-period': () => subHours(value, rangeDifferenceInHours),
-        'last-year': () => subYears(value, 1),
+        'previous-period': () => {
+          return subHours(value, rangeDifferenceInHours)
+        },
+        'last-year': () => {
+          return subYears(value, 1)
+        },
       })
     },
     [data.strategy, rangeDifferenceInHours],
@@ -927,8 +1144,12 @@ function PaidInvoicesChartCell({ className }: { className?: string }) {
   let next = useCallback(
     (value: Date) => {
       return match(data.strategy, {
-        'previous-period': () => addHours(value, rangeDifferenceInHours),
-        'last-year': () => addYears(value, 1),
+        'previous-period': () => {
+          return addHours(value, rangeDifferenceInHours)
+        },
+        'last-year': () => {
+          return addYears(value, 1)
+        },
       })
     },
     [data.strategy, rangeDifferenceInHours],
@@ -968,7 +1189,11 @@ function Goals({ className, goals }: { className?: string; goals: Goal[] }) {
           <div className="flex items-center gap-2">
             <button
               className="relative -m-2 p-2"
-              onClick={() => setIndex((v) => (v + goals.length - 1) % goals.length)}
+              onClick={() => {
+                return setIndex((v) => {
+                  return (v + goals.length - 1) % goals.length
+                })
+              }}
             >
               <ArrowSmallLeftIcon className="h-4 w-4" />
             </button>
@@ -977,7 +1202,11 @@ function Goals({ className, goals }: { className?: string; goals: Goal[] }) {
             </span>
             <button
               className="relative -m-2 p-2"
-              onClick={() => setIndex((v) => (v + goals.length + 1) % goals.length)}
+              onClick={() => {
+                return setIndex((v) => {
+                  return (v + goals.length + 1) % goals.length
+                })
+              }}
             >
               <ArrowSmallRightIcon className="h-4 w-4" />
             </button>
@@ -1000,23 +1229,35 @@ function Goals({ className, goals }: { className?: string; goals: Goal[] }) {
             <div className="flex items-center justify-center gap-2 px-1">
               <div className="h-2 w-2 rounded-full bg-[--current]"></div>
               {match(goal.type, {
-                number: () => <>{goal.current}</>,
-                money: () => <Money amount={goal.current} />,
+                number: () => {
+                  return <>{goal.current}</>
+                },
+                money: () => {
+                  return <Money amount={goal.current} />
+                },
               })}
             </div>
             <div className="flex items-center justify-center gap-2 px-1">
               <div className="h-2 w-2 rounded-full bg-[--next]"></div>
               {match(goal.type, {
-                number: () => <>{goal.next}</>,
-                money: () => <Money amount={goal.next} />,
+                number: () => {
+                  return <>{goal.next}</>
+                },
+                money: () => {
+                  return <Money amount={goal.next} />
+                },
               })}
             </div>
           </div>
           <div className="mt-4 text-xs">
             Remaining:{' '}
             {match(goal.type, {
-              number: () => <>{goal.next - goal.current}</>,
-              money: () => <Money amount={goal.next - goal.current} />,
+              number: () => {
+                return <>{goal.next - goal.current}</>
+              },
+              money: () => {
+                return <Money amount={goal.next - goal.current} />
+              },
             })}
           </div>
         </div>
@@ -1068,46 +1309,60 @@ function ComparisonChart({
 
   let data = match(interval, {
     hour: () => {
-      return eachHourOfInterval(currentRange).map((start) => ({
-        start,
-        end: endOfHour(start),
-      }))
+      return eachHourOfInterval(currentRange).map((start) => {
+        return {
+          start,
+          end: endOfHour(start),
+        }
+      })
     },
     day: () => {
-      return eachDayOfInterval(currentRange).map((start) => ({
-        start,
-        end: endOfDay(start),
-      }))
+      return eachDayOfInterval(currentRange).map((start) => {
+        return {
+          start,
+          end: endOfDay(start),
+        }
+      })
     },
     week: () => {
-      return eachWeekOfInterval(currentRange, { weekStartsOn: 1 }).map((start) => ({
-        start,
-        end: endOfWeek(start, { weekStartsOn: 1 }),
-      }))
+      return eachWeekOfInterval(currentRange, { weekStartsOn: 1 }).map((start) => {
+        return {
+          start,
+          end: endOfWeek(start, { weekStartsOn: 1 }),
+        }
+      })
     },
     month: () => {
-      return eachMonthOfInterval(currentRange).map((start) => ({
-        start,
-        end: endOfMonth(start),
-      }))
+      return eachMonthOfInterval(currentRange).map((start) => {
+        return {
+          start,
+          end: endOfMonth(start),
+        }
+      })
     },
     quarter: () => {
-      return eachQuarterOfInterval(currentRange).map((start) => ({
-        start,
-        end: endOfQuarter(start),
-      }))
+      return eachQuarterOfInterval(currentRange).map((start) => {
+        return {
+          start,
+          end: endOfQuarter(start),
+        }
+      })
     },
     year: () => {
-      return eachYearOfInterval(currentRange).map((start) => ({
-        start,
-        end: endOfYear(start),
-      }))
+      return eachYearOfInterval(currentRange).map((start) => {
+        return {
+          start,
+          end: endOfYear(start),
+        }
+      })
     },
-  }).map((range) => ({
-    range,
-    previous: null as number | null,
-    current: null as number | null,
-  }))
+  }).map((range) => {
+    return {
+      range,
+      previous: null as number | null,
+      current: null as number | null,
+    }
+  })
 
   for (let [period, records] of [
     ['previous', previousRecords],
@@ -1178,84 +1433,100 @@ function ComparisonChart({
               <LineChart data={data} margin={{ left: 15, right: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--grid-color)" />
                 <Tooltip
-                  content={({ payload = [] }) => (
-                    <div className="flex flex-col gap-4 rounded-md bg-white p-4 shadow ring-1 ring-black/10 dark:bg-zinc-900/75">
-                      {payload.map((entry, index) => {
-                        return (
-                          <div key={`item-${index}`} className="flex flex-col gap-2">
-                            <div className="text-sm font-semibold text-gray-500 dark:text-zinc-400">
-                              {match(entry.dataKey as 'previous' | 'current', {
-                                previous: () => {
-                                  return (
-                                    <FormatRange
-                                      start={previous(entry.payload.range.start)}
-                                      end={previous(entry.payload.range.end)}
-                                    />
-                                  )
-                                },
-                                current: () => {
-                                  return (
-                                    <FormatRange
-                                      start={entry.payload.range.start}
-                                      end={entry.payload.range.end}
-                                    />
-                                  )
-                                },
-                              })}
+                  content={({ payload = [] }) => {
+                    return (
+                      <div className="flex flex-col gap-4 rounded-md bg-white p-4 shadow ring-1 ring-black/10 dark:bg-zinc-900/75">
+                        {payload.map((entry, index) => {
+                          return (
+                            <div key={`item-${index}`} className="flex flex-col gap-2">
+                              <div className="text-sm font-semibold text-gray-500 dark:text-zinc-400">
+                                {match(entry.dataKey as 'previous' | 'current', {
+                                  previous: () => {
+                                    return (
+                                      <FormatRange
+                                        start={previous(entry.payload.range.start)}
+                                        end={previous(entry.payload.range.end)}
+                                      />
+                                    )
+                                  },
+                                  current: () => {
+                                    return (
+                                      <FormatRange
+                                        start={entry.payload.range.start}
+                                        end={entry.payload.range.end}
+                                      />
+                                    )
+                                  },
+                                })}
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <div
+                                  className="h-3 w-3 rounded-full"
+                                  style={{ backgroundColor: entry.color }}
+                                />
+                                <span className="text-sm font-medium text-gray-400 dark:text-zinc-400">
+                                  <Money amount={Number(entry.value)} />
+                                </span>
+                              </div>
                             </div>
-                            <div className="flex items-center gap-2">
+                          )
+                        })}
+                      </div>
+                    )
+                  }}
+                />
+                <Legend
+                  content={({ payload = [] }) => {
+                    return (
+                      <div className="mt-4 flex items-center justify-end gap-8">
+                        {payload.map((entry, index) => {
+                          return (
+                            <div key={`item-${index}`} className="flex items-center gap-2">
                               <div
                                 className="h-3 w-3 rounded-full"
                                 style={{ backgroundColor: entry.color }}
                               />
                               <span className="text-sm font-medium text-gray-400 dark:text-zinc-400">
-                                <Money amount={Number(entry.value)} />
+                                {entry.value}
                               </span>
                             </div>
-                          </div>
-                        )
-                      })}
-                    </div>
-                  )}
-                />
-                <Legend
-                  content={({ payload = [] }) => (
-                    <div className="mt-4 flex items-center justify-end gap-8">
-                      {payload.map((entry, index) => (
-                        <div key={`item-${index}`} className="flex items-center gap-2">
-                          <div
-                            className="h-3 w-3 rounded-full"
-                            style={{ backgroundColor: entry.color }}
-                          />
-                          <span className="text-sm font-medium text-gray-400 dark:text-zinc-400">
-                            {entry.value}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                          )
+                        })}
+                      </div>
+                    )
+                  }}
                 />
                 <YAxis
-                  tickFormatter={(x) =>
-                    isClassified ? 'XXX' : shortCurrencyFormatter.format(x / 100)
-                  }
+                  tickFormatter={(x) => {
+                    return isClassified ? 'XXX' : shortCurrencyFormatter.format(x / 100)
+                  }}
                 />
                 <XAxis
                   tickMargin={16}
                   tickFormatter={(idx) => {
                     let { start, end } = data[idx].range
                     return match(interval, {
-                      hour: () => format(start, 'p'),
-                      day: () => format(start, 'dd MMM'),
+                      hour: () => {
+                        return format(start, 'p')
+                      },
+                      day: () => {
+                        return format(start, 'dd MMM')
+                      },
                       week: () => {
                         if (isSameWeek(start, end)) return format(start, 'dd')
                         if (isSameMonth(start, end))
                           return `${format(start, 'dd')} — ${format(end, 'dd MMM')}`
                         return `${format(start, 'dd MMM')} — ${format(end, 'dd MMM')}`
                       },
-                      month: () => format(start, 'LLL'),
-                      quarter: () => format(start, 'qqq yyyy'),
-                      year: () => format(start, 'yyyy'),
+                      month: () => {
+                        return format(start, 'LLL')
+                      },
+                      quarter: () => {
+                        return format(start, 'qqq yyyy')
+                      },
+                      year: () => {
+                        return format(start, 'yyyy')
+                      },
                     })
                   }}
                 />
@@ -1320,8 +1591,12 @@ function CompareGroup({
 function CompareBlock<T = Record[]>({
   title,
   value,
-  data = (i) => i as T,
-  display = (i) => <>{i}</>,
+  data = (i) => {
+    return i as T
+  },
+  display = (i) => {
+    return <>{i}</>
+  },
   footer = null,
   inverse = false,
   variant = 'normal',
@@ -1348,8 +1623,12 @@ function CompareBlock<T = Record[]>({
       className={classNames(
         'relative flex flex-col gap-2 rounded-md shadow ring-1 ring-black/5 group-data-[grouped]:shadow-none group-data-[grouped]:ring-0',
         match(variant, {
-          tiny: () => 'bg-gray-100 p-2 dark:bg-zinc-800',
-          normal: () => 'bg-white p-4 dark:bg-zinc-900',
+          tiny: () => {
+            return 'bg-gray-100 p-2 dark:bg-zinc-800'
+          },
+          normal: () => {
+            return 'bg-white p-4 dark:bg-zinc-900'
+          },
         }),
         currentValue === null && 'opacity-50 transition-opacity duration-300 hover:opacity-100',
         className,
@@ -1361,8 +1640,12 @@ function CompareBlock<T = Record[]>({
           className={classNames(
             'truncate text-gray-600 dark:text-zinc-400',
             match(variant, {
-              tiny: () => 'text-xs',
-              normal: () => 'text-sm',
+              tiny: () => {
+                return 'text-xs'
+              },
+              normal: () => {
+                return 'text-sm'
+              },
             }),
           )}
         >
@@ -1373,8 +1656,12 @@ function CompareBlock<T = Record[]>({
             className={classNames(
               'font-semibold tabular-nums text-zinc-500 dark:text-zinc-400',
               match(variant, {
-                tiny: () => 'text-base',
-                normal: () => 'text-2xl',
+                tiny: () => {
+                  return 'text-base'
+                },
+                normal: () => {
+                  return 'text-2xl'
+                },
               }),
             )}
           >
@@ -1385,53 +1672,63 @@ function CompareBlock<T = Record[]>({
               className={classNames(
                 '-translate-y-0.5',
                 match(variant, {
-                  tiny: () => 'text-xs [--icon-size:theme(spacing.3)]',
-                  normal: () => 'text-sm [--icon-size:theme(spacing.5)]',
+                  tiny: () => {
+                    return 'text-xs [--icon-size:theme(spacing.3)]'
+                  },
+                  normal: () => {
+                    return 'text-sm [--icon-size:theme(spacing.5)]'
+                  },
                 }),
               )}
             >
               {match(Math.sign(currentValue! - previousValue!), {
-                [1]: () => (
-                  <span
-                    className={classNames(
-                      'flex items-baseline font-semibold',
-                      inverse
-                        ? 'text-red-600 dark:text-red-400'
-                        : 'text-green-600 dark:text-green-400',
-                    )}
-                  >
-                    <ArrowUpIcon
+                [1]: () => {
+                  return (
+                    <span
                       className={classNames(
-                        'h-[--icon-size] w-[--icon-size] shrink-0 self-center',
+                        'flex items-baseline font-semibold',
                         inverse
-                          ? 'text-red-500 dark:text-red-400'
-                          : 'text-green-500 dark:text-green-400',
+                          ? 'text-red-600 dark:text-red-400'
+                          : 'text-green-600 dark:text-green-400',
                       )}
-                    />
-                    {display(currentValue! - previousValue!)}
-                  </span>
-                ),
-                [0]: () => null,
-                [-1]: () => (
-                  <span
-                    className={classNames(
-                      'flex items-baseline font-semibold',
-                      inverse
-                        ? 'text-green-600 dark:text-green-400'
-                        : 'text-red-600 dark:text-red-400',
-                    )}
-                  >
-                    <ArrowDownIcon
+                    >
+                      <ArrowUpIcon
+                        className={classNames(
+                          'h-[--icon-size] w-[--icon-size] shrink-0 self-center',
+                          inverse
+                            ? 'text-red-500 dark:text-red-400'
+                            : 'text-green-500 dark:text-green-400',
+                        )}
+                      />
+                      {display(currentValue! - previousValue!)}
+                    </span>
+                  )
+                },
+                [0]: () => {
+                  return null
+                },
+                [-1]: () => {
+                  return (
+                    <span
                       className={classNames(
-                        'h-[--icon-size] w-[--icon-size] shrink-0 self-center',
+                        'flex items-baseline font-semibold',
                         inverse
-                          ? 'text-green-500 dark:text-green-400'
-                          : 'text-red-500 dark:text-red-400',
+                          ? 'text-green-600 dark:text-green-400'
+                          : 'text-red-600 dark:text-red-400',
                       )}
-                    />
-                    {display(currentValue! - previousValue!)}
-                  </span>
-                ),
+                    >
+                      <ArrowDownIcon
+                        className={classNames(
+                          'h-[--icon-size] w-[--icon-size] shrink-0 self-center',
+                          inverse
+                            ? 'text-green-500 dark:text-green-400'
+                            : 'text-red-500 dark:text-red-400',
+                        )}
+                      />
+                      {display(currentValue! - previousValue!)}
+                    </span>
+                  )
+                },
               })}
             </span>
           )}
@@ -1466,28 +1763,34 @@ function AccumulativePaidInvoicesChart({
   let shortCurrencyFormatter = useCurrencyFormatter({ type: 'short' })
   let isClassified = useIsClassified()
 
-  let data = eachDayOfInterval(currentRange).map((start) => ({
-    start,
-    end: endOfDay(start),
-    total: 0,
-  }))
+  let data = eachDayOfInterval(currentRange).map((start) => {
+    return {
+      start,
+      end: endOfDay(start),
+      total: 0,
+    }
+  })
 
   let accumulator = 0
-  for (let record of currentRecords
-    .slice()
-    .sort((a, z) => compareAsc(resolveRelevantRecordDate(a), resolveRelevantRecordDate(z)))) {
+  for (let record of currentRecords.slice().sort((a, z) => {
+    return compareAsc(resolveRelevantRecordDate(a), resolveRelevantRecordDate(z))
+  })) {
     if (!isPaidRecord(record)) continue
 
     let date = resolveRelevantRecordDate(record)
     if (isWithinInterval(date, currentRange)) {
-      let datum = data.find((d) => isWithinInterval(date, d))
+      let datum = data.find((d) => {
+        return isWithinInterval(date, d)
+      })
       if (!datum) continue
       accumulator += total(record)
       datum.total = accumulator
     }
   }
 
-  data = data.filter((d) => d.total !== 0)
+  data = data.filter((d) => {
+    return d.total !== 0
+  })
 
   let hasData = data.length > 1
 
@@ -1509,52 +1812,61 @@ function AccumulativePaidInvoicesChart({
               <LineChart data={data} margin={{ left: 15, right: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--grid-color)" />
                 <Tooltip
-                  content={({ payload = [] }) => (
-                    <div className="flex flex-col gap-2 rounded-md bg-white p-4 shadow ring-1 ring-black/10 dark:bg-zinc-900/75">
-                      {payload.map((entry, index) => {
-                        return (
-                          <Fragment key={`item-${index}`}>
-                            {index === 0 && (
-                              <div className="text-sm font-semibold text-gray-500 dark:text-zinc-400">
-                                <FormatRange start={entry.payload.start} end={entry.payload.end} />
+                  content={({ payload = [] }) => {
+                    return (
+                      <div className="flex flex-col gap-2 rounded-md bg-white p-4 shadow ring-1 ring-black/10 dark:bg-zinc-900/75">
+                        {payload.map((entry, index) => {
+                          return (
+                            <Fragment key={`item-${index}`}>
+                              {index === 0 && (
+                                <div className="text-sm font-semibold text-gray-500 dark:text-zinc-400">
+                                  <FormatRange
+                                    start={entry.payload.start}
+                                    end={entry.payload.end}
+                                  />
+                                </div>
+                              )}
+                              <div className="flex items-center gap-2">
+                                <div
+                                  className="h-3 w-3 rounded-full"
+                                  style={{ backgroundColor: entry.color }}
+                                />
+                                <span className="text-sm font-medium text-gray-400 dark:text-zinc-400">
+                                  <Money amount={Number(entry.value)} />
+                                </span>
                               </div>
-                            )}
-                            <div className="flex items-center gap-2">
+                            </Fragment>
+                          )
+                        })}
+                      </div>
+                    )
+                  }}
+                />
+                <Legend
+                  content={({ payload = [] }) => {
+                    return (
+                      <div className="mt-4 flex items-center justify-end gap-8">
+                        {payload.map((entry, index) => {
+                          return (
+                            <div key={`item-${index}`} className="flex items-center gap-2">
                               <div
                                 className="h-3 w-3 rounded-full"
                                 style={{ backgroundColor: entry.color }}
                               />
                               <span className="text-sm font-medium text-gray-400 dark:text-zinc-400">
-                                <Money amount={Number(entry.value)} />
+                                {entry.value}
                               </span>
                             </div>
-                          </Fragment>
-                        )
-                      })}
-                    </div>
-                  )}
-                />
-                <Legend
-                  content={({ payload = [] }) => (
-                    <div className="mt-4 flex items-center justify-end gap-8">
-                      {payload.map((entry, index) => (
-                        <div key={`item-${index}`} className="flex items-center gap-2">
-                          <div
-                            className="h-3 w-3 rounded-full"
-                            style={{ backgroundColor: entry.color }}
-                          />
-                          <span className="text-sm font-medium text-gray-400 dark:text-zinc-400">
-                            {entry.value}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                          )
+                        })}
+                      </div>
+                    )
+                  }}
                 />
                 <YAxis
-                  tickFormatter={(x) =>
-                    isClassified ? 'XXX' : shortCurrencyFormatter.format(x / 100)
-                  }
+                  tickFormatter={(x) => {
+                    return isClassified ? 'XXX' : shortCurrencyFormatter.format(x / 100)
+                  }}
                 />
                 <XAxis
                   tickMargin={16}
@@ -1601,7 +1913,9 @@ function createGoals(records: Record[], milestones: Milestones): Goal[] {
   // Paid invoices count
   {
     let current = paidRecords.length
-    let next = milestones.invoiceCountMilestonesData.findLast((m) => m > current)
+    let next = milestones.invoiceCountMilestonesData.findLast((m) => {
+      return m > current
+    })
     if (next) {
       goals.push({ current, next, label: 'Paid invoices', type: 'number' })
     }
@@ -1609,8 +1923,14 @@ function createGoals(records: Record[], milestones: Milestones): Goal[] {
 
   // Client count
   {
-    let current = new Set(paidRecords.map((r) => r.client.id)).size
-    let next = milestones.clientCountMilestonesData.findLast((m) => m > current)
+    let current = new Set(
+      paidRecords.map((r) => {
+        return r.client.id
+      }),
+    ).size
+    let next = milestones.clientCountMilestonesData.findLast((m) => {
+      return m > current
+    })
     if (next) {
       goals.push({ current, next, label: 'Total clients', type: 'number' })
     }
@@ -1620,10 +1940,16 @@ function createGoals(records: Record[], milestones: Milestones): Goal[] {
   {
     let current = new Set(
       paidRecords
-        .filter((r) => r.client.billing.country !== r.account.billing.country)
-        .map((r) => r.client.id),
+        .filter((r) => {
+          return r.client.billing.country !== r.account.billing.country
+        })
+        .map((r) => {
+          return r.client.id
+        }),
     ).size
-    let next = milestones.internationalClientCountMilestonesData.findLast((m) => m > current)
+    let next = milestones.internationalClientCountMilestonesData.findLast((m) => {
+      return m > current
+    })
     if (next) {
       goals.push({ current, next, label: 'Total international clients', type: 'number' })
     }
@@ -1631,8 +1957,12 @@ function createGoals(records: Record[], milestones: Milestones): Goal[] {
 
   // Total revenue
   {
-    let current = paidRecords.reduce((sum, r) => sum + total(r), 0)
-    let next = milestones.revenueMilestonesData.findLast((m) => m > current)
+    let current = paidRecords.reduce((sum, r) => {
+      return sum + total(r)
+    }, 0)
+    let next = milestones.revenueMilestonesData.findLast((m) => {
+      return m > current
+    })
     if (next) {
       goals.push({ current, next, label: 'Total revenue', type: 'money' })
     }
@@ -1641,9 +1971,13 @@ function createGoals(records: Record[], milestones: Milestones): Goal[] {
   return (
     goals
       // Filter out goals with 0%
-      .filter((g) => g.current / g.next !== 0)
+      .filter((g) => {
+        return g.current / g.next !== 0
+      })
 
       // Sort goals by progress
-      .sort((a, z) => z.current / z.next - a.current / a.next)
+      .sort((a, z) => {
+        return z.current / z.next - a.current / a.next
+      })
   )
 }

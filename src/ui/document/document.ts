@@ -49,8 +49,14 @@ function jsxify(node: ChildNode): JSX {
   if (node.type === 'tag') {
     return {
       tag: node.name,
-      props: Object.fromEntries(node.attributes.map((attr) => [attr.name, attr.value])),
-      children: Array.from(node.childNodes).flatMap((child) => jsxify(child) ?? []),
+      props: Object.fromEntries(
+        node.attributes.map((attr) => {
+          return [attr.name, attr.value]
+        }),
+      ),
+      children: Array.from(node.childNodes).flatMap((child) => {
+        return jsxify(child) ?? []
+      }),
     }
   }
 
@@ -61,7 +67,9 @@ let GROUP_ID_KEY = 'data-group-id'
 
 function expandRecursively(ast: JSX | JSX[]): JSX[] {
   if (Array.isArray(ast)) {
-    return ast.flatMap((child) => expandRecursively(child))
+    return ast.flatMap((child) => {
+      return expandRecursively(child)
+    })
   }
 
   if (ast === null) {
@@ -88,7 +96,9 @@ function expandRecursively(ast: JSX | JSX[]): JSX[] {
     // current page
     if (
       child.tag === 'li' &&
-      child.children.some((child) => child?.tag === 'ol' || child?.tag === 'ul')
+      child.children.some((child) => {
+        return child?.tag === 'ol' || child?.tag === 'ul'
+      })
     ) {
       child.props['data-has-children'] = true
     }
@@ -126,7 +136,9 @@ export function expand(html: string): JSX[] {
 
 export function paginate(items: JSX[], pages: number[]): JSX[][] {
   let clone = items.slice()
-  let split = pages.map((page) => clone.splice(0, page))
+  let split = pages.map((page) => {
+    return clone.splice(0, page)
+  })
 
   for (let i = split.length - 2; i >= 0; i--) {
     let again = true
@@ -151,7 +163,9 @@ export function paginate(items: JSX[], pages: number[]): JSX[][] {
           last.children.length === 1 &&
           last.children[0]?.tag === 'li' &&
           last.children[0].props['data-has-children'] &&
-          !last.children[0].children.some((child) => child?.tag === 'ol' || child?.tag === 'ul')
+          !last.children[0].children.some((child) => {
+            return child?.tag === 'ol' || child?.tag === 'ul'
+          })
         ) {
           if (!Array.isArray(split[i + 1])) break
 
@@ -163,7 +177,9 @@ export function paginate(items: JSX[], pages: number[]): JSX[][] {
     }
   }
 
-  return split.filter((page) => page.length > 0)
+  return split.filter((page) => {
+    return page.length > 0
+  })
 }
 
 export function collapse(ast: JSX[]): JSX[] {
@@ -221,12 +237,23 @@ export function collapse(ast: JSX[]): JSX[] {
 }
 
 export function stringify(ast: JSX | JSX[]): string {
-  if (Array.isArray(ast)) return ast.map((node) => stringify(node)).join('\n')
+  if (Array.isArray(ast))
+    return ast
+      .map((node) => {
+        return stringify(node)
+      })
+      .join('\n')
   if (ast === null) return ''
   if (ast.tag === '#text') return ast.props.value
-  let children = ast.children.map((child) => stringify(child)).join('')
+  let children = ast.children
+    .map((child) => {
+      return stringify(child)
+    })
+    .join('')
   let attributes = Object.entries(ast.props)
-    .map(([key, value]) => `${key}="${value}"`)
+    .map(([key, value]) => {
+      return `${key}="${value}"`
+    })
     .join(' ')
   return `<${ast.tag}${attributes.length > 0 ? ` ${attributes}` : ''}>${children}</${ast.tag}>`
 }

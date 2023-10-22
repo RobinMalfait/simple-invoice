@@ -17,18 +17,32 @@ import { tap } from '~/utils/tap'
 let scopedId = new ScopedIDGenerator('account')
 
 export let Account = z.object({
-  id: z.string().default(() => scopedId.next()),
+  id: z.string().default(() => {
+    return scopedId.next()
+  }),
   name: z.string(),
   email: z.string().email().nullable(),
   phone: z.string().nullable(),
   imageUrl: z.string().url().nullable(),
-  billing: z.lazy(() => Address),
+  billing: z.lazy(() => {
+    return Address
+  }),
   currency: z.nativeEnum(Currency),
   language: z.nativeEnum(Language),
-  tax: z.lazy(() => Tax.nullable()),
+  tax: z.lazy(() => {
+    return Tax.nullable()
+  }),
   timezone: z.string(),
-  paymentMethods: z.array(z.lazy(() => PaymentMethod)),
-  contactFields: z.array(z.lazy(() => ContactField)),
+  paymentMethods: z.array(
+    z.lazy(() => {
+      return PaymentMethod
+    }),
+  ),
+  contactFields: z.array(
+    z.lazy(() => {
+      return ContactField
+    }),
+  ),
   note: z.string().nullable(),
   legal: z.string().nullable(),
 

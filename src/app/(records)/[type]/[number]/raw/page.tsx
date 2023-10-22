@@ -8,7 +8,9 @@ export default function Raw({
 }: {
   params: { type: string; number: string }
 }) {
-  let record = records.find((record) => record.type === type && record.number === number)
+  let record = records.find((record) => {
+    return record.type === type && record.number === number
+  })
 
   if (!record) {
     return redirect('/')

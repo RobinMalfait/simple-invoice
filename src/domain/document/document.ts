@@ -19,7 +19,9 @@ export let Document = z
   ])
   .and(
     z.object({
-      id: z.string().default(() => scopedId.next()),
+      id: z.string().default(() => {
+        return scopedId.next()
+      }),
     }),
   )
 

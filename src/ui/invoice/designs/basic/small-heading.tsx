@@ -18,13 +18,19 @@ export function SmallHeading() {
           <span className="space-x-3 text-lg">
             <span>
               <span className="font-medium text-gray-500">
-                {t((x) =>
-                  match(record.type, {
-                    quote: () => x.quote.title,
-                    invoice: () => x.invoice.title,
-                    receipt: () => x.receipt.title,
-                  }),
-                )}
+                {t((x) => {
+                  return match(record.type, {
+                    quote: () => {
+                      return x.quote.title
+                    },
+                    invoice: () => {
+                      return x.invoice.title
+                    },
+                    receipt: () => {
+                      return x.receipt.title
+                    },
+                  })
+                })}
               </span>
               <span className="text-gray-300">.</span>
             </span>
@@ -34,10 +40,15 @@ export function SmallHeading() {
         </div>
 
         <span className="text-sm text-gray-600">
-          {t((x) => x.pagination.summary, {
-            current: current + 1,
-            total,
-          })}
+          {t(
+            (x) => {
+              return x.pagination.summary
+            },
+            {
+              current: current + 1,
+              total,
+            },
+          )}
         </span>
       </div>
     </div>

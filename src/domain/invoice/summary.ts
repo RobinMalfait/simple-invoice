@@ -17,7 +17,9 @@ export function summary({
   let result: Summary[] = []
 
   let hasDiscounts = discounts.length > 0
-  let hasVAT = items.some((item) => item.taxRate !== null)
+  let hasVAT = items.some((item) => {
+    return item.taxRate !== null
+  })
 
   // Calculate net subtotal
   let subtotalResult = items.reduce((sum, item) => {
@@ -61,8 +63,15 @@ export function summary({
   }
 
   // Calculate VATs
-  let vatTypes = new Set(items.filter((item) => item.taxRate !== null).map((item) => item.taxRate))
-    .size
+  let vatTypes = new Set(
+    items
+      .filter((item) => {
+        return item.taxRate !== null
+      })
+      .map((item) => {
+        return item.taxRate
+      }),
+  ).size
 
   let vats = new Map<number, number>()
   let vatResult = 0

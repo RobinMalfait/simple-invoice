@@ -9,7 +9,11 @@ it('should calculate the next invoice number for the same date', () => {
   expect(strategy.next(now)).toEqual('20230201002')
 })
 
-it.each(Object.entries(Base).map(([name, fn]) => [name, fn]))(
+it.each(
+  Object.entries(Base).map(([name, fn]) => {
+    return [name, fn]
+  }),
+)(
   'should calculate the next invoice number for the same date with a custom base "%s"',
   (_, base) => {
     let strategy = new DateBasedStrategy(base)
@@ -20,7 +24,11 @@ it.each(Object.entries(Base).map(([name, fn]) => [name, fn]))(
   },
 )
 
-it.each(Object.entries(Base).map(([name, fn]) => [name, fn]))(
+it.each(
+  Object.entries(Base).map(([name, fn]) => {
+    return [name, fn]
+  }),
+)(
   'should calculate the next invoice number for the same date with a custom base "%s", and with a different amount of significantDigits',
   (_, base) => {
     let strategy = new DateBasedStrategy(base, 2)

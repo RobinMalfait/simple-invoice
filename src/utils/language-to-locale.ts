@@ -5,7 +5,11 @@ import { match } from '~/utils/match'
 
 export function languageToLocale(language: Language) {
   return match(language, {
-    [Language.NL]: () => NL_BE,
-    [Language.EN]: () => EN_US,
+    [Language.NL]: () => {
+      return NL_BE
+    },
+    [Language.EN]: () => {
+      return EN_US
+    },
   })
 }

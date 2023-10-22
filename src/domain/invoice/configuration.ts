@@ -44,7 +44,9 @@ export type Configuration = {
 }
 
 export let defaultConfiguration: Configuration = {
-  defaultNetStrategy: (issueDate: Date) => addDays(issueDate, 30),
+  defaultNetStrategy: (issueDate: Date) => {
+    return addDays(issueDate, 30)
+  },
   numberStrategy: new IncrementStrategy().next,
   pdf: {
     filename: 'invoice-{{number}}.pdf',

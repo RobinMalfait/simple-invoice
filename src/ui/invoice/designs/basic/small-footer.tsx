@@ -11,10 +11,15 @@ export function SmallFooter() {
     <div className="flex items-center justify-between bg-gray-50 px-12 py-3 text-sm text-gray-600">
       <span>{record.account.name}</span>
       <span>
-        {t((x) => x.pagination.summary, {
-          current: current + 1,
-          total,
-        })}
+        {t(
+          (x) => {
+            return x.pagination.summary
+          },
+          {
+            current: current + 1,
+            total,
+          },
+        )}
       </span>
     </div>
   )

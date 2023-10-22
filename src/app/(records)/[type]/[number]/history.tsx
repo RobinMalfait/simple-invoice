@@ -23,7 +23,11 @@ let HistoryContext = React.createContext<{
 
 export function History(props: React.PropsWithChildren<{ record: Record; records: Record[] }>) {
   let stacks = useRecordStacks()
-  let options = (stacks[props.record.id] ?? []).map((id) => props.records.find((e) => e.id === id)!)
+  let options = (stacks[props.record.id] ?? []).map((id) => {
+    return props.records.find((e) => {
+      return e.id === id
+    })!
+  })
 
   return (
     <RecordProvider record={props.record}>
@@ -40,8 +44,18 @@ export function HistoryActions() {
 
   if (options.length <= 1) return null
 
-  let previous = options[options.findIndex((option) => option.id === record.id) - 1]
-  let next = options[options.findIndex((option) => option.id === record.id) + 1]
+  let previous =
+    options[
+      options.findIndex((option) => {
+        return option.id === record.id
+      }) - 1
+    ]
+  let next =
+    options[
+      options.findIndex((option) => {
+        return option.id === record.id
+      }) + 1
+    ]
 
   return (
     <div className="flex w-full items-center justify-between gap-1">
@@ -70,7 +84,11 @@ export function HistoryActions() {
             />
             History{' '}
             <span className="tabular-nums">
-              ({options.findIndex((option) => option.id === record.id) + 1}/{options.length})
+              (
+              {options.findIndex((option) => {
+                return option.id === record.id
+              }) + 1}
+              /{options.length})
             </span>
             <ChevronDownIcon
               className="-mr-1 h-5 w-5 text-gray-400 dark:text-gray-500"
@@ -95,32 +113,40 @@ export function HistoryActions() {
 
                 return (
                   <Menu.Item key={e.id}>
-                    {({ active }) => (
-                      <Link
-                        href={`/${e.type}/${e.number}`}
-                        className={classNames(
-                          active
-                            ? 'bg-gray-100 text-gray-900 dark:bg-zinc-950 dark:text-gray-200'
-                            : 'text-gray-700 dark:text-zinc-400',
-                          'group flex w-full items-center px-4 py-2 text-sm',
-                        )}
-                      >
-                        <Icon
-                          className="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500 dark:text-gray-500 dark:group-hover:text-gray-400"
-                          aria-hidden="true"
-                        />
-                        <span className="inline-flex w-full items-center justify-between gap-2">
-                          <span>
-                            {match(e.type, {
-                              quote: () => 'Quote',
-                              invoice: () => 'Invoice',
-                              receipt: () => 'Receipt',
-                            })}
+                    {({ active }) => {
+                      return (
+                        <Link
+                          href={`/${e.type}/${e.number}`}
+                          className={classNames(
+                            active
+                              ? 'bg-gray-100 text-gray-900 dark:bg-zinc-950 dark:text-gray-200'
+                              : 'text-gray-700 dark:text-zinc-400',
+                            'group flex w-full items-center px-4 py-2 text-sm',
+                          )}
+                        >
+                          <Icon
+                            className="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500 dark:text-gray-500 dark:group-hover:text-gray-400"
+                            aria-hidden="true"
+                          />
+                          <span className="inline-flex w-full items-center justify-between gap-2">
+                            <span>
+                              {match(e.type, {
+                                quote: () => {
+                                  return 'Quote'
+                                },
+                                invoice: () => {
+                                  return 'Invoice'
+                                },
+                                receipt: () => {
+                                  return 'Receipt'
+                                },
+                              })}
+                            </span>
+                            <span>#{e.number}</span>
                           </span>
-                          <span>#{e.number}</span>
-                        </span>
-                      </Link>
-                    )}
+                        </Link>
+                      )
+                    }}
                   </Menu.Item>
                 )
               })}

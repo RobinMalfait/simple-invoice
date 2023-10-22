@@ -17,12 +17,22 @@ type Controls = {
 export function useSidePanel() {
   let [open, setOpen] = useState(false)
 
-  let data = useMemo<Data>(() => ({ open }), [open])
+  let data = useMemo<Data>(() => {
+    return { open }
+  }, [open])
   let controls = useMemo<Controls>(() => {
     return {
-      open: () => setOpen(true),
-      close: () => setOpen(false),
-      toggle: () => setOpen((v) => !v),
+      open: () => {
+        return setOpen(true)
+      },
+      close: () => {
+        return setOpen(false)
+      },
+      toggle: () => {
+        return setOpen((v) => {
+          return !v
+        })
+      },
     }
   }, [setOpen])
 

@@ -55,8 +55,12 @@ export async function load(): Promise<DB> {
   let file = path.resolve(process.cwd(), 'db.json')
   let data = await fs
     .readFile(file, 'utf-8')
-    .then((x) => JSON.parse(x))
-    .catch(() => ({}))
+    .then((x) => {
+      return JSON.parse(x)
+    })
+    .catch(() => {
+      return {}
+    })
 
   return mergeWithDefaults(data, defaults)
 }

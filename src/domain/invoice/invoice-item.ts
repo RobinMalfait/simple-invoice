@@ -5,7 +5,9 @@ import { ScopedIDGenerator } from '~/utils/id'
 let scopedId = new ScopedIDGenerator('invoice-item')
 
 export let InvoiceItem = z.object({
-  id: z.string().default(() => scopedId.next()),
+  id: z.string().default(() => {
+    return scopedId.next()
+  }),
   description: z.string(),
   quantity: z.number(),
   unitPrice: z.number(),

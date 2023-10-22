@@ -37,38 +37,56 @@ export function TotalsByStatus({ records }: { records: Record[] }) {
       {
         type: 'quote',
         status: QuoteStatus.Draft,
-        filter: (r) => isQuote(r) && isDraft(r),
+        filter: (r) => {
+          return isQuote(r) && isDraft(r)
+        },
       },
       {
         type: 'quote',
         status: QuoteStatus.Sent,
-        filter: (r) => isQuote(r) && isSent(r),
+        filter: (r) => {
+          return isQuote(r) && isSent(r)
+        },
       },
       {
         type: 'quote',
         status: QuoteStatus.Accepted,
-        filter: (r) => isQuote(r) && isAccepted(r),
+        filter: (r) => {
+          return isQuote(r) && isAccepted(r)
+        },
       },
 
       // Invoices
       {
         type: 'invoice',
         status: InvoiceStatus.Draft,
-        filter: (r) => isInvoice(r) && isDraft(r),
+        filter: (r) => {
+          return isInvoice(r) && isDraft(r)
+        },
       },
       {
         type: 'invoice',
         status: InvoiceStatus.Sent,
-        filter: (r) => isInvoice(r) && isSent(r),
+        filter: (r) => {
+          return isInvoice(r) && isSent(r)
+        },
       },
       {
         type: 'invoice',
         status: InvoiceStatus.PartiallyPaid,
-        filter: (r) => isInvoice(r) && isPartiallyPaid(r),
+        filter: (r) => {
+          return isInvoice(r) && isPartiallyPaid(r)
+        },
       },
 
       // Covers both invoices and receipts
-      { type: 'invoice', status: InvoiceStatus.Paid, filter: (r) => isPaidRecord(r) },
+      {
+        type: 'invoice',
+        status: InvoiceStatus.Paid,
+        filter: (r) => {
+          return isPaidRecord(r)
+        },
+      },
     ] satisfies {
       type: 'quote' | 'invoice'
       status: QuoteStatus | InvoiceStatus
@@ -81,11 +99,15 @@ export function TotalsByStatus({ records }: { records: Record[] }) {
           currency,
           type: t.type,
           status: t.status,
-          total: records.filter(t.filter).reduce((acc, record) => acc + total(record), 0),
+          total: records.filter(t.filter).reduce((acc, record) => {
+            return acc + total(record)
+          }, 0),
         }
       })
     })
-    .filter((t) => t.total > 0)
+    .filter((t) => {
+      return t.total > 0
+    })
 
   return (
     <div className="flex items-center gap-2">

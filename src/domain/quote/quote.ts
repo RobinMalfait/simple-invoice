@@ -18,16 +18,40 @@ let scopedId = new ScopedIDGenerator('quote')
 
 let BaseQuote = z.object({
   type: z.literal('quote').default('quote'),
-  id: z.string().default(() => scopedId.next()),
+  id: z.string().default(() => {
+    return scopedId.next()
+  }),
   number: z.string(),
-  account: z.lazy(() => Account),
-  client: z.lazy(() => Client),
-  items: z.array(z.lazy(() => InvoiceItem)).default([]),
+  account: z.lazy(() => {
+    return Account
+  }),
+  client: z.lazy(() => {
+    return Client
+  }),
+  items: z
+    .array(
+      z.lazy(() => {
+        return InvoiceItem
+      }),
+    )
+    .default([]),
   note: z.string().nullable(),
   quoteDate: z.date(),
   quoteExpirationDate: z.date(),
-  discounts: z.array(z.lazy(() => Discount)).default([]),
-  attachments: z.array(z.lazy(() => Document)).default([]),
+  discounts: z
+    .array(
+      z.lazy(() => {
+        return Discount
+      }),
+    )
+    .default([]),
+  attachments: z
+    .array(
+      z.lazy(() => {
+        return Document
+      }),
+    )
+    .default([]),
   status: z.nativeEnum(QuoteStatus).default(QuoteStatus.Draft),
 })
 
@@ -36,7 +60,9 @@ export type Quote = z.infer<typeof BaseQuote> & {
 }
 
 export let Quote = BaseQuote.extend({
-  quote: z.lazy(() => Quote.nullable()),
+  quote: z.lazy(() => {
+    return Quote.nullable()
+  }),
 }) as z.ZodType<Quote>
 
 export class QuoteBuilder {
@@ -79,7 +105,11 @@ export class QuoteBuilder {
 
     let quote = Quote.parse(input)
 
-    if (!this._events.some((e) => e.type === 'quote:drafted')) {
+    if (
+      !this._events.some((e) => {
+        return e.type === 'quote:drafted'
+      })
+    ) {
       this._events.unshift({ type: 'quote:drafted', payload: {} })
     }
 
@@ -211,7 +241,17 @@ export class QuoteBuilder {
       throw new Error('Cannot edit an quote that is not in draft status')
     }
 
-    if (new Set(this._items.map((item) => item.taxRate).filter((rate) => rate !== 0)).size > 1) {
+    if (
+      new Set(
+        this._items
+          .map((item) => {
+            return item.taxRate
+          })
+          .filter((rate) => {
+            return rate !== 0
+          }),
+      ).size > 1
+    ) {
       throw new Error('Discount with mixed tax rates is not supported')
     }
 
@@ -246,7 +286,15 @@ export class QuoteBuilder {
 
     if (
       this._discounts.length > 0 &&
-      new Set(this._items.map((item) => item.taxRate).filter((rate) => rate !== 0)).size > 1
+      new Set(
+        this._items
+          .map((item) => {
+            return item.taxRate
+          })
+          .filter((rate) => {
+            return rate !== 0
+          }),
+      ).size > 1
     ) {
       throw new Error(
         'You already had discounts configured, but this is not supported for mixed tax rates right now',
@@ -265,7 +313,15 @@ export class QuoteBuilder {
 
     if (
       this._discounts.length > 0 &&
-      new Set(this._items.map((item) => item.taxRate).filter((rate) => rate !== 0)).size > 1
+      new Set(
+        this._items
+          .map((item) => {
+            return item.taxRate
+          })
+          .filter((rate) => {
+            return rate !== 0
+          }),
+      ).size > 1
     ) {
       throw new Error(
         'You already had discounts configured, but this is not supported for mixed tax rates right now',

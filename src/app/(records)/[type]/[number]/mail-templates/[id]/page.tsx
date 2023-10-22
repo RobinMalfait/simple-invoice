@@ -15,7 +15,9 @@ export default async function Page({
   searchParams: { recipients?: string }
 }) {
   let { type, number, id } = params
-  let record = records.find((record) => record.type === type && record.number === number)
+  let record = records.find((record) => {
+    return record.type === type && record.number === number
+  })
   if (!record) {
     redirect('/')
   }
@@ -24,8 +26,12 @@ export default async function Page({
     'use server'
 
     let recipients = Array.from(form.keys())
-      .filter((key) => /contacts\[(.*?)\]/g.test(key))
-      .map((key) => /contacts\[(.*?)\]/g.exec(key)?.[1])
+      .filter((key) => {
+        return /contacts\[(.*?)\]/g.test(key)
+      })
+      .map((key) => {
+        return /contacts\[(.*?)\]/g.exec(key)?.[1]
+      })
       .filter(Boolean) as string[]
 
     redirect(
@@ -54,28 +60,30 @@ export default async function Page({
           <p className="text-lg font-medium text-slate-900 dark:text-zinc-300">Templates</p>
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto">
-          {templates.map((template) => (
-            <Link
-              key={template.id}
-              href={`/${type}/${number}/mail-templates/${template.id}`}
-              className={classNames(
-                template.id === id
-                  ? 'bg-blue-50/50 dark:bg-zinc-500/50'
-                  : 'hover:bg-blue-50/50 dark:hover:bg-zinc-500/50',
-                'flex border-b border-slate-200 p-6 dark:border-zinc-500',
-              )}
-              aria-current={template.id === id ? 'page' : undefined}
-            >
-              <EyeIcon
-                className="-mt-0.5 h-6 w-6 flex-shrink-0 text-slate-400 dark:text-zinc-300"
-                aria-hidden="true"
-              />
-              <div className="ml-3 text-sm">
-                <p className="font-medium text-slate-900 dark:text-zinc-200">{template.name}</p>
-                <p className="mt-1 text-slate-500 dark:text-zinc-300">{template.subject}</p>
-              </div>
-            </Link>
-          ))}
+          {templates.map((template) => {
+            return (
+              <Link
+                key={template.id}
+                href={`/${type}/${number}/mail-templates/${template.id}`}
+                className={classNames(
+                  template.id === id
+                    ? 'bg-blue-50/50 dark:bg-zinc-500/50'
+                    : 'hover:bg-blue-50/50 dark:hover:bg-zinc-500/50',
+                  'flex border-b border-slate-200 p-6 dark:border-zinc-500',
+                )}
+                aria-current={template.id === id ? 'page' : undefined}
+              >
+                <EyeIcon
+                  className="-mt-0.5 h-6 w-6 flex-shrink-0 text-slate-400 dark:text-zinc-300"
+                  aria-hidden="true"
+                />
+                <div className="ml-3 text-sm">
+                  <p className="font-medium text-slate-900 dark:text-zinc-200">{template.name}</p>
+                  <p className="mt-1 text-slate-500 dark:text-zinc-300">{template.subject}</p>
+                </div>
+              </Link>
+            )
+          })}
         </div>
       </nav>
       <div className="w-full p-4 text-white">

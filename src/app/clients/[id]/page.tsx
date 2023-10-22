@@ -38,16 +38,26 @@ function tab<T extends Record>(tab: RecordTab<T>): RecordTab<T> {
 
 export default async function Page({ params: { id } }: { params: { id: string } }) {
   let combined = combineRecords(records)
-  let client = combined.find((record) => record.client.id === id)?.client
+  let client = combined.find((record) => {
+    return record.client.id === id
+  })?.client
   if (!client) {
     redirect('/')
   }
-  let recordsForClient = combined.filter((record) => record.client.id === id)
+  let recordsForClient = combined.filter((record) => {
+    return record.client.id === id
+  })
 
   let allRecords = separateRecords(records)
-  let systemContainsQuotes = allRecords.some((r) => isQuote(r))
-  let systemContainsInvoices = allRecords.some((r) => isInvoice(r))
-  let systemContainsReceipts = allRecords.some((r) => isReceipt(r))
+  let systemContainsQuotes = allRecords.some((r) => {
+    return isQuote(r)
+  })
+  let systemContainsInvoices = allRecords.some((r) => {
+    return isInvoice(r)
+  })
+  let systemContainsReceipts = allRecords.some((r) => {
+    return isReceipt(r)
+  })
 
   let tabs = [
     systemContainsQuotes &&
@@ -55,12 +65,43 @@ export default async function Page({ params: { id } }: { params: { id: string } 
         label: 'Quotes',
         filter: isQuote,
         children: [
-          { label: 'Draft', filter: (r) => r.status === QuoteStatus.Draft },
-          { label: 'Sent', filter: (r) => r.status === QuoteStatus.Sent },
-          { label: 'Accepted', filter: (r) => r.status === QuoteStatus.Accepted, default: true },
-          { label: 'Rejected', filter: (r) => r.status === QuoteStatus.Rejected },
-          { label: 'Expired', filter: (r) => r.status === QuoteStatus.Expired },
-          { label: 'Closed', filter: (r) => r.status === QuoteStatus.Closed },
+          {
+            label: 'Draft',
+            filter: (r) => {
+              return r.status === QuoteStatus.Draft
+            },
+          },
+          {
+            label: 'Sent',
+            filter: (r) => {
+              return r.status === QuoteStatus.Sent
+            },
+          },
+          {
+            label: 'Accepted',
+            filter: (r) => {
+              return r.status === QuoteStatus.Accepted
+            },
+            default: true,
+          },
+          {
+            label: 'Rejected',
+            filter: (r) => {
+              return r.status === QuoteStatus.Rejected
+            },
+          },
+          {
+            label: 'Expired',
+            filter: (r) => {
+              return r.status === QuoteStatus.Expired
+            },
+          },
+          {
+            label: 'Closed',
+            filter: (r) => {
+              return r.status === QuoteStatus.Closed
+            },
+          },
         ],
       }),
     systemContainsInvoices &&
@@ -68,22 +109,52 @@ export default async function Page({ params: { id } }: { params: { id: string } 
         label: 'Invoices',
         filter: isInvoice,
         children: [
-          { label: 'Draft', filter: (r) => r.status === InvoiceStatus.Draft },
-          { label: 'Sent', filter: (r) => r.status === InvoiceStatus.Sent },
-          { label: 'Paid', filter: (r) => r.status === InvoiceStatus.Paid, default: true },
+          {
+            label: 'Draft',
+            filter: (r) => {
+              return r.status === InvoiceStatus.Draft
+            },
+          },
+          {
+            label: 'Sent',
+            filter: (r) => {
+              return r.status === InvoiceStatus.Sent
+            },
+          },
+          {
+            label: 'Paid',
+            filter: (r) => {
+              return r.status === InvoiceStatus.Paid
+            },
+            default: true,
+          },
           {
             label: 'Partially paid',
-            filter: (r) => r.status === InvoiceStatus.PartiallyPaid,
+            filter: (r) => {
+              return r.status === InvoiceStatus.PartiallyPaid
+            },
           },
-          { label: 'Overdue', filter: (r) => r.status === InvoiceStatus.Overdue },
-          { label: 'Closed', filter: (r) => r.status === InvoiceStatus.Closed },
+          {
+            label: 'Overdue',
+            filter: (r) => {
+              return r.status === InvoiceStatus.Overdue
+            },
+          },
+          {
+            label: 'Closed',
+            filter: (r) => {
+              return r.status === InvoiceStatus.Closed
+            },
+          },
         ],
       }),
     systemContainsReceipts &&
       tab<Receipt>({
         label: 'Receipts',
         filter: isReceipt,
-        map: (list) => list.slice().reverse(),
+        map: (list) => {
+          return list.slice().reverse()
+        },
       }),
   ].filter(Boolean) as RecordTab<any>[]
 
@@ -336,22 +407,24 @@ function RecordList({ records }: { records: Record[] }) {
 
   return (
     <div className="grid auto-cols-[280px] grid-flow-col grid-cols-[repeat(auto-fill,280px)] grid-rows-1 gap-4 overflow-x-auto p-4 [scrollbar-width:auto]">
-      {records.map((record) => (
-        <I18NProvider
-          key={record.id}
-          value={{
-            // Prefer the language of the account when looking at the overview of invoices.
-            language: record.account.language,
+      {records.map((record) => {
+        return (
+          <I18NProvider
+            key={record.id}
+            value={{
+              // Prefer the language of the account when looking at the overview of invoices.
+              language: record.account.language,
 
-            // Prefer the currency of the client when looking at the overview of invoices.
-            currency: record.client.currency,
-          }}
-        >
-          <Link href={`/${record.type}/${record.number}`}>
-            <TinyRecord record={record} />
-          </Link>
-        </I18NProvider>
-      ))}
+              // Prefer the currency of the client when looking at the overview of invoices.
+              currency: record.client.currency,
+            }}
+          >
+            <Link href={`/${record.type}/${record.number}`}>
+              <TinyRecord record={record} />
+            </Link>
+          </I18NProvider>
+        )
+      })}
     </div>
   )
 }

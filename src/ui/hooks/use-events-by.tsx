@@ -34,12 +34,13 @@ export function useEventsForAccount(account: Account) {
     throw err
   }
 
-  return events.filter(
-    (x) =>
+  return events.filter((x) => {
+    return (
       (x.tags.includes('account') || x.tags.includes('milestone')) &&
       'accountId' in x.context &&
-      x.context.accountId === account.id,
-  )
+      x.context.accountId === account.id
+    )
+  })
 }
 
 export function useEventsForClient(client: Client) {
@@ -52,17 +53,18 @@ export function useEventsForClient(client: Client) {
     throw err
   }
 
-  return events.filter(
-    (x) =>
+  return events.filter((x) => {
+    return (
       (x.tags.includes('client') || x.tags.includes('milestone')) &&
       'clientId' in x.context &&
-      x.context.clientId === client.id,
-  )
+      x.context.clientId === client.id
+    )
+  })
 }
 
 function filterEventsForRecord<T extends Record>(record: T, events: Event[]) {
-  return events.filter((e) =>
-    match(record.type, {
+  return events.filter((e) => {
+    return match(record.type, {
       quote: () => {
         return (
           (e.tags.includes('quote') || e.tags.includes('milestone')) &&
@@ -84,8 +86,8 @@ function filterEventsForRecord<T extends Record>(record: T, events: Event[]) {
           e.context.receiptId === record.id
         )
       },
-    }),
-  )
+    })
+  })
 }
 
 export function useEventsForRecord<T extends Record>(record: T) {

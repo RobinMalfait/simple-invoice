@@ -6,19 +6,33 @@ interface Options {
 }
 
 export function useCurrentDate({ precision = 'minute' }: Partial<Options> = {}) {
-  let [now, setNow] = useState(() => new Date())
+  let [now, setNow] = useState(() => {
+    return new Date()
+  })
 
   useEffect(() => {
     let remaining =
       match(precision, {
-        second: () => 1,
-        minute: () => 60 - now.getSeconds(),
-        hour: () => 3600 - now.getSeconds() - now.getMinutes() * 60,
-        day: () => 86400 - now.getSeconds() - now.getMinutes() * 60 - now.getHours() * 60 * 60,
+        second: () => {
+          return 1
+        },
+        minute: () => {
+          return 60 - now.getSeconds()
+        },
+        hour: () => {
+          return 3600 - now.getSeconds() - now.getMinutes() * 60
+        },
+        day: () => {
+          return 86400 - now.getSeconds() - now.getMinutes() * 60 - now.getHours() * 60 * 60
+        },
       }) - 1
 
-    let timer = setTimeout(() => setNow(new Date()), remaining * 1000)
-    return () => clearTimeout(timer)
+    let timer = setTimeout(() => {
+      return setNow(new Date())
+    }, remaining * 1000)
+    return () => {
+      return clearTimeout(timer)
+    }
   }, [now, precision])
 
   return now

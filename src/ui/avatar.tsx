@@ -28,7 +28,9 @@ export function Avatar({
         <span className="shrink-0 uppercase">
           {name
             .split(' ')
-            .map((x) => x[0])
+            .map((x) => {
+              return x[0]
+            })
             .filter(Boolean)
             .slice(0, 2)
             .join('')}

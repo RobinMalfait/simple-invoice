@@ -43,9 +43,15 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
         match(
           record.type,
           {
-            quote: (r: Quote) => r.status,
-            invoice: (r: Invoice) => r.status,
-            receipt: () => 'Paid',
+            quote: (r: Quote) => {
+              return r.status
+            },
+            invoice: (r: Invoice) => {
+              return r.status
+            },
+            receipt: () => {
+              return 'Paid'
+            },
           },
           record,
         ),
@@ -59,9 +65,15 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
           match(
             record.type,
             {
-              quote: (r: Quote) => r.status,
-              invoice: (r: Invoice) => r.status,
-              receipt: () => 'Paid',
+              quote: (r: Quote) => {
+                return r.status
+              },
+              invoice: (r: Invoice) => {
+                return r.status
+              },
+              receipt: () => {
+                return 'Paid'
+              },
             },
             record,
           ),
@@ -73,12 +85,18 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
         ...match(
           record.type,
           {
-            quote: (r: Quote) => [`Quote date: ${format(r.quoteDate, 'PPP')}`],
-            invoice: (r: Invoice) => [
-              `Issue date: ${format(r.issueDate, 'PPP')}`,
-              `Due date: ${format(r.dueDate, 'PPP')}`,
-            ],
-            receipt: () => [],
+            quote: (r: Quote) => {
+              return [`Quote date: ${format(r.quoteDate, 'PPP')}`]
+            },
+            invoice: (r: Invoice) => {
+              return [
+                `Issue date: ${format(r.issueDate, 'PPP')}`,
+                `Due date: ${format(r.dueDate, 'PPP')}`,
+              ]
+            },
+            receipt: () => {
+              return []
+            },
           },
           record,
         ),

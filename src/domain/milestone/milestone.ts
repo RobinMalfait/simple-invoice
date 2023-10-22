@@ -14,7 +14,9 @@ type Context = {
 }
 
 export function trackMilestones(bus: EventEmitter, ctx: Context) {
-  bus.on('*', (event) => ctx.events.push(event))
+  bus.on('*', (event) => {
+    return ctx.events.push(event)
+  })
 
   fastestAcceptedQuoteMilestones(bus, ctx)
   invoiceCountMilestones(bus, ctx)
@@ -45,20 +47,24 @@ function milestones<T>(arr: T[], condition: (t: T) => boolean): T[] {
 }
 
 function initState<T>(cb: () => T) {
-  return new DefaultMap(() => ({
-    pending: cb(),
-    paid: cb(),
-  }))
+  return new DefaultMap(() => {
+    return {
+      pending: cb(),
+      paid: cb(),
+    }
+  })
 }
 
 export function fastestAcceptedQuoteMilestones(bus: EventEmitter, ctx: Context) {
   const MILESTONE = 'milestone:fastest-accepted-quote'
 
-  let stateByAccount = new DefaultMap(() => ({
-    events: new Set<Extract<Event, { type: typeof MILESTONE }>>(),
-    sentAt: new Map<string, Date>(),
-    max: null as number | null,
-  }))
+  let stateByAccount = new DefaultMap(() => {
+    return {
+      events: new Set<Extract<Event, { type: typeof MILESTONE }>>(),
+      sentAt: new Map<string, Date>(),
+      max: null as number | null,
+    }
+  })
 
   bus.on('quote:sent', (e: Extract<Event, { type: 'quote:sent' }>) => {
     let state = stateByAccount.get(e.context.accountId)!
@@ -83,9 +89,9 @@ export function fastestAcceptedQuoteMilestones(bus: EventEmitter, ctx: Context) 
 
     state.max = duration
 
-    for (let event of ctx.events.filter(
-      (_e) => _e.type === MILESTONE && _e.context.accountId === e.context.accountId,
-    ) as Extract<Event, { type: typeof MILESTONE }>[]) {
+    for (let event of ctx.events.filter((_e) => {
+      return _e.type === MILESTONE && _e.context.accountId === e.context.accountId
+    }) as Extract<Event, { type: typeof MILESTONE }>[]) {
       event.payload.best = false
     }
 
@@ -112,20 +118,21 @@ export let invoiceCountMilestonesData = [1000, 750, 500, 300, 200, 150, 100, 50,
 export function invoiceCountMilestones(bus: EventEmitter, ctx: Context) {
   const MILESTONE = 'milestone:invoices'
 
-  let stateByAccount = initState(() => ({
-    milestones: invoiceCountMilestonesData.slice(),
-    count: new Set<string>(),
-  }))
+  let stateByAccount = initState(() => {
+    return {
+      milestones: invoiceCountMilestonesData.slice(),
+      count: new Set<string>(),
+    }
+  })
 
   bus.on('invoice:sent', (e: Extract<Event, { type: 'invoice:sent' }>) => {
     let { pending, paid } = stateByAccount.get(e.context.accountId)!
 
     pending.count.add(e.context.invoiceId)
 
-    for (let milestone of milestones(
-      pending.milestones,
-      (m) => m <= paid.count.size + pending.count.size,
-    )) {
+    for (let milestone of milestones(pending.milestones, (m) => {
+      return m <= paid.count.size + pending.count.size
+    })) {
       bus.emit(
         MILESTONE,
         Event.parse({
@@ -148,7 +155,9 @@ export function invoiceCountMilestones(bus: EventEmitter, ctx: Context) {
     pending.count.delete(e.context.invoiceId)
     paid.count.add(e.context.invoiceId)
 
-    for (let milestone of milestones(paid.milestones, (m) => m <= paid.count.size)) {
+    for (let milestone of milestones(paid.milestones, (m) => {
+      return m <= paid.count.size
+    })) {
       bus.emit(
         MILESTONE,
         Event.parse({
@@ -193,11 +202,13 @@ export function invoiceCountMilestones(bus: EventEmitter, ctx: Context) {
 export function fastestPaidInvoiceMilestones(bus: EventEmitter, ctx: Context) {
   const MILESTONE = 'milestone:fastest-paid-invoice'
 
-  let stateByAccount = new DefaultMap(() => ({
-    events: new Set<Extract<Event, { type: typeof MILESTONE }>>(),
-    sentAt: new Map<string, Date>(),
-    max: null as number | null,
-  }))
+  let stateByAccount = new DefaultMap(() => {
+    return {
+      events: new Set<Extract<Event, { type: typeof MILESTONE }>>(),
+      sentAt: new Map<string, Date>(),
+      max: null as number | null,
+    }
+  })
 
   bus.on('invoice:sent', (e: Extract<Event, { type: 'invoice:sent' }>) => {
     let state = stateByAccount.get(e.context.accountId)!
@@ -226,9 +237,9 @@ export function fastestPaidInvoiceMilestones(bus: EventEmitter, ctx: Context) {
 
     state.max = duration
 
-    for (let event of ctx.events.filter(
-      (_e) => _e.type === MILESTONE && _e.context.accountId === e.context.accountId,
-    ) as Extract<Event, { type: typeof MILESTONE }>[]) {
+    for (let event of ctx.events.filter((_e) => {
+      return _e.type === MILESTONE && _e.context.accountId === e.context.accountId
+    }) as Extract<Event, { type: typeof MILESTONE }>[]) {
       event.payload.best = false
     }
 
@@ -255,10 +266,12 @@ export let clientCountMilestonesData = [100, 75, 50, 25, 10, 5, 3]
 export function clientCountMilestones(bus: EventEmitter, ctx: Context) {
   const MILESTONE = 'milestone:clients'
 
-  let stateByAccount = initState(() => ({
-    milestones: clientCountMilestonesData.slice(),
-    clientByInvoice: new Map<string, string>(),
-  }))
+  let stateByAccount = initState(() => {
+    return {
+      milestones: clientCountMilestonesData.slice(),
+      clientByInvoice: new Map<string, string>(),
+    }
+  })
 
   bus.on('invoice:sent', (e: Extract<Event, { type: 'invoice:sent' }>) => {
     let { pending, paid } = stateByAccount.get(e.context.accountId)!
@@ -271,7 +284,9 @@ export function clientCountMilestones(bus: EventEmitter, ctx: Context) {
       lazy.toLength(),
     )()
 
-    for (let milestone of milestones(pending.milestones, (m) => m <= amount)) {
+    for (let milestone of milestones(pending.milestones, (m) => {
+      return m <= amount
+    })) {
       bus.emit(
         MILESTONE,
         Event.parse({
@@ -300,7 +315,9 @@ export function clientCountMilestones(bus: EventEmitter, ctx: Context) {
       lazy.toLength(),
     )()
 
-    for (let milestone of milestones(paid.milestones, (m) => m <= amount)) {
+    for (let milestone of milestones(paid.milestones, (m) => {
+      return m <= amount
+    })) {
       bus.emit(
         MILESTONE,
         Event.parse({
@@ -350,10 +367,12 @@ export let internationalClientCountMilestonesData = [100, 75, 50, 25, 10, 5, 3, 
 export function internationalClientCountMilestones(bus: EventEmitter, ctx: Context) {
   const MILESTONE = 'milestone:international-clients'
 
-  let stateByAccount = initState(() => ({
-    milestones: internationalClientCountMilestonesData.slice(),
-    countryByInvoice: new Map<string, string | null>(),
-  }))
+  let stateByAccount = initState(() => {
+    return {
+      milestones: internationalClientCountMilestonesData.slice(),
+      countryByInvoice: new Map<string, string | null>(),
+    }
+  })
 
   bus.on('invoice:sent', (e: Extract<Event, { type: 'invoice:sent' }>) => {
     if (e.payload.invoice.client.billing.country === e.payload.invoice.account.billing.country) {
@@ -370,7 +389,9 @@ export function internationalClientCountMilestones(bus: EventEmitter, ctx: Conte
       lazy.toLength(),
     )()
 
-    for (let milestone of milestones(pending.milestones, (m) => m <= amount)) {
+    for (let milestone of milestones(pending.milestones, (m) => {
+      return m <= amount
+    })) {
       bus.emit(
         MILESTONE,
         Event.parse({
@@ -403,7 +424,9 @@ export function internationalClientCountMilestones(bus: EventEmitter, ctx: Conte
       lazy.toLength(),
     )()
 
-    for (let milestone of milestones(paid.milestones, (m) => m <= amount)) {
+    for (let milestone of milestones(paid.milestones, (m) => {
+      return m <= amount
+    })) {
       bus.emit(
         MILESTONE,
         Event.parse({
@@ -460,10 +483,12 @@ export let revenueMilestonesData = [
 export function revenueMilestones(bus: EventEmitter, ctx: Context) {
   const MILESTONE = 'milestone:revenue'
 
-  let stateByAccount = initState(() => ({
-    milestones: revenueMilestonesData.slice(),
-    totalByInvoice: new Map<string, number>(),
-  }))
+  let stateByAccount = initState(() => {
+    return {
+      milestones: revenueMilestonesData.slice(),
+      totalByInvoice: new Map<string, number>(),
+    }
+  })
 
   bus.on('invoice:sent', (e: Extract<Event, { type: 'invoice:sent' }>) => {
     let { pending, paid } = stateByAccount.get(e.context.accountId)!
@@ -472,7 +497,9 @@ export function revenueMilestones(bus: EventEmitter, ctx: Context) {
 
     let amount = sum(pending.totalByInvoice.values(), paid.totalByInvoice.values())
 
-    for (let milestone of milestones(pending.milestones, (m) => m <= amount)) {
+    for (let milestone of milestones(pending.milestones, (m) => {
+      return m <= amount
+    })) {
       bus.emit(
         MILESTONE,
         Event.parse({
@@ -499,7 +526,9 @@ export function revenueMilestones(bus: EventEmitter, ctx: Context) {
 
     let amount = sum(paid.totalByInvoice.values())
 
-    for (let milestone of milestones(paid.milestones, (m) => m <= amount)) {
+    for (let milestone of milestones(paid.milestones, (m) => {
+      return m <= amount
+    })) {
       bus.emit(
         MILESTONE,
         Event.parse({
@@ -545,9 +574,11 @@ export function revenueMilestones(bus: EventEmitter, ctx: Context) {
 export function mostExpensiveInvoiceMilestones(bus: EventEmitter, ctx: Context) {
   const MILESTONE = 'milestone:most-expensive-invoice'
 
-  let stateByAccount = initState(() => ({
-    max: null as number | null,
-  }))
+  let stateByAccount = initState(() => {
+    return {
+      max: null as number | null,
+    }
+  })
 
   bus.on('invoice:sent', (e: Extract<Event, { type: 'invoice:sent' }>) => {
     let { pending, paid } = stateByAccount.get(e.context.accountId)!
@@ -602,9 +633,9 @@ export function mostExpensiveInvoiceMilestones(bus: EventEmitter, ctx: Context) 
     let previous = paid.max
     paid.max = amount
 
-    for (let event of ctx.events.filter(
-      (_e) => _e.type === MILESTONE && _e.context.accountId === e.context.accountId,
-    ) as Extract<Event, { type: typeof MILESTONE }>[]) {
+    for (let event of ctx.events.filter((_e) => {
+      return _e.type === MILESTONE && _e.context.accountId === e.context.accountId
+    }) as Extract<Event, { type: typeof MILESTONE }>[]) {
       event.payload.best = false
     }
 
@@ -651,9 +682,11 @@ export function mostExpensiveInvoiceMilestones(bus: EventEmitter, ctx: Context) 
 export function anniversaryMilestones(bus: EventEmitter, ctx: Context) {
   const MILESTONE = 'milestone:anniversary'
 
-  let stateByAccount = new DefaultMap(() => ({
-    start: null as Date | null,
-  }))
+  let stateByAccount = new DefaultMap(() => {
+    return {
+      start: null as Date | null,
+    }
+  })
 
   bus.on('invoice:sent', (e: Extract<Event, { type: 'invoice:sent' }>) => {
     let state = stateByAccount.get(e.context.accountId)!
@@ -668,9 +701,9 @@ export function anniversaryMilestones(bus: EventEmitter, ctx: Context) {
       return
     }
 
-    let count = ctx.events.filter(
-      (e) => e.type === MILESTONE && e.context.accountId === e.context.accountId,
-    ).length
+    let count = ctx.events.filter((e) => {
+      return e.type === MILESTONE && e.context.accountId === e.context.accountId
+    }).length
 
     if (years <= count) {
       return
@@ -697,8 +730,12 @@ export function anniversaryMilestones(bus: EventEmitter, ctx: Context) {
 let scopedId = new ScopedIDGenerator('milestone')
 
 export let Milestone = z.object({
-  id: z.string().default(() => scopedId.next()),
-  account: z.lazy(() => Account),
+  id: z.string().default(() => {
+    return scopedId.next()
+  }),
+  account: z.lazy(() => {
+    return Account
+  }),
   title: z.string(),
   description: z.string().nullable(),
   achievedAt: z.date().nullable(),

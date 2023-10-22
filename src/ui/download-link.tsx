@@ -24,7 +24,9 @@ export function DownloadLink({
     d.addEventListener(window, 'blur', done)
 
     // Fallback in case the window doesn't blur
-    d.setTimeout(() => done, 5000)
+    d.setTimeout(() => {
+      return done
+    }, 5000)
 
     return d.dispose
   }, [d, downloading])

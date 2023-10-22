@@ -175,8 +175,12 @@ export default async function Page({ params: { id } }: { params: { id: string } 
                         key={paymentMethod.id}
                         classified
                         title={match(paymentMethod.type, {
-                          iban: () => 'IBAN',
-                          paypal: () => 'PayPal',
+                          iban: () => {
+                            return 'IBAN'
+                          },
+                          paypal: () => {
+                            return 'PayPal'
+                          },
                         })}
                       >
                         <div
@@ -185,12 +189,16 @@ export default async function Page({ params: { id } }: { params: { id: string } 
                         >
                           <div className="text-center">
                             {match(paymentMethod.type, {
-                              iban: () => (
-                                <BanknotesIcon className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-                              ),
-                              paypal: () => (
-                                <PaypalIcon className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-                              ),
+                              iban: () => {
+                                return (
+                                  <BanknotesIcon className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                                )
+                              },
+                              paypal: () => {
+                                return (
+                                  <PaypalIcon className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                                )
+                              },
                             })}
                           </div>
                           <div className="truncate">{paymentMethod.value}</div>

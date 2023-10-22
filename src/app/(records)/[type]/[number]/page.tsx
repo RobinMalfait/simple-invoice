@@ -23,7 +23,9 @@ export default async function Invoice({
 }: {
   params: { type: string; number: string }
 }) {
-  let record = records.find((record) => record.type === type && record.number === number)
+  let record = records.find((record) => {
+    return record.type === type && record.number === number
+  })
   if (!record) {
     redirect('/')
   }
@@ -63,9 +65,15 @@ export default async function Invoice({
                   {match(
                     record.type,
                     {
-                      quote: (r: QuoteType) => r.number,
-                      invoice: (r: InvoiceType) => r.number,
-                      receipt: (r: ReceiptType) => r.invoice.number,
+                      quote: (r: QuoteType) => {
+                        return r.number
+                      },
+                      invoice: (r: InvoiceType) => {
+                        return r.number
+                      },
+                      receipt: (r: ReceiptType) => {
+                        return r.invoice.number
+                      },
                     },
                     record,
                   )}

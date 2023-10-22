@@ -27,40 +27,72 @@ type Preset = [
 ]
 
 export let options: Preset[] = [
-  ['Today', (now, n = 1) => [startOfDay(addDays(now, 1 * n)), endOfDay(addDays(now, 1 * n))]],
+  [
+    'Today',
+    (now, n = 1) => {
+      return [startOfDay(addDays(now, 1 * n)), endOfDay(addDays(now, 1 * n))]
+    },
+  ],
   [
     'Yesterday',
-    (now, n) => [
-      subDays(startOfDay(addDays(now, 1 * n)), 1),
-      subDays(endOfDay(addDays(now, 1 * n)), 1),
-    ],
+    (now, n) => {
+      return [
+        subDays(startOfDay(addDays(now, 1 * n)), 1),
+        subDays(endOfDay(addDays(now, 1 * n)), 1),
+      ]
+    },
   ],
   [
     'Last 7 days',
-    (now, n) => [subDays(startOfDay(addDays(now, 7 * n)), 7), endOfDay(addDays(now, 7 * n))],
+    (now, n) => {
+      return [subDays(startOfDay(addDays(now, 7 * n)), 7), endOfDay(addDays(now, 7 * n))]
+    },
   ],
   [
     'Last 30 days',
-    (now, n) => [subDays(startOfDay(addDays(now, 30 * n)), 30), endOfDay(addDays(now, 30 * n))],
+    (now, n) => {
+      return [subDays(startOfDay(addDays(now, 30 * n)), 30), endOfDay(addDays(now, 30 * n))]
+    },
   ],
   [
     'This month',
-    (now, n) => [
-      startOfMonth(startOfDay(addMonths(now, 1 * n))),
-      endOfMonth(endOfDay(addMonths(now, 1 * n))),
-    ],
+    (now, n) => {
+      return [
+        startOfMonth(startOfDay(addMonths(now, 1 * n))),
+        endOfMonth(endOfDay(addMonths(now, 1 * n))),
+      ]
+    },
   ],
   [
     'Quarter to date',
-    (now, n) => [startOfQuarter(addQuarters(now, 1 * n)), addQuarters(now, 1 * n)],
+    (now, n) => {
+      return [startOfQuarter(addQuarters(now, 1 * n)), addQuarters(now, 1 * n)]
+    },
   ],
   [
     'This quarter',
-    (now, n) => [startOfQuarter(addQuarters(now, 1 * n)), endOfQuarter(addQuarters(now, 1 * n))],
+    (now, n) => {
+      return [startOfQuarter(addQuarters(now, 1 * n)), endOfQuarter(addQuarters(now, 1 * n))]
+    },
   ],
-  ['Year to date', (now, n) => [startOfYear(addYears(now, 1 * n)), addYears(now, 1 * n)]],
-  ['This year', (now, n) => [startOfYear(addYears(now, 1 * n)), endOfYear(addYears(now, 1 * n))]],
-  ['All', () => [undefined, undefined]],
+  [
+    'Year to date',
+    (now, n) => {
+      return [startOfYear(addYears(now, 1 * n)), addYears(now, 1 * n)]
+    },
+  ],
+  [
+    'This year',
+    (now, n) => {
+      return [startOfYear(addYears(now, 1 * n)), endOfYear(addYears(now, 1 * n))]
+    },
+  ],
+  [
+    'All',
+    () => {
+      return [undefined, undefined]
+    },
+  ],
 ]
 
 export function RangePicker({
@@ -98,16 +130,18 @@ export function RangePicker({
         >
           <span className="px-4 text-xs font-semibold dark:text-zinc-400">Presets</span>
           <div className="flex w-full flex-col px-2">
-            {options.map(([label]) => (
-              <ListboxOption
-                key={label}
-                as="button"
-                value={label}
-                className="relative w-full rounded-lg px-2 py-2 text-left text-sm ui-active:bg-gray-100 ui-not-active:bg-transparent dark:text-zinc-400 dark:ui-active:bg-white/10"
-              >
-                {label}
-              </ListboxOption>
-            ))}
+            {options.map(([label]) => {
+              return (
+                <ListboxOption
+                  key={label}
+                  as="button"
+                  value={label}
+                  className="relative w-full rounded-lg px-2 py-2 text-left text-sm ui-active:bg-gray-100 ui-not-active:bg-transparent dark:text-zinc-400 dark:ui-active:bg-white/10"
+                >
+                  {label}
+                </ListboxOption>
+              )
+            })}
           </div>
         </ListboxOptions>
       </Portal>

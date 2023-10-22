@@ -41,11 +41,33 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     records,
     stacks,
 
-    clientById: records.map((r) => [r.client.id, r.client]) as [string, Client][],
-    accountById: records.map((r) => [r.account.id, r.account]) as [string, Account][],
-    quoteById: records.filter((r) => isQuote(r)).map((r) => [r.id, r]) as [string, Quote][],
-    invoiceById: records.filter((r) => isInvoice(r)).map((r) => [r.id, r]) as [string, Invoice][],
-    receiptById: records.filter((r) => isReceipt(r)).map((r) => [r.id, r]) as [string, Receipt][],
+    clientById: records.map((r) => {
+      return [r.client.id, r.client]
+    }) as [string, Client][],
+    accountById: records.map((r) => {
+      return [r.account.id, r.account]
+    }) as [string, Account][],
+    quoteById: records
+      .filter((r) => {
+        return isQuote(r)
+      })
+      .map((r) => {
+        return [r.id, r]
+      }) as [string, Quote][],
+    invoiceById: records
+      .filter((r) => {
+        return isInvoice(r)
+      })
+      .map((r) => {
+        return [r.id, r]
+      }) as [string, Invoice][],
+    receiptById: records
+      .filter((r) => {
+        return isReceipt(r)
+      })
+      .map((r) => {
+        return [r.id, r]
+      }) as [string, Receipt][],
   }
   let config = await load()
   return (

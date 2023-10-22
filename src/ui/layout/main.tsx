@@ -154,113 +154,118 @@ export default function Layout({
                       <ul role="list" className="flex flex-1 flex-col gap-y-7">
                         <li>
                           <ul role="list" className="-mx-2 space-y-1">
-                            {navigation.map((item) => (
-                              <li key={item.name} className="relative">
-                                {isActive(item) && (
-                                  <motion.div
-                                    layout
-                                    layoutId="active-indicator"
-                                    className="absolute -left-4 top-1 flex items-center"
-                                  >
-                                    <div className="h-8 w-1.5 rounded-r-md bg-white/90" />
-                                  </motion.div>
-                                )}
-
-                                <Link
-                                  href={item.href}
-                                  className={classNames(
-                                    isActive(item)
-                                      ? 'bg-zinc-700 text-white'
-                                      : 'text-gray-400 hover:bg-zinc-700 hover:text-white',
-                                    'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6',
-                                    config.ui.sidebar === 'small' && 'justify-center',
+                            {navigation.map((item) => {
+                              return (
+                                <li key={item.name} className="relative">
+                                  {isActive(item) && (
+                                    <motion.div
+                                      layout
+                                      layoutId="active-indicator"
+                                      className="absolute -left-4 top-1 flex items-center"
+                                    >
+                                      <div className="h-8 w-1.5 rounded-r-md bg-white/90" />
+                                    </motion.div>
                                   )}
-                                >
-                                  <item.icon className="h-6 w-6 shrink-0" aria-hidden="true" />
-                                  {config.ui.sidebar === 'large' && <>{item.name}</>}
-                                </Link>
-                                {item.children && (
-                                  <ul
+
+                                  <Link
+                                    href={item.href}
                                     className={classNames(
-                                      'space-y-1 py-1',
-                                      config.ui.sidebar === 'large' && 'ml-8',
+                                      isActive(item)
+                                        ? 'bg-zinc-700 text-white'
+                                        : 'text-gray-400 hover:bg-zinc-700 hover:text-white',
+                                      'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6',
+                                      config.ui.sidebar === 'small' && 'justify-center',
                                     )}
                                   >
-                                    {item.children
-                                      .filter((item) => {
-                                        if (!item.record) {
-                                          return true
-                                        }
+                                    <item.icon className="h-6 w-6 shrink-0" aria-hidden="true" />
+                                    {config.ui.sidebar === 'large' && <>{item.name}</>}
+                                  </Link>
+                                  {item.children && (
+                                    <ul
+                                      className={classNames(
+                                        'space-y-1 py-1',
+                                        config.ui.sidebar === 'large' && 'ml-8',
+                                      )}
+                                    >
+                                      {item.children
+                                        .filter((item) => {
+                                          if (!item.record) {
+                                            return true
+                                          }
 
-                                        return data.records.some(
-                                          (record) => record.type === item.record,
-                                        )
-                                      })
-                                      .map((item) => {
-                                        let attentionCount = item.record
-                                          ? data.records.filter(
-                                              (record) =>
-                                                record.type === item.record &&
-                                                recordHasWarning(record),
-                                            ).length
-                                          : 0
+                                          return data.records.some((record) => {
+                                            return record.type === item.record
+                                          })
+                                        })
+                                        .map((item) => {
+                                          let attentionCount = item.record
+                                            ? data.records.filter((record) => {
+                                                return (
+                                                  record.type === item.record &&
+                                                  recordHasWarning(record)
+                                                )
+                                              }).length
+                                            : 0
 
-                                        return (
-                                          <li key={item.name} className="relative">
-                                            {isActive(item) && (
-                                              <motion.div
-                                                layout
-                                                layoutId="active-indicator"
+                                          return (
+                                            <li key={item.name} className="relative">
+                                              {isActive(item) && (
+                                                <motion.div
+                                                  layout
+                                                  layoutId="active-indicator"
+                                                  className={classNames(
+                                                    'absolute top-1 flex items-center',
+                                                    config.ui.sidebar === 'small'
+                                                      ? '-left-4'
+                                                      : '-left-12',
+                                                  )}
+                                                >
+                                                  <div className="h-8 w-1.5 rounded-r-md bg-white/90" />
+                                                </motion.div>
+                                              )}
+
+                                              <Link
+                                                href={item.href}
                                                 className={classNames(
-                                                  'absolute top-1 flex items-center',
-                                                  config.ui.sidebar === 'small'
-                                                    ? '-left-4'
-                                                    : '-left-12',
+                                                  isActive(item)
+                                                    ? 'bg-zinc-700 text-white'
+                                                    : 'text-gray-400 hover:bg-zinc-700 hover:text-white',
+                                                  'group relative flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6',
+                                                  config.ui.sidebar === 'small' && 'justify-center',
                                                 )}
                                               >
-                                                <div className="h-8 w-1.5 rounded-r-md bg-white/90" />
-                                              </motion.div>
-                                            )}
-
-                                            <Link
-                                              href={item.href}
-                                              className={classNames(
-                                                isActive(item)
-                                                  ? 'bg-zinc-700 text-white'
-                                                  : 'text-gray-400 hover:bg-zinc-700 hover:text-white',
-                                                'group relative flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6',
-                                                config.ui.sidebar === 'small' && 'justify-center',
-                                              )}
-                                            >
-                                              <item.icon
-                                                className="h-6 w-6 shrink-0"
-                                                aria-hidden="true"
-                                              />
-                                              {config.ui.sidebar === 'large' && (
-                                                <>
-                                                  {item.name}
-                                                  {attentionCount > 0 && (
-                                                    <div className="absolute right-4 top-1/2 z-50 -translate-y-1/2">
-                                                      <span className="inline-flex items-center gap-3 rounded-md bg-red-400/10 px-3 py-1 text-xs font-medium text-red-200 ring-1 ring-inset ring-red-400/50">
-                                                        {attentionCount}
-                                                      </span>
-                                                    </div>
-                                                  )}
-                                                </>
-                                              )}
-                                            </Link>
-                                          </li>
-                                        )
-                                      })}
-                                  </ul>
-                                )}
-                              </li>
-                            ))}
+                                                <item.icon
+                                                  className="h-6 w-6 shrink-0"
+                                                  aria-hidden="true"
+                                                />
+                                                {config.ui.sidebar === 'large' && (
+                                                  <>
+                                                    {item.name}
+                                                    {attentionCount > 0 && (
+                                                      <div className="absolute right-4 top-1/2 z-50 -translate-y-1/2">
+                                                        <span className="inline-flex items-center gap-3 rounded-md bg-red-400/10 px-3 py-1 text-xs font-medium text-red-200 ring-1 ring-inset ring-red-400/50">
+                                                          {attentionCount}
+                                                        </span>
+                                                      </div>
+                                                    )}
+                                                  </>
+                                                )}
+                                              </Link>
+                                            </li>
+                                          )
+                                        })}
+                                    </ul>
+                                  )}
+                                </li>
+                              )
+                            })}
                           </ul>
                         </li>
                         <li className="mt-auto">
                           <button
-                            onClick={() => toggleSidebar()}
+                            onClick={() => {
+                              return toggleSidebar()
+                            }}
                             className={classNames(
                               'flex w-full items-center gap-2 text-white opacity-50 transition-opacity hover:opacity-100',
                               config.ui.sidebar === 'small' && 'justify-center',
@@ -324,16 +329,18 @@ export default function Layout({
                 {params.type &&
                   params.number &&
                   (() => {
-                    let record = data.records.find(
-                      (record) => record.type === params.type && record.number === params.number,
-                    )
+                    let record = data.records.find((record) => {
+                      return record.type === params.type && record.number === params.number
+                    })
                     if (!record) return null
 
                     return (
                       <Group title="On this page">
                         <Action
                           icon={ArrowDownTrayIcon}
-                          invoke={() => window.open(`${window.location.href}/pdf`, '_blank')}
+                          invoke={() => {
+                            return window.open(`${window.location.href}/pdf`, '_blank')
+                          }}
                           search={'download pdf'}
                         >
                           Download PDF
@@ -341,9 +348,9 @@ export default function Layout({
 
                         <Action
                           icon={EyeIcon}
-                          invoke={() =>
-                            window.open(`${window.location.href}/pdf?preview`, '_blank')
-                          }
+                          invoke={() => {
+                            return window.open(`${window.location.href}/pdf?preview`, '_blank')
+                          }}
                           search={'preview pdf'}
                         >
                           Preview PDF
@@ -351,7 +358,9 @@ export default function Layout({
 
                         <Action
                           icon={UserIcon}
-                          invoke={() => router.push(`/clients/${record!.client.id}`)}
+                          invoke={() => {
+                            return router.push(`/clients/${record!.client.id}`)
+                          }}
                           search={'go to client'}
                         >
                           Go to client — {record.client.nickname}
@@ -362,42 +371,54 @@ export default function Layout({
 
                 {/* Generic sections */}
                 <Group title="Quick links">
-                  {navigation.map((item) => (
-                    <Fragment key={item.href}>
-                      <Action
-                        invoke={() => router.push(item.href)}
-                        icon={item.icon}
-                        search={item.name}
-                      >
-                        {item.name}
-                      </Action>
-                    </Fragment>
-                  ))}
+                  {navigation.map((item) => {
+                    return (
+                      <Fragment key={item.href}>
+                        <Action
+                          invoke={() => {
+                            return router.push(item.href)
+                          }}
+                          icon={item.icon}
+                          search={item.name}
+                        >
+                          {item.name}
+                        </Action>
+                      </Fragment>
+                    )
+                  })}
                 </Group>
 
                 {navigation
-                  .filter((item) => item.children)
-                  .map((item) => (
-                    <Group key={item.href} title={item.name}>
-                      {item.children!.map((item) => {
-                        return (
-                          <Action
-                            key={item.href}
-                            invoke={() => router.push(item.href)}
-                            icon={item.icon}
-                            search={item.name}
-                          >
-                            {item.name}
-                          </Action>
-                        )
-                      })}
-                    </Group>
-                  ))}
+                  .filter((item) => {
+                    return item.children
+                  })
+                  .map((item) => {
+                    return (
+                      <Group key={item.href} title={item.name}>
+                        {item.children!.map((item) => {
+                          return (
+                            <Action
+                              key={item.href}
+                              invoke={() => {
+                                return router.push(item.href)
+                              }}
+                              icon={item.icon}
+                              search={item.name}
+                            >
+                              {item.name}
+                            </Action>
+                          )
+                        })}
+                      </Group>
+                    )
+                  })}
 
                 <Group title="Actions">
                   <Action
                     icon={config.ui.classified ? EyeIcon : EyeSlashIcon}
-                    invoke={() => toggleClassified()}
+                    invoke={() => {
+                      return toggleClassified()
+                    }}
                     search="toggle streamer mode"
                   >
                     Toggle streamer mode
@@ -420,7 +441,9 @@ export default function Layout({
                         </div>
                       )
                     }}
-                    invoke={() => toggleSidebar()}
+                    invoke={() => {
+                      return toggleSidebar()
+                    }}
                     search="toggle sidebar"
                   >
                     Toggle sidebar

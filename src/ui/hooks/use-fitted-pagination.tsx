@@ -35,7 +35,9 @@ function FitContent({ enabled, children, onResize, onDone, ...props }: Props) {
 
 function defaultPaginater<T>(list: T[], pages: number[]): T[][] {
   let clone = list.slice()
-  return pages.map((amount) => clone.splice(0, amount))
+  return pages.map((amount) => {
+    return clone.splice(0, amount)
+  })
 }
 
 type PaginationState = {
@@ -61,7 +63,10 @@ function paginationReducer(state: PaginationState, action: Action): PaginationSt
 
     case 'good': {
       let remaining =
-        state.list.length - state.pages.slice(0, state.workingPage + 1).reduce((a, b) => a + b, 0)
+        state.list.length -
+        state.pages.slice(0, state.workingPage + 1).reduce((a, b) => {
+          return a + b
+        }, 0)
 
       // If we've handled all the pages, then we're done
       if (remaining === 0) {
@@ -95,7 +100,10 @@ function paginationReducer(state: PaginationState, action: Action): PaginationSt
       // Move the remaining to the next page
       newPages[state.workingPage + 1] ??= Math.max(
         0,
-        state.list.length - state.pages.slice(0, state.workingPage + 1).reduce((a, b) => a + b, 0),
+        state.list.length -
+          state.pages.slice(0, state.workingPage + 1).reduce((a, b) => {
+            return a + b
+          }, 0),
       )
 
       // We didn't settle on a number yet, let's keep going
@@ -124,7 +132,10 @@ function paginationReducer(state: PaginationState, action: Action): PaginationSt
       // Move the remaining to the next page
       newPages[state.workingPage + 1] ??= Math.max(
         0,
-        state.list.length - state.pages.slice(0, state.workingPage + 1).reduce((a, b) => a + b, 0),
+        state.list.length -
+          state.pages.slice(0, state.workingPage + 1).reduce((a, b) => {
+            return a + b
+          }, 0),
       )
 
       // When it's "bad", we know it doesn't fit, which means that we should always move to the
@@ -192,16 +203,15 @@ export function useFittedPagination<T>(list: T[], paginateList = defaultPaginate
   return [
     // Pages
     (() => {
-      return paginateList(list, state.pages).map(
-        (items, idx) =>
-          [
-            // Items on page
-            items,
+      return paginateList(list, state.pages).map((items, idx) => {
+        return [
+          // Items on page
+          items,
 
-            // Are we done with this page or not
-            idx < state.workingPage,
-          ] as const,
-      )
+          // Are we done with this page or not
+          idx < state.workingPage,
+        ] as const
+      })
     })(),
 
     // Scoped FitContent component
@@ -214,10 +224,14 @@ export function useFittedPagination<T>(list: T[], paginateList = defaultPaginate
             {...rest}
             enabled={state.workingPage === current}
             onDone={() => {
-              queueMicrotask(() => dispatch({ type: 'good' }))
+              queueMicrotask(() => {
+                return dispatch({ type: 'good' })
+              })
             }}
             onResize={() => {
-              queueMicrotask(() => dispatch({ type: 'bad' }))
+              queueMicrotask(() => {
+                return dispatch({ type: 'bad' })
+              })
             }}
           >
             {children}

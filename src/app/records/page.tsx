@@ -21,20 +21,27 @@ function titleForQuarter(date: Date) {
 function groupByQuarter(records: Record[]) {
   return Array.from(
     records
-      .sort(
-        (a, z) =>
+      .sort((a, z) => {
+        return (
           compareDesc(resolveRelevantRecordDate(a), resolveRelevantRecordDate(z)) ||
-          z.number.localeCompare(a.number),
-      )
+          z.number.localeCompare(a.number)
+        )
+      })
 
       // Group by quarter & year
       .reduce((acc, record) => {
         let key = match(
           record.type,
           {
-            quote: (r: Quote) => titleForQuarter(r.quoteDate),
-            invoice: (r: Invoice) => titleForQuarter(r.issueDate),
-            receipt: (r: Receipt) => titleForQuarter(r.receiptDate),
+            quote: (r: Quote) => {
+              return titleForQuarter(r.quoteDate)
+            },
+            invoice: (r: Invoice) => {
+              return titleForQuarter(r.issueDate)
+            },
+            receipt: (r: Receipt) => {
+              return titleForQuarter(r.receiptDate)
+            },
           },
           record,
         )
@@ -63,7 +70,11 @@ export default async function Home() {
             {groupByQuarter(combinedRecords).map(([title, records], idx) => {
               return (
                 <Disclosure
-                  defaultOpen={!records.every((e) => isFuture(resolveRelevantRecordDate(e)))}
+                  defaultOpen={
+                    !records.every((e) => {
+                      return isFuture(resolveRelevantRecordDate(e))
+                    })
+                  }
                   as="div"
                   key={title}
                   className="relative flex gap-x-4"
@@ -97,24 +108,26 @@ export default async function Home() {
                     </DisclosureButton>
 
                     <DisclosurePanel className="grid grid-cols-[repeat(auto-fill,minmax(275px,1fr))] gap-4">
-                      {records.map((record) => (
-                        <I18NProvider
-                          key={record.id}
-                          value={{
-                            // Prefer the language of the account when looking at the overview of
-                            // records.
-                            language: record.account.language,
+                      {records.map((record) => {
+                        return (
+                          <I18NProvider
+                            key={record.id}
+                            value={{
+                              // Prefer the language of the account when looking at the overview of
+                              // records.
+                              language: record.account.language,
 
-                            // Prefer the currency of the client when looking at the overview of
-                            // records.
-                            currency: record.client.currency,
-                          }}
-                        >
-                          <Link href={`/${record.type}/${record.number}`}>
-                            <TinyRecord record={record} />
-                          </Link>
-                        </I18NProvider>
-                      ))}
+                              // Prefer the currency of the client when looking at the overview of
+                              // records.
+                              currency: record.client.currency,
+                            }}
+                          >
+                            <Link href={`/${record.type}/${record.number}`}>
+                              <TinyRecord record={record} />
+                            </Link>
+                          </I18NProvider>
+                        )
+                      })}
                     </DisclosurePanel>
                   </div>
                 </Disclosure>

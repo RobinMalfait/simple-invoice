@@ -166,7 +166,9 @@ function PromoteToInvoicePanel() {
         })
         .then(() => {
           setCopyStatus('copied')
-          setTimeout(() => setCopyStatus('idle'), 3000)
+          setTimeout(() => {
+            return setCopyStatus('idle')
+          }, 3000)
         })
     },
     [record, formatter],
@@ -175,7 +177,9 @@ function PromoteToInvoicePanel() {
   let [issueDate, setIssueDate] = useState<Date | null>(new Date())
 
   let isAlreadyPromoted = stacks[record.id].some((id) => {
-    let record = records.find((record) => record.id === id)
+    let record = records.find((record) => {
+      return record.id === id
+    })
     return record && (isInvoice(record) || isReceipt(record))
   })
   if (isAlreadyPromoted) {
@@ -209,7 +213,9 @@ function PromoteToInvoicePanel() {
             label="Issue date"
             type="datetime-local"
             value={issueDate ? format(issueDate, "yyyy-MM-dd'T'HH:mm") : ''}
-            onChange={(e) => setIssueDate(e.target.value === '' ? null : parseISO(e.target.value))}
+            onChange={(e) => {
+              return setIssueDate(e.target.value === '' ? null : parseISO(e.target.value))
+            }}
           />
 
           <InputField
@@ -233,8 +239,12 @@ function PromoteToInvoicePanel() {
 
           <button className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-zinc-800 dark:text-zinc-400 dark:ring-zinc-700 dark:hover:bg-zinc-900">
             {match(copyStatus, {
-              idle: () => 'Copy code to clipboard',
-              copied: () => 'Copied!',
+              idle: () => {
+                return 'Copy code to clipboard'
+              },
+              copied: () => {
+                return 'Copied!'
+              },
             })}
           </button>
         </form>
@@ -280,7 +290,9 @@ function TryNewQuotePanel() {
         })
         .then(() => {
           setCopyStatus('copied')
-          setTimeout(() => setCopyStatus('idle'), 3000)
+          setTimeout(() => {
+            return setCopyStatus('idle')
+          }, 3000)
         })
     },
     [record, formatter],
@@ -289,7 +301,9 @@ function TryNewQuotePanel() {
   let isAlreadyPromoted = stacks[record.id]
     .slice(stacks[record.id].indexOf(record.id) + 1)
     .some((id) => {
-      let record = records.find((record) => record.id === id)
+      let record = records.find((record) => {
+        return record.id === id
+      })
       return record && isQuote(record)
     })
   if (isAlreadyPromoted) {
@@ -328,8 +342,12 @@ function TryNewQuotePanel() {
 
           <button className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-zinc-800 dark:text-zinc-400 dark:ring-zinc-700 dark:hover:bg-zinc-900">
             {match(copyStatus, {
-              idle: () => 'Copy code to clipboard',
-              copied: () => 'Copied!',
+              idle: () => {
+                return 'Copy code to clipboard'
+              },
+              copied: () => {
+                return 'Copied!'
+              },
             })}
           </button>
         </form>

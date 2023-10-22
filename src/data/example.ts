@@ -28,7 +28,9 @@ configure({
      *
      * Typically this is 15 days after the quoteDate.
      */
-    defaultNetStrategy: (quoteDate: Date) => addDays(quoteDate, 15),
+    defaultNetStrategy: (quoteDate: Date) => {
+      return addDays(quoteDate, 15)
+    },
 
     /**
      * All quotes should have an quote number in ascending order. This is the strategy to
@@ -81,7 +83,9 @@ configure({
      *
      * Typically this is 30 days after the issueDate.
      */
-    defaultNetStrategy: (issueDate: Date) => addDays(issueDate, 30),
+    defaultNetStrategy: (issueDate: Date) => {
+      return addDays(issueDate, 30)
+    },
 
     /**
      * All invoices should have an invoice number in ascending order. This is the strategy to

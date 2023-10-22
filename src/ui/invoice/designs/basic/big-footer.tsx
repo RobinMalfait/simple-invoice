@@ -19,13 +19,23 @@ export function BigFooter() {
       <div className="relative space-y-12 bg-gray-50 px-12 py-8 text-gray-900">
         <div className="space-y-4">
           <div className="flex items-center justify-between text-xl font-medium">
-            <span>{t((x) => x.summary.total)}</span>
+            <span>
+              {t((x) => {
+                return x.summary.total
+              })}
+            </span>
             <div className="-mx-4 -my-2 rounded-full bg-black px-4 py-2 text-white">
               <Money
                 amount={match(record.type, {
-                  quote: () => total(record),
-                  invoice: () => total(record),
-                  receipt: () => 0,
+                  quote: () => {
+                    return total(record)
+                  },
+                  invoice: () => {
+                    return total(record)
+                  },
+                  receipt: () => {
+                    return 0
+                  },
                 })}
               />
             </div>
@@ -37,7 +47,9 @@ export function BigFooter() {
                 <thead>
                   <tr>
                     <td colSpan={2} className="text-sm font-medium text-gray-900">
-                      {t((x) => x.summary.contactDetails)}
+                      {t((x) => {
+                        return x.summary.contactDetails
+                      })}
                     </td>
                   </tr>
                 </thead>
@@ -78,7 +90,9 @@ export function BigFooter() {
                 <thead>
                   <tr>
                     <td colSpan={2} className="text-sm font-medium text-gray-900">
-                      {t((x) => x.summary.paymentDetails)}
+                      {t((x) => {
+                        return x.summary.paymentDetails
+                      })}
                     </td>
                   </tr>
                 </thead>
@@ -88,8 +102,12 @@ export function BigFooter() {
                       <tr key={paymentMethod.id}>
                         <td className="text-center">
                           {match(paymentMethod.type, {
-                            iban: () => <BanknotesIcon className="h-4 w-4 text-gray-500" />,
-                            paypal: () => <PaypalIcon className="h-4 w-4 text-gray-500" />,
+                            iban: () => {
+                              return <BanknotesIcon className="h-4 w-4 text-gray-500" />
+                            },
+                            paypal: () => {
+                              return <PaypalIcon className="h-4 w-4 text-gray-500" />
+                            },
                           })}
                         </td>
                         <td className="px-3">

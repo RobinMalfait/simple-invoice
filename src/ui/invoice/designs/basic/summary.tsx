@@ -15,8 +15,12 @@ let summaryItems: {
     return [
       <>
         {item.subtype === 'discounts'
-          ? t((x) => x.summary.discount.total)
-          : t((x) => x.summary.subtotal)}
+          ? t((x) => {
+              return x.summary.discount.total
+            })
+          : t((x) => {
+              return x.summary.subtotal
+            })}
       </>,
       <>
         <Money amount={item.value} />
@@ -26,7 +30,11 @@ let summaryItems: {
   total: (item, { t }) => {
     return [
       <>
-        <span className="font-bold">{t((x) => x.summary.total)}</span>
+        <span className="font-bold">
+          {t((x) => {
+            return x.summary.total
+          })}
+        </span>
       </>,
       <>
         <span className="font-bold">
@@ -38,7 +46,11 @@ let summaryItems: {
   paid: (item, { t }) => {
     return [
       <>
-        <span className="font-bold">{t((x) => x.summary.paid)}</span>
+        <span className="font-bold">
+          {t((x) => {
+            return x.summary.paid
+          })}
+        </span>
       </>,
       <>
         <span className="font-bold">
@@ -50,9 +62,14 @@ let summaryItems: {
   vat: (item, { t }) => {
     return [
       <>
-        {t((x) => x.summary.vat, {
-          rate: `${(item.rate * 100).toFixed(0)}%`,
-        })}
+        {t(
+          (x) => {
+            return x.summary.vat
+          },
+          {
+            rate: `${(item.rate * 100).toFixed(0)}%`,
+          },
+        )}
       </>,
       <>
         <Money amount={item.value} />
@@ -62,7 +79,9 @@ let summaryItems: {
   discount: (item, { t }) => {
     return [
       <>
-        {t((x) => x.summary.discount.title)}
+        {t((x) => {
+          return x.summary.discount.title
+        })}
         {item.discount.reason && (
           <>
             <span className="px-1">
@@ -78,10 +97,12 @@ let summaryItems: {
         {match(
           item.discount.type,
           {
-            fixed: (discount: Extract<Discount, { type: 'fixed' }>) => (
-              <Money amount={-1 * discount.value * discount.quantity} />
-            ),
-            percentage: () => <>{(-1 * (item.discount.value * 100)).toFixed(0)}%</>,
+            fixed: (discount: Extract<Discount, { type: 'fixed' }>) => {
+              return <Money amount={-1 * discount.value * discount.quantity} />
+            },
+            percentage: () => {
+              return <>{(-1 * (item.discount.value * 100)).toFixed(0)}%</>
+            },
           },
           item.discount,
         )}
@@ -114,7 +135,15 @@ export function Summary({
         </td>
       </tr>
       {summaryInfo
-        .filter(type === 'subtotal' ? (summaryItem) => summaryItem.type === 'subtotal' : () => true)
+        .filter(
+          type === 'subtotal'
+            ? (summaryItem) => {
+                return summaryItem.type === 'subtotal'
+              }
+            : () => {
+                return true
+              },
+        )
         .map((summaryItem, idx) => {
           // @ts-ignore
           let [label, value] = summaryItems[summaryItem.type](summaryItem, { t })

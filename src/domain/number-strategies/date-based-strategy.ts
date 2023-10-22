@@ -1,11 +1,21 @@
 import { format } from 'date-fns'
 
 export const Base = {
-  yyyyMMdd: (date: Date) => format(date, 'yyyyMMdd'),
-  yyyyQ: (date: Date) => format(date, 'yyyyQ'),
-  yyQ: (date: Date) => format(date, 'yyQ'),
-  yyQQ: (date: Date) => format(date, 'yyQQ'),
-  yy: (date: Date) => format(date, 'yy'),
+  yyyyMMdd: (date: Date) => {
+    return format(date, 'yyyyMMdd')
+  },
+  yyyyQ: (date: Date) => {
+    return format(date, 'yyyyQ')
+  },
+  yyQ: (date: Date) => {
+    return format(date, 'yyQ')
+  },
+  yyQQ: (date: Date) => {
+    return format(date, 'yyQQ')
+  },
+  yy: (date: Date) => {
+    return format(date, 'yy')
+  },
 }
 
 export class DateBasedStrategy {

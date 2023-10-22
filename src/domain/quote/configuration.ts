@@ -45,7 +45,9 @@ export type Configuration = {
 }
 
 export let defaultConfiguration: Configuration = {
-  defaultNetStrategy: (quoteDate: Date) => addDays(quoteDate, 15),
+  defaultNetStrategy: (quoteDate: Date) => {
+    return addDays(quoteDate, 15)
+  },
   numberStrategy: new IncrementStrategy().next,
   pdf: {
     filename: 'quote-{{number}}.pdf',

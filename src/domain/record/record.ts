@@ -21,9 +21,13 @@ function* _separateRecords(records: Record[]): Generator<Record> {
 }
 
 export function separateRecords(records: Record[]) {
-  return Array.from(_separateRecords(records)).filter(
-    (record, idx, all) => all.findIndex((other) => other.id === record.id) === idx,
-  )
+  return Array.from(_separateRecords(records)).filter((record, idx, all) => {
+    return (
+      all.findIndex((other) => {
+        return other.id === record.id
+      }) === idx
+    )
+  })
 }
 
 function* _combineRecords(records: Record[]): Generator<string> {
@@ -46,7 +50,9 @@ export function combineRecords(records: Record[]): Record[] {
   let toRemove = new Set<string>(_combineRecords(records))
 
   for (let record of toRemove) {
-    let idx = all.findIndex((e) => e.id === record)
+    let idx = all.findIndex((e) => {
+      return e.id === record
+    })
     if (idx !== -1) all.splice(idx, 1)
   }
 
@@ -57,9 +63,15 @@ export function resolveRelevantRecordDate(record: Record) {
   return match(
     record.type,
     {
-      quote: (r: Quote) => r.quoteDate,
-      invoice: (r: Invoice) => r.issueDate,
-      receipt: (r: Receipt) => r.invoice.issueDate,
+      quote: (r: Quote) => {
+        return r.quoteDate
+      },
+      invoice: (r: Invoice) => {
+        return r.issueDate
+      },
+      receipt: (r: Receipt) => {
+        return r.invoice.issueDate
+      },
     },
     record,
   )

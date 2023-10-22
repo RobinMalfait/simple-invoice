@@ -27,8 +27,12 @@ export function isDraft(record: Quote | Invoice) {
   return match(
     record.type,
     {
-      quote: (r: Quote) => r.status === QuoteStatus.Draft,
-      invoice: (r: Invoice) => r.status === InvoiceStatus.Draft,
+      quote: (r: Quote) => {
+        return r.status === QuoteStatus.Draft
+      },
+      invoice: (r: Invoice) => {
+        return r.status === InvoiceStatus.Draft
+      },
     },
     record,
   )
@@ -38,8 +42,12 @@ export function isSent(record: Quote | Invoice) {
   return match(
     record.type,
     {
-      quote: (r: Quote) => r.status === QuoteStatus.Sent,
-      invoice: (r: Invoice) => r.status === InvoiceStatus.Sent,
+      quote: (r: Quote) => {
+        return r.status === QuoteStatus.Sent
+      },
+      invoice: (r: Invoice) => {
+        return r.status === InvoiceStatus.Sent
+      },
     },
     record,
   )
@@ -65,8 +73,12 @@ export function isClosed(record: Invoice | Quote) {
   return match(
     record.type,
     {
-      quote: (r: Quote) => r.status === QuoteStatus.Closed,
-      invoice: (r: Invoice) => r.status === InvoiceStatus.Closed,
+      quote: (r: Quote) => {
+        return r.status === QuoteStatus.Closed
+      },
+      invoice: (r: Invoice) => {
+        return r.status === InvoiceStatus.Closed
+      },
     },
     record,
   )
@@ -91,7 +103,9 @@ export function recordHasWarning(record: Record) {
     record.type,
     {
       // When a quote is expired, it should be handled (probably closed)
-      quote: (r: Quote) => r.status === QuoteStatus.Expired,
+      quote: (r: Quote) => {
+        return r.status === QuoteStatus.Expired
+      },
 
       invoice: (r: Invoice) => {
         // Overdue invoices should be handled, probably closed (+ new invoice)
@@ -105,7 +119,9 @@ export function recordHasWarning(record: Record) {
       },
 
       // Receipts are in the final state, nothing to warn about
-      receipt: () => false,
+      receipt: () => {
+        return false
+      },
     },
     record,
   )
@@ -114,30 +130,42 @@ export function recordHasWarning(record: Record) {
 export function recordHasAttachments(record: Record, type: 'any' | 'direct') {
   return match(type, {
     // Whether any of the records in the chain has attachments
-    any: () =>
-      match(
+    any: () => {
+      return match(
         record.type,
         {
-          quote: (r: Quote) => r.attachments.length > 0,
+          quote: (r: Quote) => {
+            return r.attachments.length > 0
+          },
           invoice: (r: Invoice) => {
             return r.attachments.length > 0 || (r.quote ? r.quote.attachments.length > 0 : false)
           },
-          receipt: (r: Receipt) => r.attachments.length > 0 || r.invoice.attachments.length > 0,
+          receipt: (r: Receipt) => {
+            return r.attachments.length > 0 || r.invoice.attachments.length > 0
+          },
         },
         record,
-      ),
+      )
+    },
 
     // Whether the record itself has attachments
-    direct: () =>
-      match(
+    direct: () => {
+      return match(
         record.type,
         {
-          quote: (r: Quote) => r.attachments.length > 0,
-          invoice: (r: Invoice) => r.attachments.length > 0,
-          receipt: (r: Receipt) => r.attachments.length > 0,
+          quote: (r: Quote) => {
+            return r.attachments.length > 0
+          },
+          invoice: (r: Invoice) => {
+            return r.attachments.length > 0
+          },
+          receipt: (r: Receipt) => {
+            return r.attachments.length > 0
+          },
         },
         record,
-      ),
+      )
+    },
   })
 }
 
@@ -174,7 +202,9 @@ export function warningMessageForRecord(record: Record): string | null {
       },
 
       // Receipts are in the final state, nothing to warn about
-      receipt: () => null,
+      receipt: () => {
+        return null
+      },
     },
     record,
   )
@@ -185,13 +215,19 @@ export function isPaidRecord(record: Record) {
     record.type,
     {
       // A quote can never be paid
-      quote: () => false,
+      quote: () => {
+        return false
+      },
 
       // An invoice is paid if it is in the paid state
-      invoice: (r: Invoice) => r.status === InvoiceStatus.Paid,
+      invoice: (r: Invoice) => {
+        return r.status === InvoiceStatus.Paid
+      },
 
       // A receipt can only be build from a paid invoice, therefore it is always paid
-      receipt: () => true,
+      receipt: () => {
+        return true
+      },
     },
     record,
   )
@@ -228,7 +264,9 @@ export function isActiveRecord(record: Record) {
       },
 
       // All receipts are considered "done"
-      receipt: () => false,
+      receipt: () => {
+        return false
+      },
     },
     record,
   )
@@ -239,13 +277,19 @@ export function isDeadRecord(record: Record) {
     record.type,
     {
       // A quote is dead when it is rejected or expired
-      quote: (r: Quote) => [QuoteStatus.Rejected, QuoteStatus.Expired].includes(r.status),
+      quote: (r: Quote) => {
+        return [QuoteStatus.Rejected, QuoteStatus.Expired].includes(r.status)
+      },
 
       // An invoice is dead when it is overdue
-      invoice: (r: Invoice) => [InvoiceStatus.Overdue].includes(r.status),
+      invoice: (r: Invoice) => {
+        return [InvoiceStatus.Overdue].includes(r.status)
+      },
 
       // A receipt is never dead
-      receipt: () => false,
+      receipt: () => {
+        return false
+      },
     },
     record,
   )

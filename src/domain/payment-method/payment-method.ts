@@ -5,7 +5,9 @@ import { match } from '~/utils/match'
 let scopedId = new ScopedIDGenerator('payment-method')
 
 export let PaymentMethod = z.object({
-  id: z.string().default(() => scopedId.next()),
+  id: z.string().default(() => {
+    return scopedId.next()
+  }),
   type: z.enum(['iban', 'paypal']),
   display: z.string(),
   value: z.string(),
@@ -22,8 +24,12 @@ export class PaymentMethodBuilder {
       type: this._type,
       value: this._value,
       display: match(this._type!, {
-        iban: () => `IBAN ${this._value}`,
-        paypal: () => `${this._value}`,
+        iban: () => {
+          return `IBAN ${this._value}`
+        },
+        paypal: () => {
+          return `${this._value}`
+        },
       }),
     })
   }

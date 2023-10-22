@@ -12,7 +12,9 @@ export function match<T extends string | number = string, R = any>(
       `Tried to handle "${value}" but there is no handler defined. Only defined handlers are: ${Object.keys(
         patterns,
       )
-        .map((key) => `"${key}"`)
+        .map((key) => {
+          return `"${key}"`
+        })
         .join(', ')}.`,
     )
   }

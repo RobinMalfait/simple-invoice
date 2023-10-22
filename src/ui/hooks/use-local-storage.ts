@@ -46,7 +46,9 @@ export function useLocalStorageState<T>(
     }
 
     window.addEventListener('storage', onStorage)
-    return () => window.removeEventListener('storage', onStorage)
+    return () => {
+      return window.removeEventListener('storage', onStorage)
+    }
   })
 
   return [value, updateValue]

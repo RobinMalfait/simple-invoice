@@ -4,7 +4,9 @@ import { ScopedIDGenerator } from '~/utils/id'
 let scopedId = new ScopedIDGenerator('contact')
 
 export let Contact = z.object({
-  id: z.string().default(() => scopedId.next()),
+  id: z.string().default(() => {
+    return scopedId.next()
+  }),
   name: z.string(),
   nickname: z.string(),
   email: z.string().email().nullable(),

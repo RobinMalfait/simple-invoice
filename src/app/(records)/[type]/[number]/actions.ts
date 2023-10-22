@@ -36,7 +36,11 @@ function parseMarkdown(value: string) {
       }
       return line
     })
-    .map((line) => line.replace(/\s{2,}/g, (spaces) => '&nbsp;'.repeat(spaces.length)))
+    .map((line) => {
+      return line.replace(/\s{2,}/g, (spaces) => {
+        return '&nbsp;'.repeat(spaces.length)
+      })
+    })
     .join('\n')
 
     // Cleanup
@@ -97,13 +101,15 @@ export async function loadTemplate(record: Record, id: string, configuration: Co
 
   record = Object.assign({}, record, {
     client: Object.assign({}, record.client, {
-      contacts: record.client.contacts.filter((contact) =>
-        configuration.recipients.includes(contact.id),
-      ),
+      contacts: record.client.contacts.filter((contact) => {
+        return configuration.recipients.includes(contact.id)
+      }),
     }),
   })
 
-  let template = config()[record.type].mail.templates.find((template) => template.id === id)
+  let template = config()[record.type].mail.templates.find((template) => {
+    return template.id === id
+  })
   if (!template) {
     return null
   }

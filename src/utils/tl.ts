@@ -18,7 +18,9 @@ function dot<T>(path: string, input: T) {
     if (!(segment in current)) {
       throw new Error(
         `Could not find property \`${segment}\` in ${Object.keys(current)
-          .map((x) => `\`${x}\``)
+          .map((x) => {
+            return `\`${x}\``
+          })
           .join(', ')}`,
       )
     }
@@ -56,21 +58,46 @@ export function render<T>(template: string, input: T, config: Configuration = {}
       for (let transform of transformations) {
         ;[transform, arg] = transform.split(':')
         next = match(transform, {
-          lower: () => next.toLowerCase(),
-          upper: () => next.toUpperCase(),
-          kebab: () => kebab(next),
-          pick: () => next.map((x: any) => dot(arg, x)),
-          and: () => and.format(next),
-          or: () => or.format(next),
-          join: () => next.join(arg),
-          first: () => next.at(0),
-          last: () => next.at(-1),
+          lower: () => {
+            return next.toLowerCase()
+          },
+          upper: () => {
+            return next.toUpperCase()
+          },
+          kebab: () => {
+            return kebab(next)
+          },
+          pick: () => {
+            return next.map((x: any) => {
+              return dot(arg, x)
+            })
+          },
+          and: () => {
+            return and.format(next)
+          },
+          or: () => {
+            return or.format(next)
+          },
+          join: () => {
+            return next.join(arg)
+          },
+          first: () => {
+            return next.at(0)
+          },
+          last: () => {
+            return next.at(-1)
+          },
 
           // Transform the transformations itself to pass in the `next` value.
           ...Object.fromEntries(
-            Object.entries(config.transformations ?? {}).map(
-              ([key, value]) => [key, () => value(next)] as const,
-            ),
+            Object.entries(config.transformations ?? {}).map(([key, value]) => {
+              return [
+                key,
+                () => {
+                  return value(next)
+                },
+              ] as const
+            }),
           ),
         })
       }

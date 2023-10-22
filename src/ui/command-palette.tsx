@@ -37,7 +37,9 @@ export function CommandPalette({ children }: PropsWithChildren<{}>) {
   useWindowEvent('keydown', (event) => {
     if (event.key === 'k' && (event.metaKey || event.ctrlKey) && !event.repeat) {
       event.preventDefault()
-      setOpen((v) => !v)
+      setOpen((v) => {
+        return !v
+      })
     }
   })
 
@@ -52,7 +54,14 @@ export function CommandPalette({ children }: PropsWithChildren<{}>) {
   )
 
   return (
-    <Transition.Root show={open} as={Fragment} afterLeave={() => setQuery('')} appear>
+    <Transition.Root
+      show={open}
+      as={Fragment}
+      afterLeave={() => {
+        return setQuery('')
+      }}
+      appear
+    >
       <Dialog as="div" className="relative z-10" onClose={setOpen}>
         <TransitionChild
           as={Fragment}
@@ -83,7 +92,9 @@ export function CommandPalette({ children }: PropsWithChildren<{}>) {
                 immediate
                 onChange={async (item) => {
                   if (item === null) return
-                  await Promise.resolve().then(() => item.invoke())
+                  await Promise.resolve().then(() => {
+                    return item.invoke()
+                  })
                   if (item.close ?? true) setOpen(false)
                 }}
               >
@@ -96,7 +107,9 @@ export function CommandPalette({ children }: PropsWithChildren<{}>) {
                     autoComplete="off"
                     className="h-12 w-full border-0 bg-transparent pl-11 pr-4 text-gray-900 focus:ring-0 dark:text-white sm:text-sm"
                     placeholder="Search..."
-                    onChange={(event) => setQuery(event.target.value)}
+                    onChange={(event) => {
+                      return setQuery(event.target.value)
+                    }}
                   />
                 </div>
 
@@ -120,11 +133,23 @@ let CommandPaletteGroupContext = createContext<{
   register() {},
 })
 export function Group({ title, children }: PropsWithChildren<{ title: string }>) {
-  let [visibleChildren, setVisibleChildren] = useState(() => new Set<string>())
+  let [visibleChildren, setVisibleChildren] = useState(() => {
+    return new Set<string>()
+  })
 
   let register = useCallback((id: string, matches: boolean) => {
-    setVisibleChildren((x) => tap(new Set(x), (v) => (matches ? v.add(id) : v.delete(id))))
-    return () => setVisibleChildren((x) => tap(new Set(x), (v) => v.delete(id)))
+    setVisibleChildren((x) => {
+      return tap(new Set(x), (v) => {
+        return matches ? v.add(id) : v.delete(id)
+      })
+    })
+    return () => {
+      return setVisibleChildren((x) => {
+        return tap(new Set(x), (v) => {
+          return v.delete(id)
+        })
+      })
+    }
   }, [])
 
   return (
@@ -168,7 +193,9 @@ export function Action({
   let { register } = useContext(CommandPaletteGroupContext)
   let matches = fuzzyMatch(query, search)
 
-  useEffect(() => register(id, matches), [register, id, matches])
+  useEffect(() => {
+    return register(id, matches)
+  }, [register, id, matches])
 
   if (!matches) {
     return null
@@ -177,43 +204,47 @@ export function Action({
   return (
     <ComboboxOption
       value={{ id, type: 'action', search, invoke, close }}
-      className={({ active }) =>
-        classNames(
+      className={({ active }) => {
+        return classNames(
           'flex cursor-default select-none items-center rounded-md px-3 py-2',
           active && 'bg-gray-900/5 text-gray-900 dark:bg-zinc-800 dark:text-white',
         )
-      }
+      }}
     >
-      {({ active }) => (
-        <>
-          {Icon && (
-            <Icon
-              className={classNames(
-                'mr-3 h-6 w-6 flex-none',
-                active ? 'text-gray-900 dark:text-white' : 'text-gray-900/40 dark:text-zinc-500',
-              )}
-              aria-hidden="true"
-            />
-          )}
-          <span className="flex-auto truncate">{children}</span>
-          {false && active && <span className="ml-3 flex-none text-zinc-400">Jump to...</span>}
-          {shortcut && (
-            <span className="ml-3 flex-none text-xs font-semibold text-gray-500 dark:text-gray-400">
-              {shortcut.map((key, idx) => (
-                <Fragment key={key}>
-                  {!isMac && idx > 0 && ' + '}
-                  <kbd className="font-sans">
-                    {
-                      // @ts-expect-error
-                      (isMac ? KeyDisplayMac : KeyDisplayWindows)[key] ?? key
-                    }
-                  </kbd>
-                </Fragment>
-              ))}
-            </span>
-          )}
-        </>
-      )}
+      {({ active }) => {
+        return (
+          <>
+            {Icon && (
+              <Icon
+                className={classNames(
+                  'mr-3 h-6 w-6 flex-none',
+                  active ? 'text-gray-900 dark:text-white' : 'text-gray-900/40 dark:text-zinc-500',
+                )}
+                aria-hidden="true"
+              />
+            )}
+            <span className="flex-auto truncate">{children}</span>
+            {false && active && <span className="ml-3 flex-none text-zinc-400">Jump to...</span>}
+            {shortcut && (
+              <span className="ml-3 flex-none text-xs font-semibold text-gray-500 dark:text-gray-400">
+                {shortcut.map((key, idx) => {
+                  return (
+                    <Fragment key={key}>
+                      {!isMac && idx > 0 && ' + '}
+                      <kbd className="font-sans">
+                        {
+                          // @ts-expect-error
+                          (isMac ? KeyDisplayMac : KeyDisplayWindows)[key] ?? key
+                        }
+                      </kbd>
+                    </Fragment>
+                  )
+                })}
+              </span>
+            )}
+          </>
+        )
+      }}
     </ComboboxOption>
   )
 }

@@ -10,9 +10,9 @@ export async function GET(
   { params }: { params: { type: string; number: string } },
 ) {
   let query = new URL(request.url).searchParams
-  let record = records.find(
-    (record) => record.type === params.type && record.number === params.number,
-  )
+  let record = records.find((record) => {
+    return record.type === params.type && record.number === params.number
+  })
   const type = query.has('preview') ? 'preview' : 'download'
 
   if (!record) {

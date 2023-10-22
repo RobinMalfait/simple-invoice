@@ -11,12 +11,16 @@ export function disposables() {
       options?: boolean | AddEventListenerOptions,
     ) {
       element.addEventListener(name, listener as any, options)
-      return api.add(() => element.removeEventListener(name, listener as any, options))
+      return api.add(() => {
+        return element.removeEventListener(name, listener as any, options)
+      })
     },
 
     setTimeout(...args: Parameters<typeof setTimeout>) {
       let timer = setTimeout(...args)
-      return api.add(() => clearTimeout(timer))
+      return api.add(() => {
+        return clearTimeout(timer)
+      })
     },
 
     add(cb: () => void) {

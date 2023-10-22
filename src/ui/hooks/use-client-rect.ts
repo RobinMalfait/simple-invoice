@@ -49,7 +49,9 @@ export function useClientRect(container: React.RefObject<HTMLElement>) {
     })
 
     resizeObserver.observe(element)
-    return () => resizeObserver.unobserve(element!)
+    return () => {
+      return resizeObserver.unobserve(element!)
+    }
   })
 
   useWindowEvent('resize', () => {
@@ -64,5 +66,7 @@ export function useClientRect(container: React.RefObject<HTMLElement>) {
     setCalculatedStyles(container.current)
   }, [setCalculatedStyles, container])
 
-  return useMemo(() => ({ ...data, force }), [data, force])
+  return useMemo(() => {
+    return { ...data, force }
+  }, [data, force])
 }

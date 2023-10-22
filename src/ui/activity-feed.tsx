@@ -154,7 +154,11 @@ function GroupedActivities({ group, isLast }: { group: MappedEvent[]; isLast: bo
               <button
                 type="button"
                 className="w-auto py-0.5 text-left text-xs leading-5 text-gray-500 dark:text-gray-300"
-                onClick={() => setCollapsed((x) => !x)}
+                onClick={() => {
+                  return setCollapsed((x) => {
+                    return !x
+                  })
+                }}
               >
                 {collapsed ? (
                   <>
@@ -729,7 +733,9 @@ function useActivityText(item: Event) {
             <span className="font-medium text-gray-900 dark:text-gray-100">Drafted</span> the quote
             from{' '}
             {match(item.payload.from, {
-              quote: () => 'another quote',
+              quote: () => {
+                return 'another quote'
+              },
             })}
             .
           </>,
@@ -772,8 +778,12 @@ function useActivityText(item: Event) {
           <span className="font-medium text-gray-900 dark:text-gray-100">cancelled</span> by{' '}
           <span className="font-medium text-gray-900 dark:text-gray-100">
             {match(item.payload.cancelledBy, {
-              client: () => 'the client',
-              account: () => 'you',
+              client: () => {
+                return 'the client'
+              },
+              account: () => {
+                return 'you'
+              },
             })}
           </span>
           .
@@ -817,7 +827,9 @@ function useActivityText(item: Event) {
             <span className="font-medium text-gray-900 dark:text-gray-100">Drafted</span> the
             invoice from a{' '}
             {match(item.payload.from, {
-              quote: () => 'quote',
+              quote: () => {
+                return 'quote'
+              },
             })}
             .
           </>,

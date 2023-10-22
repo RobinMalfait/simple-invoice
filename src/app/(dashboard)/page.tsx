@@ -13,11 +13,12 @@ import { combineRecords, resolveRelevantRecordDate } from '~/domain/record/recor
 
 export default async function Page() {
   let config = await load()
-  let records = combineRecords(rawRecords).sort(
-    (a, z) =>
+  let records = combineRecords(rawRecords).sort((a, z) => {
+    return (
       compareDesc(resolveRelevantRecordDate(a), resolveRelevantRecordDate(z)) ||
-      z.number.localeCompare(a.number),
-  )
+      z.number.localeCompare(a.number)
+    )
+  })
 
   return (
     <Dashboard

@@ -12,14 +12,20 @@ import { SmallFooter } from './small-footer'
 export function Attachment({ document }: { document: Document }) {
   let items = useMemo(() => {
     return match(document.type, {
-      markdown: () => expand(parseMarkdown(document.value)),
-      html: () => expand(document.value),
+      markdown: () => {
+        return expand(parseMarkdown(document.value))
+      },
+      html: () => {
+        return expand(document.value)
+      },
     })
   }, [document])
 
   // @ts-expect-error I'll fix this later
   let [pages, FitContent, completed] = useFittedPagination(items, paginate)
-  let [htmlCache] = useState(() => new Map<number, string>())
+  let [htmlCache] = useState(() => {
+    return new Map<number, string>()
+  })
 
   return (
     <>
@@ -72,10 +78,15 @@ export function SmallHeading({ name }: { name: string }) {
     <div className="flex items-center justify-between bg-gray-50 px-12 py-3 text-sm text-gray-600">
       <span>{name}</span>
       <span>
-        {t((x) => x.pagination.summary, {
-          current: current + 1,
-          total,
-        })}
+        {t(
+          (x) => {
+            return x.pagination.summary
+          },
+          {
+            current: current + 1,
+            total,
+          },
+        )}
       </span>
     </div>
   )

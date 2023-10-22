@@ -34,13 +34,19 @@ export function CopyButton({
           await navigator.clipboard.writeText(text ?? '')
         }
         setCopyStatus('copied')
-        setTimeout(() => setCopyStatus('idle'), 3000)
+        setTimeout(() => {
+          return setCopyStatus('idle')
+        }, 3000)
       }}
       {...props}
     >
       {match(copyStatus, {
-        idle: () => <>{children}</>,
-        copied: () => <>Copied!</>,
+        idle: () => {
+          return <>{children}</>
+        },
+        copied: () => {
+          return <>Copied!</>
+        },
       })}
     </button>
   )

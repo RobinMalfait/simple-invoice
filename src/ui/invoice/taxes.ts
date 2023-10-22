@@ -8,6 +8,10 @@ export function groupVat(items: InvoiceItem[]) {
       return grouped
     }, {}),
   )
-    .filter(({ total }) => total)
-    .sort((a, z) => a.vat - z.vat)
+    .filter(({ total }) => {
+      return total
+    })
+    .sort((a, z) => {
+      return a.vat - z.vat
+    })
 }

@@ -48,9 +48,15 @@ export function TinyRecord({ record }: { record: Record }) {
           {match(
             record.type,
             {
-              quote: (r: Quote) => <QuoteStatusDisplay status={r.status} />,
-              invoice: (r: Invoice) => <InvoiceStatusDisplay status={r.status} />,
-              receipt: (r: Receipt) => <InvoiceStatusDisplay status={r.invoice.status} />,
+              quote: (r: Quote) => {
+                return <QuoteStatusDisplay status={r.status} />
+              },
+              invoice: (r: Invoice) => {
+                return <InvoiceStatusDisplay status={r.status} />
+              },
+              receipt: (r: Receipt) => {
+                return <InvoiceStatusDisplay status={r.invoice.status} />
+              },
             },
             record,
           )}
@@ -71,9 +77,13 @@ export function TinyRecord({ record }: { record: Record }) {
           </div>
           <div className="text-center">
             {match(record.type, {
-              quote: () => <small className="lowercase">quote</small>,
+              quote: () => {
+                return <small className="lowercase">quote</small>
+              },
               invoice: null,
-              receipt: () => <small className="lowercase">receipt</small>,
+              receipt: () => {
+                return <small className="lowercase">receipt</small>
+              },
             })}
             <h3 className="text-xl font-medium text-gray-900">{record.number}</h3>
             <div className="mt-1 flex flex-grow flex-col justify-between">
@@ -91,9 +101,15 @@ export function TinyRecord({ record }: { record: Record }) {
               {match(
                 record.type,
                 {
-                  quote: (r: Quote) => format(r.quoteDate, 'PP'),
-                  invoice: (r: Invoice) => format(r.issueDate, 'PP'),
-                  receipt: (r: Receipt) => format(r.receiptDate, 'PP'),
+                  quote: (r: Quote) => {
+                    return format(r.quoteDate, 'PP')
+                  },
+                  invoice: (r: Invoice) => {
+                    return format(r.issueDate, 'PP')
+                  },
+                  receipt: (r: Receipt) => {
+                    return format(r.receiptDate, 'PP')
+                  },
                 },
                 record,
               )}
@@ -110,9 +126,15 @@ export function TinyRecord({ record }: { record: Record }) {
               {match(
                 record.type,
                 {
-                  quote: (r: Quote) => format(r.quoteExpirationDate, 'PP'),
-                  invoice: (r: Invoice) => format(r.dueDate, 'PP'),
-                  receipt: (r: Receipt) => format(r.receiptDate, 'PP'),
+                  quote: (r: Quote) => {
+                    return format(r.quoteExpirationDate, 'PP')
+                  },
+                  invoice: (r: Invoice) => {
+                    return format(r.dueDate, 'PP')
+                  },
+                  receipt: (r: Receipt) => {
+                    return format(r.receiptDate, 'PP')
+                  },
                 },
                 record,
               )}

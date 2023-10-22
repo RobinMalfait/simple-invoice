@@ -7,7 +7,9 @@ let scopedId = new ScopedIDGenerator('event')
 
 export let Event = z
   .object({
-    id: z.string().default(() => scopedId.next()),
+    id: z.string().default(() => {
+      return scopedId.next()
+    }),
   })
   .and(
     z.discriminatedUnion('type', [
@@ -251,7 +253,9 @@ export let Event = z
         }),
         payload: z.object({
           from: z.enum(['quote']).optional(),
-          invoice: z.lazy(() => Invoice),
+          invoice: z.lazy(() => {
+            return Invoice
+          }),
         }),
       }),
       z.object({
@@ -263,7 +267,9 @@ export let Event = z
           invoiceId: z.string(),
         }),
         payload: z.object({
-          invoice: z.lazy(() => Invoice),
+          invoice: z.lazy(() => {
+            return Invoice
+          }),
         }),
       }),
       z.object({
@@ -277,7 +283,9 @@ export let Event = z
         payload: z.object({
           amount: z.number(),
           outstanding: z.number(),
-          invoice: z.lazy(() => Invoice),
+          invoice: z.lazy(() => {
+            return Invoice
+          }),
         }),
       }),
       z.object({
@@ -291,7 +299,9 @@ export let Event = z
         payload: z.object({
           amount: z.number(),
           outstanding: z.number(),
-          invoice: z.lazy(() => Invoice),
+          invoice: z.lazy(() => {
+            return Invoice
+          }),
         }),
       }),
       z.object({
@@ -303,7 +313,9 @@ export let Event = z
           invoiceId: z.string(),
         }),
         payload: z.object({
-          invoice: z.lazy(() => Invoice),
+          invoice: z.lazy(() => {
+            return Invoice
+          }),
         }),
       }),
       z.object({
@@ -315,7 +327,9 @@ export let Event = z
           invoiceId: z.string(),
         }),
         payload: z.object({
-          invoice: z.lazy(() => Invoice),
+          invoice: z.lazy(() => {
+            return Invoice
+          }),
         }),
       }),
 

@@ -43,8 +43,12 @@ for (let [idx, stack] of Object.entries(stacks)) {
 let order = ['quote', 'invoice', 'receipt']
 for (let stack of Object.values(stacks)) {
   stack.sort((aId, zId) => {
-    let a = records.find((e) => e.id === aId)!
-    let z = records.find((e) => e.id === zId)!
+    let a = records.find((e) => {
+      return e.id === aId
+    })!
+    let z = records.find((e) => {
+      return e.id === zId
+    })!
 
     return order.indexOf(a.type) - order.indexOf(z.type) || a.number.localeCompare(z.number)
   })
