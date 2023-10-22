@@ -1,19 +1,28 @@
-import { Combobox, Dialog, Transition } from '@headlessui/react'
 import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
 import {
   Fragment,
-  PropsWithChildren,
   createContext,
   useCallback,
   useContext,
   useEffect,
   useId,
   useState,
+  type PropsWithChildren,
 } from 'react'
 import { classNames } from '~/ui/class-names'
 import { useWindowEvent } from '~/ui/hooks/use-window-event'
 import { fuzzyMatch } from '~/utils/fuzzy'
 import { tap } from '~/utils/tap'
+import {
+  Combobox,
+  ComboboxInput,
+  ComboboxOption,
+  ComboboxOptions,
+  Dialog,
+  DialogPanel,
+  Transition,
+  TransitionChild,
+} from './headlessui'
 
 let CommandPaletteContext = createContext<{ query: string }>({ query: '' })
 function useCommandPalette() {
@@ -45,7 +54,7 @@ export function CommandPalette({ children }: PropsWithChildren<{}>) {
   return (
     <Transition.Root show={open} as={Fragment} afterLeave={() => setQuery('')} appear>
       <Dialog as="div" className="relative z-10" onClose={setOpen}>
-        <Transition.Child
+        <TransitionChild
           as={Fragment}
           enter="ease-out duration-300"
           enterFrom="opacity-0"
@@ -55,10 +64,10 @@ export function CommandPalette({ children }: PropsWithChildren<{}>) {
           leaveTo="opacity-0"
         >
           <div className="fixed inset-0 bg-zinc-500/25 transition-opacity" />
-        </Transition.Child>
+        </TransitionChild>
 
         <div className="fixed inset-0 z-10 overflow-y-auto p-4 sm:p-6 md:p-20">
-          <Transition.Child
+          <TransitionChild
             as={Fragment}
             enter="ease-out duration-300"
             enterFrom="opacity-0 scale-95"
@@ -67,7 +76,7 @@ export function CommandPalette({ children }: PropsWithChildren<{}>) {
             leaveFrom="opacity-100 scale-100"
             leaveTo="opacity-0 scale-95"
           >
-            <Dialog.Panel className="mx-auto max-w-2xl transform divide-y divide-zinc-500 divide-opacity-20 overflow-hidden rounded-xl bg-white/80 shadow-2xl ring-1 ring-black/5 backdrop-blur transition-all dark:bg-zinc-900 dark:ring-0 dark:backdrop-blur-none">
+            <DialogPanel className="mx-auto max-w-2xl transform divide-y divide-zinc-500 divide-opacity-20 overflow-hidden rounded-xl bg-white/80 shadow-2xl ring-1 ring-black/5 backdrop-blur transition-all dark:bg-zinc-900 dark:ring-0 dark:backdrop-blur-none">
               <Combobox<CommandPaletteOption>
                 by="id"
                 nullable
@@ -83,7 +92,7 @@ export function CommandPalette({ children }: PropsWithChildren<{}>) {
                     className="pointer-events-none absolute left-4 top-3.5 h-5 w-5 text-zinc-500"
                     aria-hidden="true"
                   />
-                  <Combobox.Input
+                  <ComboboxInput
                     autoComplete="off"
                     className="h-12 w-full border-0 bg-transparent pl-11 pr-4 text-gray-900 focus:ring-0 dark:text-white sm:text-sm"
                     placeholder="Search..."
@@ -91,14 +100,14 @@ export function CommandPalette({ children }: PropsWithChildren<{}>) {
                   />
                 </div>
 
-                <Combobox.Options className="max-h-[50vh] scroll-py-2 divide-y divide-zinc-500 divide-opacity-20 overflow-y-auto">
+                <ComboboxOptions className="max-h-[50vh] scroll-py-2 divide-y divide-zinc-500 divide-opacity-20 overflow-y-auto">
                   <CommandPaletteContext.Provider value={{ query }}>
                     {children}
                   </CommandPaletteContext.Provider>
-                </Combobox.Options>
+                </ComboboxOptions>
               </Combobox>
-            </Dialog.Panel>
-          </Transition.Child>
+            </DialogPanel>
+          </TransitionChild>
         </div>
       </Dialog>
     </Transition.Root>
@@ -166,7 +175,7 @@ export function Action({
   }
 
   return (
-    <Combobox.Option
+    <ComboboxOption
       value={{ id, type: 'action', search, invoke, close }}
       className={({ active }) =>
         classNames(
@@ -205,7 +214,7 @@ export function Action({
           )}
         </>
       )}
-    </Combobox.Option>
+    </ComboboxOption>
   )
 }
 
