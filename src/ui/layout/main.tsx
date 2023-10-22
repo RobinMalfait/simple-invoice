@@ -162,7 +162,7 @@ export default function Layout({
                                     layoutId="active-indicator"
                                     className="absolute -left-4 top-1 flex items-center"
                                   >
-                                    <div className="h-8 w-1.5 rounded-r-md bg-white/20" />
+                                    <div className="h-8 w-1.5 rounded-r-md bg-white/90" />
                                   </motion.div>
                                 )}
 
@@ -218,7 +218,7 @@ export default function Layout({
                                                     : '-left-12',
                                                 )}
                                               >
-                                                <div className="h-8 w-1.5 rounded-r-md bg-white/20" />
+                                                <div className="h-8 w-1.5 rounded-r-md bg-white/90" />
                                               </motion.div>
                                             )}
 
