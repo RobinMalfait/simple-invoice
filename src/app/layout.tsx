@@ -47,27 +47,15 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     accountById: records.map((r) => {
       return [r.account.id, r.account]
     }) as [string, Account][],
-    quoteById: records
-      .filter((r) => {
-        return isQuote(r)
-      })
-      .map((r) => {
-        return [r.id, r]
-      }) as [string, Quote][],
-    invoiceById: records
-      .filter((r) => {
-        return isInvoice(r)
-      })
-      .map((r) => {
-        return [r.id, r]
-      }) as [string, Invoice][],
-    receiptById: records
-      .filter((r) => {
-        return isReceipt(r)
-      })
-      .map((r) => {
-        return [r.id, r]
-      }) as [string, Receipt][],
+    quoteById: records.filter(isQuote).map((r) => {
+      return [r.id, r]
+    }) as [string, Quote][],
+    invoiceById: records.filter(isInvoice).map((r) => {
+      return [r.id, r]
+    }) as [string, Invoice][],
+    receiptById: records.filter(isReceipt).map((r) => {
+      return [r.id, r]
+    }) as [string, Receipt][],
   }
   let config = await load()
   return (
