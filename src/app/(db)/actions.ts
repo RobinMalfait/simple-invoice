@@ -45,7 +45,7 @@ function mergeWithDefaults(data: DB, defaults: DB) {
       ...data.ui,
       dashboard: {
         ...defaults.ui.dashboard,
-        ...data.ui.dashboard,
+        ...data.ui?.dashboard,
       },
     },
   }
