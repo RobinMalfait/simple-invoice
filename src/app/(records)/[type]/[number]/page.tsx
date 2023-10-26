@@ -65,13 +65,13 @@ export default async function Invoice({
                   {match(
                     record.type,
                     {
-                      quote: (r: QuoteType) => {
+                      quote(r: QuoteType) {
                         return r.number
                       },
-                      invoice: (r: InvoiceType) => {
+                      invoice(r: InvoiceType) {
                         return r.number
                       },
-                      receipt: (r: ReceiptType) => {
+                      receipt(r: ReceiptType) {
                         return r.invoice.number
                       },
                     },
