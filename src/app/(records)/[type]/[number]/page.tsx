@@ -35,7 +35,7 @@ export default async function Invoice({
   return (
     <div className="flex h-full flex-1 overflow-hidden [--spacing:theme(spacing.8)]">
       <History record={record} records={records}>
-        <div className="flex w-[calc(210mm+theme(spacing.10)*2)] snap-y snap-mandatory scroll-px-10 scroll-pt-10 overflow-auto scroll-smooth bg-gray-950/10 shadow-inner dark:bg-zinc-600">
+        <div className="flex w-[calc(210mm+theme(spacing.10)*2)] flex-1 snap-y snap-mandatory scroll-px-10 scroll-pt-10 overflow-auto scroll-smooth bg-gray-950/10 shadow-inner dark:bg-zinc-600">
           <div className="mx-auto mb-10">
             <div className="p-10">
               <InvoicePreview />
@@ -51,7 +51,7 @@ export default async function Invoice({
             currency: me.currency,
           }}
         >
-          <div className="flex max-w-lg flex-1 shrink-0 basis-[32rem] flex-col gap-[--spacing] overflow-auto px-4 py-10 sm:px-6 lg:px-8">
+          <div className="flex max-w-lg shrink-0 basis-[32rem] flex-col gap-[--spacing] overflow-auto px-4 py-10 sm:px-6 lg:px-8">
             <div className="flex flex-col gap-4 rounded-lg bg-white p-4 shadow ring-1 ring-black/5 dark:bg-zinc-900 dark:text-gray-300">
               <h3 className="flex items-center justify-between text-xl">
                 <Link href={`/clients/${record.client.id}`} className="group relative">
