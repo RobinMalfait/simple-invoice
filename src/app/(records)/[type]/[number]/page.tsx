@@ -51,7 +51,7 @@ export default async function Invoice({
             currency: me.currency,
           }}
         >
-          <div className="flex max-w-lg shrink-0 basis-[32rem] flex-col gap-[--spacing] overflow-auto px-4 py-10 sm:px-6 lg:px-8">
+          <div className="hidden max-w-lg shrink-0 basis-[32rem] flex-col gap-[--spacing] overflow-auto px-4 py-10 sm:px-6 lg:flex lg:px-8">
             <div className="flex flex-col gap-4 rounded-lg bg-white p-4 shadow ring-1 ring-black/5 dark:bg-zinc-900 dark:text-gray-300">
               <h3 className="flex items-center justify-between text-xl">
                 <Link href={`/clients/${record.client.id}`} className="group relative">
