@@ -20,11 +20,19 @@
   },
   "account": {
     "title": "From:",
-    "vat": "VAT Number:"
+    "vat": {
+      "vat": "VAT Number:",
+      "bn": "Business Number:",
+      "ein": "EIN:"
+    }
   },
   "client": {
     "title": "To:",
-    "vat": "VAT Number:"
+    "vat": {
+      "vat": "VAT Number:",
+      "bn": "Business Number:",
+      "ein": "EIN:"
+    }
   },
   "invoiceItem": {
     "description": "Description",

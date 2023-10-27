@@ -20,11 +20,19 @@
   },
   "account": {
     "title": "Van:",
-    "vat": "BTW Nummer:"
+    "vat": {
+      "vat": "BTW Nummer:",
+      "bn": "Ondernemingsnummer:",
+      "ein": "EIN:"
+    }
   },
   "client": {
     "title": "Naar:",
-    "vat": "BTW Nummer:"
+    "vat": {
+      "vat": "BTW Nummer:",
+      "bn": "Ondernemingsnummer:",
+      "ein": "EIN:"
+    }
   },
   "invoiceItem": {
     "description": "Beschrijving",
