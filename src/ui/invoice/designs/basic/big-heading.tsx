@@ -132,7 +132,7 @@ export function BigHeading() {
               <div className="mt-4">
                 <div className="text-sm font-medium text-gray-900">
                   {t((x) => {
-                    return x.account.vat[record.account.tax!.id]
+                    return x.account.taxId[record.account.tax!.id]
                   })}
                 </div>
                 <div>
@@ -158,7 +158,7 @@ export function BigHeading() {
               <div className="mt-4">
                 <div className="text-sm font-medium text-gray-900">
                   {t((x) => {
-                    return x.client.vat[record.client.tax!.id]
+                    return x.client.taxId[record.client.tax!.id]
                   })}
                 </div>
                 <div>

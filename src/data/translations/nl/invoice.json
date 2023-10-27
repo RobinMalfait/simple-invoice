@@ -20,7 +20,7 @@
   },
   "account": {
     "title": "Van:",
-    "vat": {
+    "taxId": {
       "vat": "BTW Nummer:",
       "bn": "Ondernemingsnummer:",
       "ein": "EIN:"
@@ -28,7 +28,7 @@
   },
   "client": {
     "title": "Naar:",
-    "vat": {
+    "taxId": {
       "vat": "BTW Nummer:",
       "bn": "Ondernemingsnummer:",
       "ein": "EIN:"

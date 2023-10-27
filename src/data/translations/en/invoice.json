@@ -20,7 +20,7 @@
   },
   "account": {
     "title": "From:",
-    "vat": {
+    "taxId": {
       "vat": "VAT Number:",
       "bn": "Business Number:",
       "ein": "EIN:"
@@ -28,7 +28,7 @@
   },
   "client": {
     "title": "To:",
-    "vat": {
+    "taxId": {
       "vat": "VAT Number:",
       "bn": "Business Number:",
       "ein": "EIN:"
