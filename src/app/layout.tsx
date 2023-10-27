@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import { events, me, records, stacks } from '~/data'
 import { Account } from '~/domain/account/account'
@@ -17,21 +17,22 @@ export const metadata: Metadata = {
   title: 'Simple Invoice',
   description: 'Generate simple invoices with ease.',
   manifest: '/manifest.json',
-  themeColor: [
-    { color: '#18181b', media: '(prefers-color-scheme: light)' },
-    { color: '#18181b', media: '(prefers-color-scheme: dark)' },
-  ],
-  viewport: {
-    width: 'device-width',
-    initialScale: 1.0,
-    maximumScale: 1.0,
-    userScalable: false,
-    viewportFit: 'cover',
-  },
   icons: [
     { url: '/favicon.ico', sizes: 'any' },
     { url: '/apple-touch-icon.png', rel: 'apple-touch-icon' },
   ],
+}
+
+export const viewport: Viewport = {
+  themeColor: [
+    { color: '#18181b', media: '(prefers-color-scheme: light)' },
+    { color: '#18181b', media: '(prefers-color-scheme: dark)' },
+  ],
+  width: 'device-width',
+  initialScale: 1.0,
+  maximumScale: 1.0,
+  userScalable: false,
+  viewportFit: 'cover',
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
