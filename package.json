@@ -9,7 +9,7 @@
     "lint": "eslint . && prettier --check .",
     "test": "TZ=Europe/Brussels jest",
     "tdd": "TZ=Europe/Brussels jest --watchAll",
-    "format": "prettier --write ."
+    "format": "eslint . --fix && prettier --write ."
   },
   "prettier": {
     "semi": false,
