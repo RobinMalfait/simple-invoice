@@ -138,7 +138,7 @@ export default function Layout({
                     }),
                   )}
                 >
-                  <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-zinc-900 px-6 pb-4">
+                  <div className="flex grow select-none flex-col gap-y-5 overflow-y-auto bg-zinc-900 px-6 pb-4">
                     <div
                       className={classNames(
                         'flex h-16 shrink-0 items-center',
