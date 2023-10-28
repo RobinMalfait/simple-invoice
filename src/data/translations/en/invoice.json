@@ -56,7 +56,7 @@
     "vat": "VAT (:rate)"
   },
   "qr": {
-    "title": "Pay with bank app"
+    "label": "Pay with bank app"
   },
   "pagination": {
     "summary": ":current of :total"
