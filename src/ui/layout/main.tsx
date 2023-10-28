@@ -128,7 +128,7 @@ export default function Layout({
         <EventsProvider events={data.events}>
           <RecordsProvider records={data.records}>
             <RecordStacksProvider value={data.stacks}>
-              <div className="isolate flex flex-1 flex-col overflow-hidden">
+              <div className="isolate flex flex-1 flex-col overflow-hidden selection:bg-pink-500/80 selection:text-pink-50">
                 <div
                   className={classNames(
                     'hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:flex-col',
