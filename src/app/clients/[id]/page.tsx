@@ -4,11 +4,22 @@ import { redirect } from 'next/navigation'
 import { Fragment } from 'react'
 import { me, records } from '~/data'
 import { Invoice } from '~/domain/invoice/invoice'
-import { InvoiceStatus } from '~/domain/invoice/invoice-status'
 import { Quote } from '~/domain/quote/quote'
-import { QuoteStatus } from '~/domain/quote/quote-status'
 import { Receipt } from '~/domain/receipt/receipt'
-import { isInvoice, isQuote, isReceipt } from '~/domain/record/filters'
+import {
+  isAccepted,
+  isClosed,
+  isDraft,
+  isExpired,
+  isInvoice,
+  isOverdue,
+  isPaid,
+  isPartiallyPaid,
+  isQuote,
+  isReceipt,
+  isRejected,
+  isSent,
+} from '~/domain/record/filters'
 import { Record, combineRecords, separateRecords } from '~/domain/record/record'
 import { Address, formatAddress } from '~/ui/address/address'
 import { Avatar } from '~/ui/avatar'
@@ -65,43 +76,12 @@ export default async function Page({ params: { id } }: { params: { id: string } 
         label: 'Quotes',
         filter: isQuote,
         children: [
-          {
-            label: 'Draft',
-            filter: (r) => {
-              return r.status === QuoteStatus.Draft
-            },
-          },
-          {
-            label: 'Sent',
-            filter: (r) => {
-              return r.status === QuoteStatus.Sent
-            },
-          },
-          {
-            label: 'Accepted',
-            filter: (r) => {
-              return r.status === QuoteStatus.Accepted
-            },
-            default: true,
-          },
-          {
-            label: 'Rejected',
-            filter: (r) => {
-              return r.status === QuoteStatus.Rejected
-            },
-          },
-          {
-            label: 'Expired',
-            filter: (r) => {
-              return r.status === QuoteStatus.Expired
-            },
-          },
-          {
-            label: 'Closed',
-            filter: (r) => {
-              return r.status === QuoteStatus.Closed
-            },
-          },
+          { label: 'Draft', filter: isDraft },
+          { label: 'Sent', filter: isSent },
+          { label: 'Accepted', filter: isAccepted, default: true },
+          { label: 'Rejected', filter: isRejected },
+          { label: 'Expired', filter: isExpired },
+          { label: 'Closed', filter: isClosed },
         ],
       }),
     systemContainsInvoices &&
@@ -109,43 +89,12 @@ export default async function Page({ params: { id } }: { params: { id: string } 
         label: 'Invoices',
         filter: isInvoice,
         children: [
-          {
-            label: 'Draft',
-            filter: (r) => {
-              return r.status === InvoiceStatus.Draft
-            },
-          },
-          {
-            label: 'Sent',
-            filter: (r) => {
-              return r.status === InvoiceStatus.Sent
-            },
-          },
-          {
-            label: 'Paid',
-            filter: (r) => {
-              return r.status === InvoiceStatus.Paid
-            },
-            default: true,
-          },
-          {
-            label: 'Partially paid',
-            filter: (r) => {
-              return r.status === InvoiceStatus.PartiallyPaid
-            },
-          },
-          {
-            label: 'Overdue',
-            filter: (r) => {
-              return r.status === InvoiceStatus.Overdue
-            },
-          },
-          {
-            label: 'Closed',
-            filter: (r) => {
-              return r.status === InvoiceStatus.Closed
-            },
-          },
+          { label: 'Draft', filter: isDraft },
+          { label: 'Sent', filter: isSent },
+          { label: 'Paid', filter: isPaid, default: true },
+          { label: 'Partially paid', filter: isPartiallyPaid },
+          { label: 'Overdue', filter: isOverdue },
+          { label: 'Closed', filter: isClosed },
         ],
       }),
     systemContainsReceipts &&
