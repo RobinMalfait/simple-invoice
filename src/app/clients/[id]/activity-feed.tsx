@@ -13,17 +13,13 @@ export function ClientActivityFeed({ client }: { client: Client }) {
   }
 
   return (
-    <>
-      {events.length > 0 && (
-        <Card>
-          <CardTitle>Activity feed ({events.length})</CardTitle>
-          <CardBody variant="filled-vertical">
-            <div className="max-h-96 overflow-auto">
-              <ActivityFeed events={events} viewContext="client" />
-            </div>
-          </CardBody>
-        </Card>
-      )}
-    </>
+    <Card>
+      <CardTitle>Activity feed ({events.length})</CardTitle>
+      <CardBody variant="filled-vertical">
+        <div className="max-h-96 overflow-auto">
+          <ActivityFeed events={events} viewContext="client" />
+        </div>
+      </CardBody>
+    </Card>
   )
 }
