@@ -48,17 +48,21 @@ export default async function Page({ params: { id } }: { params: { id: string } 
 
               <CardBody variant="grid">
                 {account.email && (
-                  <Field classified title="Email">
+                  <Field classified title="Email" copy={account.email}>
                     {account.email}
                   </Field>
                 )}
                 {account.phone && (
-                  <Field classified title="Phone">
+                  <Field classified title="Phone" copy={account.phone}>
                     {account.phone}
                   </Field>
                 )}
                 {account.billing && (
-                  <Field variant="block" title="Billing address">
+                  <Field
+                    variant="block"
+                    title="Billing address"
+                    copy={formatAddress(account.billing).replace(/\n/g, ', ')}
+                  >
                     <div className="flex items-center justify-between">
                       <Address address={account.billing} />
                       <a
@@ -77,23 +81,32 @@ export default async function Page({ params: { id } }: { params: { id: string } 
                   </Field>
                 )}
                 {account.tax && (
-                  <Field classified title={`Tax (${account.tax.id.toUpperCase()})`}>
+                  <Field
+                    classified
+                    title={`Tax (${account.tax.id.toUpperCase()})`}
+                    copy={account.tax.value}
+                  >
                     {account.tax.value}
                   </Field>
                 )}
                 {account.timezone && (
-                  <Field title="Timezone">
+                  <Field title="Timezone" copy={account.timezone}>
                     <span className="mr-4">{account.timezone}</span>
                     <TimezoneDifference myTimezone={me.timezone} otherTimezone={account.timezone} />
                   </Field>
                 )}
                 {account.note && (
-                  <Field variant="block" title="Note">
+                  <Field variant="block" title="Note" copy={account.note}>
                     <Markdown>{account.note}</Markdown>
                   </Field>
                 )}
                 {account.legal && (
-                  <Field classified title="Legal" variant="block">
+                  <Field
+                    classified
+                    title="Legal"
+                    variant="block"
+                    copy={render(account.legal, { account })}
+                  >
                     <Markdown>{render(account.legal, { account })}</Markdown>
                   </Field>
                 )}
@@ -151,7 +164,7 @@ export default async function Page({ params: { id } }: { params: { id: string } 
                         : 'div'
 
                     return (
-                      <Field key={field.id} classified title={field.name}>
+                      <Field key={field.id} classified title={field.name} copy={field.value}>
                         <div title={field.value} className="flex items-center gap-3 text-sm">
                           <div className="text-center">
                             <Icon className="h-4 w-4 text-gray-500 grayscale dark:text-gray-400" />
@@ -182,6 +195,7 @@ export default async function Page({ params: { id } }: { params: { id: string } 
                             return 'PayPal'
                           },
                         })}
+                        copy={paymentMethod.value}
                       >
                         <div
                           title={paymentMethod.value}

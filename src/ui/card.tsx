@@ -4,6 +4,7 @@ import React from 'react'
 import { classNames } from '~/ui/class-names'
 import { Classified } from '~/ui/classified'
 import { match } from '~/utils/match'
+import { CopyButton } from './copy-button'
 
 export function Card({ className, children }: React.PropsWithChildren<{ className?: string }>) {
   return (
@@ -75,11 +76,27 @@ export function Field({
   children,
   classified = false,
   variant = 'text',
-}: React.PropsWithChildren<{ title: string; variant?: 'text' | 'block'; classified?: boolean }>) {
+  copy,
+}: React.PropsWithChildren<{
+  title: string
+  variant?: 'text' | 'block'
+  classified?: boolean
+  copy?: string
+}>) {
   let Wrapper = classified ? Classified : React.Fragment
   return (
-    <div>
-      <div className="text-sm font-medium">{title}</div>
+    <div className="relative">
+      <div className="flex items-center justify-between text-sm font-medium">
+        {title}
+        {Boolean(copy) && (
+          <CopyButton
+            className="text-xs opacity-30 transition-colors duration-300 hover:opacity-75"
+            text={copy}
+          >
+            Copy
+          </CopyButton>
+        )}
+      </div>
       <div
         className={classNames(
           'mt-1 text-sm',
