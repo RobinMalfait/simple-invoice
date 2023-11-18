@@ -10,7 +10,7 @@ import NL_INVOICE from '~/data/translations/nl/invoice.json'
 
 type Translation = typeof NL_INVOICE & typeof EN_INVOICE
 
-const translations: Record<Language, Translation> = {
+let translations: Record<Language, Translation> = {
   [Language.NL]: Object.assign({}, NL_INVOICE),
   [Language.EN]: Object.assign({}, EN_INVOICE),
 }

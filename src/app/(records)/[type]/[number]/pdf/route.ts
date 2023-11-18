@@ -13,7 +13,7 @@ export async function GET(
   let record = records.find((record) => {
     return record.type === params.type && record.number === params.number
   })
-  const type = query.has('preview') ? 'preview' : 'download'
+  let type = query.has('preview') ? ('preview' as const) : ('download' as const)
 
   if (!record) {
     return redirect(`/`)

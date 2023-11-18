@@ -1,6 +1,6 @@
 import { format } from 'date-fns'
 
-export const Base = {
+export let Base = {
   yyyyMMdd: (date: Date) => {
     return format(date, 'yyyyMMdd')
   },

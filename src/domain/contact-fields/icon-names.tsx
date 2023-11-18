@@ -1,5 +1,5 @@
-export const socialIcons = ['Facebook', 'Instagram', 'Twitter', 'GitHub', 'YouTube'] as const
-export const icons = [
+export let socialIcons = ['Facebook', 'Instagram', 'Twitter', 'GitHub', 'YouTube'] as const
+export let icons = [
   'AcademicCapIcon',
   'AdjustmentsHorizontalIcon',
   'AdjustmentsVerticalIcon',
