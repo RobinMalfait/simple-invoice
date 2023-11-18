@@ -59,16 +59,16 @@ export function BigFooter() {
                       field.icon === null
                         ? 'div'
                         : field.icon.type === 'heroicon'
-                        ? HI[field.icon.heroicon]
-                        : field.icon.type === 'socials'
-                        ? SocialIcons[field.icon.name]
-                        : field.icon.type === 'image'
-                        ? function ImageIcon(props: React.ComponentProps<'img'>) {
-                            // @ts-expect-error
-                            // eslint-disable-next-line @next/next/no-img-element
-                            return <img src={field.icon.imageUrl} alt="" {...props} />
-                          }
-                        : 'div'
+                          ? HI[field.icon.heroicon]
+                          : field.icon.type === 'socials'
+                            ? SocialIcons[field.icon.name]
+                            : field.icon.type === 'image'
+                              ? function ImageIcon(props: React.ComponentProps<'img'>) {
+                                  // @ts-expect-error
+                                  // eslint-disable-next-line @next/next/no-img-element
+                                  return <img src={field.icon.imageUrl} alt="" {...props} />
+                                }
+                              : 'div'
 
                     return (
                       <tr key={field.id}>

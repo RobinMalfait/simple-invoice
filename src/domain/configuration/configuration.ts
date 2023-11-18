@@ -31,8 +31,8 @@ let state = {
 type DeepPartial<T> = T extends (...args: any[]) => void
   ? T
   : T extends object
-  ? { [P in keyof T]?: DeepPartial<T[P]> }
-  : T
+    ? { [P in keyof T]?: DeepPartial<T[P]> }
+    : T
 
 export function configure(configuration: DeepPartial<Configuration>) {
   state.configuration = {
