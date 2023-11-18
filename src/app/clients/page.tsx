@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { records } from '~/data'
+import { clients, records } from '~/data'
 import { isQuote } from '~/domain/record/filters'
 import { combineRecords } from '~/domain/record/record'
 import { Avatar } from '~/ui/avatar'
@@ -15,20 +15,6 @@ export default async function Page() {
     },
     {} as Record<string, number>,
   )
-  let clients = combined
-    .map((x) => {
-      return x.client
-    })
-    .filter((c, idx, all) => {
-      return (
-        all.findIndex((other) => {
-          return other.id === c.id
-        }) === idx
-      )
-    })
-    .sort((a, z) => {
-      return a.nickname.localeCompare(z.nickname)
-    })
 
   return (
     <div className="relative px-4 py-8 text-white sm:px-6 lg:px-8">

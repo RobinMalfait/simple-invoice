@@ -1,4 +1,5 @@
 import { Account } from '~/domain/account/account'
+import { Client } from '~/domain/client/client'
 import { bus } from '~/domain/event-bus/bus'
 import { Event } from '~/domain/events/event'
 import { trackMilestones } from '~/domain/milestone/milestone'
@@ -12,7 +13,24 @@ trackMilestones(bus, { events })
 let data = require(`./${env.DATA_SOURCE_FILE}.ts`)
 
 export let me: Account = data.me
-export let records: Record[] = separateRecords(data.records)
+export let records: Record[] = separateRecords(data.records ?? [])
+export let clients: Client[] = Array.from(
+  new Set(
+    ((data.records ?? []) as Record[]).map((e) => {
+      return e.client
+    }),
+  ),
+)
+  .filter((c, idx, all) => {
+    return (
+      all.findLastIndex((other) => {
+        return other.id === c.id
+      }) === idx
+    )
+  })
+  .sort((a, z) => {
+    return a.nickname.localeCompare(z.nickname)
+  })
 
 // For each record in the system, we should be able to find all related records in either layers
 // below or layers above.
