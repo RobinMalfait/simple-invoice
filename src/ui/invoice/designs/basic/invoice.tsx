@@ -92,7 +92,7 @@ export function Invoice() {
                         <span className="absolute inset-x-0 top-0 flex -translate-y-2 items-center justify-center">
                           <span className="bg-white px-1 text-xs text-gray-600">
                             {t((x) => {
-                              return x.qr.title
+                              return x.qr.label
                             })}
                           </span>
                         </span>
