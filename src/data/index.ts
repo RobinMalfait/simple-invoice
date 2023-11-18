@@ -1,9 +1,11 @@
+import { compareDesc } from 'date-fns'
 import { Account } from '~/domain/account/account'
 import { Client } from '~/domain/client/client'
 import { bus } from '~/domain/event-bus/bus'
 import { Event } from '~/domain/events/event'
 import { trackMilestones } from '~/domain/milestone/milestone'
 import { separateRecords, type Record } from '~/domain/record/record'
+import { Transaction } from '~/domain/transaction/transaction'
 import { env } from '~/utils/env'
 
 export let events: Event[] = []
@@ -33,6 +35,11 @@ export let clients: Client[] = Array.from(
   .sort((a, z) => {
     return a.nickname.localeCompare(z.nickname)
   })
+export let transactions: Transaction[] = (data.transactions ?? []).sort(
+  (a: Transaction, z: Transaction) => {
+    return compareDesc(a.date, z.date)
+  },
+)
 
 // For each record in the system, we should be able to find all related records in either layers
 // below or layers above.

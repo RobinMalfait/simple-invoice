@@ -11,6 +11,7 @@ import {
   EyeSlashIcon,
   HomeIcon,
   RectangleStackIcon,
+  TicketIcon,
   UserGroupIcon,
   UserIcon,
 } from '@heroicons/react/24/outline'
@@ -74,6 +75,7 @@ let navigation: Navigation[] = [
       { name: 'Receipts', icon: DocumentCheckIcon, href: '/receipt', record: 'receipt' },
     ],
   },
+  { name: 'Transactions', icon: TicketIcon, href: '/transactions' },
 ]
 
 export default function Layout({
