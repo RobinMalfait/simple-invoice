@@ -40,6 +40,15 @@ export let transactions: Transaction[] = (data.transactions ?? []).sort(
     return compareDesc(a.date, z.date)
   },
 )
+export let suppliers: string[] = Array.from(
+  new Set(
+    transactions.map((x) => {
+      return x.supplier
+    }),
+  ),
+).sort((a, z) => {
+  return a.localeCompare(z)
+})
 
 // For each record in the system, we should be able to find all related records in either layers
 // below or layers above.

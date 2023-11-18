@@ -2,6 +2,7 @@
 
 import {
   ArrowDownTrayIcon,
+  BuildingStorefrontIcon,
   CalculatorIcon,
   CubeIcon,
   DocumentCheckIcon,
@@ -76,6 +77,7 @@ let navigation: Navigation[] = [
     ],
   },
   { name: 'Transactions', icon: TicketIcon, href: '/transactions' },
+  { name: 'Suppliers', icon: BuildingStorefrontIcon, href: '/suppliers' },
 ]
 
 export default function Layout({
