@@ -115,12 +115,9 @@ export function Dashboard({
   dashboardConfig: DashboardConfig
 }) {
   let allRecords = separateRecords(records)
-  let systemContainsQuotes = allRecords.some((r) => {
-    return isQuote(r)
-  })
-  let systemContainsInvoices = allRecords.some((r) => {
-    return isInvoice(r)
-  })
+  let systemContainsQuotes = allRecords.some(isQuote)
+  let systemContainsInvoices = allRecords.some(isInvoice)
+  let systemContainsReceipts = allRecords.some(isReceipt)
 
   return (
     <DashboardProvider data={{ account: me, records, milestones, config: dashboardConfig }}>
@@ -137,7 +134,7 @@ export function Dashboard({
           <InvoicesCell className="lg:col-span-2 lg:row-span-2 lg:group-data-[no-quotes]:col-span-3" />
         )}
         <GoalsCell className="lg:col-span-2 lg:row-span-2 lg:group-data-[no-quotes]:col-span-3" />
-        <ReceiptsCell className="col-span-1 row-span-1" />
+        {systemContainsReceipts && <ReceiptsCell className="col-span-1 row-span-1" />}
         <UniqueClientsCell className="col-span-1 row-span-1" />
         <BestPayingClientCell className="row-span-1 lg:col-span-2" />
         <OutstandingCell className="row-span-1 lg:col-span-2" />
