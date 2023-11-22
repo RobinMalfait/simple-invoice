@@ -31,7 +31,7 @@ export type Configuration = {
 export let defaultConfiguration: Configuration = {
   pdf: {
     filename: 'receipt-{{invoice.number}}.pdf',
-    folder: 'quotes/{{invoice.issueDate:yyyy-QQ}}',
+    folder: 'receipts/{{invoice.issueDate:yyyy-QQ}}',
   },
   mail: {
     templates: [],

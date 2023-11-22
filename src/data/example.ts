@@ -140,6 +140,46 @@ configure({
     },
   },
 
+  'credit-note': {
+    /**
+     * The configuration for PDF generation.
+     */
+    pdf: {
+      /**
+       *  The filename template for the PDF. You can use every property of the receipt as a placeholder.
+       *  - For example `{{number}}` will be replaced by the receipt number.
+       *  - You can also use nested properties, for example `{{client.name}}` will be replaced by the
+       *    client name.
+       *  - For dates, you can use a format string, for example `{{receiptDate:dd-MM-yyyy}}`
+       */
+      filename: 'credit-note-{{number}}.pdf',
+
+      /**
+       * When creating a backup, the PDFs will be stored in this folder.
+       */
+      folder: 'credit-notes/{{invoice.issueDate:yyyy-QQ}}',
+    },
+
+    mail: {
+      templates: [
+        new MailTemplateBuilder<Receipt>()
+          .name('Default')
+          .subject('I am devastated, {{client.contacts|pick:nickname|and}}')
+          .body(md`
+            Hi {{client.contacts|pick:nickname|and}},
+
+            Attached you will find a credit note for invoice **{{invoice.number}}**.
+
+            Hopefully we can do business together in the future.
+
+            Kind regards,
+            {{account.name}}
+          `)
+          .build(),
+      ],
+    },
+  },
+
   receipt: {
     /**
      * The configuration for PDF generation.
@@ -157,7 +197,7 @@ configure({
       /**
        * When creating a backup, the PDFs will be stored in this folder.
        */
-      folder: 'receipts/{{status}}/{{invoice.issueDate:yyyy-QQ}}',
+      folder: 'receipts/{{invoice.issueDate:yyyy-QQ}}',
     },
 
     mail: {
