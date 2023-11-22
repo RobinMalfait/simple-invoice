@@ -405,20 +405,30 @@ export default function Layout({
                   .map((item) => {
                     return (
                       <Group key={item.href} title={item.name}>
-                        {item.children!.map((item) => {
-                          return (
-                            <Action
-                              key={item.href}
-                              invoke={() => {
-                                return router.push(item.href)
-                              }}
-                              icon={item.icon}
-                              search={item.name}
-                            >
-                              {item.name}
-                            </Action>
-                          )
-                        })}
+                        {item
+                          .children!.filter((item) => {
+                            if (!item.record) {
+                              return true
+                            }
+
+                            return data.records.some((record) => {
+                              return record.type === item.record
+                            })
+                          })
+                          .map((item) => {
+                            return (
+                              <Action
+                                key={item.href}
+                                invoke={() => {
+                                  return router.push(item.href)
+                                }}
+                                icon={item.icon}
+                                search={item.name}
+                              >
+                                {item.name}
+                              </Action>
+                            )
+                          })}
                       </Group>
                     )
                   })}
