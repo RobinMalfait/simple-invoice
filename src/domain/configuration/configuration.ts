@@ -1,4 +1,8 @@
 import {
+  Configuration as CreditNoteConfiguration,
+  defaultConfiguration as defaultCreditNoteConfiguration,
+} from '~/domain/credit-note/configuration'
+import {
   Configuration as InvoiceConfiguration,
   defaultConfiguration as defaultInvoiceConfiguration,
 } from '~/domain/invoice/configuration'
@@ -15,12 +19,14 @@ import { merge } from '~/utils/merge'
 export type Configuration = {
   quote: QuoteConfiguration
   invoice: InvoiceConfiguration
+  'credit-note': CreditNoteConfiguration
   receipt: ReceiptConfiguration
 }
 
 let defaultConfiguration: Configuration = {
   quote: defaultQuoteConfiguration,
   invoice: defaultInvoiceConfiguration,
+  'credit-note': defaultCreditNoteConfiguration,
   receipt: defaultReceiptConfiguration,
 }
 
@@ -38,6 +44,7 @@ export function configure(configuration: DeepPartial<Configuration>) {
   state.configuration = {
     quote: merge({}, defaultQuoteConfiguration, configuration.quote),
     invoice: merge({}, defaultInvoiceConfiguration, configuration.invoice),
+    'credit-note': merge({}, defaultCreditNoteConfiguration, configuration['credit-note']),
     receipt: merge({}, defaultReceiptConfiguration, configuration.receipt),
   } as Configuration
 }

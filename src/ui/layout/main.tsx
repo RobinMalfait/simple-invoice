@@ -5,6 +5,7 @@ import {
   CalculatorIcon,
   CubeIcon,
   DocumentCheckIcon,
+  DocumentMinusIcon,
   DocumentTextIcon,
   EyeIcon,
   EyeSlashIcon,
@@ -20,6 +21,7 @@ import { Fragment, useMemo } from 'react'
 import { DB, toggleClassified, toggleSidebar } from '~/app/(db)/actions'
 import { Account } from '~/domain/account/account'
 import { Client } from '~/domain/client/client'
+import { CreditNote } from '~/domain/credit-note/credit-note'
 import { Event } from '~/domain/events/event'
 import { Invoice } from '~/domain/invoice/invoice'
 import { Quote } from '~/domain/quote/quote'
@@ -40,7 +42,7 @@ type Navigation = {
   icon: typeof HomeIcon
   href: string
   exact?: boolean
-  record?: 'quote' | 'invoice' | 'receipt'
+  record?: 'quote' | 'invoice' | 'credit-note' | 'receipt'
   children?: Navigation[]
 }
 
@@ -63,6 +65,12 @@ let navigation: Navigation[] = [
     children: [
       { name: 'Quotes', icon: CalculatorIcon, href: '/quote', record: 'quote' },
       { name: 'Invoices', icon: DocumentTextIcon, href: '/invoice', record: 'invoice' },
+      {
+        name: 'Credit notes',
+        icon: DocumentMinusIcon,
+        href: '/credit-note',
+        record: 'credit-note',
+      },
       { name: 'Receipts', icon: DocumentCheckIcon, href: '/receipt', record: 'receipt' },
     ],
   },
@@ -82,6 +90,7 @@ export default function Layout({
     clientById: [string, Client][]
     accountById: [string, Account][]
     quoteById: [string, Quote][]
+    creditNoteById: [string, CreditNote][]
     invoiceById: [string, Invoice][]
     receiptById: [string, Receipt][]
   }
@@ -96,6 +105,7 @@ export default function Layout({
       accountById: new Map<string, Account>(data.accountById),
       quoteById: new Map<string, Quote>(data.quoteById),
       invoiceById: new Map<string, Invoice>(data.invoiceById),
+      creditNoteById: new Map<string, CreditNote>(data.creditNoteById),
       receiptById: new Map<string, Receipt>(data.receiptById),
     }
   }, [data])

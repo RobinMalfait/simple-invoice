@@ -5,15 +5,22 @@
   "invoice": {
     "title": "Factuur"
   },
+  "credit-note": {
+    "title": "Creditnota",
+    "fields": {
+      "invoice": "Referentie factuur:"
+    }
+  },
   "receipt": {
     "title": "Kassabon",
     "fields": {
-      "invoice": "Factuur:"
+      "invoice": "Referentie factuur:"
     }
   },
   "dates": {
     "issueDate": "Factuurdatum:",
     "dueDate": "Vervaldatum:",
+    "creditNoteDate": "Creditnota datum:",
     "quoteDate": "Offertedatum:",
     "quoteExpirationDate": "Offerte vervaldatum:",
     "receiptDate": "Betaaldatum:"

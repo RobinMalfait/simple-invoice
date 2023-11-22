@@ -17,6 +17,7 @@ import { QuoteStatus } from '~/domain/quote/quote-status'
 import { DeepPartial } from '~/types/shared'
 import { total } from '~/ui/invoice/total'
 import { ScopedIDGenerator } from '~/utils/id'
+import { CreditNoteBuilder } from '../credit-note/credit-note'
 
 let scopedId = new ScopedIDGenerator('invoice')
 
@@ -414,6 +415,25 @@ export class InvoiceBuilder {
     }
 
     throw new Error(`Cannot pay an invoice that is in the ${this._status} state.`)
+  }
+
+  public cancel(
+    at: string | Date,
+    payload: { by: 'account' | 'client'; reason: string },
+  ): CreditNoteBuilder {
+    let parsedAt = typeof at === 'string' ? parseISO(at) : at
+
+    this._status = InvoiceStatus.Cancelled
+    this._events.push({
+      type: 'invoice:cancelled',
+      payload: {
+        cancelledBy: payload.by,
+        reason: payload.reason,
+      },
+      at: parsedAt,
+    })
+
+    return CreditNoteBuilder.fromInvoice(this.build()).creditNoteDate(parsedAt)
   }
 
   public close(at: string | Date): InvoiceBuilder {

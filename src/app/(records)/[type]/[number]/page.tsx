@@ -3,6 +3,7 @@ import { EyeIcon } from '@heroicons/react/24/outline'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { me, records } from '~/data'
+import { CreditNote as CreditNoteType } from '~/domain/credit-note/credit-note'
 import { Invoice as InvoiceType } from '~/domain/invoice/invoice'
 import { Quote as QuoteType } from '~/domain/quote/quote'
 import { Receipt as ReceiptType } from '~/domain/receipt/receipt'
@@ -70,6 +71,9 @@ export default async function Invoice({
                       },
                       invoice(r: InvoiceType) {
                         return r.number
+                      },
+                      'credit-note'(r: CreditNoteType) {
+                        return r.invoice.number
                       },
                       receipt(r: ReceiptType) {
                         return r.invoice.number

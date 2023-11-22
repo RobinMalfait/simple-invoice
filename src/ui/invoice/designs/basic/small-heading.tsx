@@ -26,6 +26,9 @@ export function SmallHeading() {
                     invoice: () => {
                       return x.invoice.title
                     },
+                    'credit-note': () => {
+                      return x['credit-note'].title
+                    },
                     receipt: () => {
                       return x.receipt.title
                     },

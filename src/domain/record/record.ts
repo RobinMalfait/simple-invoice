@@ -1,10 +1,11 @@
+import { CreditNote } from '~/domain/credit-note/credit-note'
 import { Invoice } from '~/domain/invoice/invoice'
 import { Quote } from '~/domain/quote/quote'
 import { Receipt } from '~/domain/receipt/receipt'
-import { isInvoice, isQuote, isReceipt } from '~/domain/record/filters'
+import { isCreditNote, isInvoice, isQuote, isReceipt } from '~/domain/record/filters'
 import { match } from '~/utils/match'
 
-export type Record = Quote | Invoice | Receipt
+export type Record = Quote | Invoice | CreditNote | Receipt
 
 function* _separateRecords(records: Record[]): Generator<Record> {
   for (let record of records) {
@@ -14,6 +15,8 @@ function* _separateRecords(records: Record[]): Generator<Record> {
       yield* _separateRecords([record.quote])
     } else if (isInvoice(record) && record.quote) {
       yield* _separateRecords([record.quote])
+    } else if (isCreditNote(record) && record.invoice) {
+      yield* _separateRecords([record.invoice])
     } else if (isReceipt(record) && record.invoice) {
       yield* _separateRecords([record.invoice])
     }
@@ -38,6 +41,9 @@ function* _combineRecords(records: Record[]): Generator<string> {
     } else if (isInvoice(record) && record.quote) {
       yield record.quote.id
       yield* _combineRecords([record.quote])
+    } else if (isCreditNote(record) && record.invoice) {
+      yield record.invoice.id
+      yield* _combineRecords([record.invoice])
     } else if (isReceipt(record) && record.invoice) {
       yield record.invoice.id
       yield* _combineRecords([record.invoice])
@@ -68,6 +74,9 @@ export function resolveRelevantRecordDate(record: Record) {
       },
       invoice: (r: Invoice) => {
         return r.issueDate
+      },
+      'credit-note': (r: CreditNote) => {
+        return r.creditNoteDate
       },
       receipt: (r: Receipt) => {
         return r.invoice.issueDate

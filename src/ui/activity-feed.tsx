@@ -347,6 +347,7 @@ function ActivityIndicator({ item }: { item: Event }) {
       )
 
     case 'quote:cancelled':
+    case 'invoice:cancelled':
       return <NoSymbolIcon className="h-6 w-6 text-red-600 dark:text-red-300" aria-hidden="true" />
 
     case 'quote:rejected':
@@ -886,6 +887,40 @@ function useActivityText(item: Event) {
         <>
           The invoice has been{' '}
           <span className="font-medium text-gray-900 dark:text-gray-100">closed</span>.
+        </>,
+      ]
+
+    case 'invoice:cancelled':
+      return [
+        <>
+          The invoice has been{' '}
+          <span className="font-medium text-gray-900 dark:text-gray-100">cancelled</span> by{' '}
+          <span className="font-medium text-gray-900 dark:text-gray-100">
+            {match(item.payload.cancelledBy, {
+              client: () => {
+                return 'the client'
+              },
+              account: () => {
+                return 'you'
+              },
+            })}
+          </span>
+          .
+        </>,
+        item.payload.reason && (
+          <>
+            <span className="text-xs leading-5 text-gray-500 dark:text-gray-300">
+              {item.payload.reason}
+            </span>
+          </>
+        ),
+      ]
+
+    case 'credit-note:created':
+      return [
+        <>
+          The credit note has been{' '}
+          <span className="font-medium text-gray-900 dark:text-gray-100">created</span>.
         </>,
       ]
 

@@ -61,6 +61,7 @@ import {
   isActiveRecord,
   isCancelled,
   isClosed,
+  isCreditNote,
   isDraft,
   isExpired,
   isInvoice,
@@ -117,6 +118,7 @@ export function Dashboard({
   let allRecords = separateRecords(records)
   let systemContainsQuotes = allRecords.some(isQuote)
   let systemContainsInvoices = allRecords.some(isInvoice)
+  let systemContainsCreditNotes = allRecords.some(isCreditNote)
   let systemContainsReceipts = allRecords.some(isReceipt)
 
   return (
@@ -134,10 +136,11 @@ export function Dashboard({
           <InvoicesCell className="lg:col-span-2 lg:row-span-2 lg:group-data-[no-quotes]:col-span-3" />
         )}
         <GoalsCell className="lg:col-span-2 lg:row-span-2 lg:group-data-[no-quotes]:col-span-3" />
+        {systemContainsCreditNotes && <CreditNotesCell className="col-span-1 row-span-1" />}
         {systemContainsReceipts && <ReceiptsCell className="col-span-1 row-span-1" />}
         <UniqueClientsCell className="col-span-1 row-span-1" />
         <BestPayingClientCell className="row-span-1 lg:col-span-2" />
-        <OutstandingCell className="row-span-1 lg:col-span-2" />
+        <OutstandingCell className="col-span-1 row-span-1" />
         <PaidCell className="row-span-1 lg:col-span-2" />
         <ActiveRecordsCell className="col-span-2 lg:col-span-5 lg:row-start-4" />
         <AccumulativePaidInvoicesChartCell className="col-span-2 lg:col-span-5 lg:row-start-4" />
@@ -627,6 +630,20 @@ function ReceiptsCell({ className }: { className?: string }) {
       value={(list) => {
         return separateRecords(list).filter((r) => {
           return isReceipt(r)
+        }).length
+      }}
+    />
+  )
+}
+
+function CreditNotesCell({ className }: { className?: string }) {
+  return (
+    <CompareBlock
+      className={className}
+      title="Credit notes"
+      value={(list) => {
+        return separateRecords(list).filter((r) => {
+          return isCreditNote(r)
         }).length
       }}
     />

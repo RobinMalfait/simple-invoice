@@ -1,4 +1,5 @@
 import { endOfDay, isPast } from 'date-fns'
+import { CreditNote } from '~/domain/credit-note/credit-note'
 import { Invoice } from '~/domain/invoice/invoice'
 import { InvoiceStatus } from '~/domain/invoice/invoice-status'
 import { Quote } from '~/domain/quote/quote'
@@ -15,6 +16,10 @@ export function isQuote(record: Record): record is Quote {
 
 export function isInvoice(record: Record): record is Invoice {
   return record.type === 'invoice'
+}
+
+export function isCreditNote(record: Record): record is CreditNote {
+  return record.type === 'credit-note'
 }
 
 export function isReceipt(record: Record): record is Receipt {
@@ -118,6 +123,11 @@ export function recordHasWarning(record: Record) {
         return false
       },
 
+      // Credit notes are in the final state, nothing to warn about
+      'credit-note': () => {
+        return false
+      },
+
       // Receipts are in the final state, nothing to warn about
       receipt: () => {
         return false
@@ -140,6 +150,9 @@ export function recordHasAttachments(record: Record, type: 'any' | 'direct') {
           invoice: (r: Invoice) => {
             return r.attachments.length > 0 || (r.quote ? r.quote.attachments.length > 0 : false)
           },
+          'credit-note': (r: CreditNote) => {
+            return r.attachments.length > 0 || r.invoice.attachments.length > 0
+          },
           receipt: (r: Receipt) => {
             return r.attachments.length > 0 || r.invoice.attachments.length > 0
           },
@@ -157,6 +170,9 @@ export function recordHasAttachments(record: Record, type: 'any' | 'direct') {
             return r.attachments.length > 0
           },
           invoice: (r: Invoice) => {
+            return r.attachments.length > 0
+          },
+          'credit-note': (r: CreditNote) => {
             return r.attachments.length > 0
           },
           receipt: (r: Receipt) => {
@@ -201,6 +217,11 @@ export function warningMessageForRecord(record: Record): string | null {
         return null
       },
 
+      // Credit notes are in the final state, nothing to warn about
+      'credit-note': () => {
+        return null
+      },
+
       // Receipts are in the final state, nothing to warn about
       receipt: () => {
         return null
@@ -222,6 +243,13 @@ export function isPaidRecord(record: Record) {
       // An invoice is paid if it is in the paid state
       invoice: (r: Invoice) => {
         return r.status === InvoiceStatus.Paid
+      },
+
+      // A credit note can not be "paid"
+      // TODO: Maybe in the future we allow partial payments on credit notes?
+      //       Right now, a credit note is to completely undo a previous invoice.
+      'credit-note': () => {
+        return false
       },
 
       // A receipt can only be build from a paid invoice, therefore it is always paid
@@ -263,6 +291,11 @@ export function isActiveRecord(record: Record) {
         ].includes(r.status)
       },
 
+      // All credit notes are considered "done"
+      'credit-note': () => {
+        return false
+      },
+
       // All receipts are considered "done"
       receipt: () => {
         return false
@@ -284,6 +317,11 @@ export function isDeadRecord(record: Record) {
       // An invoice is dead when it is overdue
       invoice: (r: Invoice) => {
         return [InvoiceStatus.Overdue].includes(r.status)
+      },
+
+      // A credit note is never dead
+      'credit-note': () => {
+        return false
       },
 
       // A receipt is never dead

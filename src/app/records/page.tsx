@@ -2,6 +2,7 @@ import { compareDesc, format, isFuture } from 'date-fns'
 import Link from 'next/link'
 
 import { me, records } from '~/data'
+import { CreditNote } from '~/domain/credit-note/credit-note'
 import { Invoice } from '~/domain/invoice/invoice'
 import { Quote } from '~/domain/quote/quote'
 import { Receipt } from '~/domain/receipt/receipt'
@@ -38,6 +39,9 @@ function groupByQuarter(records: Record[]) {
             },
             invoice: (r: Invoice) => {
               return titleForQuarter(r.issueDate)
+            },
+            'credit-note': (r: CreditNote) => {
+              return titleForQuarter(r.creditNoteDate)
             },
             receipt: (r: Receipt) => {
               return titleForQuarter(r.receiptDate)

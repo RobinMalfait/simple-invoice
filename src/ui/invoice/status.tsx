@@ -4,6 +4,7 @@ import {
   ClockIcon,
   EnvelopeIcon,
   LockClosedIcon,
+  NoSymbolIcon,
   PencilIcon,
 } from '@heroicons/react/24/outline'
 import { title } from 'case'
@@ -17,6 +18,7 @@ let statusIconMap: Record<
   | typeof EnvelopeIcon
   | typeof PencilIcon
   | typeof LockClosedIcon
+  | typeof NoSymbolIcon
 > = {
   [InvoiceStatus.Draft]: PencilIcon,
   [InvoiceStatus.Sent]: EnvelopeIcon,
@@ -24,6 +26,7 @@ let statusIconMap: Record<
   [InvoiceStatus.PartiallyPaid]: BellAlertIcon,
   [InvoiceStatus.Overdue]: ClockIcon,
   [InvoiceStatus.Closed]: LockClosedIcon,
+  [InvoiceStatus.Cancelled]: NoSymbolIcon,
 }
 
 let statusClassMap: Record<InvoiceStatus, string> = {
@@ -39,6 +42,8 @@ let statusClassMap: Record<InvoiceStatus, string> = {
     'bg-red-50 text-red-700 ring-red-600/10 dark:bg-red-400/10 dark:text-red-400 dark:ring-red-400/20',
   [InvoiceStatus.Closed]:
     'bg-gray-50 text-gray-600 ring-gray-500/10 dark:bg-gray-400/10 dark:text-gray-400 dark:ring-gray-400/20',
+  [InvoiceStatus.Cancelled]:
+    'bg-red-50 text-red-700 ring-red-600/10 dark:bg-red-400/10 dark:text-red-400 dark:ring-red-400/20',
 }
 
 export function StatusDisplay({

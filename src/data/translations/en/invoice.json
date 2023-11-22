@@ -5,15 +5,22 @@
   "invoice": {
     "title": "Invoice"
   },
+  "credit-note": {
+    "title": "Credit note",
+    "fields": {
+      "invoice": "Reference invoice:"
+    }
+  },
   "receipt": {
     "title": "Receipt",
     "fields": {
-      "invoice": "Invoice:"
+      "invoice": "Reference invoice:"
     }
   },
   "dates": {
     "issueDate": "Issue date:",
     "dueDate": "Due date:",
+    "creditNoteDate": "Credit note date:",
     "quoteDate": "Quote date:",
     "quoteExpirationDate": "Quote expiration date:",
     "receiptDate": "Paid date:"

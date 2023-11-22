@@ -79,6 +79,13 @@ function filterEventsForRecord<T extends Record>(record: T, events: Event[]) {
           e.context.invoiceId === record.id
         )
       },
+      'credit-note': () => {
+        return (
+          (e.tags.includes('credit-note') || e.tags.includes('milestone')) &&
+          'creditNoteId' in e.context &&
+          e.context.creditNoteId === record.id
+        )
+      },
       receipt: () => {
         return (
           (e.tags.includes('receipt') || e.tags.includes('milestone')) &&

@@ -33,6 +33,9 @@ export function BigFooter() {
                   invoice: () => {
                     return total(record)
                   },
+                  'credit-note': () => {
+                    return total(record)
+                  },
                   receipt: () => {
                     return 0
                   },

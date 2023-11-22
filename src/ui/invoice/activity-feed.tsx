@@ -44,6 +44,9 @@ export function ActivityFeed(props: React.PropsWithChildren<{ records: Record[] 
                       invoice: () => {
                         return 'Invoice'
                       },
+                      'credit-note': () => {
+                        return 'Credit note'
+                      },
                       receipt: () => {
                         return 'Receipt'
                       },

@@ -5,6 +5,7 @@ import { ClientBuilder } from '~/domain/client/client'
 import { configure } from '~/domain/configuration/configuration'
 import { ContactFieldBuilder } from '~/domain/contact-fields/contact-fields'
 import { ContactBuilder } from '~/domain/contact/contact'
+import { CreditNoteBuilder } from '~/domain/credit-note/credit-note'
 import { Currency } from '~/domain/currency/currency'
 import { DiscountBuilder } from '~/domain/discount/discount'
 import { DocumentBuilder, md } from '~/domain/document/document'
@@ -910,6 +911,36 @@ records.push(
       .pay(nextDay(), 30_00)
       .build(),
   ).build(),
+)
+
+// Credit note from Invoice
+records.push(
+  CreditNoteBuilder.fromInvoice(
+    new InvoiceBuilder()
+      .account(me)
+      .client(Client1)
+      .issueDate(inThePast(20))
+      .item(new InvoiceItemBuilder().description('Item #1').unitPrice(60_00).build())
+      .send(nextDay())
+      .build(),
+  )
+    .creditNoteDate(nextDay())
+    .build(),
+)
+
+// Cancelled invoice, with a credit note
+records.push(
+  new InvoiceBuilder()
+    .account(me)
+    .client(Client1)
+    .issueDate(inThePast(20))
+    .item(new InvoiceItemBuilder().description('Item #1').unitPrice(60_00).build())
+    .send(nextDay())
+    .cancel(nextDay(), {
+      by: 'client',
+      reason: 'Decided to buy a different product.',
+    })
+    .build(),
 )
 
 // Single item invoice, paid

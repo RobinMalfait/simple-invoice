@@ -3,10 +3,11 @@ import { Inter } from 'next/font/google'
 import { events, me, records, stacks } from '~/data'
 import { Account } from '~/domain/account/account'
 import { Client } from '~/domain/client/client'
+import { CreditNote } from '~/domain/credit-note/credit-note'
 import { Invoice } from '~/domain/invoice/invoice'
 import { Quote } from '~/domain/quote/quote'
 import { Receipt } from '~/domain/receipt/receipt'
-import { isInvoice, isQuote, isReceipt } from '~/domain/record/filters'
+import { isCreditNote, isInvoice, isQuote, isReceipt } from '~/domain/record/filters'
 import Layout from '~/ui/layout/main'
 import { load } from './(db)/actions'
 import './globals.css'
@@ -54,6 +55,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     invoiceById: records.filter(isInvoice).map((r) => {
       return [r.id, r]
     }) as [string, Invoice][],
+    creditNoteById: records.filter(isCreditNote).map((r) => {
+      return [r.id, r]
+    }) as [string, CreditNote][],
     receiptById: records.filter(isReceipt).map((r) => {
       return [r.id, r]
     }) as [string, Receipt][],

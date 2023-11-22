@@ -9,6 +9,7 @@ import { Receipt } from '~/domain/receipt/receipt'
 import {
   isAccepted,
   isClosed,
+  isCreditNote,
   isDraft,
   isExpired,
   isInvoice,
@@ -66,6 +67,9 @@ export default async function Page({ params: { id } }: { params: { id: string } 
   let systemContainsInvoices = allRecords.some((r) => {
     return isInvoice(r)
   })
+  let systemContainsCreditNotes = allRecords.some((r) => {
+    return isCreditNote(r)
+  })
   let systemContainsReceipts = allRecords.some((r) => {
     return isReceipt(r)
   })
@@ -96,6 +100,14 @@ export default async function Page({ params: { id } }: { params: { id: string } 
           { label: 'Overdue', filter: isOverdue },
           { label: 'Closed', filter: isClosed },
         ],
+      }),
+    systemContainsCreditNotes &&
+      tab<Receipt>({
+        label: 'Credit notes',
+        filter: isCreditNote,
+        map: (list) => {
+          return list.slice().reverse()
+        },
       }),
     systemContainsReceipts &&
       tab<Receipt>({

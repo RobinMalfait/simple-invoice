@@ -58,7 +58,7 @@ for (let [idx, stack] of Object.entries(stacks)) {
   stacks[idx] = Array.from(new Set(stack))
 }
 
-let order = ['quote', 'invoice', 'receipt']
+let order = ['quote', 'invoice', 'credit-note', 'receipt']
 for (let stack of Object.values(stacks)) {
   stack.sort((aId, zId) => {
     let a = records.find((e) => {

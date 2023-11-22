@@ -1,5 +1,6 @@
 import { CubeIcon } from '@heroicons/react/24/outline'
 import { format } from 'date-fns'
+import { CreditNote } from '~/domain/credit-note/credit-note'
 import { Invoice } from '~/domain/invoice/invoice'
 import { Quote } from '~/domain/quote/quote'
 import { Receipt } from '~/domain/receipt/receipt'
@@ -32,6 +33,9 @@ export function BigHeading() {
                     invoice: () => {
                       return x.invoice.title
                     },
+                    'credit-note': () => {
+                      return x['credit-note'].title
+                    },
                     receipt: () => {
                       return x.receipt.title
                     },
@@ -54,6 +58,9 @@ export function BigHeading() {
                     invoice: () => {
                       return x.dates.issueDate
                     },
+                    'credit-note': () => {
+                      return x['credit-note'].fields.invoice
+                    },
                     receipt: () => {
                       return x.receipt.fields.invoice
                     },
@@ -69,6 +76,9 @@ export function BigHeading() {
                     },
                     invoice: (r: Invoice) => {
                       return format(r.issueDate, 'PPP', { locale })
+                    },
+                    'credit-note': (r: CreditNote) => {
+                      return r.invoice.number
                     },
                     receipt: (r: Receipt) => {
                       return r.invoice.number
@@ -88,6 +98,9 @@ export function BigHeading() {
                     invoice: () => {
                       return x.dates.dueDate
                     },
+                    'credit-note': () => {
+                      return x.dates.creditNoteDate
+                    },
                     receipt: () => {
                       return x.dates.receiptDate
                     },
@@ -103,6 +116,9 @@ export function BigHeading() {
                     },
                     invoice: (r: Invoice) => {
                       return format(r.dueDate, 'PPP', { locale })
+                    },
+                    'credit-note': (r: CreditNote) => {
+                      return format(r.creditNoteDate, 'PPP', { locale })
                     },
                     receipt: (r: Receipt) => {
                       return format(r.receiptDate, 'PPP', { locale })

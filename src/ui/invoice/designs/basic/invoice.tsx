@@ -1,6 +1,7 @@
 'use client'
 
 import { InformationCircleIcon } from '@heroicons/react/24/outline'
+import { CreditNote } from '~/domain/credit-note/credit-note'
 import { Receipt } from '~/domain/receipt/receipt'
 import { isInvoice } from '~/domain/record/filters'
 import { Classified } from '~/ui/classified'
@@ -56,6 +57,9 @@ export function Invoice() {
                                 },
                                 invoice: () => {
                                   return null
+                                },
+                                'credit-note': (r: CreditNote) => {
+                                  return r.invoice.status
                                 },
                                 receipt: (r: Receipt) => {
                                   return r.invoice.status

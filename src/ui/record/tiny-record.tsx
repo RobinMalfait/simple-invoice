@@ -2,6 +2,7 @@
 
 import { CalendarIcon, PaperClipIcon, RectangleStackIcon } from '@heroicons/react/24/outline'
 import { format } from 'date-fns'
+import { CreditNote } from '~/domain/credit-note/credit-note'
 import { Invoice } from '~/domain/invoice/invoice'
 import { Quote } from '~/domain/quote/quote'
 import { Receipt } from '~/domain/receipt/receipt'
@@ -54,6 +55,9 @@ export function TinyRecord({ record }: { record: Record }) {
               invoice: (r: Invoice) => {
                 return <InvoiceStatusDisplay status={r.status} />
               },
+              'credit-note': (r: CreditNote) => {
+                return <InvoiceStatusDisplay status={r.invoice.status} />
+              },
               receipt: (r: Receipt) => {
                 return <InvoiceStatusDisplay status={r.invoice.status} />
               },
@@ -81,6 +85,9 @@ export function TinyRecord({ record }: { record: Record }) {
                 return <small className="lowercase">quote</small>
               },
               invoice: null,
+              'credit-note': () => {
+                return <small className="lowercase">credit note</small>
+              },
               receipt: () => {
                 return <small className="lowercase">receipt</small>
               },
@@ -107,6 +114,9 @@ export function TinyRecord({ record }: { record: Record }) {
                   invoice: (r: Invoice) => {
                     return format(r.issueDate, 'PP')
                   },
+                  'credit-note': (r: CreditNote) => {
+                    return format(r.creditNoteDate, 'PP')
+                  },
                   receipt: (r: Receipt) => {
                     return format(r.receiptDate, 'PP')
                   },
@@ -131,6 +141,9 @@ export function TinyRecord({ record }: { record: Record }) {
                   },
                   invoice: (r: Invoice) => {
                     return format(r.dueDate, 'PP')
+                  },
+                  'credit-note': (r: CreditNote) => {
+                    return format(r.creditNoteDate, 'PP')
                   },
                   receipt: (r: Receipt) => {
                     return format(r.receiptDate, 'PP')

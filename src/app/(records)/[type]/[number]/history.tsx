@@ -137,6 +137,9 @@ export function HistoryActions() {
                                 invoice: () => {
                                   return 'Invoice'
                                 },
+                                'credit-note': () => {
+                                  return 'Credit note'
+                                },
                                 receipt: () => {
                                   return 'Receipt'
                                 },

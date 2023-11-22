@@ -49,6 +49,9 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
             invoice: (r: Invoice) => {
               return r.status
             },
+            'credit-note': () => {
+              return 'Credited'
+            },
             receipt: () => {
               return 'Paid'
             },
@@ -70,6 +73,9 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
               },
               invoice: (r: Invoice) => {
                 return r.status
+              },
+              'credit-note': () => {
+                return 'Credited'
               },
               receipt: () => {
                 return 'Paid'
@@ -93,6 +99,9 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
                 `Issue date: ${format(r.issueDate, 'PPP')}`,
                 `Due date: ${format(r.dueDate, 'PPP')}`,
               ]
+            },
+            'credit-note': () => {
+              return []
             },
             receipt: () => {
               return []
