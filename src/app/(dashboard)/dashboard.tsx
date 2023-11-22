@@ -126,6 +126,7 @@ export function Dashboard({
       <div
         data-no-quotes={systemContainsQuotes ? null : true}
         data-no-invoices={systemContainsInvoices ? null : true}
+        data-no-credit-notes={systemContainsCreditNotes ? null : true}
         className="group grid grid-flow-row-dense grid-cols-2 gap-[--gap] px-4 py-8 [--gap:theme(spacing.4)] sm:px-6 lg:grid-cols-10 lg:px-8"
       >
         <ActionsBar className="col-span-full" />
@@ -140,7 +141,7 @@ export function Dashboard({
         {systemContainsReceipts && <ReceiptsCell className="col-span-1 row-span-1" />}
         <UniqueClientsCell className="col-span-1 row-span-1" />
         <BestPayingClientCell className="row-span-1 lg:col-span-2" />
-        <OutstandingCell className="col-span-1 row-span-1" />
+        <OutstandingCell className="col-span-1 row-span-1 lg:group-data-[no-credit-notes]:col-span-2" />
         <PaidCell className="row-span-1 lg:col-span-2" />
         <ActiveRecordsCell className="col-span-2 lg:col-span-5 lg:row-start-4" />
         <AccumulativePaidInvoicesChartCell className="col-span-2 lg:col-span-5 lg:row-start-4" />
