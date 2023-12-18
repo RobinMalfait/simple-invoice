@@ -1,7 +1,6 @@
 'use client'
 
-import { offset, useFloating } from '@floating-ui/react'
-import { Listbox, ListboxButton, ListboxOption, ListboxOptions, Portal } from '@headlessui/react'
+import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react'
 import { CalendarIcon } from '@heroicons/react/24/outline'
 import {
   addDays,
@@ -105,45 +104,38 @@ export function RangePicker({
   value: string
   onChange(preset: string): void
 }) {
-  let { refs, floatingStyles } = useFloating({
-    placement: 'bottom-end',
-    middleware: [offset(10)],
-  })
-
   return (
     <Listbox as="div" className="relative isolate" value={value} onChange={onChange}>
-      <ListboxButton
-        ref={refs.setReference}
-        className="rounded-md bg-white px-2 py-1.5 shadow ring-1 ring-black/10 dark:bg-zinc-900/75"
-      >
+      <ListboxButton className="rounded-md bg-white px-2 py-1.5 shadow ring-1 ring-black/10 dark:bg-zinc-900/75">
         <div className="flex items-center gap-1 text-sm dark:text-zinc-300">
           <CalendarIcon className="h-4 w-4" />
           <FormatRange start={start} end={end} />
         </div>
       </ListboxButton>
-      <Portal>
-        <ListboxOptions
-          ref={refs.setFloating}
-          style={floatingStyles}
-          className="z-50 w-64 rounded-md bg-white/75 py-2 shadow ring-1 ring-black/10 backdrop-blur focus:outline-none dark:bg-zinc-950/75"
-        >
-          <span className="px-4 text-xs font-semibold dark:text-zinc-400">Presets</span>
-          <div className="flex w-full flex-col px-2">
-            {options.map(([label]) => {
-              return (
-                <ListboxOption
-                  key={label}
-                  as="button"
-                  value={label}
-                  className="relative w-full rounded-lg px-2 py-2 text-left text-sm ui-active:bg-gray-100 ui-not-active:bg-transparent dark:text-zinc-400 dark:ui-active:bg-white/10"
-                >
-                  {label}
-                </ListboxOption>
-              )
-            })}
-          </div>
-        </ListboxOptions>
-      </Portal>
+      <ListboxOptions
+        anchor={{
+          to: 'bottom start',
+          gap: 'var(--gap)',
+          offset: 'calc(var(--offset) * -1)',
+        }}
+        className="z-50 w-64 rounded-md bg-white/75 py-2 shadow ring-1 ring-black/10 backdrop-blur [--offset:theme(spacing.1)] [--gap:theme(spacing.2)] focus:outline-none dark:bg-zinc-950/75"
+      >
+        <span className="px-4 text-xs font-semibold dark:text-zinc-400">Presets</span>
+        <div className="flex w-full flex-col px-2">
+          {options.map(([label]) => {
+            return (
+              <ListboxOption
+                key={label}
+                as="button"
+                value={label}
+                className="relative w-full rounded-lg px-2 py-2 text-left text-sm ui-active:bg-gray-100 ui-not-active:bg-transparent dark:text-zinc-400 dark:ui-active:bg-white/10"
+              >
+                {label}
+              </ListboxOption>
+            )
+          })}
+        </div>
+      </ListboxOptions>
     </Listbox>
   )
 }
