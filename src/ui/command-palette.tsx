@@ -110,6 +110,7 @@ export function CommandPalette({ children }: PropsWithChildren<{}>) {
                     onChange={(event) => {
                       return setQuery(event.target.value)
                     }}
+                    autoFocus
                   />
                 </div>
 
