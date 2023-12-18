@@ -106,7 +106,14 @@ export function HistoryActions() {
           leaveFrom="transform opacity-100 scale-100"
           leaveTo="transform opacity-0 scale-95"
         >
-          <Menu.Items className="absolute right-0 z-10 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-zinc-900 dark:ring-white/10">
+          <Menu.Items
+            anchor={{
+              to: 'bottom end',
+              gap: 'var(--gap)',
+              offset: 'var(--offset)',
+            }}
+            className="z-10 w-56 divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 [--gap:theme(spacing.1)] [--offset:theme(spacing.1)] focus:outline-none dark:bg-zinc-900 dark:ring-white/10"
+          >
             <div className="py-1">
               {options.map((e) => {
                 let Icon = e.id === record.id ? CheckCircleIcon : 'span'
