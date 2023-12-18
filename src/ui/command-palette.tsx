@@ -1,3 +1,13 @@
+import {
+  Combobox,
+  ComboboxInput,
+  ComboboxOption,
+  ComboboxOptions,
+  Dialog,
+  DialogPanel,
+  Transition,
+  TransitionChild,
+} from '@headlessui/react'
 import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
 import {
   Fragment,
@@ -13,16 +23,6 @@ import { classNames } from '~/ui/class-names'
 import { useWindowEvent } from '~/ui/hooks/use-window-event'
 import { fuzzyMatch } from '~/utils/fuzzy'
 import { tap } from '~/utils/tap'
-import {
-  Combobox,
-  ComboboxInput,
-  ComboboxOption,
-  ComboboxOptions,
-  Dialog,
-  DialogPanel,
-  Transition,
-  TransitionChild,
-} from './headlessui'
 
 let CommandPaletteContext = createContext<{ query: string }>({ query: '' })
 function useCommandPalette() {
