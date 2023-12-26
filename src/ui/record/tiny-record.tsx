@@ -55,8 +55,8 @@ export function TinyRecord({ record }: { record: Record }) {
               invoice: (r: Invoice) => {
                 return <InvoiceStatusDisplay status={r.status} />
               },
-              'credit-note': (r: CreditNote) => {
-                return <InvoiceStatusDisplay status={r.invoice.status} />
+              'credit-note': () => {
+                return null
               },
               receipt: (r: Receipt) => {
                 return <InvoiceStatusDisplay status={r.invoice.status} />
