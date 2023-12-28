@@ -127,7 +127,7 @@ export default async function Page({ params: { id } }: { params: { id: string } 
         currency: client.currency,
       }}
     >
-      <div className="relative px-4 py-8 text-gray-700 dark:text-zinc-400 sm:px-6 lg:px-8">
+      <div className="relative px-4 py-8 text-gray-700 sm:px-6 lg:px-8 dark:text-zinc-400">
         <div className="flex items-center gap-4">
           <Avatar url={client.imageUrl} name={client.nickname} />
 

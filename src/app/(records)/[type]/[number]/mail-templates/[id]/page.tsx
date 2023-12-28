@@ -54,7 +54,7 @@ export default async function Page({
     <div className="flex h-full w-full flex-1">
       <nav
         aria-label="Templates"
-        className="hidden w-96 flex-shrink-0 border-r border-slate-200 bg-white dark:border-zinc-900 dark:bg-zinc-700 xl:flex xl:flex-col"
+        className="hidden w-96 flex-shrink-0 border-r border-slate-200 bg-white xl:flex xl:flex-col dark:border-zinc-900 dark:bg-zinc-700"
       >
         <div className="flex h-16 flex-shrink-0 items-center border-b border-slate-200 px-6 dark:border-zinc-500">
           <p className="text-lg font-medium text-slate-900 dark:text-zinc-300">Templates</p>

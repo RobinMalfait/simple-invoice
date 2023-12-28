@@ -71,7 +71,7 @@ export default async function Home({ params: { type } }: { params: { type: strin
         currency: me.currency,
       }}
     >
-      <div className="fixed inset-x-0 top-0 z-10 h-8 bg-gray-100/75 backdrop-blur dark:bg-zinc-800/75 lg:top-4"></div>
+      <div className="fixed inset-x-0 top-0 z-10 h-8 bg-gray-100/75 backdrop-blur lg:top-4 dark:bg-zinc-800/75"></div>
       <div className="space-y-8 px-4 py-8 sm:px-6 lg:px-8">
         {filteredRecords.length > 0 ? (
           <>
