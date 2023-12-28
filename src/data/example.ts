@@ -1039,6 +1039,21 @@ records.push(
     .build(),
 )
 
+// Credit note from overdue Invoice
+records.push(
+  CreditNoteBuilder.fromInvoice(
+    new InvoiceBuilder()
+      .account(me)
+      .client(Client1)
+      .issueDate(inThePast(-80))
+      .item(new InvoiceItemBuilder().description('Item #1').unitPrice(80_00).build())
+      .send(nextDay())
+      .build(),
+  )
+    .creditNoteDate(today())
+    .build(),
+)
+
 new MilestoneBuilder()
   .account(me)
   .title('Custom **milestones**, are `here`!')
