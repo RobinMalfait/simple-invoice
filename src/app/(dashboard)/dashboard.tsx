@@ -57,6 +57,7 @@ import { Account } from '~/domain/account/account'
 import { Client } from '~/domain/client/client'
 import { Invoice } from '~/domain/invoice/invoice'
 import {
+  hasCreditNote,
   isAccepted,
   isActiveRecord,
   isCancelled,
@@ -606,7 +607,7 @@ function InvoicesCell({ className }: { className?: string }) {
         title="Overdue"
         value={(list) => {
           return separateRecords(list).filter((r) => {
-            return isInvoice(r) && isOverdue(r)
+            return isInvoice(r) && isOverdue(r) && !hasCreditNote(list, r)
           }).length
         }}
       />

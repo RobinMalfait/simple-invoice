@@ -101,6 +101,12 @@ export function isOverdue(invoice: Invoice) {
   return invoice.status === InvoiceStatus.Overdue
 }
 
+export function hasCreditNote(list: Record[], invoice: Invoice) {
+  return list.some((record) => {
+    return isCreditNote(record) && record.invoice.id === invoice.id
+  })
+}
+
 // ---
 
 export function recordHasWarning(record: Record) {
