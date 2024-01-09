@@ -353,6 +353,9 @@ export function Total(props: React.ComponentProps<'div'>) {
           invoice: () => {
             return total(record)
           },
+          'credit-note': () => {
+            return total(record)
+          },
           receipt: () => {
             return 0
           },
@@ -373,6 +376,7 @@ export function Type(props: React.ComponentProps<'span'>) {
       for={match(record.type, {
         quote: 'quote.title',
         invoice: 'invoice.title',
+        'credit-note': 'credit-note.title',
         receipt: 'receipt.title',
       })}
     />
