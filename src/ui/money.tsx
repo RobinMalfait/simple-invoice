@@ -14,7 +14,7 @@ export function Money({
   let isClassified = useIsClassified()
 
   return (
-    <span className={classNames(className, 'font-sans tabular-nums')} {...props}>
+    <span className={classNames('font-sans tabular-nums', className)} {...props}>
       <Classified>{currencyFormatter.format(isClassified ? 10000 : amount / 100)}</Classified>
     </span>
   )
