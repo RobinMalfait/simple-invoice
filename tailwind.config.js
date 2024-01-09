@@ -22,5 +22,13 @@ module.exports = {
     function ({ addVariant }) {
       addVariant('classified', 'html[data-classified] &')
     },
+
+    function ({ addVariant }) {
+      addVariant('first-page', ['&[data-first-page]', '[data-first-page] &'])
+      addVariant('even-page', ['&[data-even-page]', '[data-even-page] &'])
+      addVariant('odd-page', ['&[data-odd-page]', '[data-odd-page] &'])
+      addVariant('last-page', ['&[data-last-page]', '[data-last-page] &'])
+      addVariant('single-page', ['&[data-single-page]', '[data-single-page] &'])
+    },
   ],
 }
