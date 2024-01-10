@@ -58,7 +58,7 @@ export function CardBody({
           filled: '',
           'filled-vertical': 'px-4',
           'filled-horizontal': 'py-4',
-          grid: 'grid grid-cols-2 gap-px rounded-lg bg-gray-100 dark:bg-zinc-800 [&>*]:bg-[--bg] [&>*]:p-4',
+          grid: 'grid grid-cols-2 gap-px rounded-lg bg-gray-100 *:bg-[--bg] *:p-4 dark:bg-zinc-800',
         }),
       )}
     >

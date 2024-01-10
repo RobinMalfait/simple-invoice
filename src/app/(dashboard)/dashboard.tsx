@@ -1596,7 +1596,7 @@ function CompareGroup({
         } as React.CSSProperties
       }
       className={classNames(
-        'group grid grid-cols-[repeat(var(--horizontal-count),minmax(0,1fr))] gap-[calc(var(--gap)/2)] rounded-xl bg-white p-2 shadow ring-1 ring-black/5 dark:bg-zinc-900 first:[&>*]:col-[span_calc(var(--horizontal-count)-1)/_span_calc(var(--horizontal-count)-1)] first:[&>*]:row-span-2',
+        'group grid grid-cols-[repeat(var(--horizontal-count),minmax(0,1fr))] gap-[calc(var(--gap)/2)] rounded-xl bg-white p-2 shadow ring-1 ring-black/5 first:*:col-[span_calc(var(--horizontal-count)-1)/_span_calc(var(--horizontal-count)-1)] first:*:row-span-2 dark:bg-zinc-900',
         className,
       )}
       {...rest}
