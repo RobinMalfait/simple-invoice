@@ -1,10 +1,10 @@
 'use client'
 
-import { ReactNode, createContext, useCallback, useContext } from 'react'
+import { createContext, useCallback, useContext, type ReactNode } from 'react'
 import { Account } from '~/domain/account/account'
 import { Client } from '~/domain/client/client'
 import { Event } from '~/domain/events/event'
-import { Record } from '~/domain/record/record'
+import type { Record } from '~/domain/record/record'
 import { match } from '~/utils/match'
 
 let Context = createContext<Event[]>([])

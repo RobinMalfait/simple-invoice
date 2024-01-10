@@ -1,6 +1,6 @@
 'use client'
 
-import { ComponentProps } from 'react'
+import type { ComponentProps } from 'react'
 
 export function RecipientCheckbox(props: ComponentProps<'input'>) {
   return (

@@ -1,6 +1,6 @@
 'use client'
 
-import { ReactNode, createContext, useContext } from 'react'
+import { createContext, useContext, type ReactNode } from 'react'
 
 let Context = createContext<Pagination | null>(null)
 

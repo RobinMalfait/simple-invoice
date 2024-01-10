@@ -1,4 +1,4 @@
-import { ComponentProps } from 'react'
+import type { ComponentProps } from 'react'
 import { parseMarkdown } from '~/ui/document/document'
 
 export function Markdown({

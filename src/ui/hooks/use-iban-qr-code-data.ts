@@ -1,6 +1,6 @@
 import z from 'zod'
 import { Currency } from '~/domain/currency/currency'
-import { Record } from '~/domain/record/record'
+import type { Record } from '~/domain/record/record'
 import { useTranslation } from '~/ui/hooks/use-translation'
 import { total } from '~/ui/invoice/total'
 

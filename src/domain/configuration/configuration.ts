@@ -1,18 +1,18 @@
 import {
-  Configuration as CreditNoteConfiguration,
   defaultConfiguration as defaultCreditNoteConfiguration,
+  type Configuration as CreditNoteConfiguration,
 } from '~/domain/credit-note/configuration'
 import {
-  Configuration as InvoiceConfiguration,
   defaultConfiguration as defaultInvoiceConfiguration,
+  type Configuration as InvoiceConfiguration,
 } from '~/domain/invoice/configuration'
 import {
-  Configuration as QuoteConfiguration,
   defaultConfiguration as defaultQuoteConfiguration,
+  type Configuration as QuoteConfiguration,
 } from '~/domain/quote/configuration'
 import {
-  Configuration as ReceiptConfiguration,
   defaultConfiguration as defaultReceiptConfiguration,
+  type Configuration as ReceiptConfiguration,
 } from '~/domain/receipt/configuration'
 import { merge } from '~/utils/merge'
 

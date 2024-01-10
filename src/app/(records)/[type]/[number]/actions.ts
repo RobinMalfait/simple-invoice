@@ -1,7 +1,7 @@
 import { load } from '~/app/(db)/actions'
 import { config } from '~/domain/configuration/configuration'
 import { Contact } from '~/domain/contact/contact'
-import { Record } from '~/domain/record/record'
+import type { Record } from '~/domain/record/record'
 import { parseMarkdown as _parseMarkdown } from '~/ui/document/document'
 import { total } from '~/ui/invoice/total'
 import { createCurrencyFormatter } from '~/utils/currency-formatter'

@@ -22,7 +22,7 @@ import {
   isRejected,
   isSent,
 } from '~/domain/record/filters'
-import { Record, combineRecords, separateRecords } from '~/domain/record/record'
+import { combineRecords, separateRecords, type Record } from '~/domain/record/record'
 import { Address, formatAddress } from '~/ui/address/address'
 import { Avatar } from '~/ui/avatar'
 import { Card, CardBody, CardTitle, Field } from '~/ui/card'

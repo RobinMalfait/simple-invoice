@@ -1,6 +1,6 @@
 'use client'
 
-import { ReactNode, createContext, useContext } from 'react'
+import { createContext, useContext, type ReactNode } from 'react'
 import type { Record } from '~/domain/record/record'
 
 let Context = createContext<Record[] | null>(null)

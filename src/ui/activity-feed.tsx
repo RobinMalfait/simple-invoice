@@ -31,7 +31,7 @@ import {
   isFuture,
 } from 'date-fns'
 import Link from 'next/link'
-import { ContextType, createContext, useContext, useState } from 'react'
+import { createContext, useContext, useState, type ContextType } from 'react'
 import { Event } from '~/domain/events/event'
 import { Address, formatAddress } from '~/ui/address/address'
 import { useCardStructure } from '~/ui/card'

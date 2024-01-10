@@ -33,7 +33,6 @@ import {
 } from 'date-fns'
 import Link from 'next/link'
 import {
-  ContextType,
   Fragment,
   createContext,
   useCallback,
@@ -42,6 +41,7 @@ import {
   useMemo,
   useReducer,
   useState,
+  type ContextType,
 } from 'react'
 import {
   CartesianGrid,
@@ -75,7 +75,7 @@ import {
   isRejected,
   isSent,
 } from '~/domain/record/filters'
-import { Record, resolveRelevantRecordDate, separateRecords } from '~/domain/record/record'
+import { resolveRelevantRecordDate, separateRecords, type Record } from '~/domain/record/record'
 import { Card, CardBody, CardTitle } from '~/ui/card'
 import { classNames } from '~/ui/class-names'
 import { Classified, useIsClassified } from '~/ui/classified'

@@ -1,6 +1,6 @@
 'use client'
 
-import { ReactNode, createContext, useContext } from 'react'
+import { createContext, useContext, type ReactNode } from 'react'
 import type { Record } from '~/domain/record/record'
 import { I18NProvider } from '~/ui/hooks/use-i18n'
 import { pick } from '~/utils/pick'

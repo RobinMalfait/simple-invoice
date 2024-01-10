@@ -11,7 +11,7 @@ import {
   isQuote,
   isSent,
 } from '~/domain/record/filters'
-import { Record } from '~/domain/record/record'
+import type { Record } from '~/domain/record/record'
 import { StatusDisplay as InvoiceStatusDisplay } from '~/ui/invoice/status'
 import { total } from '~/ui/invoice/total'
 import { Money } from '~/ui/money'

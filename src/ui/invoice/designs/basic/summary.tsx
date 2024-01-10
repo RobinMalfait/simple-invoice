@@ -1,6 +1,6 @@
 import { Discount } from '~/domain/discount/discount'
 import { Invoice } from '~/domain/invoice/invoice'
-import { summary, Summary } from '~/domain/invoice/summary'
+import { summary, type Summary } from '~/domain/invoice/summary'
 import { useTranslation } from '~/ui/hooks/use-translation'
 import { Money } from '~/ui/money'
 import { match } from '~/utils/match'

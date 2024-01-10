@@ -3,7 +3,7 @@ import { Client } from '~/domain/client/client'
 import { bus } from '~/domain/event-bus/bus'
 import { Event } from '~/domain/events/event'
 import { trackMilestones } from '~/domain/milestone/milestone'
-import { Record, separateRecords } from '~/domain/record/record'
+import { separateRecords, type Record } from '~/domain/record/record'
 import { env } from '~/utils/env'
 
 export let events: Event[] = []

@@ -1,8 +1,8 @@
 import { randomUUID } from 'crypto'
 import type { ChildNode } from 'domhandler'
 import * as htmlparser2 from 'htmlparser2'
+import type { TokenizerAndRendererExtension } from 'marked'
 import * as marked from 'marked'
-import { TokenizerAndRendererExtension } from 'marked'
 import { dedent } from '~/utils/dedent'
 
 let classified: TokenizerAndRendererExtension = {

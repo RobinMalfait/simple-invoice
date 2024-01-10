@@ -1,6 +1,6 @@
 'use client'
 
-import { ComponentProps, useState } from 'react'
+import { useState, type ComponentProps } from 'react'
 import { match } from '~/utils/match'
 
 export function CopyButton({

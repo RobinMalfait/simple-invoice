@@ -1,6 +1,6 @@
 import { title } from 'case'
 import { addDays, addMonths, format, isWithinInterval, subMonths } from 'date-fns'
-import { EventAttributes, createEvents } from 'ics'
+import { createEvents, type EventAttributes } from 'ics'
 import { NextRequest } from 'next/server'
 import { load } from '~/app/(db)/actions'
 import { records as allRecords, me } from '~/data'

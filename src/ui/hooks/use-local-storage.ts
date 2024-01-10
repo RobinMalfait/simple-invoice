@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState, type Dispatch, type SetStateAction } from 'react'
 import { useIsomorphicEffect } from './use-isomorphic-effect'
 
 export function useLocalStorageState<T>(
