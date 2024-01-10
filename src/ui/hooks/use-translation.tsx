@@ -7,7 +7,7 @@ import { useI18N } from '~/ui/hooks/use-i18n'
 
 import EN_INVOICE from '~/data/translations/en/invoice.json'
 import NL_INVOICE from '~/data/translations/nl/invoice.json'
-import { Dot, dot } from '~/utils/dot'
+import { dot, type Dot } from '~/utils/dot'
 
 type Translation = typeof NL_INVOICE & typeof EN_INVOICE
 

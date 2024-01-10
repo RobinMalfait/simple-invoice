@@ -4,7 +4,7 @@ import { BanknotesIcon, CubeIcon, InformationCircleIcon } from '@heroicons/react
 import { CreditNote } from '~/domain/credit-note/credit-note'
 import { Discount } from '~/domain/discount/discount'
 import { Invoice as InvoiceType } from '~/domain/invoice/invoice'
-import { Summary, summary } from '~/domain/invoice/summary'
+import { summary, type Summary } from '~/domain/invoice/summary'
 import { Quote } from '~/domain/quote/quote'
 import { Receipt } from '~/domain/receipt/receipt'
 import { Classified } from '~/ui/classified'
