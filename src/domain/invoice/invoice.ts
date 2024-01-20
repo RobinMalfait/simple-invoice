@@ -194,7 +194,7 @@ export class InvoiceBuilder {
 
   private get computeStatus() {
     if (
-      ![InvoiceStatus.Paid, InvoiceStatus.Closed].includes(this._status) &&
+      ![InvoiceStatus.Paid, InvoiceStatus.Closed, InvoiceStatus.Cancelled].includes(this._status) &&
       isPast(this.computeDueDate!)
     ) {
       return InvoiceStatus.Overdue
