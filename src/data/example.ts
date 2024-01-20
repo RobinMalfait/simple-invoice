@@ -973,7 +973,7 @@ records.push(
   new InvoiceBuilder()
     .account(me)
     .client(Client1)
-    .issueDate(inThePast(20))
+    .issueDate(inThePast(-20))
     .item(new InvoiceItemBuilder().description('Item #1').unitPrice(60_00).build())
     .send(nextDay())
     .cancel(nextDay(), {
