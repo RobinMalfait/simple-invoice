@@ -79,7 +79,7 @@ export function resolveRelevantRecordDate(record: Record) {
         return r.creditNoteDate
       },
       receipt: (r: Receipt) => {
-        return r.invoice.issueDate
+        return r.receiptDate
       },
     },
     record,
