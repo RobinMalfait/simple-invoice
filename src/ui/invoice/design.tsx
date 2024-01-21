@@ -13,7 +13,7 @@ export function Invoice() {
 
   return (
     <RecordProvider record={record}>
-      <div className="grid w-full grid-flow-row gap-8 font-pdf print:gap-0">
+      <div className="flex w-full flex-wrap gap-8 font-pdf print:gap-0">
         <RecordPages />
 
         {record.attachments.map((attachment) => {
