@@ -1,4 +1,3 @@
-import * as HI from '@heroicons/react/24/outline'
 import { BanknotesIcon, CubeIcon, InformationCircleIcon } from '@heroicons/react/24/outline'
 
 import { CreditNote } from '~/domain/credit-note/credit-note'
@@ -14,10 +13,10 @@ import { useRecordInfo } from '~/ui/hooks/use-record-info'
 import { RecordItemProvider } from '~/ui/hooks/use-record-item'
 import { Translation, useTranslation } from '~/ui/hooks/use-translation'
 import { PaypalIcon } from '~/ui/icons/payment'
-import * as SocialIcons from '~/ui/icons/social'
 import {
   Address,
   Attachment as AttachmentBlock,
+  ContactFieldIcon,
   Date,
   Description,
   Record as InvoiceBlock,
@@ -376,25 +375,13 @@ export function Invoice() {
                   </thead>
                   <tbody>
                     {record.account.contactFields.map((field) => {
-                      let Icon =
-                        field.icon === null
-                          ? 'div'
-                          : field.icon.type === 'heroicon'
-                            ? HI[field.icon.heroicon]
-                            : field.icon.type === 'socials'
-                              ? SocialIcons[field.icon.name]
-                              : field.icon.type === 'image'
-                                ? function ImageIcon(props: React.ComponentProps<'img'>) {
-                                    // @ts-expect-error
-                                    // eslint-disable-next-line @next/next/no-img-element
-                                    return <img src={field.icon.imageUrl} alt="" {...props} />
-                                  }
-                                : 'div'
-
                       return (
                         <tr key={field.id}>
                           <td className="text-center">
-                            <Icon className="h-4 w-4 text-gray-500 grayscale" />
+                            <ContactFieldIcon
+                              field={field}
+                              className="h-4 w-4 text-gray-500 grayscale"
+                            />
                           </td>
                           <td className="px-3">
                             <Classified>{field.value}</Classified>
