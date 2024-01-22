@@ -305,14 +305,6 @@ export function Invoice() {
           </div>
           <Outlet />
         </Notes>
-
-        {/* QR Code */}
-        <QRCode className="relative rounded-lg border border-gray-400 p-3 pt-4">
-          <span className="absolute inset-x-0 top-0 flex -translate-y-2 items-center justify-center">
-            <Translation for="qr.label" className="bg-white px-1 text-xs text-gray-600" />
-          </span>
-          <Outlet />
-        </QRCode>
       </div>
 
       {/* Footer */}
@@ -324,76 +316,84 @@ export function Invoice() {
 
       {/* Big footer */}
       <div className="hidden last-page:block">
-        <div className="relative space-y-12 bg-gray-50 px-12 py-8 text-gray-900">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between text-xl font-medium">
-              <Translation for="summary.total" />
-              <Total className="-mx-4 -my-2 rounded-full bg-black px-4 py-2 text-white" />
-            </div>
+        <div className="relative space-y-6 bg-gray-50 px-12 py-8 text-gray-900">
+          <div className="flex items-center justify-between text-xl font-medium">
+            <Translation for="summary.total" />
+            <Total className="-mx-4 -my-2 rounded-full bg-black px-4 py-2 text-white" />
+          </div>
+          <div className="flex items-start gap-8">
+            {record.account.contactFields.length > 0 && (
+              <table className="text-sm">
+                <thead>
+                  <tr>
+                    <td colSpan={2} className="text-sm font-medium text-gray-900">
+                      <Translation for="summary.contactDetails" />
+                    </td>
+                  </tr>
+                </thead>
+                <tbody>
+                  {record.account.contactFields.map((field) => {
+                    return (
+                      <tr key={field.id}>
+                        <td className="text-center">
+                          <ContactFieldIcon
+                            field={field}
+                            className="h-4 w-4 text-gray-500 grayscale"
+                          />
+                        </td>
+                        <td className="px-3">
+                          <Classified>{field.value}</Classified>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            )}
 
-            <div className="flex items-start gap-8">
-              {record.account.contactFields.length > 0 && (
-                <table className="text-sm">
-                  <thead>
-                    <tr>
-                      <td colSpan={2} className="text-sm font-medium text-gray-900">
-                        <Translation for="summary.contactDetails" />
-                      </td>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {record.account.contactFields.map((field) => {
-                      return (
-                        <tr key={field.id}>
-                          <td className="text-center">
-                            <ContactFieldIcon
-                              field={field}
-                              className="h-4 w-4 text-gray-500 grayscale"
-                            />
-                          </td>
-                          <td className="px-3">
-                            <Classified>{field.value}</Classified>
-                          </td>
-                        </tr>
-                      )
-                    })}
-                  </tbody>
-                </table>
-              )}
+            {record.account.paymentMethods.length > 0 && (
+              <table className="text-sm">
+                <thead>
+                  <tr>
+                    <td colSpan={2} className="text-sm font-medium text-gray-900">
+                      <Translation for="summary.paymentDetails" />
+                    </td>
+                  </tr>
+                </thead>
+                <tbody>
+                  {record.account.paymentMethods.map((paymentMethod) => {
+                    return (
+                      <tr key={paymentMethod.id}>
+                        <td className="text-center">
+                          {match(paymentMethod.type, {
+                            iban() {
+                              return <BanknotesIcon className="h-4 w-4 text-gray-500" />
+                            },
+                            paypal() {
+                              return <PaypalIcon className="h-4 w-4 text-gray-500" />
+                            },
+                          })}
+                        </td>
+                        <td className="px-3">
+                          <Classified>{paymentMethod.value}</Classified>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            )}
 
-              {record.account.paymentMethods.length > 0 && (
-                <table className="text-sm">
-                  <thead>
-                    <tr>
-                      <td colSpan={2} className="text-sm font-medium text-gray-900">
-                        <Translation for="summary.paymentDetails" />
-                      </td>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {record.account.paymentMethods.map((paymentMethod) => {
-                      return (
-                        <tr key={paymentMethod.id}>
-                          <td className="text-center">
-                            {match(paymentMethod.type, {
-                              iban() {
-                                return <BanknotesIcon className="h-4 w-4 text-gray-500" />
-                              },
-                              paypal() {
-                                return <PaypalIcon className="h-4 w-4 text-gray-500" />
-                              },
-                            })}
-                          </td>
-                          <td className="px-3">
-                            <Classified>{paymentMethod.value}</Classified>
-                          </td>
-                        </tr>
-                      )
-                    })}
-                  </tbody>
-                </table>
-              )}
-            </div>
+            {/* Spacer */}
+            <div className="flex-1" />
+
+            {/* QR Code */}
+            <QRCode className="relative mt-3 rounded-lg border border-gray-400 p-2 pt-3">
+              <span className="absolute inset-x-0 top-0 flex -translate-y-2 items-center justify-center">
+                <Translation for="qr.label" className="bg-gray-50 px-1 text-xs text-gray-600" />
+              </span>
+              <Outlet />
+            </QRCode>
           </div>
 
           <Legal className="w-full text-center text-xs" />
