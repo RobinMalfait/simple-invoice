@@ -10,7 +10,9 @@ export let events: Event[] = []
 
 trackMilestones(bus, { events })
 
-let data = require(`./${env.DATA_SOURCE_FILE}.ts`)
+let data = require(
+  `./${process.env.NEXT_PUBLIC_DATA_SOURCE_FILE ?? process.env.NEXT_PUBLIC_ENVIRONMENT ?? env.DATA_SOURCE_FILE}.ts`,
+)
 
 export let me: Account = data.me
 export let records: Record[] = separateRecords(data.records ?? [])

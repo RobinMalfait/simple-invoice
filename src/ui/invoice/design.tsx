@@ -1,12 +1,12 @@
 'use client'
 
-import {
-  Attachment as AttachmentPages,
-  Invoice as RecordPages,
-} from '~/ui/invoice/designs/basic/invoice'
-
 import { AttachmentProvider } from '~/ui/hooks/use-attachment'
 import { RecordProvider, useRecord } from '~/ui/hooks/use-record'
+import { env } from '~/utils/env'
+
+let { Attachment: AttachmentPages, Invoice: RecordPages } = require(
+  `~/ui/invoice/designs/${process.env.NEXT_PUBLIC_DESIGN_SOURCE_FILE ?? process.env.NEXT_PUBLIC_ENVIRONMENT ?? env.DATA_SOURCE_FILE}/invoice.tsx`,
+)
 
 export function Invoice() {
   let record = useRecord()

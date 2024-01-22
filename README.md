@@ -22,18 +22,29 @@ cp .env.example .env
 npm run dev
 ```
 
-### Changing data
+### Environment variables
 
-The `.env` file contains a `DATA_SOURCE_FILE` that points to a file in the `./src/data/` folder.
+- `CLASSIFIED_MODE` — This is the default value to enable classified mode. Once you change it in the
+  application it will be persisted to the database. Classified mode will blur out all numbers and
+  personal identifiable information. If you spot a case where this is not true, please report it as
+  a bug report.
+- `NEXT_PUBLIC_ENVIRONMENT` environment variable
 
-You can add as many files in the `./src/data/` folder as you want. E.g.: `./src/data/production.ts`
-or `./src/data/development.ts`. If you want to switch data sources, then you can update the
-`DATA_SOURCE_FILE` environment variable in your `.env`.
+  This variable is used to know which data to load and which design to load.
 
-### Changing invoice designs
+  - `./src/data/${NEXT_PUBLIC_ENVIRONMENT}.ts` contains all the data for your application.
+  - `./src/ui/invoice/designs/${NEXT_PUBLIC_ENVIRONMENT}/invoice.tsx` contains the design for your
+    invoices.
 
-All pages that require a design for the actual invoice, will import the design from
-`./src/ui/invoice/design.tsx`.
+  If you want to create a new environment, then you have to make sure that files exists in the above
+  mentioned locations and we do the rest.
 
-You can add your own designs in the `./src/ui/invoice/designs/`
-folder and change the design that should be used in `./src/ui/invoice/design.tsx`.
+  [!NOTE]: Only the `example` environment is visible to Git, the other files and folders are ignored
+  by default. But, if you make changes, do make sure you are not comitting real data to a (public)
+  repository.
+
+  If you want a different design source file, or different data source file, then you can also set
+  these environment variables:
+
+  - `NEXT_PUBLIC_DATA_SOURCE_FILE` — This has precedence over `NEXT_PUBLIC_ENVIRONMENT`
+  - `NEXT_PUBLIC_DESIGN_SOURCE_FILE` — This has precedence over `NEXT_PUBLIC_ENVIRONMENT`
