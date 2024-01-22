@@ -288,26 +288,7 @@ export function Invoice() {
                         </RecordItemProvider>
                       )
                     })}
-                    <Summary
-                      status={match(
-                        record.type,
-                        {
-                          quote() {
-                            return null
-                          },
-                          invoice() {
-                            return null
-                          },
-                          'credit-note'(r: CreditNote) {
-                            return r.invoice.status // TODO: Double check
-                          },
-                          receipt(r: Receipt) {
-                            return r.invoice.status
-                          },
-                        },
-                        record,
-                      )}
-                    />
+                    <Summary />
                   </tbody>
                 </table>
               )
@@ -543,8 +524,26 @@ let summaryItems: {
   },
 }
 
-function Summary({ status }: { status: InvoiceType['status'] | null }) {
+function Summary() {
   let record = useRecord()
+  let status = match(
+    record.type,
+    {
+      quote() {
+        return null
+      },
+      invoice() {
+        return null
+      },
+      'credit-note'(r: CreditNote) {
+        return r.invoice.status // TODO: Double check
+      },
+      receipt(r: Receipt) {
+        return r.invoice.status
+      },
+    },
+    record,
+  )
   let pagination = usePaginationInfo()
   let isLastPage = pagination.current === pagination.total - 1
 
