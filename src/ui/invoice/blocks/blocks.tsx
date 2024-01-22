@@ -1,5 +1,8 @@
+import * as HI from '@heroicons/react/24/outline'
 import { format } from 'date-fns'
 import { createContext, useContext, useMemo, useState } from 'react'
+
+import type { Account } from '~/domain/account/account'
 import { isInvoice } from '~/domain/record/filters'
 import type { Record } from '~/domain/record/record'
 import { Address as InternalAddress } from '~/ui/address/address'
@@ -14,6 +17,7 @@ import { PageProvider, usePaginationInfo } from '~/ui/hooks/use-pagination-info'
 import { useRecord } from '~/ui/hooks/use-record'
 import { useRecordItem } from '~/ui/hooks/use-record-item'
 import { Translation, useTranslation } from '~/ui/hooks/use-translation'
+import * as SocialIcons from '~/ui/icons/social'
 import { total } from '~/ui/invoice/total'
 import { Markdown } from '~/ui/markdown'
 import { Money } from '~/ui/money'
@@ -431,4 +435,30 @@ type RecordPaths = Dot<Record>
 function RecordValue({ path, ...props }: { path: RecordPaths } & React.ComponentProps<'span'>) {
   let record = useRecord()
   return <span {...props}>{dot(record, path)}</span>
+}
+
+// ---
+
+export function ContactFieldIcon({
+  field,
+  ...props
+}: {
+  className?: string
+  field: Account['contactFields'][number]
+}) {
+  let Icon =
+    field.icon === null
+      ? 'div'
+      : field.icon.type === 'heroicon'
+        ? HI[field.icon.heroicon]
+        : field.icon.type === 'socials'
+          ? SocialIcons[field.icon.name]
+          : field.icon.type === 'image'
+            ? function ImageIcon(props: React.ComponentProps<'img'>) {
+                // @ts-expect-error
+                // eslint-disable-next-line @next/next/no-img-element
+                return <img src={field.icon.imageUrl} alt="" {...props} />
+              }
+            : 'div'
+  return <Icon {...props} />
 }
