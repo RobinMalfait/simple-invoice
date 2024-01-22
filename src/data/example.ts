@@ -574,6 +574,22 @@ records.push(
       new InvoiceItemBuilder().description('Item line #13').taxRate(0.06).unitPrice(100_00).build(),
     )
     .item(new InvoiceItemBuilder().description('Item line #14').unitPrice(100_00).build())
+    .item(new InvoiceItemBuilder().description('Item line #15').unitPrice(100_00).build())
+    .item(new InvoiceItemBuilder().description('Item line #16').unitPrice(100_00).build())
+    .item(
+      new InvoiceItemBuilder().description('Item line #17').unitPrice(100_00).taxRate(0.06).build(),
+    )
+    .item(new InvoiceItemBuilder().description('Item line #18').unitPrice(100_00).build())
+    .item(new InvoiceItemBuilder().description('Item line #19').unitPrice(100_00).build())
+    .item(new InvoiceItemBuilder().description('Item line #20').unitPrice(100_00).build())
+    .item(
+      new InvoiceItemBuilder().description('Item line #21').unitPrice(100_00).quantity(4).build(),
+    )
+    .item(new InvoiceItemBuilder().description('Item line #22').unitPrice(100_00).build())
+    .item(
+      new InvoiceItemBuilder().description('Item line #23').unitPrice(100_00).taxRate(0.12).build(),
+    )
+    .item(new InvoiceItemBuilder().description('Item line #24').unitPrice(100_00).build())
     .send(nextDay())
     .pay(nextDay())
     .build(),
