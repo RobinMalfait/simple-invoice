@@ -1,5 +1,6 @@
 import { kebab } from 'case'
 import { format, type Locale } from 'date-fns'
+import { dot } from '~/utils/dot'
 import { match } from '~/utils/match'
 
 type Configuration = {
@@ -7,25 +8,6 @@ type Configuration = {
   transformations?: {
     [key: string]: (value: any) => string
   }
-}
-
-function dot<T>(path: string, input: T) {
-  let segments = path.split('.')
-  let next: any = input
-  for (let segment of segments) {
-    let current = next
-    next = next[segment]
-    if (!(segment in current)) {
-      throw new Error(
-        `Could not find property \`${segment}\` in ${Object.keys(current)
-          .map((x) => {
-            return `\`${x}\``
-          })
-          .join(', ')}`,
-      )
-    }
-  }
-  return next
 }
 
 // Small custom template language, handlebars based
@@ -45,7 +27,8 @@ export function render<T>(template: string, input: T, config: Configuration = {}
     let transformations: string[] = value.split(/\s*\|\s*/g)
     let [path, arg] = transformations.shift()?.split(':') ?? []
 
-    let next = dot(path, input)
+    // @ts-expect-error Too generic, can't properly type this
+    let next = dot(input, path)
 
     // Fallback to empty string for nullish values
     next ??= ''
@@ -58,33 +41,34 @@ export function render<T>(template: string, input: T, config: Configuration = {}
       for (let transform of transformations) {
         ;[transform, arg] = transform.split(':')
         next = match(transform, {
-          lower: () => {
+          lower() {
             return next.toLowerCase()
           },
-          upper: () => {
+          upper() {
             return next.toUpperCase()
           },
-          kebab: () => {
+          kebab() {
             return kebab(next)
           },
-          pick: () => {
+          pick() {
             return next.map((x: any) => {
-              return dot(arg, x)
+              // @ts-expect-error Too generic, can't properly type this
+              return dot(x, arg)
             })
           },
-          and: () => {
+          and() {
             return and.format(next)
           },
-          or: () => {
+          or() {
             return or.format(next)
           },
-          join: () => {
+          join() {
             return next.join(arg)
           },
-          first: () => {
+          first() {
             return next.at(0)
           },
-          last: () => {
+          last() {
             return next.at(-1)
           },
 

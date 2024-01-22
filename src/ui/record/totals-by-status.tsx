@@ -12,12 +12,12 @@ import {
   isSent,
 } from '~/domain/record/filters'
 import type { Record } from '~/domain/record/record'
+import { I18NPartialProvider } from '~/ui/hooks/use-i18n'
 import { StatusDisplay as InvoiceStatusDisplay } from '~/ui/invoice/status'
 import { total } from '~/ui/invoice/total'
 import { Money } from '~/ui/money'
 import { StatusDisplay as QuoteStatusDisplay } from '~/ui/quote/status'
 import { match } from '~/utils/match'
-import { I18NPartialProvider } from '../hooks/use-i18n'
 
 function groupByCurrency(records: Record[]) {
   return Array.from(

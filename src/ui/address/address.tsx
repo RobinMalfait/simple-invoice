@@ -1,4 +1,5 @@
 import { Address as AddressType } from '~/domain/address/address'
+import { classNames } from '~/ui/class-names'
 import { Classified } from '~/ui/classified'
 
 export function formatAddress(address: AddressType) {
@@ -13,9 +14,13 @@ export function formatAddress(address: AddressType) {
     .join('\n')
 }
 
-export function Address({ address }: { address: AddressType }) {
+export function Address({
+  address,
+  className,
+  ...props
+}: React.ComponentProps<'div'> & { address: AddressType }) {
   return (
-    <div className="whitespace-pre-wrap">
+    <div className={classNames('whitespace-pre-wrap', className)} {...props}>
       <Classified>{formatAddress(address)}</Classified>
     </div>
   )

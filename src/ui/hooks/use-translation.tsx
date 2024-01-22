@@ -7,6 +7,7 @@ import { useI18N } from '~/ui/hooks/use-i18n'
 
 import EN_INVOICE from '~/data/translations/en/invoice.json'
 import NL_INVOICE from '~/data/translations/nl/invoice.json'
+import { dot, type Dot } from '~/utils/dot'
 
 type Translation = typeof NL_INVOICE & typeof EN_INVOICE
 
@@ -32,5 +33,24 @@ export function useTranslation() {
       return value
     },
     [language],
+  )
+}
+
+export function Translation({
+  for: key,
+  interpolations,
+  ...props
+}: React.ComponentProps<'span'> & {
+  for: Dot<Translation>
+  interpolations?: Record<string, string | { toString: () => string }>
+}) {
+  let t = useTranslation()
+
+  return (
+    <span {...props}>
+      {t((x) => {
+        return dot(x, key)
+      }, interpolations)}
+    </span>
   )
 }
