@@ -73,16 +73,16 @@ export function Invoice() {
                   {match(
                     record.type,
                     {
-                      quote: (r: Quote) => {
+                      quote(r: Quote) {
                         return <Date date={r.quoteDate} format="PPP" />
                       },
-                      invoice: (r: InvoiceType) => {
+                      invoice(r: InvoiceType) {
                         return <Date date={r.issueDate} format="PPP" />
                       },
-                      'credit-note': (r: CreditNote) => {
+                      'credit-note'(r: CreditNote) {
                         return <>{r.invoice.number}</>
                       },
-                      receipt: (r: Receipt) => {
+                      receipt(r: Receipt) {
                         return <>{r.invoice.number}</>
                       },
                     },
@@ -104,16 +104,16 @@ export function Invoice() {
                   {match(
                     record.type,
                     {
-                      quote: (r: Quote) => {
+                      quote(r: Quote) {
                         return <Date date={r.quoteExpirationDate} format="PPP" />
                       },
-                      invoice: (r: InvoiceType) => {
+                      invoice(r: InvoiceType) {
                         return <Date date={r.dueDate} format="PPP" />
                       },
-                      'credit-note': (r: CreditNote) => {
+                      'credit-note'(r: CreditNote) {
                         return <Date date={r.creditNoteDate} format="PPP" />
                       },
-                      receipt: (r: Receipt) => {
+                      receipt(r: Receipt) {
                         return <Date date={r.receiptDate} format="PPP" />
                       },
                     },
@@ -190,139 +190,126 @@ export function Invoice() {
           <Items>
             {({ items }) => {
               return (
-                <>
-                  <table className="min-w-full">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="w-full whitespace-nowrap px-4 py-3 text-left text-sm font-medium text-gray-900 first:pl-12">
-                          <Translation for="invoiceItem.description" />
-                        </th>
-                        <th className="w-full whitespace-nowrap px-4 py-3 text-left text-sm font-medium text-gray-900">
-                          <Translation for="invoiceItem.quantity" />
-                        </th>
+                <table className="min-w-full">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="w-full whitespace-nowrap px-4 py-3 text-left text-sm font-medium text-gray-900 first:pl-12">
+                        <Translation for="invoiceItem.description" />
+                      </th>
+                      <th className="w-full whitespace-nowrap px-4 py-3 text-left text-sm font-medium text-gray-900">
+                        <Translation for="invoiceItem.quantity" />
+                      </th>
+                      <th className="w-full whitespace-nowrap px-4 py-3 text-right text-sm font-medium text-gray-900">
+                        <Translation for="invoiceItem.unitPrice" />
+                      </th>
+                      {info.hasVat && (
                         <th className="w-full whitespace-nowrap px-4 py-3 text-right text-sm font-medium text-gray-900">
-                          <Translation for="invoiceItem.unitPrice" />
+                          <Translation for="invoiceItem.vat" />
                         </th>
-                        {info.hasVat && (
-                          <th className="w-full whitespace-nowrap px-4 py-3 text-right text-sm font-medium text-gray-900">
-                            <Translation for="invoiceItem.vat" />
-                          </th>
-                        )}
-                        <th className="w-full whitespace-nowrap px-4 py-3 text-right text-sm font-medium text-gray-900 last:pr-12">
-                          <Translation for="invoiceItem.subtotal" />
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {items.map((item, idx, all) => {
-                        return (
-                          <RecordItemProvider key={item.id} item={item}>
-                            <tr
-                              data-first={idx === 0 || undefined}
-                              data-last={idx === all.length - 1 || undefined}
-                              className="[--bottom:--py] [--indent:theme(spacing.8)] [--left:--px] [--px:theme(spacing.4)] [--py:theme(spacing[1.5])] [--right:--px] [--top:--py] data-[first]:[--top:theme(spacing.4)] data-[last]:[--bottom:theme(spacing.4)]"
-                            >
-                              <td className="whitespace-pre-wrap pb-[--bottom] pl-[calc(var(--indent)+var(--left))] pr-[--right] pt-[--top] text-left align-top text-sm font-medium text-gray-900">
-                                <Description />
-                                <ul className="empty:hidden">
-                                  {item.discounts.concat(item.discounts).map((discount, idx) => {
-                                    return (
-                                      <li
-                                        key={idx}
-                                        className="whitespace-nowrap text-left text-sm font-normal text-gray-500"
-                                      >
-                                        <Translation for="summary.discount.title" />
-                                        {discount.reason && (
-                                          <>
-                                            <span className="px-1">
-                                              (
-                                              <span className="text-xs font-medium text-gray-400">
-                                                {discount.reason}
-                                              </span>
-                                              )
-                                            </span>
-                                          </>
-                                        )}
-                                        <span className="px-3 text-gray-400">/</span>
-                                        {match(
-                                          discount.type,
-                                          {
-                                            fixed: (
-                                              discount: Extract<Discount, { type: 'fixed' }>,
-                                            ) => {
-                                              if (discount.quantity === 1) {
-                                                return <Money amount={-1 * discount.value} />
-                                              }
-
-                                              return (
-                                                <span>
-                                                  <Money amount={-1 * discount.value} />
-                                                  <span className="px-1">&times;</span>
-                                                  {discount.quantity}
-                                                </span>
-                                              )
-                                            },
-                                            percentage: () => {
-                                              return (
-                                                <>{(-1 * (discount.value * 100)).toFixed(0)}%</>
-                                              )
-                                            },
-                                          },
-                                          discount,
-                                        )}
-                                      </li>
-                                    )
-                                  })}
-                                </ul>
-                              </td>
-                              <td className="whitespace-nowrap pb-[--bottom] pl-[--left] pr-[--right] pt-[--top] text-left align-top text-sm tabular-nums text-gray-500">
-                                <Quantity />
-                              </td>
-                              <td className="whitespace-nowrap pb-[--bottom] pl-[--left] pr-[--right] pt-[--top] text-right align-top text-sm text-gray-500">
-                                <Money amount={item.unitPrice} />
-                              </td>
-                              {info.hasVat && (
-                                <td className="whitespace-nowrap pb-[--bottom] pl-[--left] pr-[--right] pt-[--top] text-right align-top text-sm tabular-nums text-gray-500">
-                                  <TaxRate />
-                                </td>
-                              )}
-                              <td className="whitespace-nowrap pb-[--bottom] pl-[--left] pr-[calc(var(--indent)+var(--right))] pt-[--top] text-right align-top text-sm font-semibold text-gray-900">
-                                <Money amount={itemPrice(item)} />
-                              </td>
-                            </tr>
-                          </RecordItemProvider>
-                        )
-                      })}
-                      {true ? (
-                        <Summary
-                          items={record.items}
-                          discounts={record.discounts}
-                          type="all"
-                          status={match(
-                            record.type,
-                            {
-                              quote: () => {
-                                return null
-                              },
-                              invoice: () => {
-                                return null
-                              },
-                              'credit-note': (r: CreditNote) => {
-                                return r.invoice.status // TODO: Double check
-                              },
-                              receipt: (r: Receipt) => {
-                                return r.invoice.status
-                              },
-                            },
-                            record,
-                          )}
-                        />
-                      ) : (
-                        <Summary items={items} discounts={[]} type="subtotal" status={null} />
                       )}
-                    </tbody>
-                  </table>
-                </>
+                      <th className="w-full whitespace-nowrap px-4 py-3 text-right text-sm font-medium text-gray-900 last:pr-12">
+                        <Translation for="invoiceItem.subtotal" />
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {items.map((item, idx, all) => {
+                      return (
+                        <RecordItemProvider key={item.id} item={item}>
+                          <tr
+                            data-first={idx === 0 || undefined}
+                            data-last={idx === all.length - 1 || undefined}
+                            className="[--bottom:--py] [--indent:theme(spacing.8)] [--left:--px] [--px:theme(spacing.4)] [--py:theme(spacing[1.5])] [--right:--px] [--top:--py] data-[first]:[--top:theme(spacing.4)] data-[last]:[--bottom:theme(spacing.4)]"
+                          >
+                            <td className="whitespace-pre-wrap pb-[--bottom] pl-[calc(var(--indent)+var(--left))] pr-[--right] pt-[--top] text-left align-top text-sm font-medium text-gray-900">
+                              <Description />
+                              <ul className="empty:hidden">
+                                {item.discounts.concat(item.discounts).map((discount, idx) => {
+                                  return (
+                                    <li
+                                      key={idx}
+                                      className="whitespace-nowrap text-left text-sm font-normal text-gray-500"
+                                    >
+                                      <Translation for="summary.discount.title" />
+                                      {discount.reason && (
+                                        <>
+                                          <span className="px-1">
+                                            (
+                                            <span className="text-xs font-medium text-gray-400">
+                                              {discount.reason}
+                                            </span>
+                                            )
+                                          </span>
+                                        </>
+                                      )}
+                                      <span className="px-3 text-gray-400">/</span>
+                                      {match(
+                                        discount.type,
+                                        {
+                                          fixed(discount: Extract<Discount, { type: 'fixed' }>) {
+                                            if (discount.quantity === 1) {
+                                              return <Money amount={-1 * discount.value} />
+                                            }
+
+                                            return (
+                                              <span>
+                                                <Money amount={-1 * discount.value} />
+                                                <span className="px-1">&times;</span>
+                                                {discount.quantity}
+                                              </span>
+                                            )
+                                          },
+                                          percentage() {
+                                            return <>{(-1 * (discount.value * 100)).toFixed(0)}%</>
+                                          },
+                                        },
+                                        discount,
+                                      )}
+                                    </li>
+                                  )
+                                })}
+                              </ul>
+                            </td>
+                            <td className="whitespace-nowrap pb-[--bottom] pl-[--left] pr-[--right] pt-[--top] text-left align-top text-sm tabular-nums text-gray-500">
+                              <Quantity />
+                            </td>
+                            <td className="whitespace-nowrap pb-[--bottom] pl-[--left] pr-[--right] pt-[--top] text-right align-top text-sm text-gray-500">
+                              <Money amount={item.unitPrice} />
+                            </td>
+                            {info.hasVat && (
+                              <td className="whitespace-nowrap pb-[--bottom] pl-[--left] pr-[--right] pt-[--top] text-right align-top text-sm tabular-nums text-gray-500">
+                                <TaxRate />
+                              </td>
+                            )}
+                            <td className="whitespace-nowrap pb-[--bottom] pl-[--left] pr-[calc(var(--indent)+var(--right))] pt-[--top] text-right align-top text-sm font-semibold text-gray-900">
+                              <Money amount={itemPrice(item)} />
+                            </td>
+                          </tr>
+                        </RecordItemProvider>
+                      )
+                    })}
+                    <Summary
+                      status={match(
+                        record.type,
+                        {
+                          quote() {
+                            return null
+                          },
+                          invoice() {
+                            return null
+                          },
+                          'credit-note'(r: CreditNote) {
+                            return r.invoice.status // TODO: Double check
+                          },
+                          receipt(r: Receipt) {
+                            return r.invoice.status
+                          },
+                        },
+                        record,
+                      )}
+                    />
+                  </tbody>
+                </table>
               )
             }}
           </Items>
@@ -408,10 +395,10 @@ export function Invoice() {
                         <tr key={paymentMethod.id}>
                           <td className="text-center">
                             {match(paymentMethod.type, {
-                              iban: () => {
+                              iban() {
                                 return <BanknotesIcon className="h-4 w-4 text-gray-500" />
                               },
-                              paypal: () => {
+                              paypal() {
                                 return <PaypalIcon className="h-4 w-4 text-gray-500" />
                               },
                             })}
@@ -542,10 +529,10 @@ let summaryItems: {
         {match(
           item.discount.type,
           {
-            fixed: (discount: Extract<Discount, { type: 'fixed' }>) => {
+            fixed(discount: Extract<Discount, { type: 'fixed' }>) {
               return <Money amount={-1 * discount.value * discount.quantity} />
             },
-            percentage: () => {
+            percentage() {
               return <>{(-1 * (item.discount.value * 100)).toFixed(0)}%</>
             },
           },
@@ -556,22 +543,17 @@ let summaryItems: {
   },
 }
 
-function Summary({
-  items,
-  discounts,
-  status,
-  type = 'all',
-}: {
-  items: InvoiceType['items']
-  discounts: InvoiceType['discounts']
-  status: InvoiceType['status'] | null
-  type: 'all' | 'subtotal'
-}) {
+function Summary({ status }: { status: InvoiceType['status'] | null }) {
+  let record = useRecord()
   let pagination = usePaginationInfo()
-  let isLastPage = pagination.current === pagination.total
+  let isLastPage = pagination.current === pagination.total - 1
+
   let t = useTranslation()
-  if (items.length === 0) return null
-  let summaryInfo = summary({ items, discounts, status })
+
+  // Only show summary on the last page
+  if (!isLastPage) return null
+
+  let summaryInfo = summary({ items: record.items, discounts: record.discounts, status })
 
   return (
     <>
@@ -581,37 +563,27 @@ function Summary({
           <div className="h-1 w-full rounded-full bg-gray-50 group-first-of-type:hidden"></div>
         </td>
       </tr>
-      {summaryInfo
-        .filter(
-          type === 'subtotal'
-            ? (summaryItem) => {
-                return summaryItem.type === 'subtotal'
-              }
-            : () => {
-                return true
-              },
+      {summaryInfo.map((summaryItem, idx) => {
+        // @ts-ignore
+        let [label, value] = summaryItems[summaryItem.type](summaryItem, { t })
+        return (
+          <tr key={idx}>
+            <td />
+            <th
+              colSpan={2}
+              className="whitespace-nowrap px-4 py-1 text-left text-sm font-normal text-gray-500"
+            >
+              {label}
+            </th>
+            <td
+              colSpan={2}
+              className="whitespace-nowrap px-4 py-1 pl-4 pr-12 text-right align-top text-sm text-gray-500"
+            >
+              {value}
+            </td>
+          </tr>
         )
-        .map((summaryItem, idx) => {
-          // @ts-ignore
-          let [label, value] = summaryItems[summaryItem.type](summaryItem, { t })
-          return (
-            <tr key={idx}>
-              <td />
-              <th
-                colSpan={2}
-                className="whitespace-nowrap px-4 py-1 text-left text-sm font-normal text-gray-500"
-              >
-                {label}
-              </th>
-              <td
-                colSpan={2}
-                className="whitespace-nowrap px-4 py-1 pl-4 pr-12 text-right align-top text-sm text-gray-500"
-              >
-                {value}
-              </td>
-            </tr>
-          )
-        })}
+      })}
 
       <tr>
         <td className="py-1" />
