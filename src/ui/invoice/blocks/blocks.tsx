@@ -167,6 +167,10 @@ export function Items({
 }) {
   let items = useRecordItems()
 
+  if (items === null) {
+    return null
+  }
+
   return <>{children({ items })}</>
 }
 
