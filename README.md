@@ -39,7 +39,7 @@ npm run dev
   If you want to create a new environment, then you have to make sure that files exists in the above
   mentioned locations and we do the rest.
 
-  [!NOTE]: Only the `example` environment is visible to Git, the other files and folders are ignored
+  Note: Only the `example` environment is visible to Git, the other files and folders are ignored
   by default. But, if you make changes, do make sure you are not comitting real data to a (public)
   repository.
 
