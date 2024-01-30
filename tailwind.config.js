@@ -10,6 +10,7 @@ module.exports = {
       },
       fontFamily: {
         sans: ['var(--font-inter)', ...fontFamily.sans],
+        hand: ['var(--font-shadows-into-light)'],
         pdf: ['Arial'],
       },
     },

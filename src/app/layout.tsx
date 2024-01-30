@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter } from 'next/font/google'
+import { Inter, Shadows_Into_Light } from 'next/font/google'
 import { events, me, records, stacks } from '~/data'
 import { Account } from '~/domain/account/account'
 import { Client } from '~/domain/client/client'
@@ -8,11 +8,18 @@ import { Invoice } from '~/domain/invoice/invoice'
 import { Quote } from '~/domain/quote/quote'
 import { Receipt } from '~/domain/receipt/receipt'
 import { isCreditNote, isInvoice, isQuote, isReceipt } from '~/domain/record/filters'
+import { classNames } from '~/ui/class-names'
 import Layout from '~/ui/layout/main'
 import { load } from './(db)/actions'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' })
+const shadwowsIntoLight = Shadows_Into_Light({
+  weight: '400',
+  subsets: [],
+  variable: '--font-shadows-into-light',
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
   title: 'Simple Invoice',
@@ -65,7 +72,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   let config = await load()
   return (
     <html lang="en" data-classified={config.ui.classified}>
-      <body className={inter.variable}>
+      <body className={classNames(inter.variable, shadwowsIntoLight.variable)}>
         <Layout data={data} config={config}>
           {children}
         </Layout>
