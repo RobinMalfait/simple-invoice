@@ -315,7 +315,7 @@ export function Invoice() {
       </div>
 
       {/* Big footer */}
-      <div className="hidden last-page:block">
+      <div className="group hidden last-page:block">
         <div className="relative space-y-6 bg-gray-50 px-12 py-8 text-gray-900">
           <div className="grid grid-cols-[1fr,auto] gap-8">
             <div className="text-xl font-medium">
@@ -324,7 +324,7 @@ export function Invoice() {
             <div className="text-xl font-medium">
               <Total className="-my-2 rounded-full bg-black px-4 py-2 text-center text-white" />
             </div>
-            <div className="flex items-start gap-8">
+            <div className="col-span-2 flex items-start gap-8 group-has-[[data-qr-code]]:col-span-1">
               {record.account.contactFields.length > 0 && (
                 <table className="text-sm">
                   <thead>
@@ -389,7 +389,10 @@ export function Invoice() {
             </div>
             <div>
               {/* QR Code */}
-              <QRCode className="relative rounded-lg border border-gray-400 p-2 pt-3">
+              <QRCode
+                data-qr-code
+                className="relative flex items-center justify-center rounded-lg border border-gray-400 p-2 pt-3"
+              >
                 <span className="absolute inset-x-0 top-0 flex -translate-y-2 items-center justify-center">
                   <Translation
                     for="qr.label"
