@@ -28,16 +28,16 @@
   "account": {
     "title": "From:",
     "taxId": {
-      "vat": "VAT Number:",
-      "bn": "Business Number:",
+      "vat": "VAT number:",
+      "bn": "Business number:",
       "ein": "EIN:"
     }
   },
   "client": {
     "title": "To:",
     "taxId": {
-      "vat": "VAT Number:",
-      "bn": "Business Number:",
+      "vat": "VAT number:",
+      "bn": "Business number:",
       "ein": "EIN:"
     }
   },
