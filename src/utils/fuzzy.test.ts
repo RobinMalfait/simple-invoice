@@ -1,3 +1,4 @@
+import { expect, it } from 'vitest'
 import { fuzzyMatch } from './fuzzy'
 
 it('should match an exact match', () => {

@@ -1,3 +1,4 @@
+import { expect, it } from 'vitest'
 import { IncrementStrategy } from './increment-strategy'
 
 it('should calculate the next invoice number', () => {

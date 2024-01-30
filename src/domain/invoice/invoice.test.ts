@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest'
 import { AccountBuilder } from '~/domain/account/account'
 import { AddressBuilder } from '~/domain/address/address'
 import { ClientBuilder } from '~/domain/client/client'

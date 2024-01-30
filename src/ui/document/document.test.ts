@@ -1,6 +1,7 @@
 /**
  * @jest-environment jsdom
  */
+import { expect, it } from 'vitest'
 import { dedent } from '~/utils/dedent'
 import { collapse, expand, paginate, parseMarkdown, stringify } from './document'
 

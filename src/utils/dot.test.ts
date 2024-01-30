@@ -1,3 +1,4 @@
+import { expect, it } from 'vitest'
 import { dot } from '~/utils/dot'
 
 it('should resolve given a path', () => {

@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`should calculate the next invoice number for the same date with a custom base "yy" 1`] = `"23001"`;
 

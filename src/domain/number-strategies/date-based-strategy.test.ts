@@ -1,4 +1,5 @@
 import { parseISO } from 'date-fns'
+import { expect, it } from 'vitest'
 import { Base, DateBasedStrategy } from './date-based-strategy'
 
 it('should calculate the next invoice number for the same date', () => {
