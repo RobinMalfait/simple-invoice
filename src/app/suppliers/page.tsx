@@ -1,4 +1,5 @@
 import { ArrowDownIcon, ArrowUpIcon } from '@heroicons/react/24/solid'
+import type { CSSProperties } from 'react'
 import { me, suppliers, transactions } from '~/data'
 import { classNames } from '~/ui/class-names'
 import { Classified } from '~/ui/classified'
@@ -50,10 +51,20 @@ export default function Page() {
                 </span>
                 <div
                   className={classNames(
-                    'grid grid-cols-[auto,1fr] gap-x-4 p-4',
+                    'relative grid grid-cols-[auto,1fr] gap-x-4 p-4',
                     data.income === 0 && 'grayscale',
                   )}
                 >
+                  <div
+                    style={
+                      {
+                        '--width': `${(data.income / (Math.abs(data.income) + Math.abs(data.expense))) * 100}%`,
+                      } as CSSProperties
+                    }
+                    className="absolute inset-1"
+                  >
+                    <div className="h-full w-[--width] rounded bg-green-500/5" />
+                  </div>
                   <span className="row-span-2">
                     <ArrowUpIcon className="h-5 w-5 text-green-500" />
                   </span>
@@ -62,10 +73,20 @@ export default function Page() {
                 </div>
                 <div
                   className={classNames(
-                    'grid grid-cols-[auto,1fr] gap-x-4 p-4',
+                    'relative grid grid-cols-[auto,1fr] gap-x-4 p-4',
                     data.expense === 0 && 'grayscale',
                   )}
                 >
+                  <div
+                    style={
+                      {
+                        '--width': `${(data.expense / (Math.abs(data.income) + Math.abs(data.expense))) * 100}%`,
+                      } as CSSProperties
+                    }
+                    className="absolute inset-1"
+                  >
+                    <div className="h-full w-[--width] rounded bg-red-500/5" />
+                  </div>
                   <span className="row-span-2">
                     <ArrowDownIcon className="h-5 w-5 text-red-500" />
                   </span>
