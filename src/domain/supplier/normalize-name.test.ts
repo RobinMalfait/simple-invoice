@@ -1,3 +1,4 @@
+import { expect, it } from 'vitest'
 import { normalizeName } from './normalize-name'
 
 it.each([
