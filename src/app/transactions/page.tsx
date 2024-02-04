@@ -22,7 +22,7 @@ export default function Page() {
         currency: me.currency,
       }}
     >
-      <div className="relative px-4 py-8 dark:text-white sm:px-6 lg:px-8">
+      <div className="relative px-4 py-8 sm:px-6 lg:px-8 dark:text-white">
         <div className="grid grid-cols-[auto,auto,auto,auto,auto,1fr,auto,auto,auto] gap-4">
           <div className="sticky top-0 col-span-full grid grid-cols-[subgrid] items-center bg-white/20 py-2 font-medium backdrop-blur-sm dark:bg-zinc-800/20">
             <div className="col-start-3">Date</div>
