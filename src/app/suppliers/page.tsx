@@ -1,5 +1,4 @@
 import { ArrowDownIcon, ArrowUpIcon } from '@heroicons/react/24/solid'
-import type { CSSProperties } from 'react'
 import { me, suppliers, transactions } from '~/data'
 import { classNames } from '~/ui/class-names'
 import { Classified } from '~/ui/classified'
@@ -33,7 +32,7 @@ export default function Page() {
         currency: me.currency,
       }}
     >
-      <div className="relative px-4 py-8 text-gray-600 sm:px-6 lg:px-8 dark:text-zinc-200">
+      <div className="relative px-4 py-8 text-gray-600 dark:text-zinc-200 sm:px-6 lg:px-8">
         <ul
           role="list"
           className="grid grid-cols-1 gap-4 lg:grid-cols-[repeat(auto-fill,minmax(theme(spacing.96),1fr))]"
@@ -51,20 +50,10 @@ export default function Page() {
                 </span>
                 <div
                   className={classNames(
-                    'relative grid grid-cols-[auto,1fr] gap-x-4 p-4',
+                    'grid grid-cols-[auto,1fr] gap-x-4 p-4',
                     data.income === 0 && 'grayscale',
                   )}
                 >
-                  <div
-                    style={
-                      {
-                        '--width': `${(data.income / (Math.abs(data.income) + Math.abs(data.expense))) * 100}%`,
-                      } as CSSProperties
-                    }
-                    className="absolute inset-1"
-                  >
-                    <div className="h-full w-[--width] rounded bg-green-500/5" />
-                  </div>
                   <span className="row-span-2">
                     <ArrowUpIcon className="h-5 w-5 text-green-500" />
                   </span>
@@ -73,20 +62,10 @@ export default function Page() {
                 </div>
                 <div
                   className={classNames(
-                    'relative grid grid-cols-[auto,1fr] gap-x-4 p-4',
+                    'grid grid-cols-[auto,1fr] gap-x-4 p-4',
                     data.expense === 0 && 'grayscale',
                   )}
                 >
-                  <div
-                    style={
-                      {
-                        '--width': `${(data.expense / (Math.abs(data.income) + Math.abs(data.expense))) * 100}%`,
-                      } as CSSProperties
-                    }
-                    className="absolute inset-1"
-                  >
-                    <div className="h-full w-[--width] rounded bg-red-500/5" />
-                  </div>
                   <span className="row-span-2">
                     <ArrowDownIcon className="h-5 w-5 text-red-500" />
                   </span>
