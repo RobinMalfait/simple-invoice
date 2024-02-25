@@ -1,12 +1,15 @@
 import { compareDesc, format } from 'date-fns'
 import Link from 'next/link'
 import { me, transactions } from '~/data'
+import type { Client } from '~/domain/client/client'
+import type { Supplier } from '~/domain/supplier/supplier'
 import { classNames } from '~/ui/class-names'
 import { Classified } from '~/ui/classified'
 import { I18NPartialProvider, I18NProvider } from '~/ui/hooks/use-i18n'
 import { Money } from '~/ui/money'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '~/ui/table'
 import { StatusDisplay } from '~/ui/transaction/status'
+import { match } from '~/utils/match'
 
 transactions.sort((a, z) => {
   return compareDesc(a.date, z.date)
@@ -42,9 +45,26 @@ export default function Page() {
                   <TableRow>
                     <TableCell>{format(transaction.date, 'yyyy-MM-dd')}</TableCell>
                     <TableCell>
-                      <Link href={`/suppliers/${transaction.supplier.id}`}>
-                        <Classified>{transaction.supplier.nickname}</Classified>
-                      </Link>
+                      {match(
+                        transaction.supplier.kind,
+                        {
+                          client(x: Client) {
+                            return (
+                              <Link href={`/clients/${x.id}`}>
+                                <Classified>{x.nickname}</Classified>
+                              </Link>
+                            )
+                          },
+                          supplier(x: Supplier) {
+                            return (
+                              <Link href={`/suppliers/${x.id}`}>
+                                <Classified>{x.nickname}</Classified>
+                              </Link>
+                            )
+                          },
+                        },
+                        transaction.supplier,
+                      )}
                     </TableCell>
                     <TableCell>
                       <Classified>

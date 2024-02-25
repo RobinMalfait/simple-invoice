@@ -15,6 +15,7 @@ import { Account } from '../account/account'
 let scopedId = new ScopedIDGenerator('supplier')
 
 export let Supplier = z.object({
+  kind: z.literal('supplier').default('supplier'),
   id: z.string().default(() => {
     return scopedId.next()
   }),

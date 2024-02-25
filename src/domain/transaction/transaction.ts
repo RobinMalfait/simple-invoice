@@ -5,6 +5,7 @@ import { Account } from '~/domain/account/account'
 import { Currency } from '~/domain/currency/currency'
 import { TransactionStatus } from '~/domain/transaction/transaction-status'
 import { ScopedIDGenerator } from '~/utils/id'
+import { Client } from '../client/client'
 import { Supplier } from '../supplier/supplier'
 
 let scopedId = new ScopedIDGenerator('transaction')
@@ -17,7 +18,7 @@ export let Transaction = z.object({
     return Account
   }),
   supplier: z.lazy(() => {
-    return Supplier
+    return z.union([Supplier, Client])
   }),
   status: z.nativeEnum(TransactionStatus).default(TransactionStatus.Completed),
   summary: z.string().nullable(),
