@@ -2,6 +2,7 @@ import EventEmitter from 'node:events'
 
 import { z } from 'zod'
 
+import { Account } from '~/domain/account/account'
 import { Address } from '~/domain/address/address'
 import { Contact } from '~/domain/contact/contact'
 import { Currency } from '~/domain/currency/currency'
@@ -10,7 +11,6 @@ import { Event } from '~/domain/events/event'
 import { Language } from '~/domain/language/language'
 import { ScopedIDGenerator } from '~/utils/id'
 import { tap } from '~/utils/tap'
-import { Account } from '../account/account'
 
 let scopedId = new ScopedIDGenerator('supplier')
 
