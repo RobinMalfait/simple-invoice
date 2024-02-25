@@ -26,7 +26,6 @@ export let Transaction = z.object({
   date: z.date(),
   currency: z.nativeEnum(Currency),
   amount: z.number(),
-  taxes: z.array(z.number()),
 })
 
 export type Transaction = z.infer<typeof Transaction>
@@ -40,7 +39,6 @@ export class TransactionBuilder {
   private _date: Transaction['date'] | null = null
   private _currency: Transaction['currency'] | null = null
   private _amount: Transaction['amount'] | null = null
-  private _taxes: Transaction['taxes'] = []
 
   public build(): Transaction {
     return Transaction.parse({
@@ -52,7 +50,6 @@ export class TransactionBuilder {
       date: this._date,
       currency: this._currency,
       amount: this._amount,
-      taxes: this._taxes,
     })
   }
 
@@ -98,16 +95,6 @@ export class TransactionBuilder {
 
   public amount(amount: Transaction['amount']): TransactionBuilder {
     this._amount = amount
-    return this
-  }
-
-  public taxes(taxes: Transaction['taxes']): TransactionBuilder {
-    this._taxes = taxes
-    return this
-  }
-
-  public tax(tax: Transaction['taxes'][number]): TransactionBuilder {
-    this._taxes.push(tax)
     return this
   }
 }
