@@ -1,5 +1,6 @@
 import { ArrowDownIcon, ArrowUpIcon } from '@heroicons/react/24/solid'
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import { me, suppliers, transactions } from '~/data'
 import { classNames } from '~/ui/class-names'
 import { Classified } from '~/ui/classified'
@@ -26,6 +27,10 @@ for (let transaction of transactions) {
 }
 
 export default function Page() {
+  if (suppliers.length === 0) {
+    return redirect('/')
+  }
+
   return (
     <I18NProvider
       value={{
