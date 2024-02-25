@@ -18,8 +18,12 @@ import { IncrementStrategy } from '~/domain/number-strategies'
 import { PaymentMethodBuilder } from '~/domain/payment-method/payment-method'
 import { Quote, QuoteBuilder } from '~/domain/quote/quote'
 import { Receipt, ReceiptBuilder } from '~/domain/receipt/receipt'
+import { isPaidRecord } from '~/domain/record/filters'
 import type { Record } from '~/domain/record/record'
+import { SupplierBuilder, type Supplier } from '~/domain/supplier/supplier'
 import { TaxBuilder } from '~/domain/tax/tax'
+import { TransactionBuilder, type Transaction } from '~/domain/transaction/transaction'
+import { total } from '~/ui/invoice/total'
 
 configure({
   quote: {
@@ -339,6 +343,8 @@ let Client2 = new ClientBuilder()
   .build()
 
 export let records: Record[] = []
+export let transactions: Transaction[] = []
+export let suppliers: Supplier[] = []
 
 // Single item invoice, fully paid, via partial payments
 records.push(
@@ -1070,9 +1076,85 @@ records.push(
     .build(),
 )
 
+// Create some custom milestones
 new MilestoneBuilder()
   .account(me)
   .title('Custom **milestones**, are `here`!')
   .description('Thank ~~me~~, **_you_**!')
   .achievedAt(inTheFuture())
   .build()
+
+// Track transactions and suppliers
+function findOrCreateSupplier(name: string) {
+  return (
+    suppliers.find((s) => {
+      return s.name === name
+    }) ?? suppliers[suppliers.push(new SupplierBuilder().account(me).name(name).build()) - 1]
+  )
+}
+
+// Create an example supplier
+suppliers.push(
+  new SupplierBuilder()
+    .account(me)
+    .name('amazon.com')
+    .nickname('Amazon')
+    .website('https://amazon.com')
+    .email('contact@amazon.com')
+    .phone('+1 234 567 890')
+    .address(
+      new AddressBuilder().street1('38 avenue John F. Kennedy').country('Luxembourg').build(),
+    )
+    .imageUrl('https://www.google.com/s2/favicons?domain=amazon.com&sz=48')
+    .build(),
+)
+
+// A new supplier
+transactions.push(
+  new TransactionBuilder()
+    .account(me)
+    .supplier(findOrCreateSupplier('My Bank'))
+    .category('Investments')
+    .summary('Bank')
+    .date(today())
+    .amount(-1000000)
+    .build(),
+)
+
+// 2 transactions for the same supplier
+transactions.push(
+  new TransactionBuilder()
+    .account(me)
+    .supplier(findOrCreateSupplier('amazon.com'))
+    .category('Office supplies')
+    .summary('Keyboard')
+    .date(today())
+    .amount(-14999)
+    .build(),
+)
+
+transactions.push(
+  new TransactionBuilder()
+    .account(me)
+    .supplier(findOrCreateSupplier('amazon.com'))
+    .category('Office supplies')
+    .summary('Mouse')
+    .date(today())
+    .amount(-9999)
+    .build(),
+)
+
+// Transaction where the supplier is a client
+{
+  let firstPaidRecord = records.find(isPaidRecord)!
+  transactions.push(
+    new TransactionBuilder()
+      .account(me)
+      .supplier(firstPaidRecord.client) // Pass in a client
+      .category('Income')
+      .summary(firstPaidRecord.number)
+      .date(today())
+      .amount(total(firstPaidRecord))
+      .build(),
+  )
+}
