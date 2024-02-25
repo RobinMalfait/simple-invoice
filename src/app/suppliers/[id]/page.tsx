@@ -1,12 +1,13 @@
 import { MapIcon } from '@heroicons/react/24/outline'
 import { redirect } from 'next/navigation'
-import { me, suppliers } from '~/data'
+import { transactions as allTransactions, me, suppliers } from '~/data'
 import { Address, formatAddress } from '~/ui/address/address'
 import { Avatar } from '~/ui/avatar'
 import { Card, CardBody, CardTitle, Field } from '~/ui/card'
 import { Classified } from '~/ui/classified'
 import { I18NProvider } from '~/ui/hooks/use-i18n'
 import { TimezoneDifference } from '~/ui/timezone-difference'
+import { TransactionsTable } from '~/ui/transaction/table'
 import { SupplierActivityFeed } from './activity-feed'
 
 export default async function Page({ params: { id } }: { params: { id: string } }) {
@@ -16,6 +17,9 @@ export default async function Page({ params: { id } }: { params: { id: string } 
   if (!supplier) {
     redirect('/')
   }
+  let transactions = allTransactions.filter((t) => {
+    return t.supplier.id === id
+  })
 
   return (
     <I18NProvider
@@ -106,6 +110,15 @@ export default async function Page({ params: { id } }: { params: { id: string } 
                 </div>
               </CardBody>
             </Card>
+
+            {transactions.length > 0 && (
+              <Card>
+                <CardTitle>Transactions</CardTitle>
+                <CardBody>
+                  <TransactionsTable transactions={transactions} />
+                </CardBody>
+              </Card>
+            )}
           </div>
 
           <div className="col-span-1 flex w-full flex-col gap-[inherit]">

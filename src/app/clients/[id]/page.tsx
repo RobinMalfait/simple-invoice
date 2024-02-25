@@ -3,7 +3,7 @@ import { MapIcon } from '@heroicons/react/24/outline'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { Fragment } from 'react'
-import { me, records } from '~/data'
+import { transactions as allTransactions, me, records } from '~/data'
 import { Invoice } from '~/domain/invoice/invoice'
 import { Quote } from '~/domain/quote/quote'
 import { Receipt } from '~/domain/receipt/receipt'
@@ -34,6 +34,7 @@ import { Markdown } from '~/ui/markdown'
 import { TinyRecord } from '~/ui/record/tiny-record'
 import { TotalsByStatus } from '~/ui/record/totals-by-status'
 import { TimezoneDifference } from '~/ui/timezone-difference'
+import { TransactionsTable } from '~/ui/transaction/table'
 import { ClientActivityFeed } from './activity-feed'
 
 type RecordTab<T extends Record> = {
@@ -58,6 +59,9 @@ export default async function Page({ params: { id } }: { params: { id: string } 
   }
   let recordsForClient = combined.filter((record) => {
     return record.client.id === id
+  })
+  let transactions = allTransactions.filter((t) => {
+    return t.supplier.id === id
   })
 
   let allRecords = separateRecords(records)
@@ -228,6 +232,15 @@ export default async function Page({ params: { id } }: { params: { id: string } 
                 <RecordTabs records={recordsForClient} tabs={tabs} />
               </CardBody>
             </Card>
+
+            {transactions.length > 0 && (
+              <Card>
+                <CardTitle>Transactions</CardTitle>
+                <CardBody>
+                  <TransactionsTable transactions={transactions} />
+                </CardBody>
+              </Card>
+            )}
           </div>
 
           <div className="col-span-1 flex w-full flex-col gap-[inherit]">
