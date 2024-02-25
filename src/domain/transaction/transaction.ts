@@ -4,8 +4,13 @@ import { z } from 'zod'
 import { Account } from '~/domain/account/account'
 import { Currency } from '~/domain/currency/currency'
 import { TransactionStatus } from '~/domain/transaction/transaction-status'
+import { total } from '~/ui/invoice/total'
 import { ScopedIDGenerator } from '~/utils/id'
 import { Client } from '../client/client'
+import { CreditNote } from '../credit-note/credit-note'
+import { Invoice } from '../invoice/invoice'
+import { Quote } from '../quote/quote'
+import { Receipt } from '../receipt/receipt'
 import { Supplier } from '../supplier/supplier'
 
 let scopedId = new ScopedIDGenerator('transaction')
@@ -20,6 +25,24 @@ export let Transaction = z.object({
   supplier: z.lazy(() => {
     return z.union([Supplier, Client])
   }),
+  record: z
+    .union([
+      z.lazy(() => {
+        return Quote
+      }),
+      z.lazy(() => {
+        return Invoice
+      }),
+      z.lazy(() => {
+        return CreditNote
+      }),
+      z.lazy(() => {
+        return Receipt
+      }),
+    ])
+    .optional()
+    .nullable()
+    .default(null),
   status: z.nativeEnum(TransactionStatus).default(TransactionStatus.Completed),
   summary: z.string().nullable(),
   category: z.string().nullable(),
@@ -33,6 +56,7 @@ export type Transaction = z.infer<typeof Transaction>
 export class TransactionBuilder {
   private _account: Transaction['account'] | null = null
   private _supplier: Transaction['supplier'] | null = null
+  private _record: Transaction['record'] | null = null
   private _status: Transaction['status'] = TransactionStatus.Completed
   private _summary: Transaction['summary'] | null = null
   private _category: Transaction['category'] | null = null
@@ -44,6 +68,7 @@ export class TransactionBuilder {
     return Transaction.parse({
       account: this._account,
       supplier: this._supplier,
+      record: this._record,
       status: this._status,
       summary: this._summary,
       category: this._category,
@@ -51,6 +76,15 @@ export class TransactionBuilder {
       currency: this._currency,
       amount: this._amount,
     })
+  }
+
+  static forRecord(record: NonNullable<Transaction['record']>): TransactionBuilder {
+    return new TransactionBuilder()
+      .account(record.account)
+      .supplier(record.client)
+      .record(record)
+      .summary(`Payment for ${record.type} #${record.number}`)
+      .amount(total(record))
   }
 
   public account(account: Transaction['account']): TransactionBuilder {
@@ -65,6 +99,11 @@ export class TransactionBuilder {
 
   public supplier(supplier: Transaction['supplier']): TransactionBuilder {
     this._supplier = supplier
+    return this
+  }
+
+  public record(record: Transaction['record']): TransactionBuilder {
+    this._record = record
     return this
   }
 

@@ -23,7 +23,6 @@ import type { Record } from '~/domain/record/record'
 import { SupplierBuilder, type Supplier } from '~/domain/supplier/supplier'
 import { TaxBuilder } from '~/domain/tax/tax'
 import { TransactionBuilder, type Transaction } from '~/domain/transaction/transaction'
-import { total } from '~/ui/invoice/total'
 
 configure({
   quote: {
@@ -1148,13 +1147,6 @@ transactions.push(
 {
   let firstPaidRecord = records.find(isPaidRecord)!
   transactions.push(
-    new TransactionBuilder()
-      .account(me)
-      .supplier(firstPaidRecord.client) // Pass in a client
-      .category('Income')
-      .summary(firstPaidRecord.number)
-      .date(today())
-      .amount(total(firstPaidRecord))
-      .build(),
+    TransactionBuilder.forRecord(firstPaidRecord).date(today()).category('Income').build(),
   )
 }
