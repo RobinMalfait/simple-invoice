@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter, Shadows_Into_Light } from 'next/font/google'
-import { events, me, records, stacks } from '~/data'
+import { events, me, records, stacks, suppliers, transactions } from '~/data'
 import { Account } from '~/domain/account/account'
 import { Client } from '~/domain/client/client'
 import { CreditNote } from '~/domain/credit-note/credit-note'
@@ -49,6 +49,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     me,
     records,
     stacks,
+
+    hasSuppliers: suppliers.length > 0,
+    hasTransactions: transactions.length > 0,
 
     clientById: records.map((r) => {
       return [r.client.id, r.client]
