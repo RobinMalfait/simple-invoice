@@ -58,9 +58,20 @@ export function TransactionsTable({ transactions }: { transactions: Transaction[
                     )}
                   </TableCell>
                   <TableCell>
-                    <Classified>
-                      {transaction.summary || <span className="text-sm">--</span>}
-                    </Classified>
+                    {transaction.record ? (
+                      <Link
+                        href={`/${transaction.record.type}/${transaction.record.number}`}
+                        className="underline"
+                      >
+                        <Classified>
+                          {transaction.summary || <span className="text-sm">--</span>}
+                        </Classified>
+                      </Link>
+                    ) : (
+                      <Classified>
+                        {transaction.summary || <span className="text-sm">--</span>}
+                      </Classified>
+                    )}
                   </TableCell>
                   <TableCell>
                     {transaction.category || <span className="text-sm">--</span>}
