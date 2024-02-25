@@ -1085,11 +1085,16 @@ new MilestoneBuilder()
 
 // Track transactions and suppliers
 function findOrCreateSupplier(name: string) {
-  return (
-    suppliers.find((s) => {
-      return s.name === name
-    }) ?? suppliers[suppliers.push(new SupplierBuilder().account(me).name(name).build()) - 1]
-  )
+  let supplier = suppliers.find((s) => {
+    return s.name === name
+  })
+
+  if (!supplier) {
+    supplier = new SupplierBuilder().account(me).name(name).build()
+    suppliers.push(supplier)
+  }
+
+  return supplier
 }
 
 // Create an example supplier
