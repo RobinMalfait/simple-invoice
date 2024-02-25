@@ -26,20 +26,9 @@ export let Transaction = z.object({
     return z.union([Supplier, Client])
   }),
   record: z
-    .union([
-      z.lazy(() => {
-        return Quote
-      }),
-      z.lazy(() => {
-        return Invoice
-      }),
-      z.lazy(() => {
-        return CreditNote
-      }),
-      z.lazy(() => {
-        return Receipt
-      }),
-    ])
+    .lazy(() => {
+      return z.union([Quote, Invoice, CreditNote, Receipt])
+    })
     .optional()
     .nullable()
     .default(null),
