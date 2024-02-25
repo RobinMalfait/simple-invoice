@@ -5,6 +5,7 @@ import { bus } from '~/domain/event-bus/bus'
 import { Event } from '~/domain/events/event'
 import { trackMilestones } from '~/domain/milestone/milestone'
 import { separateRecords, type Record } from '~/domain/record/record'
+import type { Supplier } from '~/domain/supplier/supplier'
 import { Transaction } from '~/domain/transaction/transaction'
 import { env } from '~/utils/env'
 
@@ -40,14 +41,8 @@ export let transactions: Transaction[] = (data.transactions ?? []).sort(
     return compareDesc(a.date, z.date)
   },
 )
-export let suppliers: string[] = Array.from(
-  new Set(
-    transactions.map((x) => {
-      return x.supplier
-    }),
-  ),
-).sort((a, z) => {
-  return a.localeCompare(z)
+export let suppliers: Supplier[] = (data.suppliers ?? []).sort((a: Supplier, z: Supplier) => {
+  return a.name.localeCompare(z.name)
 })
 
 // For each record in the system, we should be able to find all related records in either layers

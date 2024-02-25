@@ -27,7 +27,7 @@ export let Supplier = z.object({
   phone: z.string().nullable(),
   website: z.string().nullable(),
   imageUrl: z.string().nullable(),
-  address: Address,
+  address: z.optional(Address).nullable(),
   currency: z.nativeEnum(Currency),
   language: z.nativeEnum(Language),
   timezone: z.string(),
@@ -37,10 +37,12 @@ export type Supplier = z.infer<typeof Supplier>
 
 export class SupplierBuilder {
   private _id: Supplier['id'] | undefined = undefined
+  private _account: Supplier['account'] | null = null
   private _name: Supplier['name'] | null = null
   private _nickname: Contact['nickname'] | null = null
   private _email: Supplier['email'] | null = null
   private _phone: Supplier['phone'] | null = null
+  private _website: Supplier['website'] | null = null
   private _imageUrl: Supplier['imageUrl'] | null = null
   private _address: Supplier['address'] | null = null
   private _currency: Supplier['currency'] | null = Currency.EUR
@@ -58,10 +60,12 @@ export class SupplierBuilder {
   public build(): Supplier {
     let supplier = Supplier.parse({
       id: this._id,
+      account: this._account,
       name: this._name,
       nickname: this._nickname ?? this._name,
       email: this._email,
       phone: this._phone,
+      website: this._website,
       imageUrl: this._imageUrl,
       address: this._address,
       currency: this._currency,
@@ -86,10 +90,12 @@ export class SupplierBuilder {
 
   public static from(supplier: Supplier): SupplierBuilder {
     let builder = new SupplierBuilder()
+    builder._account = supplier.account
     builder._name = supplier.name
     builder._nickname = supplier.nickname
     builder._email = supplier.email
     builder._phone = supplier.phone
+    builder._website = supplier.website
     builder._imageUrl = supplier.imageUrl
     builder._address = supplier.address
     builder._currency = supplier.currency
@@ -106,6 +112,20 @@ export class SupplierBuilder {
         mutator(builder)
       }).build(),
     )
+  }
+
+  public account(account: Supplier['account']): SupplierBuilder {
+    this._account = account
+
+    if (this._currency === null) {
+      this._currency = account.currency
+    }
+
+    if (this._language === null) {
+      this._language = account.language
+    }
+
+    return this
   }
 
   public name(name: Supplier['name']): SupplierBuilder {
@@ -125,6 +145,11 @@ export class SupplierBuilder {
 
   public phone(phone: Supplier['phone']): SupplierBuilder {
     this._phone = phone
+    return this
+  }
+
+  public website(website: Supplier['website']): SupplierBuilder {
+    this._website = website
     return this
   }
 

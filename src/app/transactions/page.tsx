@@ -1,4 +1,5 @@
 import { compareDesc, format } from 'date-fns'
+import Link from 'next/link'
 import { me, transactions } from '~/data'
 import { classNames } from '~/ui/class-names'
 import { Classified } from '~/ui/classified'
@@ -41,7 +42,9 @@ export default function Page() {
                   <TableRow>
                     <TableCell>{format(transaction.date, 'yyyy-MM-dd')}</TableCell>
                     <TableCell>
-                      <Classified>{transaction.supplier}</Classified>
+                      <Link href={`/suppliers/${transaction.supplier.id}`}>
+                        <Classified>{transaction.supplier.nickname}</Classified>
+                      </Link>
                     </TableCell>
                     <TableCell>
                       <Classified>
