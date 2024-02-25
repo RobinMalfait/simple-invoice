@@ -62,26 +62,26 @@ export default function Page() {
                 >
                   <Classified>{supplier.nickname}</Classified>
                 </span>
-                <div
-                  className={classNames(
-                    'grid grid-cols-[auto,1fr] gap-x-4 p-4',
-                    data.income === 0 && 'grayscale',
-                  )}
-                >
+                <div className={'grid grid-cols-[auto,1fr] gap-x-4 p-4'}>
                   <span className="row-span-2">
-                    <ArrowUpIcon className="h-5 w-5 text-green-500" />
+                    <ArrowUpIcon
+                      className={classNames(
+                        'h-5 w-5 text-green-500',
+                        data.income === 0 && 'grayscale',
+                      )}
+                    />
                   </span>
                   <Money amount={data.income} />
                   <span className="text-xs text-zinc-400">Income</span>
                 </div>
-                <div
-                  className={classNames(
-                    'grid grid-cols-[auto,1fr] gap-x-4 p-4',
-                    data.expense === 0 && 'grayscale',
-                  )}
-                >
+                <div className="grid grid-cols-[auto,1fr] gap-x-4 p-4">
                   <span className="row-span-2">
-                    <ArrowDownIcon className="h-5 w-5 text-red-500" />
+                    <ArrowDownIcon
+                      className={classNames(
+                        'h-5 w-5 text-red-500',
+                        data.expense === 0 && 'grayscale',
+                      )}
+                    />
                   </span>
                   <Money amount={data.expense} />
                   <span className="text-xs text-zinc-400">Expense</span>
