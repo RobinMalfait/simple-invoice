@@ -1,4 +1,5 @@
 import { addDays, startOfToday, subMonths } from 'date-fns'
+import path from 'node:path'
 import { Account, AccountBuilder } from '~/domain/account/account'
 import { AddressBuilder } from '~/domain/address/address'
 import { ClientBuilder } from '~/domain/client/client'
@@ -22,6 +23,7 @@ import { isPaidRecord } from '~/domain/record/filters'
 import type { Record } from '~/domain/record/record'
 import { SupplierBuilder, type Supplier } from '~/domain/supplier/supplier'
 import { TaxBuilder } from '~/domain/tax/tax'
+import { parseTransactions } from '~/domain/transaction/import/import'
 import { TransactionBuilder, type Transaction } from '~/domain/transaction/transaction'
 
 configure({
@@ -1154,4 +1156,15 @@ transactions.push(
   transactions.push(
     TransactionBuilder.forRecord(firstPaidRecord).date(today()).category('Income').build(),
   )
+}
+
+// Transactions imported from a CSV file
+let parsedTransactions = parseTransactions(
+  path.resolve(process.cwd(), 'src/data/transactions/example.csv'),
+  (builder, record) => {
+    builder.account(me).supplier(findOrCreateSupplier(record.supplier))
+  },
+)
+for (let transaction of parsedTransactions) {
+  transactions.push(transaction)
 }
