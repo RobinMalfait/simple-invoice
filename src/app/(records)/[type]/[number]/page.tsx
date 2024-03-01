@@ -120,7 +120,7 @@ export default async function Invoice({
                 <span className="text-sm font-medium text-gray-900 dark:text-gray-300">
                   Transactions
                 </span>
-                <TransactionsTable transactions={transactions} />
+                <TransactionsTable viewContext="supplier" transactions={transactions} />
               </div>
             )}
 

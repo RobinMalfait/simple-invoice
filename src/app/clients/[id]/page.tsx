@@ -237,7 +237,7 @@ export default async function Page({ params: { id } }: { params: { id: string } 
               <Card>
                 <CardTitle>Transactions</CardTitle>
                 <CardBody>
-                  <TransactionsTable transactions={transactions} />
+                  <TransactionsTable viewContext="supplier" transactions={transactions} />
                 </CardBody>
               </Card>
             )}

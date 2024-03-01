@@ -11,13 +11,19 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '~
 import { StatusDisplay } from '~/ui/transaction/status'
 import { match } from '~/utils/match'
 
-export function TransactionsTable({ transactions }: { transactions: Transaction[] }) {
+export function TransactionsTable({
+  viewContext = 'transaction',
+  transactions,
+}: {
+  viewContext?: 'transaction' | 'supplier'
+  transactions: Transaction[]
+}) {
   return (
     <Table>
       <TableHead>
         <TableRow>
           <TableHeader>Date</TableHeader>
-          <TableHeader>Supplier</TableHeader>
+          {viewContext === 'transaction' && <TableHeader>Supplier</TableHeader>}
           <TableHeader>Summary</TableHeader>
           <TableHeader>Category</TableHeader>
           <TableHeader className="text-right">Amount</TableHeader>
@@ -35,28 +41,30 @@ export function TransactionsTable({ transactions }: { transactions: Transaction[
               <I18NPartialProvider key={transaction.id} value={{ currency: transaction.currency }}>
                 <TableRow>
                   <TableCell>{format(transaction.date, 'yyyy-MM-dd')}</TableCell>
-                  <TableCell>
-                    {match(
-                      transaction.supplier.kind,
-                      {
-                        client(x: Client) {
-                          return (
-                            <Link href={`/clients/${x.id}`}>
-                              <Classified>{x.nickname}</Classified>
-                            </Link>
-                          )
+                  {viewContext === 'transaction' && (
+                    <TableCell>
+                      {match(
+                        transaction.supplier.kind,
+                        {
+                          client(x: Client) {
+                            return (
+                              <Link href={`/clients/${x.id}`}>
+                                <Classified>{x.nickname}</Classified>
+                              </Link>
+                            )
+                          },
+                          supplier(x: Supplier) {
+                            return (
+                              <Link href={`/suppliers/${x.id}`}>
+                                <Classified>{x.nickname}</Classified>
+                              </Link>
+                            )
+                          },
                         },
-                        supplier(x: Supplier) {
-                          return (
-                            <Link href={`/suppliers/${x.id}`}>
-                              <Classified>{x.nickname}</Classified>
-                            </Link>
-                          )
-                        },
-                      },
-                      transaction.supplier,
-                    )}
-                  </TableCell>
+                        transaction.supplier,
+                      )}
+                    </TableCell>
+                  )}
                   <TableCell>
                     {transaction.record ? (
                       <Link
