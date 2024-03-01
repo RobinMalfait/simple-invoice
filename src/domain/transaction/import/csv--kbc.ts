@@ -1,4 +1,7 @@
+// KBC
+
 import { parse } from 'date-fns'
+import fs from 'fs'
 import { Currency } from '~/domain/currency/currency'
 import { csv } from '~/domain/transaction/import/utils'
 import { Transaction, TransactionBuilder } from '~/domain/transaction/transaction'
@@ -39,18 +42,17 @@ let normalizers: {
   },
 }
 
-export function kbc(
+export function handle(
   filepath: string,
   transform: (builder: TransactionBuilder, normalized: ReturnType<typeof normalize>) => void,
 ): Transaction[] {
-  return csv(filepath, (record) => {
+  return csv(read(filepath), (record) => {
     let builder = new TransactionBuilder()
     let normalized = normalize(record)
 
     builder
       .amount(normalized.amount)
       .date(normalized.date)
-      .supplier(normalized.supplier)
       .currency(normalized.currency)
       .summary(normalized.summary)
 
@@ -60,7 +62,7 @@ export function kbc(
   })
 }
 
-function parseDescription(input: string) {
+function parseDescription(input: string = '') {
   if (input.startsWith('AFREKENING')) {
     return {
       summary: null,
@@ -123,4 +125,40 @@ function normalize(raw: any) {
     ),
     { raw },
   ) as { raw: any } & { [K in keyof typeof normalizers]: ReturnType<(typeof normalizers)[K]> }
+}
+
+function read(filepath: string) {
+  return fs.readFileSync(filepath, 'latin1')
+}
+
+export function check(filepath: string) {
+  let valid = false
+
+  csv(read(filepath), (record) => {
+    if ('kredietkaart' in record) {
+      for (let field of ['bedrag in EUR', 'Datum verrekening', 'Handelaar', 'toelichting']) {
+        if (!(field in record)) {
+          return
+        }
+      }
+    } else {
+      for (let field of [
+        'Bedrag',
+        'Datum',
+        'Naam tegenpartij',
+        'Munt',
+        'Vrije mededeling',
+        'Omschrijving',
+      ]) {
+        if (!(field in record)) {
+          return
+        }
+      }
+    }
+
+    valid = true
+    return
+  })
+
+  return valid
 }
