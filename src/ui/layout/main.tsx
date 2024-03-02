@@ -2,6 +2,7 @@
 
 import {
   ArrowDownTrayIcon,
+  BuildingStorefrontIcon,
   CalculatorIcon,
   CubeIcon,
   DocumentCheckIcon,
@@ -11,6 +12,7 @@ import {
   EyeSlashIcon,
   HomeIcon,
   RectangleStackIcon,
+  TicketIcon,
   UserGroupIcon,
   UserIcon,
 } from '@heroicons/react/24/outline'
@@ -37,6 +39,23 @@ import { RecordStacksProvider } from '~/ui/hooks/use-record-stacks'
 import { RecordsProvider } from '~/ui/hooks/use-records'
 import { match } from '~/utils/match'
 
+type Data = {
+  me: Account
+  records: Record[]
+  events: Event[]
+  stacks: { [id: string]: string[] }
+
+  hasTransactions: boolean
+  hasSuppliers: boolean
+
+  clientById: [string, Client][]
+  accountById: [string, Account][]
+  quoteById: [string, Quote][]
+  creditNoteById: [string, CreditNote][]
+  invoiceById: [string, Invoice][]
+  receiptById: [string, Receipt][]
+}
+
 type Navigation = {
   name: string
   icon: typeof HomeIcon
@@ -44,6 +63,7 @@ type Navigation = {
   exact?: boolean
   record?: 'quote' | 'invoice' | 'credit-note' | 'receipt'
   children?: Navigation[]
+  allowed?: (data: Data) => boolean
 }
 
 let navigation: Navigation[] = [
@@ -74,6 +94,22 @@ let navigation: Navigation[] = [
       { name: 'Receipts', icon: DocumentCheckIcon, href: '/receipt', record: 'receipt' },
     ],
   },
+  {
+    name: 'Transactions',
+    icon: TicketIcon,
+    href: '/transactions',
+    allowed: (data) => {
+      return data.hasTransactions
+    },
+  },
+  {
+    name: 'Suppliers',
+    icon: BuildingStorefrontIcon,
+    href: '/suppliers',
+    allowed: (data) => {
+      return data.hasSuppliers
+    },
+  },
 ]
 
 export default function Layout({
@@ -81,19 +117,7 @@ export default function Layout({
   data,
   config,
 }: React.PropsWithChildren<{
-  data: {
-    me: Account
-    records: Record[]
-    events: Event[]
-    stacks: { [id: string]: string[] }
-
-    clientById: [string, Client][]
-    accountById: [string, Account][]
-    quoteById: [string, Quote][]
-    creditNoteById: [string, CreditNote][]
-    invoiceById: [string, Invoice][]
-    receiptById: [string, Receipt][]
-  }
+  data: Data
   config: DB
 }>) {
   let router = useRouter()
@@ -164,111 +188,119 @@ export default function Layout({
                       <ul role="list" className="flex flex-1 flex-col gap-y-7">
                         <li>
                           <ul role="list" className="-mx-2 space-y-1">
-                            {navigation.map((item) => {
-                              return (
-                                <li key={item.name} className="relative">
-                                  {isActive(item) && (
-                                    <motion.div
-                                      layout
-                                      layoutId="active-indicator"
-                                      className="absolute -left-4 top-1 flex items-center"
-                                    >
-                                      <div className="h-8 w-1.5 rounded-r-md bg-white/90" />
-                                    </motion.div>
-                                  )}
-
-                                  <Link
-                                    href={item.href}
-                                    className={classNames(
-                                      isActive(item)
-                                        ? 'bg-zinc-700 text-white'
-                                        : 'text-gray-400 hover:bg-zinc-700 hover:text-white',
-                                      'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6',
-                                      config.ui.sidebar === 'small' && 'justify-center',
+                            {navigation
+                              .filter((item) => {
+                                return item.allowed?.(data) ?? true
+                              })
+                              .map((item) => {
+                                return (
+                                  <li key={item.name} className="relative">
+                                    {isActive(item) && (
+                                      <motion.div
+                                        layout
+                                        layoutId="active-indicator"
+                                        className="absolute -left-4 top-1 flex items-center"
+                                      >
+                                        <div className="h-8 w-1.5 rounded-r-md bg-white/90" />
+                                      </motion.div>
                                     )}
-                                  >
-                                    <item.icon className="h-6 w-6 shrink-0" aria-hidden="true" />
-                                    {config.ui.sidebar === 'large' && <>{item.name}</>}
-                                  </Link>
-                                  {item.children && (
-                                    <ul
+
+                                    <Link
+                                      href={item.href}
                                       className={classNames(
-                                        'space-y-1 py-1',
-                                        config.ui.sidebar === 'large' && 'ml-8',
+                                        isActive(item)
+                                          ? 'bg-zinc-700 text-white'
+                                          : 'text-gray-400 hover:bg-zinc-700 hover:text-white',
+                                        'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6',
+                                        config.ui.sidebar === 'small' && 'justify-center',
                                       )}
                                     >
-                                      {item.children
-                                        .filter((item) => {
-                                          if (!item.record) {
-                                            return true
-                                          }
-
-                                          return data.records.some((record) => {
-                                            return record.type === item.record
+                                      <item.icon className="h-6 w-6 shrink-0" aria-hidden="true" />
+                                      {config.ui.sidebar === 'large' && <>{item.name}</>}
+                                    </Link>
+                                    {item.children && (
+                                      <ul
+                                        className={classNames(
+                                          'space-y-1 py-1',
+                                          config.ui.sidebar === 'large' && 'ml-8',
+                                        )}
+                                      >
+                                        {item.children
+                                          .filter((item) => {
+                                            return item.allowed?.(data) ?? true
                                           })
-                                        })
-                                        .map((item) => {
-                                          let attentionCount = item.record
-                                            ? data.records.filter((record) => {
-                                                return (
-                                                  record.type === item.record &&
-                                                  recordHasWarning(record)
-                                                )
-                                              }).length
-                                            : 0
+                                          .filter((item) => {
+                                            if (!item.record) {
+                                              return true
+                                            }
 
-                                          return (
-                                            <li key={item.name} className="relative">
-                                              {isActive(item) && (
-                                                <motion.div
-                                                  layout
-                                                  layoutId="active-indicator"
+                                            return data.records.some((record) => {
+                                              return record.type === item.record
+                                            })
+                                          })
+                                          .map((item) => {
+                                            let attentionCount = item.record
+                                              ? data.records.filter((record) => {
+                                                  return (
+                                                    record.type === item.record &&
+                                                    recordHasWarning(record)
+                                                  )
+                                                }).length
+                                              : 0
+
+                                            return (
+                                              <li key={item.name} className="relative">
+                                                {isActive(item) && (
+                                                  <motion.div
+                                                    layout
+                                                    layoutId="active-indicator"
+                                                    className={classNames(
+                                                      'absolute top-1 flex items-center',
+                                                      config.ui.sidebar === 'small'
+                                                        ? '-left-4'
+                                                        : '-left-12',
+                                                    )}
+                                                  >
+                                                    <div className="h-8 w-1.5 rounded-r-md bg-white/90" />
+                                                  </motion.div>
+                                                )}
+
+                                                <Link
+                                                  href={item.href}
                                                   className={classNames(
-                                                    'absolute top-1 flex items-center',
-                                                    config.ui.sidebar === 'small'
-                                                      ? '-left-4'
-                                                      : '-left-12',
+                                                    isActive(item)
+                                                      ? 'bg-zinc-700 text-white'
+                                                      : 'text-gray-400 hover:bg-zinc-700 hover:text-white',
+                                                    'group relative flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6',
+                                                    config.ui.sidebar === 'small' &&
+                                                      'justify-center',
                                                   )}
                                                 >
-                                                  <div className="h-8 w-1.5 rounded-r-md bg-white/90" />
-                                                </motion.div>
-                                              )}
-
-                                              <Link
-                                                href={item.href}
-                                                className={classNames(
-                                                  isActive(item)
-                                                    ? 'bg-zinc-700 text-white'
-                                                    : 'text-gray-400 hover:bg-zinc-700 hover:text-white',
-                                                  'group relative flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6',
-                                                  config.ui.sidebar === 'small' && 'justify-center',
-                                                )}
-                                              >
-                                                <item.icon
-                                                  className="h-6 w-6 shrink-0"
-                                                  aria-hidden="true"
-                                                />
-                                                {config.ui.sidebar === 'large' && (
-                                                  <>
-                                                    {item.name}
-                                                    {attentionCount > 0 && (
-                                                      <div className="absolute right-4 top-1/2 z-50 -translate-y-1/2">
-                                                        <span className="inline-flex items-center gap-3 rounded-md bg-red-400/10 px-3 py-1 text-xs font-medium text-red-200 ring-1 ring-inset ring-red-400/50">
-                                                          {attentionCount}
-                                                        </span>
-                                                      </div>
-                                                    )}
-                                                  </>
-                                                )}
-                                              </Link>
-                                            </li>
-                                          )
-                                        })}
-                                    </ul>
-                                  )}
-                                </li>
-                              )
-                            })}
+                                                  <item.icon
+                                                    className="h-6 w-6 shrink-0"
+                                                    aria-hidden="true"
+                                                  />
+                                                  {config.ui.sidebar === 'large' && (
+                                                    <>
+                                                      {item.name}
+                                                      {attentionCount > 0 && (
+                                                        <div className="absolute right-4 top-1/2 z-50 -translate-y-1/2">
+                                                          <span className="inline-flex items-center gap-3 rounded-md bg-red-400/10 px-3 py-1 text-xs font-medium text-red-200 ring-1 ring-inset ring-red-400/50">
+                                                            {attentionCount}
+                                                          </span>
+                                                        </div>
+                                                      )}
+                                                    </>
+                                                  )}
+                                                </Link>
+                                              </li>
+                                            )
+                                          })}
+                                      </ul>
+                                    )}
+                                  </li>
+                                )
+                              })}
                           </ul>
                         </li>
                         <li className="mt-auto">
@@ -381,24 +413,31 @@ export default function Layout({
 
                 {/* Generic sections */}
                 <Group title="Quick links">
-                  {navigation.map((item) => {
-                    return (
-                      <Fragment key={item.href}>
-                        <Action
-                          invoke={() => {
-                            return router.push(item.href)
-                          }}
-                          icon={item.icon}
-                          search={item.name}
-                        >
-                          {item.name}
-                        </Action>
-                      </Fragment>
-                    )
-                  })}
+                  {navigation
+                    .filter((item) => {
+                      return item.allowed?.(data) ?? true
+                    })
+                    .map((item) => {
+                      return (
+                        <Fragment key={item.href}>
+                          <Action
+                            invoke={() => {
+                              return router.push(item.href)
+                            }}
+                            icon={item.icon}
+                            search={item.name}
+                          >
+                            {item.name}
+                          </Action>
+                        </Fragment>
+                      )
+                    })}
                 </Group>
 
                 {navigation
+                  .filter((item) => {
+                    return item.allowed?.(data) ?? true
+                  })
                   .filter((item) => {
                     return item.children
                   })
@@ -407,6 +446,9 @@ export default function Layout({
                       <Group key={item.href} title={item.name}>
                         {item
                           .children!.filter((item) => {
+                            return item.allowed?.(data) ?? true
+                          })
+                          .filter((item) => {
                             if (!item.record) {
                               return true
                             }

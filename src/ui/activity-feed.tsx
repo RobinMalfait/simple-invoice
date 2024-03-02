@@ -57,7 +57,7 @@ type MappedEvent = {
   isLast: boolean
 }
 
-export let ViewContext = createContext<'account' | 'client' | 'record'>('account')
+export let ViewContext = createContext<'account' | 'client' | 'record' | 'supplier'>('account')
 
 export function ActivityFeed({
   events,

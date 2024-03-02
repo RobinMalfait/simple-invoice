@@ -16,6 +16,7 @@ import { tap } from '~/utils/tap'
 let scopedId = new ScopedIDGenerator('client')
 
 export let Client = z.object({
+  kind: z.literal('client').default('client'),
   id: z.string().default(() => {
     return scopedId.next()
   }),

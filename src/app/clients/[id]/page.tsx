@@ -3,7 +3,7 @@ import { MapIcon } from '@heroicons/react/24/outline'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { Fragment } from 'react'
-import { me, records } from '~/data'
+import { transactions as allTransactions, me, records } from '~/data'
 import { Invoice } from '~/domain/invoice/invoice'
 import { Quote } from '~/domain/quote/quote'
 import { Receipt } from '~/domain/receipt/receipt'
@@ -34,6 +34,7 @@ import { Markdown } from '~/ui/markdown'
 import { TinyRecord } from '~/ui/record/tiny-record'
 import { TotalsByStatus } from '~/ui/record/totals-by-status'
 import { TimezoneDifference } from '~/ui/timezone-difference'
+import { TransactionsTable } from '~/ui/transaction/table'
 import { ClientActivityFeed } from './activity-feed'
 
 type RecordTab<T extends Record> = {
@@ -58,6 +59,9 @@ export default async function Page({ params: { id } }: { params: { id: string } 
   }
   let recordsForClient = combined.filter((record) => {
     return record.client.id === id
+  })
+  let transactions = allTransactions.filter((t) => {
+    return t.supplier.id === id
   })
 
   let allRecords = separateRecords(records)
@@ -228,55 +232,66 @@ export default async function Page({ params: { id } }: { params: { id: string } 
                 <RecordTabs records={recordsForClient} tabs={tabs} />
               </CardBody>
             </Card>
+
+            {transactions.length > 0 && (
+              <Card>
+                <CardTitle>Transactions</CardTitle>
+                <CardBody>
+                  <TransactionsTable viewContext="supplier" transactions={transactions} />
+                </CardBody>
+              </Card>
+            )}
           </div>
 
           <div className="col-span-1 flex w-full flex-col gap-[inherit]">
             {client.contacts.length > 0 && (
-              <Card>
-                <CardTitle>Contacts</CardTitle>
-                <CardBody>
-                  <ul className="flex flex-col divide-y divide-gray-100 dark:divide-zinc-800">
-                    {client.contacts.map((contact) => {
-                      let fields = [
-                        contact.nickname !== contact.name ? contact.nickname : null,
-                        contact.phone,
-                        contact.email,
-                      ].filter(Boolean)
+              <div>
+                <Card>
+                  <CardTitle>Contacts</CardTitle>
+                  <CardBody>
+                    <ul className="flex flex-col divide-y divide-gray-100 dark:divide-zinc-800">
+                      {client.contacts.map((contact) => {
+                        let fields = [
+                          contact.nickname !== contact.name ? contact.nickname : null,
+                          contact.phone,
+                          contact.email,
+                        ].filter(Boolean)
 
-                      return (
-                        <li key={contact.id} className="py-2 first:pt-0 last:pb-0">
-                          <div className="flex items-center gap-4">
-                            <Avatar size="sm" url={contact.imageUrl} name={contact.name} />
-                            <div className="flex w-full flex-col justify-center">
-                              <div className="flex w-full items-center justify-between gap-2">
-                                <span className="flex flex-col">{contact.name}</span>
-                                {contact.role && (
-                                  <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10 dark:bg-blue-400/10 dark:text-blue-400 dark:ring-blue-400/30 ">
-                                    {contact.role}
-                                  </span>
-                                )}
-                              </div>
-                              <div className="flex items-center gap-2">
-                                {fields.map((field, idx) => {
-                                  return (
-                                    <Fragment key={idx}>
-                                      {idx !== 0 && <span>&middot;</span>}
+                        return (
+                          <li key={contact.id} className="py-2 first:pt-0 last:pb-0">
+                            <div className="flex items-center gap-4">
+                              <Avatar size="sm" url={contact.imageUrl} name={contact.name} />
+                              <div className="flex w-full flex-col justify-center">
+                                <div className="flex w-full items-center justify-between gap-2">
+                                  <span className="flex flex-col">{contact.name}</span>
+                                  {contact.role && (
+                                    <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10 dark:bg-blue-400/10 dark:text-blue-400 dark:ring-blue-400/30 ">
+                                      {contact.role}
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  {fields.map((field, idx) => {
+                                    return (
+                                      <Fragment key={idx}>
+                                        {idx !== 0 && <span>&middot;</span>}
 
-                                      <div className="select-all text-xs">
-                                        <Classified>{field}</Classified>
-                                      </div>
-                                    </Fragment>
-                                  )
-                                })}
+                                        <div className="select-all text-xs">
+                                          <Classified>{field}</Classified>
+                                        </div>
+                                      </Fragment>
+                                    )
+                                  })}
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        </li>
-                      )
-                    })}
-                  </ul>
-                </CardBody>
-              </Card>
+                          </li>
+                        )
+                      })}
+                    </ul>
+                  </CardBody>
+                </Card>
+              </div>
             )}
 
             <div>

@@ -6,6 +6,7 @@ import { z } from 'zod'
 import { Account } from '~/domain/account/account'
 import { Client } from '~/domain/client/client'
 import { config } from '~/domain/configuration/configuration'
+import { CreditNoteBuilder } from '~/domain/credit-note/credit-note'
 import { Discount } from '~/domain/discount/discount'
 import { Document } from '~/domain/document/document'
 import { bus as defaultBus } from '~/domain/event-bus/bus'
@@ -17,7 +18,6 @@ import { QuoteStatus } from '~/domain/quote/quote-status'
 import type { DeepPartial } from '~/types/shared'
 import { total } from '~/ui/invoice/total'
 import { ScopedIDGenerator } from '~/utils/id'
-import { CreditNoteBuilder } from '../credit-note/credit-note'
 
 let scopedId = new ScopedIDGenerator('invoice')
 

@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import { clients, records } from '~/data'
 import { isQuote } from '~/domain/record/filters'
 import { combineRecords } from '~/domain/record/record'
@@ -6,6 +7,10 @@ import { Avatar } from '~/ui/avatar'
 import { Classified } from '~/ui/classified'
 
 export default async function Page() {
+  if (clients.length === 0) {
+    return redirect('/')
+  }
+
   let combined = combineRecords(records)
   let recordCountByClientId = combined.reduce(
     (acc, record) => {

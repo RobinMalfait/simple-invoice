@@ -5,6 +5,7 @@ import { Account } from '~/domain/account/account'
 import { Client } from '~/domain/client/client'
 import { Event } from '~/domain/events/event'
 import type { Record } from '~/domain/record/record'
+import type { Supplier } from '~/domain/supplier/supplier'
 import { match } from '~/utils/match'
 
 let Context = createContext<Event[]>([])
@@ -58,6 +59,25 @@ export function useEventsForClient(client: Client) {
       (x.tags.includes('client') || x.tags.includes('milestone')) &&
       'clientId' in x.context &&
       x.context.clientId === client.id
+    )
+  })
+}
+
+export function useEventsForSupplier(supplier: Supplier) {
+  let events = useContext(Context)
+  if (events === null) {
+    let err = new Error(
+      'useEventsForSupplier() is used, but there is no parent <EventsProvider /> found.',
+    )
+    if (Error.captureStackTrace) Error.captureStackTrace(err, useEventsBy)
+    throw err
+  }
+
+  return events.filter((x) => {
+    return (
+      (x.tags.includes('supplier') || x.tags.includes('milestone')) &&
+      'supplierId' in x.context &&
+      x.context.supplierId === supplier.id
     )
   })
 }

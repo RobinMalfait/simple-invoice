@@ -2,7 +2,7 @@ import { ExclamationTriangleIcon } from '@heroicons/react/20/solid'
 import { EyeIcon } from '@heroicons/react/24/outline'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { me, records } from '~/data'
+import { transactions as allTransactions, me, records } from '~/data'
 import { CreditNote as CreditNoteType } from '~/domain/credit-note/credit-note'
 import { Invoice as InvoiceType } from '~/domain/invoice/invoice'
 import { Quote as QuoteType } from '~/domain/quote/quote'
@@ -14,6 +14,7 @@ import { AttachmentList } from '~/ui/invoice/attachment-list'
 import { Invoice as InvoicePreview } from '~/ui/invoice/design'
 import { total } from '~/ui/invoice/total'
 import { Money } from '~/ui/money'
+import { TransactionsTable } from '~/ui/transaction/table'
 import { match } from '~/utils/match'
 import { loadTemplateList } from './actions'
 import { Actions } from './components'
@@ -32,6 +33,9 @@ export default async function Invoice({
   }
 
   let templates = await loadTemplateList(record)
+  let transactions = allTransactions.filter((t) => {
+    return t.record?.id === record?.id
+  })
 
   return (
     <div className="flex h-full flex-1 overflow-hidden [--spacing:theme(spacing.8)]">
@@ -108,6 +112,15 @@ export default async function Invoice({
                   Attachments
                 </span>
                 <AttachmentList />
+              </div>
+            )}
+
+            {transactions.length > 0 && (
+              <div className="flex flex-col gap-4 rounded-lg bg-white p-4 shadow ring-1 ring-black/5 dark:bg-zinc-900 dark:text-gray-300">
+                <span className="text-sm font-medium text-gray-900 dark:text-gray-300">
+                  Transactions
+                </span>
+                <TransactionsTable viewContext="supplier" transactions={transactions} />
               </div>
             )}
 
