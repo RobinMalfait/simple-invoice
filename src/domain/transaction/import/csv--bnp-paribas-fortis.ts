@@ -72,6 +72,21 @@ function parseDescription(input: string) {
       supplier:
         /BETALING MET .* XXXX \d{4} (.*?) \d{2}\/\d{2}\/\d{4}/.exec(input)?.[1].trim() ?? null,
     }
+  } else if (input.startsWith('GELDOPNEMING')) {
+    return {
+      summary: /GELDOPNEMING (.*?) NUMMER/g?.exec(input)?.[1].trim() ?? null,
+      supplier: 'Geldopneming',
+    }
+  } else if (/BIJDRAGE/.test(input)) {
+    return {
+      summary: /BIJDRAGE (.*?) BANKREFERENTIE/.exec(input)?.[1].trim() ?? null,
+      supplier: 'Bijdrage',
+    }
+  } else if (/BETALING AAN/.test(input)) {
+    return {
+      summary: /(BETALING AAN .*?) : /.exec(input)?.[1].trim() ?? null,
+      supplier: /BETALING AAN (.*?) : /.exec(input)?.[1].trim() ?? null,
+    }
   } else {
     console.log('Could not parse description:', { description: input })
     return {
