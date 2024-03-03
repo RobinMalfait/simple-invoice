@@ -67,8 +67,11 @@ function parseDescription(input: string) {
       supplier: /VIA MOBILE BANKING (.*) MEDEDELING/.exec(input)?.[1].trim() ?? null,
     }
   } else {
-    console.log('-->', { input })
-    throw new Error('Not implemented yet.')
+    console.log('Could not parse description:', { description: input })
+    return {
+      summary: input,
+      supplier: null,
+    }
   }
 }
 
