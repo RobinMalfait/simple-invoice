@@ -87,6 +87,11 @@ function parseDescription(input: string) {
       summary: /(BETALING AAN .*?) : /.exec(input)?.[1].trim() ?? null,
       supplier: /BETALING AAN (.*?) : /.exec(input)?.[1].trim() ?? null,
     }
+  } else if (/INSTANTOVERSCHRIJVING/.test(input)) {
+    return {
+      summary: /INSTANTOVERSCHRIJVING (.*?) BANKREFERENTIE/.exec(input)?.[1].trim() ?? null,
+      supplier: /BIC \w* (\w* \w*)/.exec(input)?.[1].trim() ?? null,
+    }
   } else {
     console.log('Could not parse description:', { description: input })
     return {
