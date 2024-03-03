@@ -66,6 +66,12 @@ function parseDescription(input: string) {
       summary: /MEDEDELING : (.*) BANKREFERENTIE/.exec(input)?.[1].trim() ?? null,
       supplier: /VIA MOBILE BANKING (.*) MEDEDELING/.exec(input)?.[1].trim() ?? null,
     }
+  } else if (input.startsWith('BETALING MET')) {
+    return {
+      summary: null,
+      supplier:
+        /BETALING MET .* XXXX \d{4} (.*?) \d{2}\/\d{2}\/\d{4}/.exec(input)?.[1].trim() ?? null,
+    }
   } else {
     console.log('Could not parse description:', { description: input })
     return {
