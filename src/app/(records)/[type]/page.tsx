@@ -13,13 +13,14 @@ import { Empty } from '~/ui/empty'
 import { I18NProvider } from '~/ui/hooks/use-i18n'
 import { TinyRecord } from '~/ui/record/tiny-record'
 import { TotalsByStatus } from '~/ui/record/totals-by-status'
+import { DefaultMap } from '~/utils/default-map'
 import { match } from '~/utils/match'
 
 function titleForQuarter(date: Date) {
   return [format(date, 'QQQ'), format(date, 'y')].join(' • ')
 }
 
-function groupByQuarter(records: Record[]) {
+function groupRecords(records: Record[]) {
   return Array.from(
     records
       .sort((a, z) => {
@@ -30,29 +31,37 @@ function groupByQuarter(records: Record[]) {
       })
 
       // Group by quarter & year
-      .reduce((acc, record) => {
-        let key = match(
-          record.type,
-          {
-            quote: (r: Quote) => {
-              return titleForQuarter(r.quoteDate)
+      .reduce(
+        (acc, record) => {
+          let [year, key] = match(
+            record.type,
+            {
+              quote: (r: Quote) => {
+                return [format(r.quoteDate, 'y'), titleForQuarter(r.quoteDate)] as const
+              },
+              invoice: (r: Invoice) => {
+                return [format(r.issueDate, 'y'), titleForQuarter(r.issueDate)] as const
+              },
+              'credit-note': (r: CreditNote) => {
+                return [format(r.creditNoteDate, 'y'), titleForQuarter(r.creditNoteDate)] as const
+              },
+              receipt: (r: Receipt) => {
+                return [format(r.receiptDate, 'y'), titleForQuarter(r.receiptDate)] as const
+              },
             },
-            invoice: (r: Invoice) => {
-              return titleForQuarter(r.issueDate)
-            },
-            'credit-note': (r: CreditNote) => {
-              return titleForQuarter(r.creditNoteDate)
-            },
-            receipt: (r: Receipt) => {
-              return titleForQuarter(r.receiptDate)
-            },
-          },
-          record,
-        )
-        if (!acc.has(key)) acc.set(key, [])
-        acc.get(key)!.push(record)
-        return acc
-      }, new Map<string, Record[]>()),
+            record,
+          )
+
+          acc.get(year).get(key).push(record)
+
+          return acc
+        },
+        new DefaultMap(() => {
+          return new DefaultMap(() => {
+            return [] as Record[]
+          })
+        }),
+      ),
   )
 }
 
@@ -71,69 +80,95 @@ export default async function Home({ params: { type } }: { params: { type: strin
         currency: me.currency,
       }}
     >
-      <div className="fixed inset-x-0 top-0 z-10 h-8 bg-gray-100/75 backdrop-blur lg:top-4 dark:bg-zinc-800/75"></div>
-      <div className="space-y-8 px-4 py-8 sm:px-6 lg:px-8">
+      <div>
         {filteredRecords.length > 0 ? (
           <>
-            {groupByQuarter(filteredRecords).map(([title, records], idx) => {
+            {groupRecords(filteredRecords).map(([year, records]) => {
               return (
-                <Disclosure
-                  defaultOpen={
-                    !records.every((e) => {
-                      return isFuture(resolveRelevantRecordDate(e))
-                    })
-                  }
-                  as="div"
-                  key={title}
-                  className="relative flex gap-x-4"
-                >
-                  <div
-                    className={classNames(
-                      idx === 0 ? '-top-8' : 'top-0',
-                      'absolute -bottom-8 left-0 z-20 flex w-6 -translate-x-2 justify-center',
-                    )}
-                  >
-                    <div className="w-px bg-gray-300 dark:bg-zinc-500"></div>
-                  </div>
-
-                  <div className="relative ml-10 flex w-full flex-col gap-4">
-                    <DisclosureButton className="sticky top-8 isolate z-20">
+                <Disclosure key={year} defaultOpen={true} as="div">
+                  <div className="relative flex w-full flex-col">
+                    <DisclosureButton className="sticky top-0 isolate z-30">
                       <div className="absolute inset-y-3 left-0 flex h-6 w-6 flex-none -translate-x-12 items-center justify-center bg-gray-100 dark:bg-zinc-800">
                         <div
                           className={classNames(
                             'h-1.5 w-1.5 rounded-full ',
-                            title === titleForQuarter(new Date())
+                            year === format(new Date(), 'y')
                               ? 'bg-blue-400 ring-1 ring-blue-400 ring-offset-4 ring-offset-gray-100 dark:ring-offset-zinc-800'
                               : 'bg-gray-300 ring-1 ring-gray-300 dark:bg-zinc-500 dark:ring-zinc-500',
                           )}
                         />
                       </div>
 
-                      <div className="relative z-20 -mx-1.5 flex justify-between rounded-md bg-white/95 px-[18px] py-3 text-gray-500 ring-1 ring-black/5 backdrop-blur dark:bg-zinc-900/95 dark:text-gray-400">
-                        <span>{title}</span>
-                        <TotalsByStatus records={records} />
+                      <div className="relative z-20 -mx-1.5 flex justify-between rounded-md bg-white/60 py-3 pl-24 pr-14 text-gray-500 ring-1 ring-black/5 backdrop-blur dark:bg-zinc-900/95 dark:text-gray-400">
+                        <span>{year}</span>
+                        <TotalsByStatus records={Array.from(records.values()).flat(1)} />
                       </div>
                     </DisclosureButton>
 
-                    <DisclosurePanel className="grid grid-cols-[repeat(auto-fill,minmax(275px,1fr))] gap-4">
-                      {records.map((record) => {
+                    <DisclosurePanel className="relative w-full space-y-8 px-4 py-8 sm:px-6 lg:px-8">
+                      {Array.from(records.entries()).map(([title, records]) => {
                         return (
-                          <I18NProvider
-                            key={record.id}
-                            value={{
-                              // Prefer the language of the account when looking at the overview of
-                              // record.
-                              language: record.account.language,
-
-                              // Prefer the currency of the client when looking at the overview of
-                              // record.
-                              currency: record.client.currency,
-                            }}
+                          <Disclosure
+                            key={title}
+                            as="div"
+                            defaultOpen={
+                              !records.every((e) => {
+                                return isFuture(resolveRelevantRecordDate(e))
+                              })
+                            }
+                            className="relative flex gap-x-4"
                           >
-                            <Link href={`/${record.type}/${record.number}`}>
-                              <TinyRecord record={record} />
-                            </Link>
-                          </I18NProvider>
+                            <div className="absolute -bottom-8 -top-8 left-0 z-20 flex w-6 -translate-x-2 justify-center">
+                              <div className="w-px bg-gray-300 dark:bg-zinc-500"></div>
+                            </div>
+
+                            <div className="relative ml-10 flex w-full flex-col gap-4">
+                              <div className="sticky top-16 isolate z-20">
+                                <div className="absolute -left-4 -right-8 -top-8 bottom-0 z-10 bg-gray-100/75 backdrop-blur dark:bg-zinc-800/75"></div>
+
+                                <DisclosureButton className="w-full">
+                                  <div className="absolute inset-y-3 left-0 flex h-6 w-6 flex-none -translate-x-12 items-center justify-center bg-gray-100 dark:bg-zinc-800">
+                                    <div
+                                      className={classNames(
+                                        'h-1.5 w-1.5 rounded-full ',
+                                        title === titleForQuarter(new Date())
+                                          ? 'bg-blue-400 ring-1 ring-blue-400 ring-offset-4 ring-offset-gray-100 dark:ring-offset-zinc-800'
+                                          : 'bg-gray-300 ring-1 ring-gray-300 dark:bg-zinc-500 dark:ring-zinc-500',
+                                      )}
+                                    />
+                                  </div>
+
+                                  <div className="relative z-20 flex w-full justify-between rounded-md bg-white/95 px-[18px] py-3 text-gray-500 ring-1 ring-black/5 backdrop-blur dark:bg-zinc-900/95 dark:text-gray-400">
+                                    <span>{title}</span>
+                                    <TotalsByStatus records={records} />
+                                  </div>
+                                </DisclosureButton>
+                              </div>
+
+                              <DisclosurePanel className="grid grid-cols-[repeat(auto-fill,minmax(275px,1fr))] gap-4">
+                                {records.map((record) => {
+                                  return (
+                                    <I18NProvider
+                                      key={record.id}
+                                      value={{
+                                        // Prefer the language of the account when looking at the overview of
+                                        // records.
+                                        language: record.account.language,
+
+                                        // Prefer the currency of the client when looking at the overview of
+                                        // records.
+                                        currency: record.client.currency,
+                                      }}
+                                    >
+                                      <Link href={`/${record.type}/${record.number}`}>
+                                        <TinyRecord record={record} />
+                                      </Link>
+                                    </I18NProvider>
+                                  )
+                                })}
+                              </DisclosurePanel>
+                            </div>
+                          </Disclosure>
                         )
                       })}
                     </DisclosurePanel>
@@ -142,7 +177,7 @@ export default async function Home({ params: { type } }: { params: { type: strin
               )
             })}
 
-            <div className="relative flex -translate-x-2 gap-x-4">
+            <div className="relative ml-8 flex -translate-x-2 gap-x-4">
               <div className="absolute bottom-8 left-0 top-0 flex w-6 justify-center">
                 <div className="w-px bg-gray-300 dark:bg-zinc-500"></div>
               </div>
@@ -157,7 +192,7 @@ export default async function Home({ params: { type } }: { params: { type: strin
             </div>
           </>
         ) : (
-          <Empty message={`No ${type}s yet`} />
+          <Empty message="No records yet" />
         )}
       </div>
     </I18NProvider>
