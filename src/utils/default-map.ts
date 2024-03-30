@@ -4,10 +4,13 @@ export class DefaultMap<T = string, V = any> extends Map<T, V> {
   }
 
   get(key: T): V {
-    if (!this.has(key)) {
-      this.set(key, this.factory(key))
+    let value = super.get(key)
+
+    if (value === undefined) {
+      value = this.factory(key)
+      this.set(key, value)
     }
 
-    return super.get(key)!
+    return value
   }
 }
