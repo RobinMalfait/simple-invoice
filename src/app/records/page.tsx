@@ -95,7 +95,7 @@ export default async function Home() {
                         />
                       </div>
 
-                      <div className="relative z-20 -mx-1.5 flex justify-between rounded-md bg-white/60 px-[18px] py-3 text-gray-500 ring-1 ring-black/5 backdrop-blur dark:bg-zinc-900/95 dark:text-gray-400">
+                      <div className="relative z-20 -mx-1.5 flex justify-between rounded-md bg-white/60 py-3 pl-24 pr-14 text-gray-500 ring-1 ring-black/5 backdrop-blur dark:bg-zinc-900/95 dark:text-gray-400">
                         <span>{year}</span>
                         <TotalsByStatus records={Array.from(records.values()).flat(1)} />
                       </div>
