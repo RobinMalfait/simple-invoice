@@ -75,7 +75,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   let config = await load()
   return (
     <html lang="en" data-classified={config.ui.classified}>
-      <body className={classNames(inter.variable, shadwowsIntoLight.variable)}>
+      <body
+        data-sidebar={config.ui.sidebar}
+        className={classNames('group', inter.variable, shadwowsIntoLight.variable)}
+      >
         <Layout data={data} config={config}>
           {children}
         </Layout>

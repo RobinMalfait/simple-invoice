@@ -1,3 +1,5 @@
+'use client'
+
 import { compareDesc, format, isFuture } from 'date-fns'
 import Link from 'next/link'
 
@@ -74,13 +76,14 @@ export function RecordList({ records }: { records: Record[] }) {
 
   return (
     <div>
+      <div className="fixed -left-4 -right-8 -top-8 z-20 h-28 bg-gray-100/75 backdrop-blur dark:bg-zinc-800/75"></div>
+      <div className="fixed -right-8 top-20 z-10 h-16 bg-gray-100/75 backdrop-blur group-data-[sidebar=large]:left-[calc(360px-theme(spacing.4))] group-data-[sidebar=small]:left-[calc(152px-theme(spacing.4))] dark:bg-zinc-800/75"></div>
+
       {groupRecords(records).map(([year, records]) => {
         return (
           <Disclosure key={year} defaultOpen={true} as="div">
             <div className="relative flex w-full flex-col">
-              <DisclosureButton className="sticky top-4 isolate z-30 px-4">
-                <div className="absolute -left-4 -right-8 -top-8 bottom-0 bg-gray-100/75 backdrop-blur dark:bg-zinc-800/75"></div>
-
+              <DisclosureButton className="sticky top-4 isolate z-20 px-4">
                 <div className="absolute inset-y-3 left-0 flex h-6 w-6 flex-none -translate-x-12 items-center justify-center bg-gray-100 dark:bg-zinc-800">
                   <div
                     className={classNames(
@@ -92,7 +95,7 @@ export function RecordList({ records }: { records: Record[] }) {
                   />
                 </div>
 
-                <div className="relative z-20 flex justify-between rounded-md bg-white/60 px-[18px] py-3 text-gray-500 ring-1 ring-black/5 backdrop-blur dark:bg-zinc-900/95 dark:text-gray-400">
+                <div className="relative flex justify-between rounded-md bg-white/60 px-[18px] py-3 text-gray-500 ring-1 ring-black/5 backdrop-blur dark:bg-zinc-900/95 dark:text-gray-400">
                   <span>{year}</span>
                   <TotalsByStatus records={Array.from(records.values()).flat(1)} />
                 </div>
@@ -111,14 +114,12 @@ export function RecordList({ records }: { records: Record[] }) {
                       }
                       className="relative flex gap-x-4"
                     >
-                      <div className="absolute -bottom-8 -top-8 left-0 z-20 flex w-6 -translate-x-2 justify-center">
+                      <div className="absolute -bottom-8 -top-8 left-0 flex w-6 -translate-x-2 justify-center">
                         <div className="w-px bg-gray-300 dark:bg-zinc-500"></div>
                       </div>
 
                       <div className="relative ml-10 flex w-full flex-col gap-4">
-                        <div className="sticky top-20 isolate z-20">
-                          <div className="absolute -left-4 -right-8 -top-8 bottom-0 z-10 bg-gray-100/75 backdrop-blur dark:bg-zinc-800/75"></div>
-
+                        <div className="sticky top-20 isolate z-10">
                           <DisclosureButton className="w-full">
                             <div className="absolute inset-y-3 left-0 flex h-6 w-6 flex-none -translate-x-12 items-center justify-center bg-gray-100 dark:bg-zinc-800">
                               <div
@@ -131,7 +132,7 @@ export function RecordList({ records }: { records: Record[] }) {
                               />
                             </div>
 
-                            <div className="relative z-20 flex w-full justify-between rounded-md bg-white/95 px-[18px] py-3 text-gray-500 ring-1 ring-black/5 backdrop-blur dark:bg-zinc-900/95 dark:text-gray-400">
+                            <div className="relative flex w-full justify-between rounded-md bg-white/95 px-[18px] py-3 text-gray-500 ring-1 ring-black/5 backdrop-blur dark:bg-zinc-900/95 dark:text-gray-400">
                               <span>{title}</span>
                               <TotalsByStatus records={records} />
                             </div>
