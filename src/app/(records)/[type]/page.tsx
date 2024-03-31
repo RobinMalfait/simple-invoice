@@ -72,6 +72,9 @@ export default async function Home({ params: { type } }: { params: { type: strin
     }),
   )
 
+  let currentYear = format(new Date(), 'y')
+  let currentQuarter = titleForQuarter(new Date())
+
   return (
     <I18NProvider
       value={{
@@ -87,19 +90,21 @@ export default async function Home({ params: { type } }: { params: { type: strin
               return (
                 <Disclosure key={year} defaultOpen={true} as="div">
                   <div className="relative flex w-full flex-col">
-                    <DisclosureButton className="sticky top-0 isolate z-30">
+                    <DisclosureButton className="sticky top-4 isolate z-30 px-4">
+                      <div className="absolute -left-4 -right-8 -top-8 bottom-0 bg-gray-100/75 backdrop-blur dark:bg-zinc-800/75"></div>
+
                       <div className="absolute inset-y-3 left-0 flex h-6 w-6 flex-none -translate-x-12 items-center justify-center bg-gray-100 dark:bg-zinc-800">
                         <div
                           className={classNames(
                             'h-1.5 w-1.5 rounded-full ',
-                            year === format(new Date(), 'y')
+                            year === currentYear
                               ? 'bg-blue-400 ring-1 ring-blue-400 ring-offset-4 ring-offset-gray-100 dark:ring-offset-zinc-800'
                               : 'bg-gray-300 ring-1 ring-gray-300 dark:bg-zinc-500 dark:ring-zinc-500',
                           )}
                         />
                       </div>
 
-                      <div className="relative z-20 -mx-1.5 flex justify-between rounded-md bg-white/60 py-3 pl-24 pr-14 text-gray-500 ring-1 ring-black/5 backdrop-blur dark:bg-zinc-900/95 dark:text-gray-400">
+                      <div className="relative z-20 flex justify-between rounded-md bg-white/60 px-[18px] py-3 text-gray-500 ring-1 ring-black/5 backdrop-blur dark:bg-zinc-900/95 dark:text-gray-400">
                         <span>{year}</span>
                         <TotalsByStatus records={Array.from(records.values()).flat(1)} />
                       </div>
@@ -123,7 +128,7 @@ export default async function Home({ params: { type } }: { params: { type: strin
                             </div>
 
                             <div className="relative ml-10 flex w-full flex-col gap-4">
-                              <div className="sticky top-16 isolate z-20">
+                              <div className="sticky top-20 isolate z-20">
                                 <div className="absolute -left-4 -right-8 -top-8 bottom-0 z-10 bg-gray-100/75 backdrop-blur dark:bg-zinc-800/75"></div>
 
                                 <DisclosureButton className="w-full">
@@ -131,7 +136,7 @@ export default async function Home({ params: { type } }: { params: { type: strin
                                     <div
                                       className={classNames(
                                         'h-1.5 w-1.5 rounded-full ',
-                                        title === titleForQuarter(new Date())
+                                        title === currentQuarter
                                           ? 'bg-blue-400 ring-1 ring-blue-400 ring-offset-4 ring-offset-gray-100 dark:ring-offset-zinc-800'
                                           : 'bg-gray-300 ring-1 ring-gray-300 dark:bg-zinc-500 dark:ring-zinc-500',
                                       )}
