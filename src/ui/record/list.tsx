@@ -75,7 +75,7 @@ export function RecordList({ records }: { records: Record[] }) {
   }
 
   return (
-    <div>
+    <div className="flex flex-col gap-4 py-4">
       <div className="fixed -left-4 -right-8 -top-8 z-20 h-28 bg-gray-100/75 backdrop-blur dark:bg-zinc-800/75"></div>
       <div className="fixed -right-8 top-20 z-10 h-16 bg-gray-100/75 backdrop-blur group-data-[sidebar=large]:left-[calc(360px-theme(spacing.4))] group-data-[sidebar=small]:left-[calc(152px-theme(spacing.4))] dark:bg-zinc-800/75"></div>
 
@@ -114,7 +114,7 @@ export function RecordList({ records }: { records: Record[] }) {
                       }
                       className="relative flex gap-x-4"
                     >
-                      <div className="absolute -bottom-8 -top-8 left-0 flex w-6 -translate-x-2 justify-center">
+                      <div className="absolute -bottom-16 -top-8 left-0 flex w-6 -translate-x-2 justify-center">
                         <div className="w-px bg-gray-300 dark:bg-zinc-500"></div>
                       </div>
 
@@ -171,7 +171,7 @@ export function RecordList({ records }: { records: Record[] }) {
         )
       })}
 
-      <div className="relative ml-8 flex -translate-x-2 gap-x-4">
+      <div className="relative ml-8 flex -translate-x-2 -translate-y-4 gap-x-4">
         <div className="absolute bottom-8 left-0 top-0 flex w-6 justify-center">
           <div className="w-px bg-gray-300 dark:bg-zinc-500"></div>
         </div>
