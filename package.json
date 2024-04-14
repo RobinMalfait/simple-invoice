@@ -21,6 +21,16 @@
     "plugins": [
       "prettier-plugin-organize-imports",
       "prettier-plugin-tailwindcss"
+    ],
+    "overrides": [
+      {
+        "files": [
+          "tsconfig.json"
+        ],
+        "options": {
+          "parser": "jsonc"
+        }
+      }
     ]
   },
   "dependencies": {
