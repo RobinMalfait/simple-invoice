@@ -88,7 +88,6 @@ export function CommandPalette({ children }: PropsWithChildren<{}>) {
             <DialogPanel className="mx-auto max-w-2xl transform divide-y divide-zinc-500 divide-opacity-20 overflow-hidden rounded-xl bg-white/80 shadow-2xl ring-1 ring-black/5 backdrop-blur transition-all dark:bg-zinc-900 dark:ring-0 dark:backdrop-blur-none">
               <Combobox<CommandPaletteOption>
                 by="id"
-                nullable
                 immediate
                 onChange={async (item) => {
                   if (item === null) return
