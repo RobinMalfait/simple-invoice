@@ -4,9 +4,8 @@ import type { Transaction, TransactionBuilder } from '~/domain/transaction/trans
 import * as coda from '~/domain/transaction/import/coda'
 import * as bnp from '~/domain/transaction/import/csv--bnp-paribas-fortis'
 import * as kbc from '~/domain/transaction/import/csv--kbc'
-import * as mint from '~/domain/transaction/import/csv--mint'
 
-let importers = [coda, kbc, bnp, /* mint */]
+let importers = [coda, kbc, bnp /* mint */]
 
 export function parseTransactions(
   filepath: string,
