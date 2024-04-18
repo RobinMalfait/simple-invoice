@@ -62,6 +62,7 @@ export function Notes(props: React.PropsWithChildren<{ records: Record[] }>) {
               )}
             >
               {record.internal.notes
+                .slice()
                 .sort((a, z) => {
                   return compareAsc(a.at, z.at)
                 })
