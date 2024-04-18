@@ -615,6 +615,28 @@ records.push(
     .build(),
 )
 
+// Single item invoice with internal notes
+records.push(
+  new InvoiceBuilder()
+    .account(me)
+    .client(Client2)
+    .issueDate(inThePast())
+    .item(new InvoiceItemBuilder().description('Item line #1').unitPrice(100_00).build())
+    .internal.note('This is an internal note that can be used for internal purposes only.', today())
+    .internal.note(
+      md`
+        This is _another_ note. It's **important** to know that this is a very important note because it contains markdown.
+
+        1. Even with list items
+        2. Such as these…
+      `,
+      nextDay(),
+    )
+    .send(nextDay())
+    .pay(nextDay())
+    .build(),
+)
+
 // Single item invoice, in the future
 records.push(
   new InvoiceBuilder()

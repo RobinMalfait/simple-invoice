@@ -47,6 +47,11 @@ export let CreditNote = z.object({
       return Document
     }),
   ),
+
+  // Internal information, not visible to the client
+  internal: z.object({
+    notes: z.array(z.object({ value: z.string(), at: z.date() })),
+  }),
 })
 
 export type CreditNote = z.infer<typeof CreditNote>
@@ -61,6 +66,7 @@ export class CreditNoteBuilder {
   private _creditNoteDate: Date | null = null
   private _discounts: Discount[] = []
   private _attachments: Document[] = []
+  private _internalNotes: Invoice['internal']['notes'] = []
 
   private _events: Partial<Event>[] = []
 
@@ -81,6 +87,9 @@ export class CreditNoteBuilder {
       creditNoteDate: this._creditNoteDate,
       discounts: this._discounts,
       attachments: this._attachments,
+      internal: {
+        notes: this._internalNotes,
+      },
     })
 
     // Invert the values
@@ -167,5 +176,15 @@ export class CreditNoteBuilder {
   public attachment(attachment: Document): CreditNoteBuilder {
     this._attachments.push(attachment)
     return this
+  }
+
+  get internal() {
+    return {
+      note: (note: string, at: string | Date) => {
+        let parsedAt = typeof at === 'string' ? parseISO(at) : at
+        this._internalNotes.push({ value: note, at: parsedAt })
+        return this
+      },
+    }
   }
 }
