@@ -3,12 +3,12 @@
 import { compareAsc, format, formatDistance } from 'date-fns'
 import { Fragment } from 'react'
 import type { Record } from '~/domain/record/record'
+import { classNames } from '~/ui/class-names'
 import { useCurrentDate } from '~/ui/hooks/use-current-date'
+import { useRecord } from '~/ui/hooks/use-record'
+import { useRecordStacks } from '~/ui/hooks/use-record-stacks'
+import { Markdown } from '~/ui/markdown'
 import { match } from '~/utils/match'
-import { classNames } from '../class-names'
-import { useRecord } from '../hooks/use-record'
-import { useRecordStacks } from '../hooks/use-record-stacks'
-import { Markdown } from '../markdown'
 
 export function Notes(props: React.PropsWithChildren<{ records: Record[] }>) {
   let stacks = useRecordStacks()
