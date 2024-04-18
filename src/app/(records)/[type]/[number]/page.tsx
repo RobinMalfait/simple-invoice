@@ -1,5 +1,6 @@
 import { ExclamationTriangleIcon } from '@heroicons/react/20/solid'
-import { EyeIcon } from '@heroicons/react/24/outline'
+import { EyeIcon, LockClosedIcon } from '@heroicons/react/24/outline'
+import { compareAsc } from 'date-fns'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { transactions as allTransactions, me, records } from '~/data'
@@ -12,6 +13,7 @@ import { I18NProvider } from '~/ui/hooks/use-i18n'
 import { ActivityFeed } from '~/ui/invoice/activity-feed'
 import { AttachmentList } from '~/ui/invoice/attachment-list'
 import { Invoice as InvoicePreview } from '~/ui/invoice/design'
+import { Notes } from '~/ui/invoice/notes'
 import { total } from '~/ui/invoice/total'
 import { Money } from '~/ui/money'
 import { TransactionsTable } from '~/ui/transaction/table'
@@ -105,6 +107,25 @@ export default async function Invoice({
               <span className="text-sm font-medium text-gray-900 dark:text-gray-300">Activity</span>
               <ActivityFeed records={records} />
             </div>
+
+            {record.internal.notes.length > 0 && (
+              <div className="flex flex-col gap-4 rounded-lg bg-white p-4 shadow ring-1 ring-black/5 dark:bg-zinc-900 dark:text-gray-300">
+                <div className="flex items-center gap-2">
+                  <LockClosedIcon
+                    className="h-4 w-4 text-gray-600 dark:text-gray-300"
+                    aria-hidden="true"
+                  />
+                  <span className="text-sm font-medium text-gray-900 dark:text-gray-300">
+                    Internal notes
+                  </span>
+                </div>
+                <Notes
+                  notes={record.internal.notes.sort((a, z) => {
+                    return compareAsc(a.at, z.at)
+                  })}
+                />
+              </div>
+            )}
 
             {record.attachments.length > 0 && (
               <div className="flex flex-col gap-4 rounded-lg bg-white p-4 shadow ring-1 ring-black/5 dark:bg-zinc-900 dark:text-gray-300">
