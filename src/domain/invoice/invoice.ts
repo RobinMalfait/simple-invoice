@@ -63,6 +63,11 @@ export let Invoice = z.object({
 
   // Visual representation
   qr: z.boolean().nullable().default(null),
+
+  // Internal information, not visible to the client
+  internal: z.object({
+    notes: z.array(z.object({ value: z.string(), at: z.date() })),
+  }),
 })
 
 export type Invoice = z.infer<typeof Invoice>
@@ -80,6 +85,7 @@ export class InvoiceBuilder {
   private _quote: Quote | null = null
   private _paidAt: Date | null = null
   private _qr: Invoice['qr'] | null = null
+  private _internalNotes: Invoice['internal']['notes'] = []
 
   private _status = InvoiceStatus.Draft
   private paid: number = 0
@@ -110,6 +116,9 @@ export class InvoiceBuilder {
       paid: this.paid,
       outstanding: this.outstanding ?? total({ items: this._items, discounts: this._discounts }),
       qr: this._qr,
+      internal: {
+        notes: this._internalNotes,
+      },
     }
 
     let invoice = Invoice.parse(input)
@@ -354,6 +363,16 @@ export class InvoiceBuilder {
     this._qr = qr
 
     return this
+  }
+
+  get internal() {
+    return {
+      note: (note: string, at: string | Date) => {
+        let parsedAt = typeof at === 'string' ? parseISO(at) : at
+        this._internalNotes.push({ value: note, at: parsedAt })
+        return this
+      },
+    }
   }
 
   public send(at: string | Date): InvoiceBuilder {

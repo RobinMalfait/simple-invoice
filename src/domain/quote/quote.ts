@@ -53,6 +53,11 @@ let BaseQuote = z.object({
     )
     .default([]),
   status: z.nativeEnum(QuoteStatus).default(QuoteStatus.Draft),
+
+  // Internal information, not visible to the client
+  internal: z.object({
+    notes: z.array(z.object({ value: z.string(), at: z.date() })),
+  }),
 })
 
 export type Quote = z.infer<typeof BaseQuote> & {
@@ -76,6 +81,7 @@ export class QuoteBuilder {
   private _discounts: Discount[] = []
   private _attachments: Document[] = []
   private _quote: Quote | null = null
+  private _internalNotes: Quote['internal']['notes'] = []
 
   private _status = QuoteStatus.Draft
 
@@ -101,6 +107,10 @@ export class QuoteBuilder {
       status: this.computeStatus,
 
       quote: this._quote,
+
+      internal: {
+        notes: this._internalNotes,
+      },
     }
 
     let quote = Quote.parse(input)
@@ -329,6 +339,16 @@ export class QuoteBuilder {
     }
 
     return this
+  }
+
+  get internal() {
+    return {
+      note: (note: string, at: string | Date) => {
+        let parsedAt = typeof at === 'string' ? parseISO(at) : at
+        this._internalNotes.push({ value: note, at: parsedAt })
+        return this
+      },
+    }
   }
 
   public send(at: string | Date): QuoteBuilder {

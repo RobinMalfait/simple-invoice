@@ -48,6 +48,11 @@ export let Receipt = z.object({
       return Document
     }),
   ),
+
+  // Internal information, not visible to the client
+  internal: z.object({
+    notes: z.array(z.object({ value: z.string(), at: z.date() })),
+  }),
 })
 
 export type Receipt = z.infer<typeof Receipt>
@@ -62,6 +67,7 @@ export class ReceiptBuilder {
   private _receiptDate: Date | null = null
   private _discounts: Discount[] = []
   private _attachments: Document[] = []
+  private _internalNotes: Receipt['internal']['notes'] = []
 
   private _events: Partial<Event>[] = []
 
@@ -82,6 +88,9 @@ export class ReceiptBuilder {
       receiptDate: this._receiptDate,
       discounts: this._discounts,
       attachments: this._attachments,
+      internal: {
+        notes: this._internalNotes,
+      },
     })
 
     for (let event of this._events) {
@@ -143,5 +152,15 @@ export class ReceiptBuilder {
   public attachment(attachment: Document): ReceiptBuilder {
     this._attachments.push(attachment)
     return this
+  }
+
+  get internal() {
+    return {
+      note: (note: string, at: string | Date) => {
+        let parsedAt = typeof at === 'string' ? parseISO(at) : at
+        this._internalNotes.push({ value: note, at: parsedAt })
+        return this
+      },
+    }
   }
 }
