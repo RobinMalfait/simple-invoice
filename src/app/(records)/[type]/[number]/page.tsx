@@ -1,6 +1,5 @@
 import { ExclamationTriangleIcon } from '@heroicons/react/20/solid'
 import { EyeIcon, LockClosedIcon } from '@heroicons/react/24/outline'
-import { compareAsc } from 'date-fns'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { transactions as allTransactions, me, records } from '~/data'
@@ -119,11 +118,7 @@ export default async function Invoice({
                     Internal notes
                   </span>
                 </div>
-                <Notes
-                  notes={record.internal.notes.sort((a, z) => {
-                    return compareAsc(a.at, z.at)
-                  })}
-                />
+                <Notes records={records} />
               </div>
             )}
 

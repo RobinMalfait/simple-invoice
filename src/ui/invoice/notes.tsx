@@ -1,26 +1,86 @@
 'use client'
 
-import { format, formatDistance } from 'date-fns'
+import { compareAsc, format, formatDistance } from 'date-fns'
+import { Fragment } from 'react'
+import type { Record } from '~/domain/record/record'
 import { useCurrentDate } from '~/ui/hooks/use-current-date'
+import { match } from '~/utils/match'
+import { classNames } from '../class-names'
+import { useRecord } from '../hooks/use-record'
+import { useRecordStacks } from '../hooks/use-record-stacks'
 import { Markdown } from '../markdown'
 
-export function Notes({ notes }: { notes: { value: string; at: Date }[] }) {
+export function Notes(props: React.PropsWithChildren<{ records: Record[] }>) {
+  let stacks = useRecordStacks()
+  let record = useRecord()
+  let records = (stacks[record.id] ?? []).map((id) => {
+    return props.records.find((e) => {
+      return e.id === id
+    })!
+  })
+
   let now = useCurrentDate()
+  let activeRecordIdx = stacks[record.id]?.indexOf(record.id) ?? -1
 
   return (
     <ul role="list" className="flex flex-col gap-4">
-      {notes.map((note, idx) => {
+      {records.map((record, idx) => {
         return (
-          <li key={idx} className="flex flex-col border-l-2 pl-2 dark:border-gray-200/25">
-            <time
-              title={format(note.at, 'PPPpp')}
-              dateTime={format(note.at, 'PPPpp')}
-              className="py-0.5 text-xs leading-5 text-gray-500 dark:text-gray-300"
+          <Fragment key={record.id}>
+            {records.length !== 1 && (
+              <li
+                className={classNames(
+                  'relative flex items-center text-sm',
+                  idx > activeRecordIdx && 'opacity-50 grayscale',
+                )}
+              >
+                <span className="whitespace-nowrap pr-3">
+                  {match(record.type, {
+                    quote: () => {
+                      return 'Quote'
+                    },
+                    invoice: () => {
+                      return 'Invoice'
+                    },
+                    'credit-note': () => {
+                      return 'Credit note'
+                    },
+                    receipt: () => {
+                      return 'Receipt'
+                    },
+                  })}{' '}
+                  (#{record.number})
+                </span>
+                <span className="h-px w-full bg-gray-200 dark:bg-zinc-600"></span>
+              </li>
+            )}
+            <ul
+              role="list"
+              className={classNames(
+                'relative flex flex-col gap-6',
+                idx > activeRecordIdx && 'opacity-50 grayscale',
+              )}
             >
-              {formatDistance(note.at, now, { addSuffix: true })}
-            </time>
-            <Markdown className="prose prose-sm dark:prose-invert">{note.value}</Markdown>
-          </li>
+              {record.internal.notes
+                .sort((a, z) => {
+                  return compareAsc(a.at, z.at)
+                })
+                .map((note, idx) => {
+                  return (
+                    <li key={idx} className="flex flex-col border-l-2 pl-2 dark:border-gray-200/25">
+                      <time
+                        title={format(note.at, 'PPPpp')}
+                        dateTime={format(note.at, 'PPPpp')}
+                        className="py-0.5 text-xs leading-5 text-gray-500 dark:text-gray-300"
+                      >
+                        {formatDistance(note.at, now, { addSuffix: true })}
+                      </time>
+                      <Markdown className="prose prose-sm dark:prose-invert">{note.value}</Markdown>
+                    </li>
+                  )
+                })}
+            </ul>
+          </Fragment>
         )
       })}
     </ul>
