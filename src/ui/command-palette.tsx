@@ -54,9 +54,8 @@ export function CommandPalette({ children }: PropsWithChildren<{}>) {
   )
 
   return (
-    <Transition.Root
+    <Transition
       show={open}
-      as={Fragment}
       afterLeave={() => {
         return setQuery('')
       }}
@@ -123,7 +122,7 @@ export function CommandPalette({ children }: PropsWithChildren<{}>) {
           </TransitionChild>
         </div>
       </Dialog>
-    </Transition.Root>
+    </Transition>
   )
 }
 
@@ -204,27 +203,27 @@ export function Action({
   return (
     <ComboboxOption
       value={{ id, type: 'action', search, invoke, close }}
-      className={({ active }) => {
+      className={({ focus }) => {
         return classNames(
           'flex cursor-default select-none items-center rounded-md px-3 py-2',
-          active && 'bg-gray-900/5 text-gray-900 dark:bg-zinc-800 dark:text-white',
+          focus && 'bg-gray-900/5 text-gray-900 dark:bg-zinc-800 dark:text-white',
         )
       }}
     >
-      {({ active }) => {
+      {({ focus }) => {
         return (
           <>
             {Icon && (
               <Icon
                 className={classNames(
                   'mr-3 h-6 w-6 flex-none',
-                  active ? 'text-gray-900 dark:text-white' : 'text-gray-900/40 dark:text-zinc-500',
+                  focus ? 'text-gray-900 dark:text-white' : 'text-gray-900/40 dark:text-zinc-500',
                 )}
                 aria-hidden="true"
               />
             )}
             <span className="flex-auto truncate">{children}</span>
-            {false && active && <span className="ml-3 flex-none text-zinc-400">Jump to...</span>}
+            {false && focus && <span className="ml-3 flex-none text-zinc-400">Jump to...</span>}
             {shortcut && (
               <span className="ml-3 flex-none text-xs font-semibold text-gray-500 dark:text-gray-400">
                 {shortcut.map((key, idx) => {

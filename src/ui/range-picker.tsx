@@ -113,12 +113,8 @@ export function RangePicker({
         </div>
       </ListboxButton>
       <ListboxOptions
-        anchor={{
-          to: 'bottom start',
-          gap: 'var(--gap)',
-          offset: 'calc(var(--offset) * -1)',
-        }}
-        className="z-50 w-64 rounded-md bg-white/75 py-2 shadow ring-1 ring-black/10 backdrop-blur [--gap:theme(spacing.2)] [--offset:theme(spacing.1)] focus:outline-none dark:bg-zinc-950/75"
+        anchor="bottom start"
+        className="z-50 w-64 rounded-md bg-white/75 py-2 shadow ring-1 ring-black/10 backdrop-blur [--anchor-gap:theme(spacing.2)] [--anchor-offset:calc(theme(spacing.1)*-1)] focus:outline-none dark:bg-zinc-950/75"
       >
         <span className="px-4 text-xs font-semibold dark:text-zinc-400">Presets</span>
         <div className="flex w-full flex-col px-2">

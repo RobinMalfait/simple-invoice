@@ -1,6 +1,6 @@
 'use client'
 
-import { Menu, Transition } from '@headlessui/react'
+import { Menu, MenuButton, MenuItem, MenuItems, Transition } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import {
   CheckCircleIcon,
@@ -10,7 +10,6 @@ import {
 } from '@heroicons/react/24/outline'
 import Link from 'next/link'
 import * as React from 'react'
-import { Fragment } from 'react'
 import type { Record } from '~/domain/record/record'
 import { classNames } from '~/ui/class-names'
 import { RecordProvider, useRecord } from '~/ui/hooks/use-record'
@@ -77,7 +76,7 @@ export function HistoryActions() {
       </div>
       <Menu as="div" className="relative inline-block text-left">
         <div>
-          <Menu.Button className="inline-flex w-full select-none justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-zinc-900 dark:text-zinc-400 dark:ring-zinc-700 dark:hover:bg-zinc-950">
+          <MenuButton className="inline-flex w-full select-none justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-zinc-900 dark:text-zinc-400 dark:ring-zinc-700 dark:hover:bg-zinc-950">
             <ClockIcon
               className="-ml-1 h-5 w-5 text-gray-400 dark:text-zinc-500"
               aria-hidden="true"
@@ -94,11 +93,10 @@ export function HistoryActions() {
               className="-mr-1 h-5 w-5 text-gray-400 dark:text-gray-500"
               aria-hidden="true"
             />
-          </Menu.Button>
+          </MenuButton>
         </div>
 
         <Transition
-          as={Fragment}
           enter="transition ease-out duration-100"
           enterFrom="transform opacity-0 scale-95"
           enterTo="transform opacity-100 scale-100"
@@ -106,26 +104,22 @@ export function HistoryActions() {
           leaveFrom="transform opacity-100 scale-100"
           leaveTo="transform opacity-0 scale-95"
         >
-          <Menu.Items
-            anchor={{
-              to: 'bottom end',
-              gap: 'var(--gap)',
-              offset: 'var(--offset)',
-            }}
-            className="z-10 w-56 divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 [--gap:theme(spacing.1)] [--offset:theme(spacing.1)] focus:outline-none dark:bg-zinc-900 dark:ring-white/10"
+          <MenuItems
+            anchor="bottom end"
+            className="z-10 w-56 divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 [--anchor-gap:theme(spacing.1)] [--anchor-offset:theme(spacing.1)] focus:outline-none dark:bg-zinc-900 dark:ring-white/10"
           >
             <div className="py-1">
               {options.map((e) => {
                 let Icon = e.id === record.id ? CheckCircleIcon : 'span'
 
                 return (
-                  <Menu.Item key={e.id}>
-                    {({ active }) => {
+                  <MenuItem key={e.id}>
+                    {({ focus }) => {
                       return (
                         <Link
                           href={`/${e.type}/${e.number}`}
                           className={classNames(
-                            active
+                            focus
                               ? 'bg-gray-100 text-gray-900 dark:bg-zinc-950 dark:text-gray-200'
                               : 'text-gray-700 dark:text-zinc-400',
                             'group flex w-full items-center px-4 py-2 text-sm',
@@ -157,11 +151,11 @@ export function HistoryActions() {
                         </Link>
                       )
                     }}
-                  </Menu.Item>
+                  </MenuItem>
                 )
               })}
             </div>
-          </Menu.Items>
+          </MenuItems>
         </Transition>
       </Menu>
     </div>
