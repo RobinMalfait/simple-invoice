@@ -224,7 +224,7 @@ export function Invoice() {
                             <td className="whitespace-pre-wrap pb-[--bottom] pl-[calc(var(--indent)+var(--left))] pr-[--right] pt-[--top] text-left align-top text-sm font-medium text-gray-900">
                               <Description />
                               <ul className="empty:hidden">
-                                {item.discounts.concat(item.discounts).map((discount, idx) => {
+                                {item.discounts.map((discount, idx) => {
                                   return (
                                     <li
                                       key={idx}
