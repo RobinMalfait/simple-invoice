@@ -130,7 +130,7 @@ export function Dashboard({
         data-no-credit-notes={systemContainsCreditNotes ? null : true}
         className="group grid grid-flow-row-dense grid-cols-2 gap-[--gap] px-4 py-8 [--gap:theme(spacing.4)] sm:px-6 lg:grid-cols-10 lg:px-8"
       >
-        <ActionsBar className="col-span-full" />
+        <ActionsBar className="z-20 col-span-full" />
         {systemContainsQuotes && (
           <QuotesCell className="lg:col-span-2 lg:row-span-2 lg:group-data-[no-invoices]:col-span-3" />
         )}

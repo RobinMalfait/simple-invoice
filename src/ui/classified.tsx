@@ -30,12 +30,12 @@ export function Classified(props: { children: React.ReactNode }) {
       <span
         className={classNames(
           classified &&
-            'pointer-events-none relative -mx-2 -my-1 inline-block select-none px-2 py-1',
+            'pointer-events-none relative z-10 -mx-2 -my-1 inline-block select-none px-2 py-1',
         )}
       >
         <Fragment>{props.children}</Fragment>
         {classified && (
-          <span className="pointer-events-none absolute inset-0 z-50 h-full w-full select-none bg-zinc-950" />
+          <span className="pointer-events-none absolute inset-0 z-20 h-full w-full select-none bg-zinc-950" />
         )}
       </span>
     </>
