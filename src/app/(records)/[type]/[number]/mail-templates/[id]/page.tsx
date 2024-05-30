@@ -95,7 +95,7 @@ export default async function Page({
                 {record.client.contacts.map((contact) => {
                   return (
                     <li key={contact.id}>
-                      <label className="inline-flex items-center gap-2 rounded-md bg-blue-50 px-2 py-1 pl-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10 dark:bg-blue-400/10 dark:text-blue-400 dark:ring-blue-400/30 ">
+                      <label className="inline-flex items-center gap-2 rounded-md bg-blue-50 px-2 py-1 pl-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10 dark:bg-blue-400/10 dark:text-blue-400 dark:ring-blue-400/30">
                         <RecipientCheckbox
                           name={`contacts[${contact.id}]`}
                           checked={recipients.split(',').includes(contact.id)}

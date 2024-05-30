@@ -87,7 +87,7 @@ export function RecordList({ records }: { records: Record[] }) {
                 <div className="absolute inset-y-3 left-0 flex h-6 w-6 flex-none -translate-x-12 items-center justify-center bg-gray-100 dark:bg-zinc-800">
                   <div
                     className={classNames(
-                      'h-1.5 w-1.5 rounded-full ',
+                      'h-1.5 w-1.5 rounded-full',
                       year === currentYear
                         ? 'bg-blue-400 ring-1 ring-blue-400 ring-offset-4 ring-offset-gray-100 dark:ring-offset-zinc-800'
                         : 'bg-gray-300 ring-1 ring-gray-300 dark:bg-zinc-500 dark:ring-zinc-500',
@@ -124,7 +124,7 @@ export function RecordList({ records }: { records: Record[] }) {
                             <div className="absolute inset-y-3 left-0 flex h-6 w-6 flex-none -translate-x-12 items-center justify-center bg-gray-100 dark:bg-zinc-800">
                               <div
                                 className={classNames(
-                                  'h-1.5 w-1.5 rounded-full ',
+                                  'h-1.5 w-1.5 rounded-full',
                                   title === currentQuarter
                                     ? 'bg-blue-400 ring-1 ring-blue-400 ring-offset-4 ring-offset-gray-100 dark:ring-offset-zinc-800'
                                     : 'bg-gray-300 ring-1 ring-gray-300 dark:bg-zinc-500 dark:ring-zinc-500',
