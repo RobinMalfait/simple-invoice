@@ -86,7 +86,9 @@ export async function GET(request: Request, { params }: { params: { id: string }
 }
 
 async function generatePDFs(urls: [filename: string, url: string][]) {
-  let browser = await puppeteer.launch({ headless: 'new' })
+  let browser = await puppeteer.launch({
+    headless: true,
+  })
   try {
     let buffers = await Promise.all(
       urls.map(async ([filename, url]) => {

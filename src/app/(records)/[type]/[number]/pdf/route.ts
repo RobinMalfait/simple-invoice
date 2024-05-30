@@ -43,7 +43,7 @@ function presentPDF(filename: string, data: Buffer, type: 'download' | 'preview'
 }
 
 async function generatePDF(url: string) {
-  let browser = await puppeteer.launch({ headless: 'new' })
+  let browser = await puppeteer.launch({ headless: true })
   let page = await browser.newPage()
 
   await page.goto(url)
