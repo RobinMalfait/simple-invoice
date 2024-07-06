@@ -25,7 +25,7 @@ export function DownloadLink({
 
     // Fallback in case the window doesn't blur
     d.setTimeout(() => {
-      return done
+      done()
     }, 5000)
 
     return d.dispose
@@ -34,6 +34,8 @@ export function DownloadLink({
   return (
     <a
       onClick={(e) => {
+        e.stopPropagation()
+
         if (downloading) {
           e.preventDefault()
           return
@@ -45,12 +47,14 @@ export function DownloadLink({
       download
       {...props}
     >
-      {downloading ? (
-        <ArrowPathIcon className="mr-2 h-4 w-4 animate-spin" />
-      ) : (
-        <ArrowDownTrayIcon className="mr-2 h-4 w-4" />
-      )}
-      {children}
+      <span className="inline-flex items-center">
+        {downloading ? (
+          <ArrowPathIcon className="mr-2 h-4 w-4 animate-spin" />
+        ) : (
+          <ArrowDownTrayIcon className="mr-2 h-4 w-4" />
+        )}
+        {children}
+      </span>
     </a>
   )
 }
