@@ -22,11 +22,11 @@ export function TinyRecord({ record }: { record: Record }) {
   let warning = recordHasWarning(record)
 
   return (
-    <div className="group relative rounded-md bg-white text-gray-700 shadow transition-[transform,opacity] duration-300 will-change-transform hover:-translate-y-1 dark:bg-zinc-950">
+    <div className="group/tiny-record relative rounded-md bg-white text-gray-700 shadow transition-[transform,opacity] duration-300 will-change-transform hover:-translate-y-1 dark:bg-zinc-950">
       {isLayered && (
         <>
-          <div className="absolute inset-0 -z-10 h-full w-full rotate-2 rounded-md bg-gray-100 ring-1 ring-black/5 drop-shadow transition-[transform,opacity] duration-200 will-change-[transform,opacity] group-hover:rotate-0 group-hover:opacity-0 dark:bg-zinc-700"></div>
-          <div className="absolute inset-0 -z-10 h-full w-full -rotate-1 rounded-md bg-gray-50 ring-1 ring-black/5 drop-shadow transition-transform duration-200 will-change-[transform,opacity] group-hover:rotate-0 group-hover:opacity-0 dark:bg-zinc-600"></div>
+          <div className="absolute inset-0 -z-10 h-full w-full rotate-2 rounded-md bg-gray-100 ring-1 ring-black/5 drop-shadow transition-[transform,opacity] duration-200 will-change-[transform,opacity] group-hover/tiny-record:rotate-0 group-hover/tiny-record:opacity-0 dark:bg-zinc-700"></div>
+          <div className="absolute inset-0 -z-10 h-full w-full -rotate-1 rounded-md bg-gray-50 ring-1 ring-black/5 drop-shadow transition-transform duration-200 will-change-[transform,opacity] group-hover/tiny-record:rotate-0 group-hover/tiny-record:opacity-0 dark:bg-zinc-600"></div>
         </>
       )}
 
