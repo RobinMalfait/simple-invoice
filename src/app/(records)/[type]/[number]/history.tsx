@@ -1,6 +1,6 @@
 'use client'
 
-import { Menu, MenuButton, MenuItem, MenuItems, Transition } from '@headlessui/react'
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import {
   CheckCircleIcon,
@@ -96,67 +96,59 @@ export function HistoryActions() {
           </MenuButton>
         </div>
 
-        <Transition
-          enter="transition ease-out duration-100"
-          enterFrom="transform opacity-0 scale-95"
-          enterTo="transform opacity-100 scale-100"
-          leave="transition ease-in duration-75"
-          leaveFrom="transform opacity-100 scale-100"
-          leaveTo="transform opacity-0 scale-95"
+        <MenuItems
+          transition
+          anchor="bottom end"
+          className="z-10 w-56 divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 transition [--anchor-gap:theme(spacing.1)] [--anchor-offset:theme(spacing.1)] focus:outline-none data-[closed]:scale-95 data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in dark:bg-zinc-900 dark:ring-white/10"
         >
-          <MenuItems
-            anchor="bottom end"
-            className="z-10 w-56 divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 [--anchor-gap:theme(spacing.1)] [--anchor-offset:theme(spacing.1)] focus:outline-none dark:bg-zinc-900 dark:ring-white/10"
-          >
-            <div className="py-1">
-              {options.map((e) => {
-                let Icon = e.id === record.id ? CheckCircleIcon : 'span'
+          <div className="py-1">
+            {options.map((e) => {
+              let Icon = e.id === record.id ? CheckCircleIcon : 'span'
 
-                return (
-                  <MenuItem key={e.id}>
-                    {({ focus }) => {
-                      return (
-                        <Link
-                          href={`/${e.type}/${e.number}`}
-                          className={classNames(
-                            focus
-                              ? 'bg-gray-100 text-gray-900 dark:bg-zinc-950 dark:text-gray-200'
-                              : 'text-gray-700 dark:text-zinc-400',
-                            'group flex w-full items-center px-4 py-2 text-sm',
-                          )}
-                        >
-                          <Icon
-                            className="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500 dark:text-gray-500 dark:group-hover:text-gray-400"
-                            aria-hidden="true"
-                          />
-                          <span className="inline-flex w-full items-center justify-between gap-2">
-                            <span>
-                              {match(e.type, {
-                                quote: () => {
-                                  return 'Quote'
-                                },
-                                invoice: () => {
-                                  return 'Invoice'
-                                },
-                                'credit-note': () => {
-                                  return 'Credit note'
-                                },
-                                receipt: () => {
-                                  return 'Receipt'
-                                },
-                              })}
-                            </span>
-                            <span>#{e.number}</span>
+              return (
+                <MenuItem key={e.id}>
+                  {({ focus }) => {
+                    return (
+                      <Link
+                        href={`/${e.type}/${e.number}`}
+                        className={classNames(
+                          focus
+                            ? 'bg-gray-100 text-gray-900 dark:bg-zinc-950 dark:text-gray-200'
+                            : 'text-gray-700 dark:text-zinc-400',
+                          'group flex w-full items-center px-4 py-2 text-sm',
+                        )}
+                      >
+                        <Icon
+                          className="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500 dark:text-gray-500 dark:group-hover:text-gray-400"
+                          aria-hidden="true"
+                        />
+                        <span className="inline-flex w-full items-center justify-between gap-2">
+                          <span>
+                            {match(e.type, {
+                              quote: () => {
+                                return 'Quote'
+                              },
+                              invoice: () => {
+                                return 'Invoice'
+                              },
+                              'credit-note': () => {
+                                return 'Credit note'
+                              },
+                              receipt: () => {
+                                return 'Receipt'
+                              },
+                            })}
                           </span>
-                        </Link>
-                      )
-                    }}
-                  </MenuItem>
-                )
-              })}
-            </div>
-          </MenuItems>
-        </Transition>
+                          <span>#{e.number}</span>
+                        </span>
+                      </Link>
+                    )
+                  }}
+                </MenuItem>
+              )
+            })}
+          </div>
+        </MenuItems>
       </Menu>
     </div>
   )

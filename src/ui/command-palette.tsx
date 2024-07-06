@@ -4,9 +4,8 @@ import {
   ComboboxOption,
   ComboboxOptions,
   Dialog,
+  DialogBackdrop,
   DialogPanel,
-  Transition,
-  TransitionChild,
 } from '@headlessui/react'
 import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
 import {
@@ -54,75 +53,61 @@ export function CommandPalette({ children }: PropsWithChildren<{}>) {
   )
 
   return (
-    <Transition
-      show={open}
-      afterLeave={() => {
-        return setQuery('')
+    <Dialog
+      as="div"
+      className="relative z-10"
+      open={open}
+      onClose={() => {
+        setOpen(false)
+        setQuery('')
       }}
-      appear
     >
-      <Dialog as="div" className="relative z-10" onClose={setOpen}>
-        <TransitionChild
-          as={Fragment}
-          enter="ease-out duration-300"
-          enterFrom="opacity-0"
-          enterTo="opacity-100"
-          leave="ease-in duration-200"
-          leaveFrom="opacity-100"
-          leaveTo="opacity-0"
+      <DialogBackdrop
+        transition
+        className="fixed inset-0 bg-zinc-500/25 transition-opacity data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in"
+      />
+
+      <div className="fixed inset-0 z-10 overflow-y-auto p-4 sm:p-6 md:p-20">
+        <DialogPanel
+          transition
+          className="mx-auto max-w-2xl transform divide-y divide-zinc-500 divide-opacity-20 overflow-hidden rounded-xl bg-white/80 shadow-2xl ring-1 ring-black/5 backdrop-blur transition-all data-[closed]:scale-95 data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in dark:bg-zinc-900 dark:ring-0 dark:backdrop-blur-none"
         >
-          <div className="fixed inset-0 bg-zinc-500/25 transition-opacity" />
-        </TransitionChild>
-
-        <div className="fixed inset-0 z-10 overflow-y-auto p-4 sm:p-6 md:p-20">
-          <TransitionChild
-            as={Fragment}
-            enter="ease-out duration-300"
-            enterFrom="opacity-0 scale-95"
-            enterTo="opacity-100 scale-100"
-            leave="ease-in duration-200"
-            leaveFrom="opacity-100 scale-100"
-            leaveTo="opacity-0 scale-95"
+          <Combobox<CommandPaletteOption>
+            by="id"
+            immediate
+            onChange={async (item) => {
+              if (item === null) return
+              await Promise.resolve().then(() => {
+                return item.invoke()
+              })
+              if (item.close ?? true) setOpen(false)
+            }}
           >
-            <DialogPanel className="mx-auto max-w-2xl transform divide-y divide-zinc-500 divide-opacity-20 overflow-hidden rounded-xl bg-white/80 shadow-2xl ring-1 ring-black/5 backdrop-blur transition-all dark:bg-zinc-900 dark:ring-0 dark:backdrop-blur-none">
-              <Combobox<CommandPaletteOption>
-                by="id"
-                immediate
-                onChange={async (item) => {
-                  if (item === null) return
-                  await Promise.resolve().then(() => {
-                    return item.invoke()
-                  })
-                  if (item.close ?? true) setOpen(false)
+            <div className="relative">
+              <MagnifyingGlassIcon
+                className="pointer-events-none absolute left-4 top-3.5 h-5 w-5 text-zinc-500"
+                aria-hidden="true"
+              />
+              <ComboboxInput
+                autoComplete="off"
+                className="h-12 w-full border-0 bg-transparent pl-11 pr-4 text-gray-900 focus:ring-0 sm:text-sm dark:text-white"
+                placeholder="Search..."
+                onChange={(event) => {
+                  return setQuery(event.target.value)
                 }}
-              >
-                <div className="relative">
-                  <MagnifyingGlassIcon
-                    className="pointer-events-none absolute left-4 top-3.5 h-5 w-5 text-zinc-500"
-                    aria-hidden="true"
-                  />
-                  <ComboboxInput
-                    autoComplete="off"
-                    className="h-12 w-full border-0 bg-transparent pl-11 pr-4 text-gray-900 focus:ring-0 sm:text-sm dark:text-white"
-                    placeholder="Search..."
-                    onChange={(event) => {
-                      return setQuery(event.target.value)
-                    }}
-                    autoFocus
-                  />
-                </div>
+                autoFocus
+              />
+            </div>
 
-                <ComboboxOptions className="max-h-[50vh] scroll-py-2 divide-y divide-zinc-500 divide-opacity-20 overflow-y-auto">
-                  <CommandPaletteContext.Provider value={{ query }}>
-                    {children}
-                  </CommandPaletteContext.Provider>
-                </ComboboxOptions>
-              </Combobox>
-            </DialogPanel>
-          </TransitionChild>
-        </div>
-      </Dialog>
-    </Transition>
+            <ComboboxOptions className="max-h-[50vh] scroll-py-2 divide-y divide-zinc-500 divide-opacity-20 overflow-y-auto">
+              <CommandPaletteContext.Provider value={{ query }}>
+                {children}
+              </CommandPaletteContext.Provider>
+            </ComboboxOptions>
+          </Combobox>
+        </DialogPanel>
+      </div>
+    </Dialog>
   )
 }
 
