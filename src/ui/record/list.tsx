@@ -168,7 +168,14 @@ export function RecordList({ records }: { records: Record[] }) {
                                 <MenuItem>
                                   <DownloadLink
                                     href={`/${type}/download?${new URLSearchParams([
-                                      ['ids', records.map((e) => e.id).join(',')],
+                                      [
+                                        'ids',
+                                        records
+                                          .map((e) => {
+                                            return e.id
+                                          })
+                                          .join(','),
+                                      ],
                                       [
                                         'filename',
                                         `${type}s-${titleForQuarter(resolveRelevantRecordDate(records[0]), '-')}`,
