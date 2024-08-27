@@ -167,7 +167,7 @@ export function RecordList({ records }: { records: Record[] }) {
                               <div className="py-1">
                                 <MenuItem>
                                   <DownloadLink
-                                    href={`/${type}/download?${new URLSearchParams([
+                                    href={`${type ?? 'all'}/download?${new URLSearchParams([
                                       [
                                         'ids',
                                         records
@@ -178,7 +178,9 @@ export function RecordList({ records }: { records: Record[] }) {
                                       ],
                                       [
                                         'filename',
-                                        `${type}s-${titleForQuarter(resolveRelevantRecordDate(records[0]), '-')}`,
+                                        type
+                                          ? `${type}s-${titleForQuarter(resolveRelevantRecordDate(records[0]), '-')}`
+                                          : `${titleForQuarter(resolveRelevantRecordDate(records[0]), '-')}`,
                                       ],
                                     ]).toString()}`}
                                     className="group flex w-full items-center px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 dark:text-zinc-400 data-[focus]:dark:bg-zinc-950 data-[focus]:dark:text-gray-200"
