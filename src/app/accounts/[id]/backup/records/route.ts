@@ -105,11 +105,13 @@ async function generatePDFs(urls: [filename: string, url: string][]) {
 
         return [
           filename,
-          await page.pdf({
-            printBackground: true,
-            format: 'A4',
-            preferCSSPageSize: true,
-          }),
+          Buffer.from(
+            await page.pdf({
+              printBackground: true,
+              format: 'A4',
+              preferCSSPageSize: true,
+            }),
+          ),
         ] as const
       }),
     )
