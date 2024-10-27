@@ -6,10 +6,10 @@
     "dev": "next dev --turbo",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint . && prettier --check .",
+    "lint": "prettier --check .",
     "test": "TZ=Europe/Brussels vitest run",
     "tdd": "TZ=Europe/Brussels vitest",
-    "format": "eslint . --fix && prettier --write ."
+    "format": "prettier --write ."
   },
   "prettier": {
     "semi": false,
@@ -67,8 +67,6 @@
     "@types/node": "^22.8.1",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
-    "eslint": "^8.57.1",
-    "eslint-config-next": "^14.2.16",
     "jsdom": "^25.0.1",
     "postcss": "^8.4.47",
     "prettier": "^3.3.3",
