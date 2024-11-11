@@ -138,12 +138,12 @@ export function Group({ title, children }: PropsWithChildren<{ title: string }>)
 
   return (
     <CommandPaletteGroupContext.Provider value={{ register }}>
-      <li className={classNames('p-2', visibleChildren.size === 0 && 'hidden')}>
+      <div className={classNames('p-2', visibleChildren.size === 0 && 'hidden')}>
         <h2 className="mb-2 mt-4 px-3 text-xs font-semibold text-gray-900 dark:text-zinc-200">
           {title}
         </h2>
         <ul className="text-sm text-gray-700 dark:text-zinc-400">{children}</ul>
-      </li>
+      </div>
     </CommandPaletteGroupContext.Provider>
   )
 }
