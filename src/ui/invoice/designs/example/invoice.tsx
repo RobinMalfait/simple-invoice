@@ -1,11 +1,10 @@
-import { BanknotesIcon, CubeIcon, InformationCircleIcon } from '@heroicons/react/24/outline'
-
-import { CreditNote } from '~/domain/credit-note/credit-note'
-import { Discount } from '~/domain/discount/discount'
-import { Invoice as InvoiceType } from '~/domain/invoice/invoice'
+import { BanknotesIcon, CubeIcon } from '@heroicons/react/24/outline'
+import type { CreditNote } from '~/domain/credit-note/credit-note'
+import type { Discount } from '~/domain/discount/discount'
+import type { Invoice as InvoiceType } from '~/domain/invoice/invoice'
 import { summary, type Summary } from '~/domain/invoice/summary'
-import { Quote } from '~/domain/quote/quote'
-import { Receipt } from '~/domain/receipt/receipt'
+import type { Quote } from '~/domain/quote/quote'
+import type { Receipt } from '~/domain/receipt/receipt'
 import { Classified } from '~/ui/classified'
 import { usePaginationInfo } from '~/ui/hooks/use-pagination-info'
 import { useRecord } from '~/ui/hooks/use-record'
@@ -36,24 +35,25 @@ import { Money } from '~/ui/money'
 import { Outlet } from '~/ui/outlet'
 import { match } from '~/utils/match'
 
-export function Invoice() {
+function DefaultLogo() {
+  return <CubeIcon className="h-10 text-gray-500 first-page:h-12 first-page:text-gray-400" />
+}
+
+export function Invoice({ Logo = DefaultLogo }: { Logo?: typeof DefaultLogo }) {
   let record = useRecord()
   let info = useRecordInfo()
 
   return (
-    <InvoiceBlock className="bg-white">
+    <InvoiceBlock className="bg-[--primary] [--primary:white] [--round:theme(spacing.12)] [--secondary:theme(colors.gray.100)]">
       {/* Header */}
       {/* Big heading */}
       <div className="hidden first-page:block">
-        <div className="bg-gray-50 px-12 py-8">
-          <CubeIcon className="h-12 text-gray-400" />
+        <div className="relative bg-[--secondary] px-12 py-8">
+          <Logo />
 
           <div className="mt-4 flex items-end justify-between">
             <span className="space-x-3 text-2xl">
-              <span>
-                <Type className="font-medium text-gray-500" />
-                <span className="text-gray-300">.</span>
-              </span>
+              <Type className="font-medium" />
               <span className="text-lg text-gray-300">/</span>
               <Value of="number" className="text-lg tabular-nums text-gray-500" />
             </span>
@@ -125,7 +125,14 @@ export function Invoice() {
           </div>
         </div>
 
-        <div className="flex justify-between px-12 py-8 text-gray-500">
+        <div className="relative flex justify-between px-12 py-8 text-gray-500">
+          <div className="absolute left-0 top-0 size-[--round] bg-[--secondary]">
+            <div className="h-full rounded-tl-full bg-[--primary]"></div>
+          </div>
+          <div className="absolute right-0 top-0 size-[--round] bg-[--secondary]">
+            <div className="h-full rounded-tr-full bg-[--primary]"></div>
+          </div>
+
           <div className="flex flex-col">
             <Translation className="text-sm font-medium text-gray-900" for="account.title" />
             <div className="flex flex-1 flex-col whitespace-pre-wrap text-sm font-normal">
@@ -165,10 +172,10 @@ export function Invoice() {
       </div>
 
       {/* Small Heading */}
-      <div className="hidden bg-gray-50 px-12 py-8 last-page:block single-page:hidden">
+      <div className="hidden bg-[--secondary] px-12 py-8 last-page:block single-page:hidden">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <CubeIcon className="h-10 text-gray-400" />
+            <Logo />
 
             <span className="space-x-3 text-lg">
               <span>
@@ -191,7 +198,7 @@ export function Invoice() {
             {({ items }) => {
               return (
                 <table className="min-w-full">
-                  <thead className="bg-gray-50">
+                  <thead className="bg-gray-100/80">
                     <tr>
                       <th className="w-full whitespace-nowrap px-4 py-3 text-left text-sm font-medium text-gray-900 first:pl-12">
                         <Translation for="invoiceItem.description" />
@@ -299,32 +306,35 @@ export function Invoice() {
 
       <div className="hidden w-full items-end justify-between px-8 pb-4 pt-1 empty:hidden last-page:flex">
         {/* Notes */}
-        <Notes className="relative w-full max-w-sm space-y-1 rounded-md bg-gray-50 p-4 text-xs">
-          <div className="absolute -right-3 -top-3 rounded-full bg-gray-50 p-1">
-            <InformationCircleIcon className="h-6 w-6 text-gray-400" />
-          </div>
+        <Notes className="relative z-10 space-y-1 rounded-full bg-[--secondary] p-4 font-hand text-xl">
           <Outlet />
         </Notes>
       </div>
 
       {/* Footer */}
       {/* Small footer */}
-      <div className="hidden items-center justify-between bg-gray-50 px-12 py-3 text-sm text-gray-600 first-page:flex single-page:hidden">
+      <div className="hidden items-center justify-between bg-[--secondary] px-12 py-3 text-sm text-gray-600 first-page:flex single-page:hidden">
         <Value of="account.name" />
         <Pagination />
       </div>
 
       {/* Big footer */}
-      <div className="group hidden last-page:block">
-        <div className="relative space-y-6 bg-gray-50 px-12 py-8 text-gray-900">
+      <div className="group relative hidden last-page:block">
+        <div className="absolute right-0 top-0 z-10 size-[--round] bg-[--primary]">
+          <div className="h-full rounded-tr-full bg-[--secondary]"></div>
+        </div>
+        <div className="absolute left-0 top-0 z-10 size-[--round] bg-[--primary]">
+          <div className="h-full rounded-tl-full bg-[--secondary]"></div>
+        </div>
+        <div className="relative space-y-6 bg-[--secondary] px-12 py-8 text-gray-900">
           <div className="grid grid-cols-[1fr,auto] gap-8">
             <div className="text-xl font-medium">
               <Translation for="summary.total" />
             </div>
             <div className="text-xl font-medium">
-              <Total className="-my-2 rounded-full bg-black px-4 py-2 text-center text-white" />
+              <Total className="relative z-10 -mx-4 -my-2 rounded-full bg-black px-4 py-2 text-center text-white" />
             </div>
-            <div className="col-span-2 flex items-start gap-8 group-has-[[data-qr-code]]:col-span-1">
+            <div className="col-span-2 flex items-start gap-8 empty:hidden group-has-[[data-qr-code]]:col-span-1">
               {record.account.contactFields.length > 0 && (
                 <table className="text-sm">
                   <thead>
@@ -344,7 +354,7 @@ export function Invoice() {
                               className="h-4 w-4 text-gray-500 grayscale"
                             />
                           </td>
-                          <td className="px-3">
+                          <td className="px-2">
                             <Classified>{field.value}</Classified>
                           </td>
                         </tr>
@@ -377,7 +387,7 @@ export function Invoice() {
                               },
                             })}
                           </td>
-                          <td className="px-3">
+                          <td className="px-2">
                             <Classified>{paymentMethod.value}</Classified>
                           </td>
                         </tr>
@@ -387,7 +397,7 @@ export function Invoice() {
                 </table>
               )}
             </div>
-            <div>
+            <div className="empty:hidden">
               {/* QR Code */}
               <QRCode
                 data-qr-code
@@ -396,13 +406,14 @@ export function Invoice() {
                 <span className="absolute inset-x-0 top-0 flex -translate-y-2 items-center justify-center">
                   <Translation
                     for="qr.label"
-                    className="whitespace-nowrap bg-gray-50 px-1 text-xs text-gray-600"
+                    className="whitespace-nowrap bg-[--secondary] px-1 text-xs text-gray-600"
                   />
                 </span>
                 <Outlet />
               </QRCode>
             </div>
           </div>
+          <hr className="border-gray-200" />
           <Legal className="w-full text-center text-xs" />
         </div>
       </div>
@@ -414,7 +425,7 @@ export function Attachment() {
   return (
     <AttachmentBlock className="bg-white">
       {/* Header */}
-      <div className="flex items-center justify-between bg-gray-50 px-12 py-3 text-sm text-gray-600">
+      <div className="flex items-center justify-between bg-[--secondary] px-12 py-3 text-sm text-gray-600">
         <Value of="attachment.name" />
         <Pagination />
       </div>
@@ -425,7 +436,7 @@ export function Attachment() {
       </div>
 
       {/* Footer */}
-      <div className="flex items-center justify-between bg-gray-50 px-12 py-3 text-sm text-gray-600">
+      <div className="flex items-center justify-between bg-[--secondary] px-12 py-3 text-sm text-gray-600">
         <Value of="account.name" />
         <Pagination />
       </div>
@@ -566,7 +577,7 @@ function Summary() {
       <tr>
         <td></td>
         <td colSpan={4} className="pb-3 pl-4 pr-12">
-          <div className="h-1 w-full rounded-full bg-gray-50 group-first-of-type:hidden"></div>
+          <div className="h-1 w-full rounded-full bg-[--secondary] group-first-of-type:hidden"></div>
         </td>
       </tr>
       {summaryInfo.map((summaryItem, idx) => {
