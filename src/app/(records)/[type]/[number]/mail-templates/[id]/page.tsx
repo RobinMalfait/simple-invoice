@@ -9,12 +9,13 @@ import { RecipientCheckbox } from './recipient-checkbox'
 
 export default async function Page({
   params,
-  searchParams: { recipients = '' },
+  searchParams,
 }: {
-  params: { type: string; number: string; id: string }
-  searchParams: { recipients?: string }
+  params: Promise<{ type: string; number: string; id: string }>
+  searchParams: Promise<{ recipients?: string }>
 }) {
-  let { type, number, id } = params
+  let { recipients = '' } = await searchParams
+  let { type, number, id } = await params
   let record = records.find((record) => {
     return record.type === type && record.number === number
   })

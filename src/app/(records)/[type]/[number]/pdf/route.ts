@@ -7,8 +7,9 @@ import { render } from '~/utils/tl'
 
 export async function GET(
   request: Request,
-  { params }: { params: { type: string; number: string } },
+  { params: paramsPromise }: { params: Promise<{ type: string; number: string }> },
 ) {
+  let params = await paramsPromise
   let query = new URL(request.url).searchParams
   let record = records.find((record) => {
     return record.type === params.type && record.number === params.number

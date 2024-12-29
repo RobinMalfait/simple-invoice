@@ -3,7 +3,8 @@ import { combineRecords } from '~/domain/record/record'
 import { I18NProvider } from '~/ui/hooks/use-i18n'
 import { RecordList } from '~/ui/record/list'
 
-export default async function Home({ params: { type } }: { params: { type: string } }) {
+export default async function Home({ params }: { params: Promise<{ type: string }> }) {
+  let { type } = await params
   let filteredRecords = combineRecords(
     records.filter((e) => {
       return e.type === type

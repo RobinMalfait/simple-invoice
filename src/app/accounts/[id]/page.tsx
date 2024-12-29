@@ -17,8 +17,8 @@ import { match } from '~/utils/match'
 import { render } from '~/utils/tl'
 import { AccountActivityFeed } from './activity-feed'
 
-export default async function Page({ params: { id } }: { params: { id: string } }) {
-  let base = headers().get('host')
+export default async function Page() {
+  let base = (await headers()).get('host')
   let account = me
 
   return (

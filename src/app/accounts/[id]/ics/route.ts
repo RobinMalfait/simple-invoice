@@ -11,8 +11,9 @@ import { total } from '~/ui/invoice/total'
 import { createCurrencyFormatter } from '~/utils/currency-formatter'
 import { match } from '~/utils/match'
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
-  if (params.id !== me.id) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  let { id } = await params
+  if (id !== me.id) {
     return new Response('Not found.', { status: 404 })
   }
 

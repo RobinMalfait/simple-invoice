@@ -10,7 +10,8 @@ import { TimezoneDifference } from '~/ui/timezone-difference'
 import { TransactionsTable } from '~/ui/transaction/table'
 import { SupplierActivityFeed } from './activity-feed'
 
-export default async function Page({ params: { id } }: { params: { id: string } }) {
+export default async function Page({ params }: { params: Promise<{ id: string }> }) {
+  let { id } = await params
   let supplier = suppliers.find((s) => {
     return s.id === id
   })

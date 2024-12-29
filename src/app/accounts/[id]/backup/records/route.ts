@@ -37,7 +37,7 @@ class BufferStream extends Writable {
   }
 }
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: Request) {
   // TODO: Filter records by account
   let myRecords = records
 

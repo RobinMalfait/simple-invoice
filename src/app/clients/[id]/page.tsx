@@ -49,7 +49,8 @@ function tab<T extends Record>(tab: RecordTab<T>): RecordTab<T> {
   return tab
 }
 
-export default async function Page({ params: { id } }: { params: { id: string } }) {
+export default async function Page({ params }: { params: Promise<{ id: string }> }) {
+  let { id } = await params
   let combined = combineRecords(records)
   let client = combined.find((record) => {
     return record.client.id === id

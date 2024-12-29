@@ -22,10 +22,11 @@ import { Actions } from './components'
 import { History, HistoryActions } from './history'
 
 export default async function Invoice({
-  params: { type, number },
+  params,
 }: {
-  params: { type: string; number: string }
+  params: Promise<{ type: string; number: string }>
 }) {
+  let { type, number } = await params
   let record = records.find((record) => {
     return record.type === type && record.number === number
   })
