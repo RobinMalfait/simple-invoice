@@ -1,4 +1,8 @@
 /** @type {import('next').NextConfig} */
-let nextConfig = {}
+let nextConfig = {
+  experimental: {
+    reactCompiler: true,
+  },
+}
 
 module.exports = nextConfig
