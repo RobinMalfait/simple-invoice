@@ -110,7 +110,40 @@ export function RecordList({ records }: { records: Record[] }) {
 
                 <div className="relative flex justify-between rounded-md bg-white/60 px-[18px] py-3 text-gray-500 ring-1 ring-black/5 backdrop-blur dark:bg-zinc-900/95 dark:text-gray-400">
                   <span>{year}</span>
-                  <TotalsByStatus records={Array.from(records.values()).flat(1)} />
+                  <div className="flex gap-2">
+                    <TotalsByStatus records={Array.from(records.values()).flat(1)} />
+                    {Array.from(records.values())
+                      .flat(1)
+                      .some((record) => {
+                        return /^be/i.test(record.account.tax?.value ?? '')
+                      }) && (
+                      <Menu as="div" className="inline-flex items-center text-left">
+                        <MenuButton
+                          aria-label="Open actions"
+                          className="inline-flex w-full select-none justify-center gap-x-1.5 rounded-md bg-white p-1 text-sm font-semibold text-gray-900 hover:bg-gray-50 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-950"
+                        >
+                          <EllipsisVerticalIcon aria-hidden="true" className="h-5 w-5" />
+                        </MenuButton>
+
+                        <MenuItems
+                          transition
+                          anchor="bottom end"
+                          className="z-10 w-56 divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 transition [--anchor-gap:theme(spacing.1)] [--anchor-offset:theme(spacing.1)] focus:outline-none data-[closed]:scale-95 data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in dark:bg-zinc-900 dark:ring-white/10"
+                        >
+                          <div className="py-1">
+                            <MenuItem>
+                              <DownloadLink
+                                href={`/clients/listing/${year}/download`}
+                                className="group flex w-full items-center px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 dark:text-zinc-400 data-[focus]:dark:bg-zinc-950 data-[focus]:dark:text-gray-200"
+                              >
+                                Download client listing
+                              </DownloadLink>
+                            </MenuItem>
+                          </div>
+                        </MenuItems>
+                      </Menu>
+                    )}
+                  </div>
                 </div>
               </DisclosureButton>
 
