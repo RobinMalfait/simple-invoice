@@ -339,30 +339,13 @@ export default function Layout({
                     }),
                   )}
                 >
-                  <main className="flex flex-1 flex-col overflow-hidden">
-                    <div className="relative z-10 hidden h-4 w-full shrink-0 bg-zinc-900 lg:flex">
-                      <svg
-                        className="absolute left-0 top-full h-4 w-4 -translate-x-0.5 -translate-y-0.5 text-zinc-900"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 16 16"
-                      >
-                        <defs>
-                          <mask id="circle-cutout">
-                            <rect width="16" height="16" fill="white" />
-                            <circle cx="16" cy="16" r="14" fill="black" />
-                          </mask>
-                        </defs>
-
-                        <rect
-                          width="16"
-                          height="16"
-                          fill="currentColor"
-                          mask="url(#circle-cutout)"
-                        />
-                      </svg>
-                    </div>
-                    <div className="relative isolate z-0 flex-1 overflow-auto">{children}</div>
-                  </main>
+                  <div className="flex flex-1 flex-col overflow-hidden lg:pl-4 lg:pt-4">
+                    <main className="flex flex-1 overflow-hidden bg-zinc-900 shadow-md ring-1 ring-zinc-950/5 lg:rounded-tl-xl dark:ring-white/10">
+                      <div className="relative isolate z-0 flex-1 overflow-y-auto bg-gray-100 dark:bg-zinc-800">
+                        {children}
+                      </div>
+                    </main>
+                  </div>
                 </div>
               </div>
 
