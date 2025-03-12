@@ -8,7 +8,7 @@
   }
 
   body {
-    @apply flex h-full flex-col bg-gray-100 font-sans text-gray-900 antialiased dark:bg-zinc-800;
+    @apply flex h-full flex-col bg-zinc-900 font-sans text-gray-900 antialiased;
   }
 
   @page {
