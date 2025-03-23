@@ -85,7 +85,10 @@ function clientListingData(year: number) {
 
       // We are only interested in clients with at least 250 EUR in total
       // excluding VAT.
-      .filter(([, { total }]) => total > 250),
+      .filter(([, { total }]) => total > 250)
+
+      // Sort by total excluding VAT
+      .sort(([, a], [, z]) => z.total - a.total),
   }
 }
 
