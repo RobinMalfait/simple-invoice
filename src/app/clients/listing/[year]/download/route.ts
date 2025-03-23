@@ -123,8 +123,8 @@ export async function GET(_request: Request, { params }: { params: Promise<{ yea
   let row = 29 // Start at row 29
   for (let [client, { total, vat }] of data.clients) {
     worksheet.getCell(`C${row}`).value = client
-    worksheet.getCell(`D${row}`).value = total
-    worksheet.getCell(`E${row}`).value = vat
+    worksheet.getCell(`D${row}`).value = Number(total.toFixed(2)) // Max 2 decimals
+    worksheet.getCell(`E${row}`).value = Number(vat.toFixed(2)) // Max 2 decimals
 
     row++
   }
