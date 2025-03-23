@@ -114,6 +114,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ yea
   worksheet.getCell('E10').value = data.me.city
   worksheet.getCell('E11').value = data.me.email
   worksheet.getCell('E12').value = data.me.phone
+  worksheet.getCell('E15').value = data.year
 
   // Client data
   let row = 29 // Start at row 29
