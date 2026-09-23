@@ -302,12 +302,12 @@ export class InvoiceBuilder {
     return this
   }
 
-  public items(items: InvoiceItem[]): InvoiceBuilder {
+  public items(items: InvoiceItem[] | ((items: InvoiceItem[]) => InvoiceItem[])): InvoiceBuilder {
     if (this._status !== InvoiceStatus.Draft) {
       throw new Error('Cannot edit an invoice that is not in draft status')
     }
 
-    this._items = items.slice()
+    this._items = Array.isArray(items) ? items.slice() : items(this._items.slice()).slice()
 
     if (
       this._discounts.length > 0 &&

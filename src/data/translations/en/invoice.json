@@ -30,7 +30,7 @@
     "taxId": {
       "vat": "VAT number:",
       "bn": "Business number:",
-      "ein": "EIN:"
+      "ein": "Tax ID number:"
     }
   },
   "client": {
@@ -38,7 +38,7 @@
     "taxId": {
       "vat": "VAT number:",
       "bn": "Business number:",
-      "ein": "EIN:"
+      "ein": "Tax ID number:"
     }
   },
   "invoiceItem": {
